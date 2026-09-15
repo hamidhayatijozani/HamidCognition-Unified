@@ -53,12 +53,11 @@ def deterministic_decision(req: PermissionRequest) -> tuple[str, str, list[str]]
     return "ALLOW", "LOW", ["no_blocking_policy_matched"]
 
 
-def build_decision(req: PermissionRequest) -> DecisionObject:
+def build_decision(req: PermissionRequest, request_digest: str) -> DecisionObject:
     decision, risk, constraints = deterministic_decision(req)
     issued = utc_now()
     expires = issued + timedelta(seconds=DECISION_TTL_SECONDS)
     nonce = uuid.uuid4().hex
-    request_digest = sha256_digest(request_payload(req))
     unsigned = {
         "contract_version": CONTRACT_VERSION, "decision_id": f"dec_{uuid.uuid4().hex}", "request_id": req.request_id,
         "tenant_id": req.tenant_id, "decision": decision, "risk_level": risk, "request_digest": request_digest,
@@ -76,27 +75,28 @@ def build_decision(req: PermissionRequest) -> DecisionObject:
     return DecisionObject(**unsigned, decision_digest=decision_digest, signature=signature)
 
 
-def verify_request_signature(req: PermissionRequest, signature: str | None) -> None:
+def verify_request_signature(payload: dict[str, Any], signature: str | None) -> None:
     secret = signing_secret()
     if not secret:
         raise HTTPException(503, "csg_signing_secret_not_configured")
-    if not signature or not verify_hmac(request_payload(req), signature, secret):
+    if not signature or not verify_hmac(payload, signature, secret):
         raise HTTPException(401, "request_signature_invalid")
 
 
-def decide(req: PermissionRequest, authorization: str | None, idempotency_key: str | None, request_signature: str | None, correlation_id: str | None) -> tuple[DecisionObject, str]:
+def decide(req: PermissionRequest, authorization: str | None, idempotency_key: str | None, request_signature: str | None, correlation_id: str | None, raw_payload: dict[str, Any] | None = None) -> tuple[DecisionObject, str]:
     authenticate(authorization)
     if not idempotency_key or len(idempotency_key) > 128:
         raise HTTPException(400, "idempotency_key_required")
     validate_timestamp(req.timestamp)
-    verify_request_signature(req, request_signature)
-    request_digest = sha256_digest(request_payload(req))
+    payload = raw_payload if raw_payload is not None else request_payload(req)
+    verify_request_signature(payload, request_signature)
+    request_digest = sha256_digest(payload)
     existing = load_idempotency(req.tenant_id, idempotency_key)
     if existing:
         old_digest, old_response = existing
         if old_digest != request_digest:
             raise HTTPException(409, "idempotency_key_reused_for_different_request")
         return DecisionObject.model_validate_json(old_response), correlation_id or f"corr_{uuid.uuid4().hex}"
-    decision = build_decision(req)
+    decision = build_decision(req, request_digest)
     save_idempotency(req.tenant_id, idempotency_key, request_digest, decision.model_dump_json(), utc_now().isoformat())
     return decision, correlation_id or f"corr_{uuid.uuid4().hex}"
