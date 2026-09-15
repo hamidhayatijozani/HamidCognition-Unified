@@ -5,15 +5,16 @@ import json
 import os
 import sqlite3
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
-APP_VERSION = "0.2.0-mvp"
+APP_VERSION = "0.3.0-mvp"
 DB_PATH = os.getenv("ACTION_GATE_DB", "action_gate.db")
 API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
+APPROVAL_TTL_SECONDS = int(os.getenv("ACTION_GATE_APPROVAL_TTL_SECONDS", "300"))
 POLICY_SNAPSHOT = {
     "policy_version": "builtin-v1",
     "high_risk": ["delete_file", "delete_customer", "delete_database", "transfer_funds", "transfer_money"],
@@ -63,6 +64,13 @@ class Approval(BaseModel):
     approver_id: str
     approved: bool
     reason: str | None = None
+    action_hash: str
+    ttl_seconds: int | None = None
+
+
+class ExecutionOutcome(BaseModel):
+    action_hash: str
+    outcome: dict[str, Any] = Field(default_factory=dict)
 
 
 def policy_sets(snapshot: dict[str, Any]):
@@ -113,6 +121,10 @@ def load(decision_id: str):
     return json.loads(row[0])
 
 
+def parse_time(value: str) -> datetime:
+    return datetime.fromisoformat(value)
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "product": "HamidCognition Action Gate", "version": APP_VERSION, "policy_hash": POLICY_HASH}
@@ -124,7 +136,7 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
     request_id = req.request_id or f"req_{uuid.uuid4().hex}"
     decision_id = f"dec_{uuid.uuid4().hex}"; trace_id = f"trace_{uuid.uuid4().hex}"
     risk, risk_reasons = evaluate_risk(req); decision, policy_checks = decide(req, risk); normalized = normalized_action(req)
-    record = {"schema_version": "action-gate-evidence-1.1", "product_version": APP_VERSION, "decision_id": decision_id, "trace_id": trace_id, "request_id": request_id, "request": req.model_dump(), "identity": {"agent_id": req.agent_id}, "normalized_action": normalized, "action_hash": digest(normalized), "policy_version": POLICY_SNAPSHOT["policy_version"], "policy_snapshot": POLICY_SNAPSHOT, "policy_hash": POLICY_HASH, "risk_assessment": {"level": risk, "reasons": risk_reasons, "agent_risk_hint": req.risk_hint}, "evidence": req.evidence, "decision": decision, "policy_checks": policy_checks, "approval": None, "execution": None, "outcome": None, "timestamp": now()}
+    record = {"schema_version": "action-gate-evidence-1.2", "product_version": APP_VERSION, "decision_id": decision_id, "trace_id": trace_id, "request_id": request_id, "request": req.model_dump(), "identity": {"agent_id": req.agent_id}, "normalized_action": normalized, "action_hash": digest(normalized), "policy_version": POLICY_SNAPSHOT["policy_version"], "policy_snapshot": POLICY_SNAPSHOT, "policy_hash": POLICY_HASH, "risk_assessment": {"level": risk, "reasons": risk_reasons, "agent_risk_hint": req.risk_hint}, "evidence": req.evidence, "decision": decision, "policy_checks": policy_checks, "approval": None, "execution": None, "outcome": None, "timestamp": now()}
     record["evidence_hash"] = digest(record); save(record)
     return {k: record[k] for k in ("decision", "decision_id", "request_id", "risk_assessment", "policy_checks", "evidence", "trace_id", "timestamp", "evidence_hash", "action_hash", "policy_version", "policy_hash")} | {"reason": policy_checks[0]["reason"]}
 
@@ -133,15 +145,25 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
 def approve(decision_id: str, approval: Approval, authorization: str | None = Header(default=None)):
     require_auth(authorization); record = load(decision_id)
     if record["decision"] != "ASK": raise HTTPException(409, "decision_is_not_awaiting_approval")
-    record["approval"] = {**approval.model_dump(), "timestamp": now(), "action_hash": record["action_hash"]}
+    if approval.action_hash != record["action_hash"]:
+        raise HTTPException(409, "approval_action_binding_mismatch")
+    ttl = approval.ttl_seconds if approval.ttl_seconds is not None else APPROVAL_TTL_SECONDS
+    if ttl <= 0 or ttl > 86400:
+        raise HTTPException(422, "invalid_approval_ttl")
+    expires_at = (datetime.now(timezone.utc) + timedelta(seconds=ttl)).isoformat()
+    record["approval"] = {**approval.model_dump(), "timestamp": now(), "expires_at": expires_at}
     record["decision"] = "ALLOW" if approval.approved else "DENY"; record["evidence_hash"] = digest(record); save(record); return record
 
 
 @app.post("/v1/action/{decision_id}/execution")
-def execution(decision_id: str, outcome: dict[str, Any], authorization: str | None = Header(default=None)):
+def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | None = Header(default=None)):
     require_auth(authorization); record = load(decision_id)
     if record["decision"] not in {"ALLOW", "SANDBOX"}: raise HTTPException(403, "execution_not_permitted_by_gate")
-    record["execution"] = {"timestamp": now(), "status": "EXECUTED", "action_hash": record["action_hash"]}; record["outcome"] = outcome; record["evidence_hash"] = digest(record); save(record); return record
+    if outcome.action_hash != record["action_hash"]: raise HTTPException(409, "execution_action_binding_mismatch")
+    if record["approval"] and record["approval"].get("approved"):
+        if parse_time(record["approval"]["expires_at"]) <= datetime.now(timezone.utc):
+            raise HTTPException(403, "approval_expired")
+    record["execution"] = {"timestamp": now(), "status": "EXECUTED", "action_hash": record["action_hash"]}; record["outcome"] = outcome.outcome; record["evidence_hash"] = digest(record); save(record); return record
 
 
 @app.get("/v1/replay/{decision_id}")
