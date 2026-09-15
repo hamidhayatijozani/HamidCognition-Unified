@@ -23,4 +23,5 @@ jobs:
           python-version: '3.12'
       - run: pip install -r requirements.txt
       - run: pytest -q
-      - run: python demo.py
+      - run: nohup uvicorn app:app --host 127.0.0.1 --port 8000 >/tmp/action-gate.log 2>&1 &
+      - run: sleep 2 && python demo.py
