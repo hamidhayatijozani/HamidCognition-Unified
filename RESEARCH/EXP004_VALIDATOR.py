@@ -1,8 +1,9 @@
 """Independent semantic validator for EXP-004 result artifacts.
 
-The validator derives the expected interpretation from the evidence fields instead
-of trusting the artifact's interpretation/promotion labels. This is deliberately
-small and deterministic so it can itself be subjected to adversarial mutation tests.
+The validator derives interpretation from evidence fields instead of trusting
+interpretation/promotion labels. It also cross-checks each primary delta against
+model accuracy minus baseline accuracy. The module is intentionally deterministic
+so it can itself be attacked by mutation tests.
 """
 
 from __future__ import annotations
@@ -21,7 +22,6 @@ def _require(condition: bool, message: str, errors: List[str]) -> None:
 
 def validate_exp004(payload: Dict[str, Any]) -> tuple[bool, List[str]]:
     errors: List[str] = []
-
     _require(isinstance(payload, dict), "artifact_not_object", errors)
     if errors:
         return False, errors
@@ -70,17 +70,31 @@ def validate_exp004(payload: Dict[str, Any]) -> tuple[bool, List[str]]:
                 snapshot_integrity_ok = False
                 continue
 
+            model_accuracy = primary.get("model_accuracy")
+            baseline_accuracy = primary.get("majority_baseline_accuracy")
             delta = primary.get("accuracy_delta_vs_majority")
             cost = primary.get("cost_aware_return")
-            chronological = primary.get("integrity", {}).get("chronological") is True
-            future_free = primary.get("integrity", {}).get("future_features_used") is False
-            untuned = primary.get("integrity", {}).get("test_tuning") is False
+            metric_integrity = primary.get("integrity")
+            _require(isinstance(model_accuracy, (int, float)) and 0 <= model_accuracy <= 1, f"{name}_model_accuracy_invalid", errors)
+            _require(isinstance(baseline_accuracy, (int, float)) and 0 <= baseline_accuracy <= 1, f"{name}_baseline_accuracy_invalid", errors)
             _require(isinstance(delta, (int, float)), f"{name}_delta_invalid", errors)
             _require(isinstance(cost, (int, float)), f"{name}_cost_invalid", errors)
-            _require(chronological, f"{name}_metric_not_chronological", errors)
-            _require(future_free, f"{name}_metric_future_features", errors)
-            _require(untuned, f"{name}_metric_test_tuning", errors)
-            if isinstance(delta, (int, float)) and isinstance(cost, (int, float)):
+            _require(isinstance(metric_integrity, dict), f"{name}_metric_integrity_missing", errors)
+            if isinstance(metric_integrity, dict):
+                chronological = metric_integrity.get("chronological") is True
+                future_free = metric_integrity.get("future_features_used") is False
+                untuned = metric_integrity.get("test_tuning") is False
+                _require(chronological, f"{name}_metric_not_chronological", errors)
+                _require(future_free, f"{name}_metric_future_features", errors)
+                _require(untuned, f"{name}_metric_test_tuning", errors)
+                if not (chronological and future_free and untuned):
+                    snapshot_integrity_ok = False
+            else:
+                snapshot_integrity_ok = False
+
+            if all(isinstance(x, (int, float)) for x in (model_accuracy, baseline_accuracy, delta, cost)):
+                derived_delta = float(model_accuracy) - float(baseline_accuracy)
+                _require(abs(float(delta) - derived_delta) < 1e-12, f"{name}_delta_not_derived_from_accuracy", errors)
                 primary_deltas.append(float(delta))
                 primary_costs.append(float(cost))
 
@@ -88,17 +102,9 @@ def validate_exp004(payload: Dict[str, Any]) -> tuple[bool, List[str]]:
     _require(len(primary_costs) == 2, "primary_cost_count_invalid", errors)
 
     if len(primary_deltas) == 2 and len(primary_costs) == 2:
-        derived_survival = (
-            snapshot_integrity_ok
-            and all(d > 0 for d in primary_deltas)
-            and all(c > 0 for c in primary_costs)
-        )
+        derived_survival = snapshot_integrity_ok and all(d > 0 for d in primary_deltas) and all(c > 0 for c in primary_costs)
         expected_interpretation = "SURVIVES_PRELIMINARY" if derived_survival else "FAILS_PRIMARY_GATE"
-        expected_promotion = (
-            "BLOCKED_PENDING_INDEPENDENT_REPRODUCTION"
-            if derived_survival
-            else "CLAIM_FALSIFIED_UNDER_PREREGISTERED_GATE"
-        )
+        expected_promotion = "BLOCKED_PENDING_INDEPENDENT_REPRODUCTION" if derived_survival else "CLAIM_FALSIFIED_UNDER_PREREGISTERED_GATE"
         _require(payload.get("interpretation") == expected_interpretation, "interpretation_not_derived_from_evidence", errors)
         _require(payload.get("promotion") == expected_promotion, "promotion_not_derived_from_evidence", errors)
 
@@ -107,10 +113,8 @@ def validate_exp004(payload: Dict[str, Any]) -> tuple[bool, List[str]]:
         if isinstance(summary, dict):
             declared = summary.get("snapshot_deltas_vs_majority")
             _require(isinstance(declared, list) and len(declared) == 2, "declared_delta_vector_invalid", errors)
-            if isinstance(declared, list) and len(declared) == 2:
-                _require(all(isinstance(x, (int, float)) for x in declared), "declared_delta_type_invalid", errors)
-                if all(isinstance(x, (int, float)) for x in declared):
-                    _require(all(abs(float(a) - float(b)) < 1e-12 for a, b in zip(declared, primary_deltas)), "declared_delta_vector_mismatch", errors)
+            if isinstance(declared, list) and len(declared) == 2 and all(isinstance(x, (int, float)) for x in declared):
+                _require(all(abs(float(a) - float(b)) < 1e-12 for a, b in zip(declared, primary_deltas)), "declared_delta_vector_mismatch", errors)
             _require(summary.get("all_snapshots_positive") is derived_survival, "all_snapshots_positive_inconsistent", errors)
 
     return len(errors) == 0, errors
@@ -120,3 +124,12 @@ def assert_valid(payload: Dict[str, Any]) -> None:
     valid, errors = validate_exp004(payload)
     if not valid:
         raise ValidationError("; ".join(errors))
+
+
+if __name__ == "__main__":
+    import json
+    from pathlib import Path
+    artifact = json.loads((Path(__file__).resolve().parent / "EXP004RESULT.json").read_text(encoding="utf-8"))
+    ok, errors = validate_exp004(artifact)
+    print(json.dumps({"valid": ok, "errors": errors}, indent=2))
+    raise SystemExit(0 if ok else 1)
