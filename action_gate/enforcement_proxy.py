@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -9,10 +10,10 @@ GATE_URL = os.getenv("GATE_URL", "http://127.0.0.1:8000")
 TOOL_URL = os.getenv("TOOL_URL", "http://127.0.0.1:9000")
 
 
-def gate(payload):
-    req = urllib.request.Request(GATE_URL + "/v1/action/evaluate", data=json.dumps(payload).encode(), headers={"Content-Type": "application/json"})
+def post_json(url, payload, headers=None):
+    req = urllib.request.Request(url, data=json.dumps(payload).encode(), headers={"Content-Type": "application/json", **(headers or {})})
     with urllib.request.urlopen(req) as r:
-        return json.loads(r.read())
+        return r.status, json.loads(r.read())
 
 
 class HTTPHandler(BaseHTTPRequestHandler):
@@ -20,20 +21,22 @@ class HTTPHandler(BaseHTTPRequestHandler):
         size = int(self.headers.get("Content-Length", "0"))
         body = self.rfile.read(size)
         payload = json.loads(body or b"{}")
+        action = self.headers.get("X-Action", "http_post")
+        target = self.headers.get("X-Action-Target", self.path)
         decision_id = self.headers.get("X-HCJ-Decision-ID")
         if decision_id:
-            target = TOOL_URL + self.path
-            req = urllib.request.Request(target, data=body, headers={"Content-Type": self.headers.get("Content-Type", "application/json")})
-            with urllib.request.urlopen(req) as r:
-                out = r.read()
-                self.send_response(r.status)
-                self.end_headers()
-                self.wfile.write(out)
+            try:
+                status, out = post_json(TOOL_URL + self.path, payload)
+            except urllib.error.HTTPError as e:
+                status, out = e.code, {"error": e.read().decode(errors="replace")}
+            self.send_response(status)
+            self.end_headers()
+            self.wfile.write(json.dumps(out).encode())
             return
-        result = gate({"agent_id": self.headers.get("X-Agent-ID", "unknown"), "action": "http_post", "target": self.path, "parameters": payload})
+        result = post_json(GATE_URL + "/v1/action/evaluate", {"agent_id": self.headers.get("X-Agent-ID", "unknown"), "action": action, "target": target, "parameters": payload})[1]
         self.send_response(200)
         self.end_headers()
-        self.wfile.write(json.dumps(result).encode())
+        self.wfile.write(json.dumps({"enforced": result["decision"] in {"ALLOW", "SANDBOX"}, "decision": result}).encode())
 
 
 class MCPHandler(BaseHTTPRequestHandler):
@@ -47,18 +50,17 @@ class MCPHandler(BaseHTTPRequestHandler):
             return
         params = message.get("params", {})
         tool = params.get("name", "unknown")
-        result = gate({"agent_id": self.headers.get("X-Agent-ID", "unknown"), "action": tool, "target": params.get("arguments", {}).get("target"), "parameters": params.get("arguments", {})})
+        args = params.get("arguments", {})
+        result = post_json(GATE_URL + "/v1/action/evaluate", {"agent_id": self.headers.get("X-Agent-ID", "unknown"), "action": tool, "target": args.get("target"), "parameters": args})[1]
         if result["decision"] not in {"ALLOW", "SANDBOX"}:
             self.send_response(200)
             self.end_headers()
             self.wfile.write(json.dumps({"jsonrpc": "2.0", "id": message.get("id"), "result": {"blocked_by_action_gate": True, "decision": result}}).encode())
             return
-        req = urllib.request.Request(TOOL_URL, data=json.dumps(message).encode(), headers={"Content-Type": "application/json"})
-        with urllib.request.urlopen(req) as r:
-            out = r.read()
-        self.send_response(200)
+        status, out = post_json(TOOL_URL, message)
+        self.send_response(status)
         self.end_headers()
-        self.wfile.write(out)
+        self.wfile.write(json.dumps(out).encode() if isinstance(out, dict) else out)
 
 
 if __name__ == "__main__":
