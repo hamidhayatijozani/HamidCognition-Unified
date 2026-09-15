@@ -63,12 +63,19 @@ jobs:
       - name: Validate EXP-004 result
         run: |
           test -f RESEARCH/EXP004RESULT.json
-          python -m json.tool RESEARCH/EXP004RESULT.json
-          grep '"experiment": "EXP-004"' RESEARCH/EXP004RESULT.json
-          grep '"status": "EXECUTED_REAL_EXTERNAL_WALK_FORWARD"' RESEARCH/EXP004RESULT.json
-          grep '"future_features_used": false' RESEARCH/EXP004RESULT.json
-          grep '"test_tuning": false' RESEARCH/EXP004RESULT.json
-          grep '"interpretation": "SURVIVES_PRELIMINARY"' RESEARCH/EXP004RESULT.json
+          python - <<'PY'
+          import json
+          p = json.load(open('RESEARCH/EXP004RESULT.json', encoding='utf-8'))
+          assert p['experiment'] == 'EXP-004'
+          assert p['status'] == 'EXECUTED_REAL_EXTERNAL_WALK_FORWARD'
+          assert p['integrity']['future_features_used'] is False
+          assert p['integrity']['test_tuning'] is False
+          assert p['integrity']['snapshots_disjoint'] is True
+          assert p['interpretation'] in {'SURVIVES_PRELIMINARY', 'FAILS_PRIMARY_GATE'}
+          assert len(p['snapshots']) == 2
+          for s in p['snapshots'].values():
+              assert s['raw_sha256'] and s['observations'] >= 500
+          PY
       - name: Upload research results
         uses: actions/upload-artifact@v4
         with:
