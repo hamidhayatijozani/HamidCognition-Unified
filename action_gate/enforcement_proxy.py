@@ -16,6 +16,19 @@ def post_json(url, payload, headers=None):
         return r.status, json.loads(r.read())
 
 
+def get_json(url):
+    with urllib.request.urlopen(url) as r:
+        return r.status, json.loads(r.read())
+
+
+def permitted(decision_id: str) -> bool:
+    try:
+        _, record = get_json(GATE_URL + "/v1/evidence/" + decision_id)
+        return record.get("decision") in {"ALLOW", "SANDBOX"}
+    except Exception:
+        return False
+
+
 class HTTPHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         size = int(self.headers.get("Content-Length", "0"))
@@ -25,6 +38,11 @@ class HTTPHandler(BaseHTTPRequestHandler):
         target = self.headers.get("X-Action-Target", self.path)
         decision_id = self.headers.get("X-HCJ-Decision-ID")
         if decision_id:
+            if not permitted(decision_id):
+                self.send_response(403)
+                self.end_headers()
+                self.wfile.write(b'{"error":"action_gate_denied"}')
+                return
             try:
                 status, out = post_json(TOOL_URL + self.path, payload)
             except urllib.error.HTTPError as e:
@@ -60,7 +78,7 @@ class MCPHandler(BaseHTTPRequestHandler):
         status, out = post_json(TOOL_URL, message)
         self.send_response(status)
         self.end_headers()
-        self.wfile.write(json.dumps(out).encode() if isinstance(out, dict) else out)
+        self.wfile.write(json.dumps(out).encode())
 
 
 if __name__ == "__main__":
