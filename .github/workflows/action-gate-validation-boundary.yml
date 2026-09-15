@@ -1,0 +1,30 @@
+name: Action Gate Validation Boundary
+
+on:
+  push:
+    paths:
+      - 'action_gate/**'
+      - 'RESEARCH/ACTION_GATE_VALIDATION_BOUNDARY.md'
+      - '.github/workflows/action-gate-validation-boundary.yml'
+  pull_request:
+    paths:
+      - 'action_gate/**'
+      - 'RESEARCH/ACTION_GATE_VALIDATION_BOUNDARY.md'
+      - '.github/workflows/action-gate-validation-boundary.yml'
+
+jobs:
+  validation-boundary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run Validation Boundary adversarial suite
+        run: python action_gate/test_validation_boundary.py
+      - name: Assert boundary specification is present
+        run: |
+          test -f RESEARCH/ACTION_GATE_VALIDATION_BOUNDARY.md
+          grep -q 'No validation bypass' RESEARCH/ACTION_GATE_VALIDATION_BOUNDARY.md
+          grep -q 'Exact-request binding' RESEARCH/ACTION_GATE_VALIDATION_BOUNDARY.md
+          grep -q 'No label authority' RESEARCH/ACTION_GATE_VALIDATION_BOUNDARY.md
