@@ -4,6 +4,7 @@ import urllib.request
 
 BASE = os.getenv("ACTION_GATE_URL", "http://127.0.0.1:8000")
 TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
+TENANT = os.getenv("ACTION_GATE_TENANT_ID", "demo-tenant")
 
 
 def headers():
@@ -20,9 +21,9 @@ def post(path, payload):
 
 
 scenarios = [
-    {"name": "delete production file", "payload": {"agent_id": "demo-agent", "action": "delete_file", "target": "/production/data.db"}},
-    {"name": "external customer email", "payload": {"agent_id": "demo-agent", "action": "send_email", "target": "customer@example.com"}},
-    {"name": "financial transfer", "payload": {"agent_id": "demo-agent", "action": "transfer_funds", "target": "account_123", "parameters": {"amount": 1000}}},
+    {"name": "delete production file", "payload": {"tenant_id": TENANT, "agent_id": "demo-agent", "action": "delete_file", "target": "/production/data.db"}},
+    {"name": "external customer email", "payload": {"tenant_id": TENANT, "agent_id": "demo-agent", "action": "send_email", "target": "customer@example.com"}},
+    {"name": "financial transfer", "payload": {"tenant_id": TENANT, "agent_id": "demo-agent", "action": "transfer_funds", "target": "account_123", "parameters": {"amount": 1000}}},
 ]
 
 for item in scenarios:
