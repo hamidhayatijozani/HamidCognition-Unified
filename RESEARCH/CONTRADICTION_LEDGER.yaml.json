@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "id": "C-001",
+      "claim": "P/S/T has a canonical implementation",
+      "status": "UNKNOWN",
+      "contradiction": true,
+      "resolution": "EXP-001 found no canonical equivalence across the four recorded variants.",
+      "promotion_blocked": true
+    },
+    {
+      "id": "C-002",
+      "claim": "hamidcognition-realtime predictor is an LSTM implementation",
+      "status": "FALSIFIED",
+      "contradiction": true,
+      "resolution": "Direct source inspection found LinearRegression in the implementation.",
+      "promotion_blocked": false
+    },
+    {
+      "id": "C-003",
+      "claim": "EUR/USD predictor has demonstrated out-of-sample predictive skill",
+      "status": "UNKNOWN",
+      "contradiction": false,
+      "resolution": "No real walk-forward evidence package is recorded yet.",
+      "promotion_blocked": true
+    }
+  ]
+}
