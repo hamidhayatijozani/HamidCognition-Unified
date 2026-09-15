@@ -10,7 +10,7 @@ from action_gate.replay_harness import replay_check
 @pytest.fixture
 def module(monkeypatch):
     monkeypatch.setenv("HHJ_CSG_HMAC_SECRET", "sim-secret")
-    monkeypatch.delenv("HHJ_CSG_API_KEY", raising=False)
+    monkeypatch.setenv("HHJ_CSG_API_KEY", "sim-api-key")
     import action_gate.contract_app as contract_app
     contract_app = importlib.reload(contract_app)
     contract_app._idempotency.clear()
