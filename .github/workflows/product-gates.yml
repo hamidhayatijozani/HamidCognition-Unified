@@ -28,6 +28,8 @@ jobs:
         working-directory: action_gate
         env:
           ACTION_GATE_ENV: development
+          ACTION_GATE_API_TOKEN: ci-csg-token
+          ACTION_GATE_SIGNING_SECRET: ci-csg-secret
         run: pytest -q
       - name: Run Validation Boundary conformance suite
         working-directory: action_gate
@@ -43,7 +45,7 @@ jobs:
         run: python mcp_integration.py
       - name: Compile runtime
         working-directory: action_gate
-        run: python -m py_compile app.py storage.py enforcement_integration.py mcp_integration.py test_validation_boundary_conformance.py
+        run: python -m py_compile app.py storage.py rate_limit.py canonicalization.py csg_contract.py csg_ingress.py csg_routes.py agentrq_simulator.py csg_acceptance.py enforcement_integration.py mcp_integration.py test_validation_boundary_conformance.py
       - name: Validate production Compose
         working-directory: action_gate
         env:
@@ -73,15 +75,18 @@ jobs:
         run: |
           docker compose -f docker-compose.production.yml ps
           docker compose -f docker-compose.production.yml exec -T action-gate python -c 'import json,urllib.request; h={"Authorization":"Bearer ci-action-gate-token"}; health=json.load(urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:8000/health",headers=h))); assert health["status"]=="ok" and health["storage"]["backend"]=="postgresql", health; payload={"tenant_id":"compose-tenant","agent_id":"compose-agent","actor_id":"compose-actor","action":"read_public_file","target":"/public/info.txt","parameters":{}}; r=urllib.request.Request("http://enforcement:8080/execute",data=json.dumps(payload["parameters"]).encode(),headers={"Content-Type":"application/json","X-Agent-ID":"compose-agent","X-Actor-ID":"compose-actor","X-Tenant-ID":"compose-tenant","X-Action":"read_public_file","X-Action-Target":"/public/info.txt"}); out=json.load(urllib.request.urlopen(r)); assert out["enforced"] is True, out; did=out["decision"]["decision_id"]; e=json.load(urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:8000/v1/evidence/"+did+"?tenant_id=compose-tenant",headers=h))); assert e["execution"]["status"]=="EXECUTED" and e["tenant_id"]=="compose-tenant", e; print("REAL_POSTGRES_E2E_SMOKE_PASS")'
+      - name: HHJ-CSG 200-event replay acceptance
+        working-directory: action_gate
+        run: docker compose -f docker-compose.production.yml exec -T action-gate python csg_acceptance.py
       - name: Build validation evidence pack
         if: always()
         working-directory: action_gate
         run: |
           python - <<'PY'
-          import json, os, subprocess
+          import json, os
           pack = {
               "product": "HamidCognition Action Gate",
-              "validation": "Action Gate Validation Boundary",
+              "validation": "Action Gate Validation Boundary + HHJ-CSG Contract-First Vertical Slice",
               "repository": "hamidhayatijozani/HamidCognition-Unified",
               "branch": os.environ.get("GITHUB_REF_NAME"),
               "commit": os.environ.get("GITHUB_SHA"),
@@ -90,7 +95,7 @@ jobs:
               "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
               "event": os.environ.get("GITHUB_EVENT_NAME"),
               "status": "EVIDENCE_CAPTURED",
-              "claim_boundary": "The product gates establish only the tested decision-to-enforcement-to-tool-to-outcome path and its evidence/replay properties; they do not establish general agent safety, policy correctness, infrastructure security, or downstream outcome safety.",
+              "claim_boundary": "The product gates establish only the tested decision-to-enforcement-to-tool-to-outcome path and the HHJ-CSG contract, authenticity, idempotency and replay properties exercised here; they do not establish general agent safety, policy correctness, infrastructure security, or downstream outcome safety.",
           }
           with open("validation-evidence-pack.json", "w", encoding="utf-8") as f:
               json.dump(pack, f, indent=2, sort_keys=True)
