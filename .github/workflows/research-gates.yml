@@ -89,12 +89,22 @@ jobs:
           assert p['integrity']['test_tuning'] is False
           assert p['integrity']['snapshots_disjoint'] is True
           assert p['interpretation'] in {'SURVIVES_PRELIMINARY', 'FAILS_PRIMARY_GATE'}
+          expected_promotion = {
+              'SURVIVES_PRELIMINARY': 'BLOCKED_PENDING_INDEPENDENT_REPRODUCTION',
+              'FAILS_PRIMARY_GATE': 'CLAIM_FALSIFIED_UNDER_PREREGISTERED_GATE',
+          }[p['interpretation']]
+          assert p['promotion'] == expected_promotion
+          if p['interpretation'] == 'FAILS_PRIMARY_GATE':
+              assert p['primary_summary']['all_snapshots_positive'] is False
+              assert all(delta <= 0 for delta in p['primary_summary']['snapshot_deltas_vs_majority'])
           assert len(p['snapshots']) == 2
           for s in p['snapshots'].values():
               assert s['raw_sha256'] and s['observations'] >= 500
           PY
       - name: Upload research results
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: exp-004-result
           path: RESEARCH/EXP004RESULT.json
+          if-no-files-found: error

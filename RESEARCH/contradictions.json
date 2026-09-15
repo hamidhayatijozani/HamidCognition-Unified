@@ -39,11 +39,11 @@
     {
       "id": "C-003",
       "title": "EUR/USD predictor predictive-skill claim falsified",
-      "discovered_in": "EXP-002",
+      "discovered_in": "EXP-004",
       "discovered_date": "2026-09-15",
       "severity": "major",
       "description": "The historical claim that the audited EUR/USD predictor demonstrated out-of-sample predictive skill was tested against two disjoint real Yahoo Finance 5-minute snapshots under the pre-registered EXP-004 walk-forward gate and failed decisively.",
-      "observed_behavior": "At the primary +5 minute horizon, predictor accuracy was 0.2166 versus 0.5075 majority baseline in snapshot A and 0.2553 versus 0.4983 majority baseline in snapshot B. Accuracy deltas were -0.2909 and -0.2430; cost-aware returns were -0.2792 and -0.3113. Bootstrap 95% CIs for the accuracy deltas excluded zero in both snapshots, and paired sign-flip permutation p-values were 0.000999 in both.",
+      "observed_behavior": "At the primary +5 minute horizon, predictor accuracy was approximately 0.2157 versus 0.5077 majority baseline in snapshot A and 0.2556 versus 0.4986 majority baseline in snapshot B. Accuracy deltas were approximately -0.2920 and -0.2429; cost-aware returns were approximately -0.2740 and -0.3084. Bootstrap 95% CIs for the accuracy deltas excluded zero in both snapshots, and paired sign-flip permutation p-values were 0.000999 in both.",
       "expected_behavior": "A predictive-skill claim would require the audited predictor to beat the declared primary baseline on the frozen out-of-sample gate across independent real-data snapshots without leakage.",
       "affected_components": ["EUR/USD predictor"],
       "affected_variants": [],
