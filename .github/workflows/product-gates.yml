@@ -29,6 +29,12 @@ jobs:
         env:
           ACTION_GATE_ENV: development
         run: pytest -q
+      - name: Run real HTTP enforcement integration
+        working-directory: action_gate
+        run: python enforcement_integration.py
+      - name: Run real MCP enforcement integration
+        working-directory: action_gate
+        run: python mcp_integration.py
       - name: Compile runtime
         working-directory: action_gate
         run: python -m py_compile app.py storage.py enforcement_integration.py mcp_integration.py
@@ -41,3 +47,33 @@ jobs:
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml config
+      - name: Start production stack
+        working-directory: action_gate
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          DOMAIN: localhost
+        run: docker compose -f docker-compose.production.yml up -d --build
+      - name: Production PostgreSQL and E2E smoke
+        working-directory: action_gate
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          DOMAIN: localhost
+        run: |
+          docker compose -f docker-compose.production.yml ps
+          docker compose -f docker-compose.production.yml exec -T action-gate python -c 'import json,urllib.request; h={"Authorization":"Bearer ci-action-gate-token"}; health=json.load(urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:8000/health",headers=h))); assert health["status"]=="ok" and health["storage"]["backend"]=="postgresql", health; payload={"tenant_id":"compose-tenant","agent_id":"compose-agent","actor_id":"compose-actor","action":"read_public_file","target":"/public/info.txt","parameters":{}}; r=urllib.request.Request("http://enforcement:8080/execute",data=json.dumps(payload["parameters"]).encode(),headers={"Content-Type":"application/json","X-Agent-ID":"compose-agent","X-Actor-ID":"compose-actor","X-Tenant-ID":"compose-tenant","X-Action":"read_public_file","X-Action-Target":"/public/info.txt"}); out=json.load(urllib.request.urlopen(r)); assert out["enforced"] is True, out; did=out["decision"]["decision_id"]; e=json.load(urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:8000/v1/evidence/"+did+"?tenant_id=compose-tenant",headers=h))); assert e["execution"]["status"]=="EXECUTED" and e["tenant_id"]=="compose-tenant", e; print("REAL_POSTGRES_E2E_SMOKE_PASS")'
+      - name: Stop production stack
+        if: always()
+        working-directory: action_gate
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          DOMAIN: localhost
+        run: docker compose -f docker-compose.production.yml down -v
