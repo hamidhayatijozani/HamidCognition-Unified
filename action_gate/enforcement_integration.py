@@ -55,6 +55,9 @@ try:
     status, mismatch = post("http://127.0.0.1:8080/execute", {"x": 1}, altered_headers)
     assert status == 403 and mismatch["error"] == "action_gate_denied_or_binding_mismatch"
 
+    status, forged = post("http://127.0.0.1:9000/execute", {"x": 1})
+    assert status == 403 and forged["error"] == "direct_tool_access_rejected"
+
     status, denied = post("http://127.0.0.1:8080/execute", {"x": 1}, {**common, "X-HCJ-Decision-ID": "fabricated", "X-Action": "read_public_file", "X-Action-Target": "/public/info.txt"})
     assert status == 403 and denied["error"] == "action_gate_denied_or_binding_mismatch"
     print("REAL_ENFORCEMENT_INTEGRATION_PASS")
