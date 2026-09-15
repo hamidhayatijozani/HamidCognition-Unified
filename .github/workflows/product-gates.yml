@@ -37,6 +37,7 @@ jobs:
       - name: Run real HTTP enforcement integration
         working-directory: action_gate
         run: python enforcement_integration.py
+      # MCP integration owns its complete local Gate/tool/proxy topology.
       - name: Run real MCP enforcement integration
         working-directory: action_gate
         run: python mcp_integration.py
