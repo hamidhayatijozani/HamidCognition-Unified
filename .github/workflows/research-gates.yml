@@ -1,0 +1,34 @@
+name: Research Evidence Gates
+
+on:
+  push:
+    paths:
+      - 'RESEARCH/**'
+      - 'experiments/**'
+      - '.github/workflows/**'
+  pull_request:
+    paths:
+      - 'RESEARCH/**'
+      - 'experiments/**'
+      - '.github/workflows/**'
+
+jobs:
+  evidence-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate contradiction ledger
+        run: python RESEARCH/CONTRADICTION_LEDGER.py
+      - name: Run EXP-002 static leakage audit
+        run: python experiments/EXP-002/audit.py
+      - name: Run EXP-001 structural checks
+        working-directory: experiments/EXP-001
+        run: python test_exp001.py
+      - name: Run EXP-001 replay gate
+        working-directory: experiments/EXP-001
+        run: |
+          python replay.py > /tmp/exp001-replay.json
+          grep '"identical_fingerprints": true' /tmp/exp001-replay.json
