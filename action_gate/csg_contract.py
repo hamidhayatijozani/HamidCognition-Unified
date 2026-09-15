@@ -27,6 +27,13 @@ class PermissionRequest(BaseModel):
     evidence: list[dict[str, Any]] = Field(default_factory=list, max_length=100)
     risk_hint: Literal["LOW", "MEDIUM", "HIGH", "CRITICAL"] | None = None
 
+    @field_validator("timestamp", mode="before")
+    @classmethod
+    def canonical_timestamp(cls, value: Any) -> Any:
+        if not isinstance(value, str) or not value.endswith("Z"):
+            raise ValueError("timestamp_must_use_utc_z_format")
+        return value
+
     @field_validator("parameters", "context")
     @classmethod
     def bounded_objects(cls, value: dict[str, Any]) -> dict[str, Any]:
