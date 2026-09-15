@@ -50,8 +50,9 @@ try:
     status, evidence = get(f"http://127.0.0.1:8000/v1/evidence/{decision_id}?tenant_id={TENANT}")
     assert status == 200 and evidence["execution"]["status"] == "EXECUTED"
 
+    # Replay reaches the Gate, which rejects the consumed nonce; the enforcement layer must fail closed.
     status, replayed = post("http://127.0.0.1:8080/execute", {"x": 1}, bound_headers)
-    assert status == 403 and replayed["error"] == "action_gate_denied_or_binding_mismatch"
+    assert status == 502 and replayed["error"] == "evidence_recording_failed_closed"
 
     altered_headers = {**allowed_headers, "X-HCJ-Decision-ID": decision_id, "X-Action-Target": "/other-target"}
     status, mismatch = post("http://127.0.0.1:8080/execute", {"x": 1}, altered_headers)
