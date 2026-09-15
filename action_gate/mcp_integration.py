@@ -46,25 +46,26 @@ try:
     assert status == 200
     assert allowed["tool_executed"] is True
 
-    # A forged decision id must not be accepted by the MCP path.
-    forged_message = {"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": {"name": "read_public_file", "arguments": {"target": "/public/info.txt"}}}
+    # MCP must reject unsupported methods before any tool execution path is reached.
+    status, unsupported = call({"jsonrpc": "2.0", "id": 3, "method": "resources/read", "params": {"uri": "file:///public/info.txt"}})
+    assert status == 400
+    assert unsupported["error"] == "MCP adapter permits tools/call only"
+
+    # A forged attestation must never authorize the direct tool endpoint.
     forged_headers = {
         "Content-Type": "application/json",
-        "X-Agent-ID": "mcp-demo",
-        "X-Actor-ID": "actor-mcp",
-        "X-Tenant-ID": TENANT,
         "X-HCJ-Decision-ID": "fabricated-decision-id",
+        "X-HCJ-Action-Hash": "fabricated-action-hash",
+        "X-HCJ-Nonce": "fabricated-nonce",
+        "X-HCJ-Enforcement-Attestation": "fabricated-attestation",
     }
-    req = urllib.request.Request("http://127.0.0.1:8081", data=json.dumps(forged_message).encode(), headers=forged_headers)
     try:
-        with urllib.request.urlopen(req) as r:
-            forged_status, forged_body = r.status, json.loads(r.read())
+        urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:9000", data=b"{}", headers=forged_headers))
+        raise AssertionError("forged tool attestation unexpectedly succeeded")
     except urllib.error.HTTPError as e:
-        forged_status, forged_body = e.code, json.loads(e.read())
-    assert forged_status == 200
-    assert forged_body["result"]["blocked_by_action_gate"] is False
-    assert "tool_executed" not in forged_body
+        assert e.code == 403
 
+    # Missing enforcement authority must also be rejected by the direct tool endpoint.
     try:
         urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:9000", data=b"{}", headers={"Content-Type": "application/json"}))
         raise AssertionError("direct tool bypass unexpectedly succeeded")
