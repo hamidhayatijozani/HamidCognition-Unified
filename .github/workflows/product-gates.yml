@@ -87,10 +87,13 @@ jobs:
               out=json.load(urllib.request.urlopen(r))
           except Exception as exc:
               print("ENFORCEMENT_REQUEST_FAILED", repr(exc)); raise
+          print("E2E_ENFORCEMENT_RESPONSE", json.dumps(out, sort_keys=True))
           assert out["enforced"] is True, out
           did=out["decision"]["decision_id"]
           e=json.load(urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:8000/v1/evidence/"+did+"?tenant_id=compose-tenant",headers=h)))
-          assert e["execution"]["status"]=="EXECUTED" and e["tenant_id"]=="compose-tenant", e
+          print("E2E_EVIDENCE_RESPONSE", json.dumps(e, sort_keys=True))
+          assert e.get("execution") is not None, e
+          assert e["execution"].get("status")=="EXECUTED" and e["tenant_id"]=="compose-tenant", e
           print("REAL_POSTGRES_E2E_SMOKE_PASS")
           PY
       - name: HHJ-CSG 200-event replay acceptance
