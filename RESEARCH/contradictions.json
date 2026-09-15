@@ -1,0 +1,57 @@
+{
+  "schema_version": 2,
+  "migrated_from": "RESEARCH/CONTRADICTION_LEDGER.yaml.json",
+  "contradictions": [
+    {
+      "id": "C-001",
+      "title": "No canonical P/S/T equivalence established",
+      "discovered_in": "EXP-001",
+      "discovered_date": "2026-09-15",
+      "severity": "major",
+      "description": "The claim that P/S/T has a canonical implementation remains unsupported because EXP-001 found no canonical equivalence across the recorded variants.",
+      "observed_behavior": "Recorded variants did not establish canonical equivalence.",
+      "expected_behavior": "A canonical implementation claim would require reproducible equivalence evidence.",
+      "affected_components": ["P/S/T"],
+      "affected_variants": [],
+      "status": "open",
+      "resolution_notes": "Not resolved. Preserve as an explicit promotion blocker.",
+      "resolved_date": null,
+      "blocking_issues": [],
+      "test_artifact": "EXP-001"
+    },
+    {
+      "id": "C-002",
+      "title": "LSTM implementation claim contradicted by source inspection",
+      "discovered_in": "EXP-002",
+      "discovered_date": "2026-09-15",
+      "severity": "documentation",
+      "description": "The historical claim that the hamidcognition-realtime predictor is an LSTM implementation was contradicted by direct source inspection, which found LinearRegression.",
+      "observed_behavior": "Implementation contains LinearRegression rather than an LSTM model.",
+      "expected_behavior": "A claim of LSTM implementation would require an actual LSTM implementation in the inspected source.",
+      "affected_components": ["hamidcognition-realtime"],
+      "affected_variants": [],
+      "status": "false_alarm",
+      "resolution_notes": "Claim falsified by direct source inspection. This record remains for provenance and contradiction history.",
+      "resolved_date": "2026-09-15",
+      "blocking_issues": [],
+      "test_artifact": "EXP-002"
+    },
+    {
+      "id": "C-003",
+      "title": "No real walk-forward evidence for EUR/USD predictive skill",
+      "discovered_in": "EXP-002",
+      "discovered_date": "2026-09-15",
+      "severity": "major",
+      "description": "The claim that the EUR/USD predictor has demonstrated out-of-sample predictive skill remains unsupported because no real walk-forward evidence package is recorded.",
+      "observed_behavior": "Static leakage audit found no native temporal split or walk-forward loop in the inspected implementation.",
+      "expected_behavior": "A predictive-skill claim requires a reproducible real walk-forward evidence package.",
+      "affected_components": ["EUR/USD predictor"],
+      "affected_variants": [],
+      "status": "open",
+      "resolution_notes": "Blocked pending real walk-forward evidence.",
+      "resolved_date": null,
+      "blocking_issues": [],
+      "test_artifact": "EXP-002"
+    }
+  ]
+}
