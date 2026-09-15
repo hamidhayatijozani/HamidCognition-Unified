@@ -8,8 +8,6 @@ from typing import Any
 
 import psycopg
 
-from rate_limit import SlidingWindowRateLimiter
-
 DATABASE_URL = os.getenv("ACTION_GATE_DATABASE_URL")
 SQLITE_PATH = os.getenv("ACTION_GATE_DB", "action_gate.db")
 
@@ -97,3 +95,8 @@ def load_record(decision_id: str) -> str | None:
         return row[0] if row else None
     finally:
         con.close()
+
+
+# Initialize the schema at import time so legacy TestClient-based integrations are valid
+# even when lifespan/startup events are not entered.
+init_db()
