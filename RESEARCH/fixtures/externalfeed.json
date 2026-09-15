@@ -1,16 +1,30 @@
 {
-  "fixture_id": "EXP-003-SYNTHETIC-001",
-  "fixture_status": "SYNTHETIC_TEST_FIXTURE",
+  "fixture_id": "EXP-003-ECB-EURUSD-2026-09-15-001",
+  "fixture_status": "EXTERNAL_SOURCE_SNAPSHOT",
   "provenance": {
-    "source_type": "synthetic",
-    "external_source_claimed": false,
-    "purpose": "validate fixture loading, canonical hashing, and execution plumbing"
+    "source_type": "external",
+    "provider": "European Central Bank",
+    "dataset": "Euro foreign exchange reference rates",
+    "source_url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/eurofxref-graph-usd.en.html",
+    "retrieved_at_utc": "2026-09-15T12:00:00Z",
+    "source_series": "EUR/USD reference rate",
+    "source_semantics": "USD per EUR",
+    "snapshot_method": "Values transcribed from the published ECB USD reference-rate series page and frozen as an immutable experiment input.",
+    "preprocessing": "No interpolation or smoothing. Only published observations shown by the ECB series were retained; weekends/non-publication days are absent.",
+    "external_source_claimed": true,
+    "purpose": "Real external-source replay and provenance validation for EXP-003."
   },
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "feed": [
-    {"timestamp":"2026-01-01T00:00:00Z","symbol":"TEST","value":100.0},
-    {"timestamp":"2026-01-01T00:01:00Z","symbol":"TEST","value":100.5},
-    {"timestamp":"2026-01-01T00:02:00Z","symbol":"TEST","value":99.8},
-    {"timestamp":"2026-01-01T00:03:00Z","symbol":"TEST","value":100.2}
+    {"timestamp":"2026-09-01T00:00:00Z","symbol":"EURUSD","value":1.1590},
+    {"timestamp":"2026-09-02T00:00:00Z","symbol":"EURUSD","value":1.1578},
+    {"timestamp":"2026-09-03T00:00:00Z","symbol":"EURUSD","value":1.1615},
+    {"timestamp":"2026-09-04T00:00:00Z","symbol":"EURUSD","value":1.1622},
+    {"timestamp":"2026-09-07T00:00:00Z","symbol":"EURUSD","value":1.1622},
+    {"timestamp":"2026-09-08T00:00:00Z","symbol":"EURUSD","value":1.1614},
+    {"timestamp":"2026-09-09T00:00:00Z","symbol":"EURUSD","value":1.1652},
+    {"timestamp":"2026-09-10T00:00:00Z","symbol":"EURUSD","value":1.1616},
+    {"timestamp":"2026-09-11T00:00:00Z","symbol":"EURUSD","value":1.1592},
+    {"timestamp":"2026-09-14T00:00:00Z","symbol":"EURUSD","value":1.1551}
   ]
 }
