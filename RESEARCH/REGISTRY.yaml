@@ -6,6 +6,8 @@ entries:
     type: concept
     name: P/S/T Cognitive State Engine
     status: implemented
+    experimental_status: EXPERIMENTALLY_EXECUTED
+    canonical_status: NOT_ESTABLISHED
     variants:
       - source: hamidcognition-complete/core/hamid_cognition.py
         role: baseline_candidate
@@ -20,6 +22,7 @@ entries:
         role: incompatible_variant_candidate
         evidence: distinct_state_update_semantics
     promotion_gate: EXP-001
+    promotion_result: NO_CANONICAL_EQUIVALENCE_ESTABLISHED
   - id: HC-002
     type: concept
     name: HHJ-CSG Cognitive Safety Gateway
@@ -98,7 +101,9 @@ entries:
 experiments:
   - id: EXP-001
     name: P/S/T variant conformance
-    status: planned
+    status: executed
+    result: NO_CANONICAL_EQUIVALENCE_ESTABLISHED
+    replay: verified_for_frozen_vector
     blocks: HC-001
   - id: EXP-002
     name: Predictor walk-forward audit

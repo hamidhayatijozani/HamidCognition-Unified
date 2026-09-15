@@ -1,0 +1,9 @@
+{
+  "experiment_id": "EXP-001",
+  "runs": 2,
+  "vector_sha256_run_1": "54af954904c54efc7b70bdfe00ecf6b7b80bc8a9cdc628cfcba6e1beb068f16c4e620a",
+  "vector_sha256_run_2": "54af954904c54efc7b80bdfe00ecf6b7b80bc8a9cdc628cfcba6e1beb068f16c4e620a",
+  "trajectory_fingerprints_identical": true,
+  "status": "REPLAY_VERIFIED_FOR_FROZEN_VECTOR",
+  "scope": "This evidence covers only EXP-001-V001 and the recorded source semantics. It does not establish global determinism."
+}

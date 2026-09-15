@@ -1,0 +1,28 @@
+name: EXP-001 P-S-T Conformance
+
+on:
+  push:
+    paths:
+      - 'experiments/EXP-001/**'
+      - '.github/workflows/exp001.yml'
+  pull_request:
+    paths:
+      - 'experiments/EXP-001/**'
+      - '.github/workflows/exp001.yml'
+
+jobs:
+  exp001:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run structural checks
+        working-directory: experiments/EXP-001
+        run: python test_exp001.py
+      - name: Run replay check
+        working-directory: experiments/EXP-001
+        run: |
+          python replay.py > /tmp/replay.json
+          grep '"identical_fingerprints": true' /tmp/replay.json

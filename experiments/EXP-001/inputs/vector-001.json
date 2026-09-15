@@ -1,0 +1,24 @@
+{
+  "experiment_id": "EXP-001",
+  "vector_id": "EXP-001-V001",
+  "deterministic": true,
+  "initial_state": {"P": 0.88, "S": 0.78, "T": 0.40},
+  "steps": [
+    {"pressure": 0.85, "novelty": 0.75},
+    {"pressure": 0.90, "novelty": 0.80},
+    {"pressure": 0.70, "novelty": 0.90},
+    {"pressure": 0.60, "novelty": 0.70},
+    {"pressure": 0.80, "novelty": 0.60},
+    {"pressure": 0.50, "novelty": 0.80},
+    {"pressure": 0.95, "novelty": 0.95},
+    {"pressure": 0.20, "novelty": 0.30},
+    {"pressure": 0.75, "novelty": 0.85},
+    {"pressure": 0.40, "novelty": 0.65}
+  ],
+  "mapping": {
+    "realtime_pressure": "pressure/1.5",
+    "realtime_momentum": "novelty/2.0",
+    "realtime_trend_strength": 0.5,
+    "variant_d_freedom": 3.0
+  }
+}
