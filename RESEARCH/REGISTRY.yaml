@@ -1,0 +1,125 @@
+schema_version: 1
+project: HamidCognition-Unified
+epistemic_rule: "Implementation is not proof; canonical status requires reproducible conformance evidence."
+entries:
+  - id: HC-001
+    type: concept
+    name: P/S/T Cognitive State Engine
+    status: implemented
+    variants:
+      - source: hamidcognition-complete/core/hamid_cognition.py
+        role: baseline_candidate
+        evidence: exact_duplicate_lineage
+      - source: hamidcognition-realtime/core/hamid_cognition.py
+        role: behavioral_variant
+        evidence: distinct_sha
+      - source: HamidCognition/hamid_cognition_engine.py
+        role: experimental_variant
+        evidence: distinct_sha
+      - source: HamidCognitionEngine/hamid_cognition_engine.py
+        role: incompatible_variant_candidate
+        evidence: distinct_state_update_semantics
+    promotion_gate: EXP-001
+  - id: HC-002
+    type: concept
+    name: HHJ-CSG Cognitive Safety Gateway
+    status: hypothesis
+    required_evidence:
+      - decision_boundary_tests
+      - adversarial_bypass_tests
+      - replay_tests
+      - degraded_mode_tests
+  - id: HC-003
+    type: concept
+    name: ClaimLab
+    status: hypothesis
+    required_evidence:
+      - claim_label_conformance
+      - evidence_confidence_gap_tests
+  - id: HC-004
+    type: concept
+    name: LUMEN Behavioral State Transfer
+    status: hypothesis
+    required_evidence:
+      - state_transfer_ab_test
+      - narrative_reconstruction_control
+  - id: HC-005
+    type: concept
+    name: KIRGANDE Unknown-Space Explorer
+    status: hypothesis
+    required_evidence:
+      - novelty_without_manual_label_test
+      - falsification_yield
+      - unexplained_archive_recovery
+  - id: HC-006
+    type: concept
+    name: Farahoosh-Prime
+    status: superseded
+    superseded_by: HC-005
+  - id: HC-007
+    type: hypothesis
+    name: Amplitude-dependent restoring force
+    status: untested
+    experiment: EXP-004
+  - id: HC-008
+    type: concept
+    name: Trading Cognitive Loop
+    status: prototype
+    required_evidence:
+      - walk_forward_backtest
+      - naive_baseline
+      - leakage_audit
+      - regime_stability
+  - id: HC-009
+    type: experiment_line
+    name: EUR/USD Short-Horizon Research
+    status: prototype
+    execution_mode: simulated_only
+  - id: HC-010
+    type: principle
+    name: Evidence-first metrics
+    status: design_principle
+  - id: HC-011
+    type: principle
+    name: Replay / provenance / behavioral integrity
+    status: design_principle
+  - id: HC-012
+    type: hypothesis
+    name: Degraded-mode cognitive safety
+    status: untested
+  - id: HC-013
+    type: hypothesis
+    name: Common-mode corruption
+    status: untested
+  - id: HC-014
+    type: hypothesis
+    name: Semantic drift / state drift
+    status: untested
+experiments:
+  - id: EXP-001
+    name: P/S/T variant conformance
+    status: planned
+    blocks: HC-001
+  - id: EXP-002
+    name: Predictor walk-forward audit
+    status: planned
+    blocks: HC-008
+  - id: EXP-003
+    name: Replay determinism and external-feed sensitivity
+    status: planned
+    blocks: HC-011
+  - id: EXP-004
+    name: Amplitude-dependent recovery retest v2
+    status: planned
+    blocks: HC-007
+unknowns:
+  - U-001
+  - U-002
+  - U-003
+  - U-004
+  - U-005
+  - U-006
+  - U-007
+  - U-008
+  - U-009
+  - U-010
