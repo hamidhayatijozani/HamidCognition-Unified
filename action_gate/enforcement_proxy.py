@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import os
 import urllib.error
+import urllib.parse
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 GATE_URL = os.getenv("GATE_URL", "http://127.0.0.1:8000")
 TOOL_URL = os.getenv("TOOL_URL", "http://127.0.0.1:9000")
 API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
+ENFORCEMENT_SECRET = os.getenv("ACTION_GATE_ENFORCEMENT_SECRET", "dev-enforcement-secret")
 
 
 def canonical(obj):
@@ -18,6 +21,10 @@ def canonical(obj):
 
 def action_hash(tenant_id, actor_id, action, target, parameters):
     return hashlib.sha256(canonical({"tenant_id": tenant_id, "actor_id": actor_id, "action": action.lower(), "target": target, "parameters": parameters}).encode()).hexdigest()
+
+
+def attestation(decision_id, action_hash_value, nonce):
+    return hmac.new(ENFORCEMENT_SECRET.encode(), f"{decision_id}:{action_hash_value}:{nonce}".encode(), hashlib.sha256).hexdigest()
 
 
 def auth_headers():
@@ -38,7 +45,7 @@ def get_json(url):
 
 def permitted(decision_id: str, tenant_id: str, expected_action_hash: str) -> dict | None:
     try:
-        _, record = get_json(GATE_URL + "/v1/evidence/" + decision_id + "?tenant_id=" + urllib.parse.quote(tenant_id, safe=""))
+        _, record = get_json(GATE_URL + "/v1/evidence/" + urllib.parse.quote(decision_id, safe="") + "?tenant_id=" + urllib.parse.quote(tenant_id, safe=""))
         if record.get("tenant_id") != tenant_id or record.get("decision") not in {"ALLOW", "SANDBOX"} or record.get("action_hash") != expected_action_hash:
             return None
         return record
@@ -47,7 +54,11 @@ def permitted(decision_id: str, tenant_id: str, expected_action_hash: str) -> di
 
 
 def record_execution(decision_id: str, tenant_id: str, action_hash_value: str, nonce: str, outcome: dict):
-    return post_json(GATE_URL + f"/v1/action/{decision_id}/execution", {"tenant_id": tenant_id, "action_hash": action_hash_value, "nonce": nonce, "outcome": outcome})
+    return post_json(GATE_URL + f"/v1/action/{urllib.parse.quote(decision_id, safe='')}/execution", {"tenant_id": tenant_id, "action_hash": action_hash_value, "nonce": nonce, "outcome": outcome})
+
+
+def tool_headers(decision_id, action_hash_value, nonce):
+    return {"X-HCJ-Decision-ID": decision_id, "X-HCJ-Action-Hash": action_hash_value, "X-HCJ-Nonce": nonce, "X-HCJ-Enforcement-Attestation": attestation(decision_id, action_hash_value, nonce)}
 
 
 class HTTPHandler(BaseHTTPRequestHandler):
@@ -61,7 +72,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
                 record = permitted(decision_id, tenant_id, expected_hash)
                 if not record:
                     self.send_response(403); self.end_headers(); self.wfile.write(b'{"error":"action_gate_denied_or_binding_mismatch"}'); return
-                status, out = post_json(TOOL_URL + self.path, payload)
+                status, out = post_json(TOOL_URL + self.path, payload, tool_headers(decision_id, expected_hash, record["nonce"]))
                 try:
                     record_execution(decision_id, tenant_id, expected_hash, record["nonce"], {"http_status": status, "tool_response": out})
                 except Exception:
@@ -85,7 +96,7 @@ class MCPHandler(BaseHTTPRequestHandler):
             result = post_json(GATE_URL + "/v1/action/evaluate", {"agent_id": agent_id, "actor_id": actor_id, "tenant_id": tenant_id, "action": tool, "target": target, "parameters": args})[1]
             if result["decision"] not in {"ALLOW", "SANDBOX"}:
                 self.send_response(200); self.end_headers(); self.wfile.write(json.dumps({"jsonrpc": "2.0", "id": message.get("id"), "result": {"blocked_by_action_gate": True, "decision": result}}).encode()); return
-            status, out = post_json(TOOL_URL, message)
+            status, out = post_json(TOOL_URL, message, tool_headers(result["decision_id"], result["action_hash"], result["nonce"]))
             try:
                 record_execution(result["decision_id"], tenant_id, result["action_hash"], result["nonce"], {"http_status": status, "tool_response": out, "protocol": "MCP", "method": "tools/call", "tool": tool})
             except Exception:
@@ -96,6 +107,5 @@ class MCPHandler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    import urllib.parse
     mode = os.getenv("MODE", "mcp").lower(); handler = MCPHandler if mode == "mcp" else HTTPHandler
     ThreadingHTTPServer(("0.0.0.0", int(os.getenv("PORT", "8080"))), handler).serve_forever()
