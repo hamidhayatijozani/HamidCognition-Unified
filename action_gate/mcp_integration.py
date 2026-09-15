@@ -19,10 +19,22 @@ procs = [
 try:
     time.sleep(2)
 
-    def call(message):
-        req = urllib.request.Request("http://127.0.0.1:8081", data=json.dumps(message).encode(), headers={"Content-Type": "application/json", "X-Agent-ID": "mcp-demo", "X-Actor-ID": "actor-mcp", "X-Tenant-ID": TENANT})
-        with urllib.request.urlopen(req) as r:
-            return r.status, json.loads(r.read())
+    def call(message, tenant=TENANT):
+        req = urllib.request.Request(
+            "http://127.0.0.1:8081",
+            data=json.dumps(message).encode(),
+            headers={
+                "Content-Type": "application/json",
+                "X-Agent-ID": "mcp-demo",
+                "X-Actor-ID": "actor-mcp",
+                "X-Tenant-ID": tenant,
+            },
+        )
+        try:
+            with urllib.request.urlopen(req) as r:
+                return r.status, json.loads(r.read())
+        except urllib.error.HTTPError as e:
+            return e.code, json.loads(e.read())
 
     status, denied = call({"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": "delete_file", "arguments": {"target": "/production/data.db"}}})
     assert status == 200
@@ -32,6 +44,25 @@ try:
     status, allowed = call({"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "read_public_file", "arguments": {"target": "/public/info.txt"}}})
     assert status == 200
     assert allowed["tool_executed"] is True
+
+    # A forged decision id must not be accepted by the MCP path.
+    forged_message = {"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": {"name": "read_public_file", "arguments": {"target": "/public/info.txt"}}}
+    forged_headers = {
+        "Content-Type": "application/json",
+        "X-Agent-ID": "mcp-demo",
+        "X-Actor-ID": "actor-mcp",
+        "X-Tenant-ID": TENANT,
+        "X-HCJ-Decision-ID": "fabricated-decision-id",
+    }
+    req = urllib.request.Request("http://127.0.0.1:8081", data=json.dumps(forged_message).encode(), headers=forged_headers)
+    try:
+        with urllib.request.urlopen(req) as r:
+            forged_status, forged_body = r.status, json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        forged_status, forged_body = e.code, json.loads(e.read())
+    assert forged_status == 200
+    assert forged_body["result"]["blocked_by_action_gate"] is False
+    assert "tool_executed" not in forged_body
 
     try:
         urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:9000", data=b"{}", headers={"Content-Type": "application/json"}))
