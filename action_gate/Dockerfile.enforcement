@@ -1,0 +1,5 @@
+FROM python:3.12-slim
+WORKDIR /app
+COPY enforcement_proxy.py .
+EXPOSE 8080
+CMD ["python", "enforcement_proxy.py"]
