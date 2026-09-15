@@ -6,9 +6,11 @@ on:
       - 'action_gate/contracts/**'
       - 'action_gate/contract.py'
       - 'action_gate/contract_app.py'
+      - 'action_gate/contract_execution.py'
       - 'action_gate/agent_rq_simulator.py'
       - 'action_gate/replay_harness.py'
       - 'action_gate/test_contract_vertical_slice.py'
+      - 'action_gate/test_contract_execution.py'
       - 'action_gate/test_agent_rq_simulator.py'
       - 'action_gate/requirements.txt'
       - '.github/workflows/hhj-csg-contract-slice.yml'
@@ -17,9 +19,11 @@ on:
       - 'action_gate/contracts/**'
       - 'action_gate/contract.py'
       - 'action_gate/contract_app.py'
+      - 'action_gate/contract_execution.py'
       - 'action_gate/agent_rq_simulator.py'
       - 'action_gate/replay_harness.py'
       - 'action_gate/test_contract_vertical_slice.py'
+      - 'action_gate/test_contract_execution.py'
       - 'action_gate/test_agent_rq_simulator.py'
       - 'action_gate/requirements.txt'
       - '.github/workflows/hhj-csg-contract-slice.yml'
@@ -49,5 +53,7 @@ jobs:
           PY
       - name: Run contract and ingress adversarial tests
         run: pytest -q action_gate/test_contract_vertical_slice.py
+      - name: Run execution boundary adversarial tests
+        run: pytest -q action_gate/test_contract_execution.py
       - name: Run AgentRQ simulator and replay acceptance tests
         run: pytest -q action_gate/test_agent_rq_simulator.py
