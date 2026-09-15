@@ -39,6 +39,10 @@ def wait_for(url, timeout=10):
         try:
             with urllib.request.urlopen(url, timeout=0.5):
                 return
+        except urllib.error.HTTPError:
+            # An HTTP response, including 501 from the minimal proxy's GET path,
+            # proves the listener is alive. Connection errors do not.
+            return
         except Exception:
             time.sleep(0.1)
     raise RuntimeError(f"service_not_ready: {url}")
