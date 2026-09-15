@@ -1,0 +1,23 @@
+{
+  "experiment_id": "EXP-001",
+  "title": "P/S/T Variant Conformance and Replay",
+  "status": "EXECUTED",
+  "deterministic": true,
+  "source_variants": {
+    "V-A": {"repository": "hamidhayatijozani/hamidcognition-complete", "path": "core/hamid_cognition.py", "sha": "1c71fd77b7bf3cde5665a7eb413d3a55aac0e402"},
+    "V-B": {"repository": "hamidhayatijozani/hamidcognition-realtime", "path": "core/hamid_cognition.py", "sha": "3cf67fec9a95198a1045dab98ee0ce6016d90e54"},
+    "V-C": {"repository": "hamidhayatijozani/HamidCognition", "path": "hamid_cognition_engine.py", "sha": "226c748173c98017d65446735c0fe87f09506073"},
+    "V-D": {"repository": "hamidhayatijozani/HamidCognitionEngine", "path": "hamid_cognition_engine.py", "sha": "589ab1e0e0330d0efaff088ef67bb79a8e86f04d"}
+  },
+  "input_vector": "inputs/vector-001.json",
+  "vector_sha256": "54af954904c54efc7b70bdfe00ecf6b7b80bc8a9cdc628cfcba6e1beb068f16c4e620a",
+  "comparison": {
+    "state_metric": "euclidean_distance_over_PST",
+    "equivalence": "exact_state_trajectory_equality",
+    "phase_comparison": "raw labels retained; no semantic relabeling"
+  },
+  "replay": {
+    "runs": 2,
+    "expected": "identical fingerprints"
+  }
+}
