@@ -89,7 +89,57 @@ def test_production_requires_auth_configuration():
         module.ENVIRONMENT, module.API_TOKEN = old_env, old_token
 
 
+def test_production_requires_signing_secret():
+    import app as module
+    old_env, old_token, old_secret = module.ENVIRONMENT, module.API_TOKEN, module.SIGNING_SECRET
+    module.ENVIRONMENT, module.API_TOKEN, module.SIGNING_SECRET = "production", "ci-token", None
+    try:
+        r = client.post("/v1/action/evaluate", headers={"Authorization": "Bearer ci-token"}, json={"tenant_id": TENANT, "agent_id": "a", "action": "read_public_file"})
+        assert r.status_code == 503
+    finally:
+        module.ENVIRONMENT, module.API_TOKEN, module.SIGNING_SECRET = old_env, old_token, old_secret
+
+
+def test_hmac_signature_verifies_and_detects_tampering():
+    import app as module
+    old_secret = module.SIGNING_SECRET
+    module.SIGNING_SECRET = "unit-test-secret"
+    try:
+        data = evaluate({"agent_id": "a", "action": "read_public_file", "target": "/public/info.txt"})
+        assert len(data["decision_signature"]) == 64
+        record = module.load(data["decision_id"], TENANT)
+        assert module.verify_signature(record)
+        record["action_hash"] = "tampered"
+        assert not module.verify_signature(record)
+    finally:
+        module.SIGNING_SECRET = old_secret
+
+
+def test_rate_limit_is_enforced():
+    import app as module
+    old_limiter = module.limiter
+    from rate_limit import SlidingWindowRateLimiter
+    module.limiter = SlidingWindowRateLimiter(1, 60)
+    try:
+        first = client.post("/v1/action/evaluate", json={"tenant_id": "rate-tenant", "agent_id": "a", "action": "read_public_file"})
+        second = client.post("/v1/action/evaluate", json={"tenant_id": "rate-tenant", "agent_id": "a", "action": "read_public_file"})
+        assert first.status_code == 200
+        assert second.status_code == 429
+    finally:
+        module.limiter = old_limiter
+
+
+def test_evidence_versions_are_append_only():
+    import app as module
+    data = evaluate({"agent_id": "a", "action": "send_email", "target": "customer@example.com"})
+    module.load(data["decision_id"], TENANT)
+    con = module.db()
+    versions = con.execute("SELECT COUNT(*) FROM record_versions WHERE decision_id=?", (data["decision_id"],)).fetchone()[0]
+    con.close()
+    assert versions >= 1
+
+
 def test_health_version():
     r = client.get("/health")
     assert r.status_code == 200
-    assert r.json()["version"] == "0.2.0-secure-multitenant-mvp"
+    assert r.json()["version"] == "0.2.1-secure-multitenant-mvp"
