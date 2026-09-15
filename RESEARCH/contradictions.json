@@ -38,20 +38,20 @@
     },
     {
       "id": "C-003",
-      "title": "No real walk-forward evidence for EUR/USD predictive skill",
+      "title": "EUR/USD predictor predictive-skill claim falsified",
       "discovered_in": "EXP-002",
       "discovered_date": "2026-09-15",
       "severity": "major",
-      "description": "The claim that the EUR/USD predictor has demonstrated out-of-sample predictive skill remains unsupported because no real walk-forward evidence package is recorded.",
-      "observed_behavior": "Static leakage audit found no native temporal split or walk-forward loop in the inspected implementation.",
-      "expected_behavior": "A predictive-skill claim requires a reproducible real walk-forward evidence package.",
+      "description": "The historical claim that the audited EUR/USD predictor demonstrated out-of-sample predictive skill was tested against two disjoint real Yahoo Finance 5-minute snapshots under the pre-registered EXP-004 walk-forward gate and failed decisively.",
+      "observed_behavior": "At the primary +5 minute horizon, predictor accuracy was 0.2166 versus 0.5075 majority baseline in snapshot A and 0.2553 versus 0.4983 majority baseline in snapshot B. Accuracy deltas were -0.2909 and -0.2430; cost-aware returns were -0.2792 and -0.3113. Bootstrap 95% CIs for the accuracy deltas excluded zero in both snapshots, and paired sign-flip permutation p-values were 0.000999 in both.",
+      "expected_behavior": "A predictive-skill claim would require the audited predictor to beat the declared primary baseline on the frozen out-of-sample gate across independent real-data snapshots without leakage.",
       "affected_components": ["EUR/USD predictor"],
       "affected_variants": [],
-      "status": "open",
-      "resolution_notes": "Blocked pending real walk-forward evidence.",
-      "resolved_date": null,
+      "status": "falsified",
+      "resolution_notes": "EXP-004 executed real chronological walk-forward evaluation with future_features_used=false, test_tuning=false, disjoint source snapshots, and SHA-256 fingerprints. The audited predictor failed the primary gate in both snapshots. Do not promote the historical predictive-skill claim. Any future predictor must be treated as a new claim with a new pre-registration and independent evidence package.",
+      "resolved_date": "2026-09-15",
       "blocking_issues": [],
-      "test_artifact": "EXP-002"
+      "test_artifact": "EXP-004"
     }
   ]
 }
