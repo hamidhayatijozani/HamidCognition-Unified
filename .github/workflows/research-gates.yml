@@ -78,29 +78,9 @@ jobs:
       - name: Run EXP-004 real-source walk-forward
         run: python RESEARCH/EXP004_WALKFORWARD.py
       - name: Validate EXP-004 result
-        run: |
-          test -f RESEARCH/EXP004RESULT.json
-          python - <<'PY'
-          import json
-          p = json.load(open('RESEARCH/EXP004RESULT.json', encoding='utf-8'))
-          assert p['experiment'] == 'EXP-004'
-          assert p['status'] == 'EXECUTED_REAL_EXTERNAL_WALK_FORWARD'
-          assert p['integrity']['future_features_used'] is False
-          assert p['integrity']['test_tuning'] is False
-          assert p['integrity']['snapshots_disjoint'] is True
-          assert p['interpretation'] in {'SURVIVES_PRELIMINARY', 'FAILS_PRIMARY_GATE'}
-          expected_promotion = {
-              'SURVIVES_PRELIMINARY': 'BLOCKED_PENDING_INDEPENDENT_REPRODUCTION',
-              'FAILS_PRIMARY_GATE': 'CLAIM_FALSIFIED_UNDER_PREREGISTERED_GATE',
-          }[p['interpretation']]
-          assert p['promotion'] == expected_promotion
-          if p['interpretation'] == 'FAILS_PRIMARY_GATE':
-              assert p['primary_summary']['all_snapshots_positive'] is False
-              assert all(delta <= 0 for delta in p['primary_summary']['snapshot_deltas_vs_majority'])
-          assert len(p['snapshots']) == 2
-          for s in p['snapshots'].values():
-              assert s['raw_sha256'] and s['observations'] >= 500
-          PY
+        run: python RESEARCH/EXP004_VALIDATOR.py
+      - name: Run EXP-005 adversarial validator tests
+        run: python RESEARCH/EXP005_ADVERSARIAL.py
       - name: Upload research results
         if: always()
         uses: actions/upload-artifact@v4
