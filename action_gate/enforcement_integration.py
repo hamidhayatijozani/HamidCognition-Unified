@@ -12,7 +12,7 @@ OTHER_TENANT = "other-tenant"
 env = os.environ.copy()
 env.update({"ACTION_GATE_DB": "/tmp/action-gate-integration.db", "PYTHONPATH": ROOT, "ACTION_GATE_ENV": "development", "ACTION_GATE_ENFORCEMENT_SECRET": "dev-enforcement-secret"})
 procs = [
-    subprocess.Popen([sys.executable, "app.py"], cwd=ROOT, env={**env, "ACTION_GATE_ENV": "development"}),
+    subprocess.Popen([sys.executable, "-m", "uvicorn", "app:app", "--host", "127.0.0.1", "--port", "8000"], cwd=ROOT, env=env),
     subprocess.Popen([sys.executable, "tool_server.py"], cwd=ROOT, env=env),
     subprocess.Popen([sys.executable, "enforcement_proxy.py"], cwd=ROOT, env={**env, "MODE": "http", "PORT": "8080"}),
 ]
@@ -63,7 +63,6 @@ try:
     status, forged = post("http://127.0.0.1:8080/execute", {"x": 1}, {**common, "X-HCJ-Decision-ID": "fabricated", "X-Action": "read_public_file", "X-Action-Target": "/public/info.txt"})
     assert status == 403 and forged["error"] == "action_gate_denied_or_binding_mismatch"
 
-    # Tampered attestation must be rejected at the tool boundary.
     status, attestation_denied = post("http://127.0.0.1:9000/execute", {"x": 1}, {"X-HCJ-Decision-ID": decision_id, "X-HCJ-Action-Hash": evidence["action_hash"], "X-HCJ-Nonce": evidence["nonce"], "X-HCJ-Enforcement-Attestation": "0" * 64})
     assert status == 403 and attestation_denied["error"] == "direct_tool_access_rejected"
 
