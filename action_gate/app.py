@@ -13,8 +13,12 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
 from rate_limit import SlidingWindowRateLimiter
+try:
+    from .execution_guard import validate_legacy_execution
+except ImportError:
+    from execution_guard import validate_legacy_execution
 
-APP_VERSION = "0.2.1-secure-multitenant-mvp"
+APP_VERSION = "0.2.2-secure-multitenant-mvp"
 DB_PATH = os.getenv("ACTION_GATE_DB", "action_gate.db")
 API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
 SIGNING_SECRET = os.getenv("ACTION_GATE_SIGNING_SECRET")
@@ -49,22 +53,22 @@ def digest(obj: Any) -> str:
 
 def sign(obj: Any) -> str:
     if not SIGNING_SECRET:
-        if ENVIRONMENT == "production":
-            raise HTTPException(503, "production_signing_secret_not_configured")
-        return digest(obj)
+        raise HTTPException(503, "action_gate_signing_secret_not_configured")
     return hmac.new(SIGNING_SECRET.encode(), canonical(obj).encode(), hashlib.sha256).hexdigest()
 
 
 def verify_signature(record: dict[str, Any]) -> bool:
     payload = {"decision_id": record["decision_id"], "tenant_id": record["tenant_id"], "action_hash": record["action_hash"], "policy_hash": record["policy_hash"], "nonce": record["nonce"], "expires_at": record["expires_at"]}
-    expected = sign(payload)
+    if not SIGNING_SECRET:
+        return False
+    expected = hmac.new(SIGNING_SECRET.encode(), canonical(payload).encode(), hashlib.sha256).hexdigest()
     return hmac.compare_digest(expected, record.get("decision_signature", ""))
 
 
 def require_auth(authorization: str | None) -> None:
-    if ENVIRONMENT == "production" and not API_TOKEN:
-        raise HTTPException(503, "production_authentication_not_configured")
-    if API_TOKEN is not None and not hmac.compare_digest(authorization or "", f"Bearer {API_TOKEN}"):
+    if not API_TOKEN:
+        raise HTTPException(503, "action_gate_authentication_not_configured")
+    if not isinstance(authorization, str) or not hmac.compare_digest(authorization, f"Bearer {API_TOKEN}"):
         raise HTTPException(401, "invalid_action_gate_credentials")
 
 
@@ -224,12 +228,12 @@ def approve(decision_id: str, approval: Approval, authorization: str | None = He
 
 @app.post("/v1/action/{decision_id}/execution")
 def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | None = Header(default=None)):
-    require_auth(authorization); enforce_rate_limit(authorization, outcome.tenant_id); record = load(decision_id, outcome.tenant_id); ensure_live(record)
-    if record["decision"] not in {"ALLOW", "SANDBOX"}: raise HTTPException(403, "execution_not_permitted_by_gate")
-    if outcome.action_hash != record["action_hash"]: raise HTTPException(409, "execution_action_binding_mismatch")
-    if outcome.nonce != record["nonce"]: raise HTTPException(409, "execution_nonce_mismatch")
-    if record["approval"] and record["approval"].get("approved") and datetime.fromisoformat(record["approval"]["expires_at"]) <= datetime.now(timezone.utc): raise HTTPException(403, "approval_expired")
-    record["execution"] = {"timestamp": now(), "status": "EXECUTED", "action_hash": record["action_hash"], "nonce": record["nonce"]}; record["outcome"] = outcome.outcome; record["consumed_at"] = now(); record["evidence_hash"] = digest(record); save(record, "EXECUTION_RECORDED"); return record
+    require_auth(authorization); enforce_rate_limit(authorization, outcome.tenant_id); record = load(decision_id, outcome.tenant_id)
+    allowed, reason = validate_legacy_execution(record, action_hash=outcome.action_hash, nonce=outcome.nonce, signature_valid=verify_signature(record))
+    if not allowed:
+        status = 409 if reason in {"execution_action_binding_mismatch", "execution_nonce_mismatch", "decision_nonce_already_consumed"} else 403
+        raise HTTPException(status, reason)
+    record["execution"] = {"timestamp": now(), "status": "EXECUTED", "action_hash": record["action_hash"], "nonce": record["nonce"], "boundary": "execution_guard"}; record["outcome"] = outcome.outcome; record["consumed_at"] = now(); record["evidence_hash"] = digest(record); save(record, "EXECUTION_RECORDED"); return record
 
 
 @app.get("/v1/replay/{decision_id}")
