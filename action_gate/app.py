@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 
 from rate_limit import SlidingWindowRateLimiter
 from storage import health as storage_health, init_db, load_record, save_record
+from csg_routes import router as csg_router
 
 APP_VERSION = "0.3.0-production-storage"
 API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
@@ -31,6 +32,7 @@ POLICY_SNAPSHOT = {
 }
 POLICY_HASH = hashlib.sha256(json.dumps(POLICY_SNAPSHOT, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 app = FastAPI(title="HamidCognition Action Gate", version=APP_VERSION)
+app.include_router(csg_router)
 limiter = SlidingWindowRateLimiter(RATE_LIMIT_PER_MINUTE, 60)
 
 
