@@ -106,16 +106,18 @@ experiments:
     replay: verified_for_frozen_vector
     blocks: HC-001
   - id: EXP-002
-    name: Predictor walk-forward audit
-    status: planned
+    name: Predictor leakage and walk-forward audit
+    status: static_audit_ready_real_data_required
+    source_sha: df584043edb5fa5a2037adbc72f1bf90568ac9da
+    result: no_oos_claim_established
     blocks: HC-008
   - id: EXP-003
     name: Replay determinism and external-feed sensitivity
-    status: planned
+    status: protocol_ready_fixture_required
     blocks: HC-011
   - id: EXP-004
     name: Amplitude-dependent recovery retest v2
-    status: planned
+    status: protocol_ready_frozen_prior_data_required
     blocks: HC-007
 unknowns:
   - U-001
