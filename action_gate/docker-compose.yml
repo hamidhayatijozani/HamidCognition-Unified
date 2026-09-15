@@ -1,0 +1,14 @@
+services:
+  action-gate:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      ACTION_GATE_API_TOKEN: ${ACTION_GATE_API_TOKEN:?set ACTION_GATE_API_TOKEN}
+      ACTION_GATE_APPROVAL_TTL_SECONDS: ${ACTION_GATE_APPROVAL_TTL_SECONDS:-300}
+    volumes:
+      - action_gate_data:/data
+    restart: unless-stopped
+
+volumes:
+  action_gate_data:
