@@ -1,37 +1,44 @@
 # EXP-004 — EUR/USD Walk-Forward Predictive Test
 
-Status: PRE-REGISTERED / IMPLEMENTATION REQUIRED
+Status: PRE-REGISTERED / EXECUTED-READY
 
 ## Claim under test
 C-003: the EUR/USD predictor has demonstrated out-of-sample predictive skill.
 
+## Predictor identity
+The audited implementation is `hamidcognition-realtime/models/predictor.py`, source SHA recorded by EXP-002 as `df584043edb5fa5a2037adbc72f1bf90568ac9da`. Direct inspection established that `ForexPredictor.predict_future()` determines direction from a `LinearRegression` slope fitted to the last 20 `Close` observations, with `predicted_price = current_price + slope * minute` when `cognitive_bias` is frozen at 0. EXP-004 evaluates that exact direction-producing mechanism rather than substituting a new predictor.
+
 ## Null hypothesis
-H0: after costs, the predictor has no reproducible out-of-sample advantage over the declared baselines.
+H0: after declared friction, the audited predictor has no reproducible out-of-sample advantage over the declared baselines.
 
 ## Alternative
-H1: the predictor beats the pre-registered primary baseline on the primary out-of-sample metric across the frozen walk-forward evaluation, without leakage.
+H1: the audited predictor beats the pre-registered primary baseline on the primary out-of-sample metric across two disjoint real-data snapshots, without leakage.
 
 ## Data rule
-Use only timestamped EUR/USD observations available before each prediction timestamp. No future-derived features, labels, scaling, hyperparameter tuning, threshold selection, or model selection may use the test interval.
+Use real timestamped EUR/USD 5-minute observations from Yahoo Finance. Intraday data are required because the audited predictor produces +5/+10/+20 minute forecasts. Only observations strictly before each prediction origin may enter the feature window. No future-derived features, labels, scaling, hyperparameter tuning, threshold selection, or model selection may use the test interval.
 
 ## Evaluation design
-1. Freeze dataset snapshot and cryptographic fingerprint before evaluation.
-2. Chronological expanding-window walk-forward evaluation.
-3. Each fold trains only on observations strictly preceding its test interval.
-4. Primary task: one-step-ahead direction prediction.
-5. Primary baseline: majority-direction classifier estimated from the corresponding training window.
+1. Freeze and SHA-256 fingerprint two disjoint real external snapshots.
+2. Use an expanding chronological walk-forward origin within each snapshot.
+3. For every origin, the predictor receives only the prior 20 closes.
+4. Evaluate +5, +10, and +20 minute direction; +5 minutes is the primary metric.
+5. Primary baseline: majority-direction classifier from the corresponding training prefix.
 6. Secondary baseline: previous-direction persistence.
-7. Report accuracy, balanced accuracy, directional hit rate, and a cost-aware simulated return using fixed spread/slippage assumptions declared before scoring.
-8. No threshold or parameter tuning on test folds.
-9. Include permutation/null test and bootstrap confidence interval over fold-level outcomes.
-10. A result is NOT VERIFIED merely because it is statistically positive. Promotion requires independent reproduction on a second frozen snapshot.
+7. Freeze cognitive bias at 0 so the core predictor is tested without importing an untested cognitive-state signal.
+8. Use fixed round-trip friction of 0.0002 for the directional cost proxy.
+9. Report accuracy, baseline deltas, cost-aware return, deterministic bootstrap 95% CI, and paired sign-flip permutation p-value.
+10. No test-fold tuning or threshold selection.
+11. A positive result is not automatically VERIFIED. Promotion remains blocked pending an independent reproduction after this run.
 
 ## Falsification / survival gate
 - FAIL: any detected temporal leakage.
-- FAIL: inability to reproduce the exact snapshot fingerprint.
-- FAIL: primary metric does not beat the pre-registered baseline under the declared criterion.
-- SURVIVES: all integrity checks pass and primary metric beats baseline under the declared criterion.
-- VERIFIED remains blocked until independent reproduction succeeds.
+- FAIL: missing or unverifiable source fingerprints.
+- FAIL: primary +5 minute accuracy does not beat the primary baseline in every independent snapshot, or cost-aware return is not positive in every snapshot.
+- SURVIVES_PRELIMINARY: all integrity checks pass and both disjoint snapshots pass the primary gate.
+- VERIFIED remains blocked until an independent reproduction succeeds.
+
+## Important correction from the first implementation
+The first EXP-004 implementation incorrectly used daily ECB observations and a newly invented last-5-return predictor. That could not resolve C-003 because the audited predictor is a minute-horizon intraday predictor. That implementation is superseded by the current EXP-004 evaluator.
 
 ## Current epistemic target
-This experiment can resolve C-003 only if the predictor implementation and a real historical dataset are both evaluated under this frozen protocol. Synthetic data cannot resolve C-003.
+This experiment is intended to convert C-003 from `UNKNOWN` toward evidence-backed survival or falsification. It cannot legitimately promote the claim to VERIFIED by itself.
