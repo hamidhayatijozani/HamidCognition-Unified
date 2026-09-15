@@ -13,6 +13,13 @@ HamidCognition فقط یک مجموعه کد نیست. این مخزن باید 
 
 هدف Unified بنابراین «یکسان‌سازی مصنوعی» نیست؛ هدف، ساختن یک **ردیابی قابل بازسازی از تکامل ایده تا آزمون و نتیجه** است.
 
+## Repository governance
+
+`HamidCognition-Unified` مرجع فعلیِ پژوهشی و provenance است، اما جایگزین تاریخچه مخازن قبلی نمی‌شود. نقش هر repository، نحوه ارجاع، canonicalization و قواعد حفظ Issues در `RESEARCH/REPOSITORY_GOVERNANCE.md` ثبت شده است.
+
+**Canonical research record:** `HamidCognition-Unified`  
+**Historical implementations:** preserved and cited by repository + exact commit/path when relevant.
+
 ## Current evidence state
 
 - **EXP-001 P/S/T conformance:** executed; replay verified for the frozen vector; no canonical equivalence established.
@@ -79,7 +86,7 @@ CANONICALIZATION or ARCHIVE
 - **Mutation / Falsification Lab** — تغییر کنترل‌شده فرضیات برای تلاش فعالانه جهت شکست مدل.
 - **Executable contradiction guard** — تناقض‌های unresolved اجازه promotion به VERIFIED نمی‌گیرند.
 
-جزئیات در `RESEARCH/INNOVATION_ARCHITECTURE.md` و `RESEARCH/COMPLETION_STATUS.md` ثبت شده است.
+جزئیات در `RESEARCH/INNOVATION_ARCHITECTURE.md`، `RESEARCH/REPOSITORY_GOVERNANCE.md` و `RESEARCH/COMPLETION_STATUS.md` ثبت شده است.
 
 ## Project lineage
 
@@ -106,6 +113,7 @@ CANONICALIZATION or ARCHIVE
 - `PROJECT_CATALOG.md` — کاتالوگ رسمی خطوط پروژه
 - `RIGHTS_AND_PROVENANCE.md` — provenance، انتساب و حقوق
 - `CITATION.cff` — فرمت machine-readable برای citation
+- `RESEARCH/REPOSITORY_GOVERNANCE.md` — نقش مخازن، canonicalization و citation map
 - `RESEARCH/COMPLETION_STATUS.md` — وضعیت واقعی شواهد و blockers
 - `RESEARCH/REGISTRY.yaml` — registry و promotion state
 - `RESEARCH/CONTRADICTION_LEDGER.py` — validator اجرایی تناقض‌ها
@@ -123,7 +131,9 @@ CANONICALIZATION or ARCHIVE
 
 ## Citation
 
-برای ارجاع، **Hamid Hayati Jozani — HamidCognition / HamidCognition-Unified** و لینک مخزن را ذکر کنید و در صورت وجود، release/commit/DOI دقیق را نیز ثبت کنید.
+برای ارجاع، **Hamid Hayati Jozani — HamidCognition-Unified** و لینک مخزن را ذکر کنید و در صورت وجود، release/commit/DOI دقیق را نیز ثبت کنید.
+
+برای یک artifact تاریخی، repository و commit/path همان artifact را نیز مشخص کنید؛ از نسبت‌دادن خودکار وضعیت فعلی Unified به نسخه‌های قدیمی خودداری کنید.
 
 ## Important distinction
 
