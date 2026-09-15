@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hamidcognition.dev/schemas/permission_request-0.1.json",
+  "title": "HHJ-CSG Permission Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "request_id", "tenant_id", "agent_id", "action", "target", "parameters", "timestamp", "idempotency_key"],
+  "properties": {
+    "contract_version": {"const": "PR-0.1"},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9._:-]+$"},
+    "tenant_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "agent_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "action": {"type": "string", "minLength": 1, "maxLength": 128},
+    "target": {"type": "string", "minLength": 1, "maxLength": 512},
+    "parameters": {"type": "object", "maxProperties": 64},
+    "context": {"type": "object", "maxProperties": 64},
+    "evidence": {"type": "array", "maxItems": 64, "items": {"type": "object", "maxProperties": 32}},
+    "risk_hint": {"type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "idempotency_key": {"type": "string", "minLength": 1, "maxLength": 128}
+  },
+  "allOf": [
+    {"if": {"properties": {"idempotency_key": {"type": "string"}}}, "then": {"required": ["idempotency_key"]}}
+  ]
+}
