@@ -16,9 +16,6 @@ jobs:
     defaults:
       run:
         working-directory: action_gate
-    env:
-      ACTION_GATE_API_TOKEN: ci-test-token
-      ACTION_GATE_APPROVAL_TTL_SECONDS: 300
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -28,5 +25,11 @@ jobs:
       - run: pytest -q
       - run: nohup env ACTION_GATE_API_TOKEN=ci-test-token uvicorn app:app --host 127.0.0.1 --port 8000 >/tmp/action-gate.log 2>&1 &
       - run: sleep 2 && python demo.py
+        env:
+          ACTION_GATE_API_TOKEN: ci-test-token
       - run: python enforcement_integration.py
+        env:
+          ACTION_GATE_API_TOKEN: ci-test-token
       - run: python mcp_integration.py
+        env:
+          ACTION_GATE_API_TOKEN: ci-test-token
