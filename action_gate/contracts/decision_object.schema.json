@@ -4,7 +4,7 @@
   "title": "HHJ-CSG Decision Object",
   "type": "object",
   "additionalProperties": false,
-  "required": ["contract_version", "decision_id", "request_id", "request_digest", "decision_digest", "decision", "risk_level", "policy_version", "algorithm_version", "canonicalization_version", "issued_at", "expires_at", "nonce", "signature", "signature_algorithm", "key_id", "metrics_snapshot", "execution_receipt"],
+  "required": ["contract_version", "decision_id", "request_id", "request_digest", "decision_digest", "decision", "risk_level", "policy_version", "algorithm_version", "canonicalization_version", "issued_at", "expires_at", "nonce", "signature", "signature_algorithm", "key_id", "metrics_snapshot", "execution_receipt", "trace_id"],
   "properties": {
     "contract_version": {"const": "DO-0.1"},
     "decision_id": {"type": "string", "minLength": 1, "maxLength": 128},
@@ -23,6 +23,7 @@
     "signature_algorithm": {"const": "HMAC-SHA256"},
     "key_id": {"type": "string", "minLength": 1, "maxLength": 128},
     "metrics_snapshot": {"type": "object", "additionalProperties": {"type": ["number", "string", "boolean", "null"]}},
+    "trace_id": {"type": "string", "minLength": 1, "maxLength": 128},
     "execution_receipt": {
       "type": "object",
       "additionalProperties": false,
