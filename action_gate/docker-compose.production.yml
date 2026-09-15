@@ -1,0 +1,86 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-action_gate}
+      POSTGRES_USER: ${POSTGRES_USER:-action_gate}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  action-gate:
+    build: .
+    environment:
+      ACTION_GATE_ENV: production
+      ACTION_GATE_API_TOKEN: ${ACTION_GATE_API_TOKEN:?set ACTION_GATE_API_TOKEN}
+      ACTION_GATE_SIGNING_SECRET: ${ACTION_GATE_SIGNING_SECRET:?set ACTION_GATE_SIGNING_SECRET}
+      ACTION_GATE_DATABASE_URL: postgresql://${POSTGRES_USER:-action_gate}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-action_gate}
+      ACTION_GATE_RATE_LIMIT_PER_MINUTE: ${ACTION_GATE_RATE_LIMIT_PER_MINUTE:-120}
+      ACTION_GATE_DECISION_TTL_SECONDS: ${ACTION_GATE_DECISION_TTL_SECONDS:-300}
+      ACTION_GATE_APPROVAL_TTL_SECONDS: ${ACTION_GATE_APPROVAL_TTL_SECONDS:-300}
+    expose:
+      - "8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health').read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  tool:
+    build:
+      context: .
+      dockerfile: Dockerfile.tool
+    environment:
+      ACTION_GATE_ENFORCEMENT_SECRET: ${ACTION_GATE_ENFORCEMENT_SECRET:?set ACTION_GATE_ENFORCEMENT_SECRET}
+    expose:
+      - "9000"
+    restart: unless-stopped
+
+  enforcement:
+    build:
+      context: .
+      dockerfile: Dockerfile.enforcement
+    environment:
+      GATE_URL: http://action-gate:8000
+      TOOL_URL: http://tool:9000
+      ACTION_GATE_API_TOKEN: ${ACTION_GATE_API_TOKEN:?set ACTION_GATE_API_TOKEN}
+      ACTION_GATE_ENFORCEMENT_SECRET: ${ACTION_GATE_ENFORCEMENT_SECRET:?set ACTION_GATE_ENFORCEMENT_SECRET}
+      MODE: http
+      PORT: "8080"
+    expose:
+      - "8080"
+    depends_on:
+      action-gate:
+        condition: service_healthy
+    restart: unless-stopped
+
+  edge:
+    image: caddy:2-alpine
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      enforcement:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:
