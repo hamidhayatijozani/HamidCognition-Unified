@@ -2,7 +2,7 @@ FROM python:3.12-slim
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY app.py .
+COPY app.py storage.py rate_limit.py ./
 RUN mkdir -p /data
 ENV ACTION_GATE_DB=/data/action_gate.db
 EXPOSE 8000
