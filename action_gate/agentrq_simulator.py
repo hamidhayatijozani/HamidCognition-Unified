@@ -5,7 +5,6 @@ import hmac
 import json
 import os
 import random
-import time
 import uuid
 from datetime import datetime, timezone
 
@@ -25,19 +24,13 @@ def sign(payload: dict) -> str:
 def make_event(index: int, mode: str = "valid") -> dict:
     action = ["read_public", "send_email", "delete_file", "transfer_funds"][index % 4]
     event = {
-        "contract_version": "hhj-csg/1.0",
-        "request_id": f"evt-{index:04d}",
-        "tenant_id": "tenant-sim",
-        "agent_id": "agentrq-simulator",
-        "actor_id": "sim-actor",
-        "action": action,
+        "contract_version": "hhj-csg/1.0", "request_id": f"evt-{index:04d}", "tenant_id": "tenant-sim", "agent_id": "agentrq-simulator",
+        "actor_id": "sim-actor", "action": action,
         "target": "production-db" if action == "delete_file" and index % 8 == 0 else "public-resource",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "parameters": {"index": index, "nonce": uuid.uuid4().hex},
-        "context": {"scenario": mode, "seed": 42},
+        "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "parameters": {"index": index, "nonce": uuid.uuid4().hex}, "context": {"scenario": mode, "seed": 42},
     }
-    if mode == "malformed":
-        event.pop("contract_version")
+    if mode == "malformed": event.pop("contract_version")
     return event
 
 
@@ -49,16 +42,13 @@ def run(count: int = 200, base_url: str = BASE_URL) -> dict:
             mode = rng.choice(["valid"] * 7 + ["malformed", "signature_failure", "duplicate", "timeout"])
             event = make_event(index, mode)
             headers = {"Authorization": f"Bearer {TOKEN}", "Idempotency-Key": event["request_id"]}
-            if mode != "malformed":
-                headers["X-HCJ-Request-Signature"] = sign(event)
-            if mode == "signature_failure":
-                headers["X-HCJ-Request-Signature"] = "0" * 64
+            if mode != "malformed": headers["X-HCJ-Request-Signature"] = sign(event)
+            if mode == "signature_failure": headers["X-HCJ-Request-Signature"] = "0" * 64
             try:
                 results["sent"] += 1
                 response = client.post("/v1/csg/decide", json=event, headers=headers)
                 if response.status_code == 200:
-                    results["accepted"] += 1
-                    results["responses"].append(response.json())
+                    results["accepted"] += 1; results["responses"].append(response.json())
                 else:
                     results["rejected"] += 1
                     if mode == "malformed": results["malformed"] += 1
