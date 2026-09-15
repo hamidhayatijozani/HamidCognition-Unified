@@ -1,0 +1,50 @@
+name: HHJ-CSG Contract-First Vertical Slice
+
+on:
+  push:
+    paths:
+      - 'action_gate/contracts/**'
+      - 'action_gate/contract.py'
+      - 'action_gate/contract_app.py'
+      - 'action_gate/agent_rq_simulator.py'
+      - 'action_gate/replay_harness.py'
+      - 'action_gate/test_contract_vertical_slice.py'
+      - 'action_gate/test_agent_rq_simulator.py'
+      - 'action_gate/requirements.txt'
+      - '.github/workflows/hhj-csg-contract-slice.yml'
+  pull_request:
+    paths:
+      - 'action_gate/contracts/**'
+      - 'action_gate/contract.py'
+      - 'action_gate/contract_app.py'
+      - 'action_gate/agent_rq_simulator.py'
+      - 'action_gate/replay_harness.py'
+      - 'action_gate/test_contract_vertical_slice.py'
+      - 'action_gate/test_agent_rq_simulator.py'
+      - 'action_gate/requirements.txt'
+      - '.github/workflows/hhj-csg-contract-slice.yml'
+
+jobs:
+  contract-slice:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: python -m pip install -r action_gate/requirements.txt
+      - name: Validate JSON Schemas
+        run: python - <<'PY'
+          import json
+          from pathlib import Path
+          from jsonschema import Draft202012Validator
+          for path in Path('action_gate/contracts').glob('*.json'):
+              schema = json.loads(path.read_text())
+              Draft202012Validator.check_schema(schema)
+              print(f'{path}: schema PASS')
+          PY
+      - name: Run contract and ingress adversarial tests
+        run: pytest -q action_gate/test_contract_vertical_slice.py
+      - name: Run AgentRQ simulator and replay acceptance tests
+        run: pytest -q action_gate/test_agent_rq_simulator.py
