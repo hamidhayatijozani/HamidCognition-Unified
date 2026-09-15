@@ -29,6 +29,11 @@ jobs:
         env:
           ACTION_GATE_ENV: development
         run: pytest -q
+      - name: Run Validation Boundary conformance suite
+        working-directory: action_gate
+        env:
+          ACTION_GATE_ENV: development
+        run: pytest -q test_validation_boundary_conformance.py --junitxml=validation-boundary-junit.xml
       - name: Run real HTTP enforcement integration
         working-directory: action_gate
         run: python enforcement_integration.py
@@ -37,7 +42,7 @@ jobs:
         run: python mcp_integration.py
       - name: Compile runtime
         working-directory: action_gate
-        run: python -m py_compile app.py storage.py enforcement_integration.py mcp_integration.py
+        run: python -m py_compile app.py storage.py enforcement_integration.py mcp_integration.py test_validation_boundary_conformance.py
       - name: Validate production Compose
         working-directory: action_gate
         env:
@@ -67,6 +72,37 @@ jobs:
         run: |
           docker compose -f docker-compose.production.yml ps
           docker compose -f docker-compose.production.yml exec -T action-gate python -c 'import json,urllib.request; h={"Authorization":"Bearer ci-action-gate-token"}; health=json.load(urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:8000/health",headers=h))); assert health["status"]=="ok" and health["storage"]["backend"]=="postgresql", health; payload={"tenant_id":"compose-tenant","agent_id":"compose-agent","actor_id":"compose-actor","action":"read_public_file","target":"/public/info.txt","parameters":{}}; r=urllib.request.Request("http://enforcement:8080/execute",data=json.dumps(payload["parameters"]).encode(),headers={"Content-Type":"application/json","X-Agent-ID":"compose-agent","X-Actor-ID":"compose-actor","X-Tenant-ID":"compose-tenant","X-Action":"read_public_file","X-Action-Target":"/public/info.txt"}); out=json.load(urllib.request.urlopen(r)); assert out["enforced"] is True, out; did=out["decision"]["decision_id"]; e=json.load(urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:8000/v1/evidence/"+did+"?tenant_id=compose-tenant",headers=h))); assert e["execution"]["status"]=="EXECUTED" and e["tenant_id"]=="compose-tenant", e; print("REAL_POSTGRES_E2E_SMOKE_PASS")'
+      - name: Build validation evidence pack
+        if: always()
+        working-directory: action_gate
+        run: |
+          python - <<'PY'
+          import json, os, subprocess
+          pack = {
+              "product": "HamidCognition Action Gate",
+              "validation": "Action Gate Validation Boundary",
+              "repository": "hamidhayatijozani/HamidCognition-Unified",
+              "branch": os.environ.get("GITHUB_REF_NAME"),
+              "commit": os.environ.get("GITHUB_SHA"),
+              "workflow": os.environ.get("GITHUB_WORKFLOW"),
+              "run_id": os.environ.get("GITHUB_RUN_ID"),
+              "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+              "event": os.environ.get("GITHUB_EVENT_NAME"),
+              "status": "EVIDENCE_CAPTURED",
+              "claim_boundary": "The product gates establish only the tested decision-to-enforcement-to-tool-to-outcome path and its evidence/replay properties; they do not establish general agent safety, policy correctness, infrastructure security, or downstream outcome safety.",
+          }
+          with open("validation-evidence-pack.json", "w", encoding="utf-8") as f:
+              json.dump(pack, f, indent=2, sort_keys=True)
+          PY
+      - name: Upload validation evidence pack
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: action-gate-validation-evidence-${{ github.run_id }}
+          path: |
+            action_gate/validation-boundary-junit.xml
+            action_gate/validation-evidence-pack.json
+          if-no-files-found: warn
       - name: Stop production stack
         if: always()
         working-directory: action_gate
