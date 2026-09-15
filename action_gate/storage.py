@@ -29,6 +29,7 @@ def init_db() -> None:
         con.execute("CREATE TABLE IF NOT EXISTS record_versions (version_id TEXT PRIMARY KEY, decision_id TEXT NOT NULL, version INTEGER NOT NULL, event_type TEXT NOT NULL, record TEXT NOT NULL, created_at TEXT NOT NULL, UNIQUE(decision_id, version))")
         con.execute("CREATE TABLE IF NOT EXISTS audit_events (event_id TEXT PRIMARY KEY, decision_id TEXT, event_type TEXT NOT NULL, event TEXT NOT NULL, previous_hash TEXT NOT NULL, event_hash TEXT NOT NULL, created_at TEXT NOT NULL)")
         con.execute("CREATE TABLE IF NOT EXISTS idempotency_keys (tenant_id TEXT NOT NULL, idempotency_key TEXT NOT NULL, request_digest TEXT NOT NULL, response TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY (tenant_id, idempotency_key))")
+        con.execute("CREATE TABLE IF NOT EXISTS validation_events (event_id TEXT PRIMARY KEY, correlation_id TEXT NOT NULL, tenant_id TEXT, request_id TEXT, idempotency_key TEXT, request_digest TEXT, validation_result TEXT NOT NULL, error_code TEXT, raw_request TEXT NOT NULL, created_at TEXT NOT NULL)")
         con.commit()
         if backend() == "sqlite":
             con.execute("CREATE TRIGGER IF NOT EXISTS audit_events_no_update BEFORE UPDATE ON audit_events BEGIN SELECT RAISE(ABORT, 'audit_events_are_append_only'); END")
@@ -65,12 +66,28 @@ def save_idempotency(tenant_id: str, idempotency_key: str, request_digest: str, 
     con = connect()
     try:
         if backend() == "postgresql":
-            con.execute("INSERT INTO idempotency_keys VALUES (%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING", (tenant_id, idempotency_key, request_digest, response, created_at))
+            row = con.execute("INSERT INTO idempotency_keys VALUES (%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING RETURNING tenant_id", (tenant_id, idempotency_key, request_digest, response, created_at)).fetchone()
         else:
             con.execute("INSERT OR IGNORE INTO idempotency_keys VALUES (?,?,?,?,?)", (tenant_id, idempotency_key, request_digest, response, created_at))
-        changed = con.execute("SELECT changes()" if backend() == "sqlite" else "SELECT 1").fetchone()[0]
+            row = con.execute("SELECT changes()").fetchone()
         con.commit()
-        return bool(changed)
+        return bool(row)
+    except Exception:
+        con.rollback()
+        raise
+    finally:
+        con.close()
+
+
+def save_validation_event(*, correlation_id: str, tenant_id: str | None, request_id: str | None, idempotency_key: str | None, request_digest: str | None, validation_result: str, error_code: str | None, raw_request: str, created_at: str) -> None:
+    con = connect()
+    event_id = f"val_{uuid.uuid4().hex}"
+    try:
+        if backend() == "postgresql":
+            con.execute("INSERT INTO validation_events VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", (event_id, correlation_id, tenant_id, request_id, idempotency_key, request_digest, validation_result, error_code, raw_request, created_at))
+        else:
+            con.execute("INSERT INTO validation_events VALUES (?,?,?,?,?,?,?,?,?,?)", (event_id, correlation_id, tenant_id, request_id, idempotency_key, request_digest, validation_result, error_code, raw_request, created_at))
+        con.commit()
     except Exception:
         con.rollback()
         raise
