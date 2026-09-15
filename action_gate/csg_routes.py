@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import uuid
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Header, HTTPException, Request
 
@@ -24,31 +25,10 @@ async def csg_decide(
     correlation = correlation_id or f"corr_{uuid.uuid4().hex}"
     raw = (await request.body()).decode("utf-8", errors="replace")
     try:
-        decision, correlation = decide(req, authorization, idempotency_key, request_signature, correlation)
-        save_validation_event(
-            correlation_id=correlation,
-            tenant_id=req.tenant_id,
-            request_id=req.request_id,
-            idempotency_key=idempotency_key,
-            request_digest=decision.request_digest,
-            validation_result="PASS",
-            error_code=None,
-            raw_request=raw,
-            created_at=decision.issued_at.isoformat(),
-        )
+        payload = json.loads(raw)
+        decision, correlation = decide(req, authorization, idempotency_key, request_signature, correlation, raw_payload=payload)
+        save_validation_event(correlation_id=correlation, tenant_id=req.tenant_id, request_id=req.request_id, idempotency_key=idempotency_key, request_digest=decision.request_digest, validation_result="PASS", error_code=None, raw_request=raw, created_at=decision.issued_at.isoformat())
         return {"correlation_id": correlation, **decision.model_dump(mode="json")}
     except HTTPException as exc:
-        tenant = req.tenant_id if req else None
-        request_id = req.request_id if req else None
-        save_validation_event(
-            correlation_id=correlation,
-            tenant_id=tenant,
-            request_id=request_id,
-            idempotency_key=idempotency_key,
-            request_digest=None,
-            validation_result="REJECT",
-            error_code=str(exc.detail),
-            raw_request=raw,
-            created_at=__import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
-        )
+        save_validation_event(correlation_id=correlation, tenant_id=req.tenant_id, request_id=req.request_id, idempotency_key=idempotency_key, request_digest=None, validation_result="REJECT", error_code=str(exc.detail), raw_request=raw, created_at=datetime.now(timezone.utc).isoformat())
         raise
