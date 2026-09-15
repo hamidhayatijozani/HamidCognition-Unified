@@ -2,6 +2,11 @@ name: EXP-003 External Feed Replay
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - "RESEARCH/EXP003EXTERNAL_REPLAY.py"
+      - "RESEARCH/fixtures/externalfeed.json"
+      - ".github/workflows/run-exp-003.yml"
 
 jobs:
   exp-003:
