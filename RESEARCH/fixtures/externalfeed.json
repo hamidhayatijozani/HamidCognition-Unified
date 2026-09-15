@@ -1,0 +1,16 @@
+{
+  "fixture_id": "EXP-003-SYNTHETIC-001",
+  "fixture_status": "SYNTHETIC_TEST_FIXTURE",
+  "provenance": {
+    "source_type": "synthetic",
+    "external_source_claimed": false,
+    "purpose": "validate fixture loading, canonical hashing, and execution plumbing"
+  },
+  "schema_version": "1.0",
+  "feed": [
+    {"timestamp":"2026-01-01T00:00:00Z","symbol":"TEST","value":100.0},
+    {"timestamp":"2026-01-01T00:01:00Z","symbol":"TEST","value":100.5},
+    {"timestamp":"2026-01-01T00:02:00Z","symbol":"TEST","value":99.8},
+    {"timestamp":"2026-01-01T00:03:00Z","symbol":"TEST","value":100.2}
+  ]
+}
