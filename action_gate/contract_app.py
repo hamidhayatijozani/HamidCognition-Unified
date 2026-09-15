@@ -6,7 +6,9 @@ Run with: uvicorn action_gate.contract_app:app --port 8090
 """
 from __future__ import annotations
 
+import hmac
 import os
+import threading
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any
@@ -45,12 +47,14 @@ HMAC_KEY_ID = os.getenv("HHJ_CSG_HMAC_KEY_ID", "poc-key-1")
 MAX_REQUEST_AGE_SECONDS = int(os.getenv("HHJ_CSG_MAX_REQUEST_AGE_SECONDS", "300"))
 FUTURE_SKEW_SECONDS = int(os.getenv("HHJ_CSG_FUTURE_SKEW_SECONDS", "5"))
 DECISION_TTL_SECONDS = int(os.getenv("HHJ_CSG_DECISION_TTL_SECONDS", "300"))
+MAX_BODY_BYTES = int(os.getenv("HHJ_CSG_MAX_BODY_BYTES", str(1024 * 1024)))
 
 app = FastAPI(title="HHJ-CSG Contract-First Vertical Slice", version="0.1.0")
 _request_validator = Draft202012Validator(load_schema("permission_request.schema.json"), format_checker=FormatChecker())
 _decision_validator = Draft202012Validator(load_schema("decision_object.schema.json"), format_checker=FormatChecker())
 _idempotency: dict[str, tuple[str, dict[str, Any]]] = {}
 _audit: list[dict[str, Any]] = []
+_idempotency_lock = threading.Lock()
 
 POLICY_VERSION = "hhj-csg-policy-0.1"
 ALGORITHM_VERSION = "deterministic-policy-0.1"
@@ -61,13 +65,20 @@ def _error(code: str, detail: Any, status: int = 422) -> None:
 
 
 def authenticate(api_key: str | None) -> None:
-    if API_KEY is not None and api_key != API_KEY:
+    # Authentication is fail-closed: an unconfigured API key is a deployment
+    # error, not permission to accept unauthenticated high-impact requests.
+    if not API_KEY:
+        _error("AUTHENTICATION_NOT_CONFIGURED", "HHJ_CSG_API_KEY_required", 503)
+    if not isinstance(api_key, str) or not hmac.compare_digest(api_key, API_KEY):
         _error("AUTHENTICATION_FAILED", "invalid_api_key", 401)
 
 
 def verify_request_signature(request: dict[str, Any], signature: str | None) -> None:
-    if HMAC_SECRET is None:
-        return
+    # HMAC is mandatory for this contract-first ingress. There is deliberately
+    # no unsigned compatibility mode because that would make the security
+    # boundary depend on deployment configuration by accident.
+    if not HMAC_SECRET:
+        _error("SIGNATURE_NOT_CONFIGURED", "HHJ_CSG_HMAC_SECRET_required", 503)
     payload = {"contract_version": REQUEST_CONTRACT_VERSION, "request_digest": sha256_digest(request)}
     if not verify_hmac(payload, signature or "", HMAC_SECRET):
         _error("SIGNATURE_INVALID", "request_hmac_verification_failed", 401)
@@ -129,15 +140,10 @@ def make_decision(request: dict[str, Any], trace_id: str) -> dict[str, Any]:
         "execution_receipt": {"status": "PENDING_EXECUTION", "decision_id": decision_id, "request_digest": request_digest},
         "trace_id": trace_id,
     }
-    if HMAC_SECRET is None:
-        # No secret means the POC can still exercise the contract, but it must
-        # never be described as authenticated. The signature field is absent.
-        result["signature"] = "0" * 64
-    else:
-        result["signature"] = hmac_sha256(decision_signing_payload(result), HMAC_SECRET)
+    result["signature"] = hmac_sha256(decision_signing_payload(result), HMAC_SECRET)
     result["decision_digest"] = sha256_digest({k: v for k, v in result.items() if k not in {"decision_digest", "signature"}})
-    if HMAC_SECRET is not None:
-        result["signature"] = hmac_sha256(decision_signing_payload(result), HMAC_SECRET)
+    # decision_digest is itself covered by the final signature.
+    result["signature"] = hmac_sha256(decision_signing_payload(result), HMAC_SECRET)
     return result
 
 
@@ -147,38 +153,67 @@ def health() -> dict[str, Any]:
 
 
 @app.post("/decide")
-async def decide(request: Request, x_api_key: str | None = Header(default=None), x_hhj_signature: str | None = Header(default=None), x_hhj_key_id: str | None = Header(default=None), x_hhj_canonicalization: str | None = Header(default=None)) -> dict[str, Any]:
+async def decide(
+    request: Request,
+    x_api_key: str | None = Header(default=None),
+    x_hhj_signature: str | None = Header(default=None),
+    x_hhj_key_id: str | None = Header(default=None),
+    x_hhj_canonicalization: str | None = Header(default=None),
+    idempotency_key: str | None = Header(default=None),
+) -> dict[str, Any]:
     authenticate(x_api_key)
-    if x_hhj_canonicalization not in (None, CANONICALIZATION_VERSION):
+    if x_hhj_canonicalization != CANONICALIZATION_VERSION:
         _error("CANONICALIZATION_UNSUPPORTED", x_hhj_canonicalization, 422)
-    if x_hhj_key_id not in (None, HMAC_KEY_ID):
+    if x_hhj_key_id != HMAC_KEY_ID:
         _error("KEY_ID_UNKNOWN", x_hhj_key_id, 401)
+    content_length = request.headers.get("content-length")
+    if content_length is not None:
+        try:
+            if int(content_length) > MAX_BODY_BYTES:
+                _error("REQUEST_TOO_LARGE", "request_body_exceeds_limit", 413)
+        except ValueError:
+            _error("MALFORMED_CONTENT_LENGTH", "content_length_is_invalid", 400)
     try:
         body = await request.json()
     except Exception:
         _error("MALFORMED_JSON", "request_body_is_not_valid_json", 400)
     if not isinstance(body, dict):
         _error("INVALID_REQUEST", "permission_request_must_be_object", 422)
+    if idempotency_key is None or not idempotency_key.strip():
+        _error("IDEMPOTENCY_KEY_REQUIRED", "Idempotency-Key_header_required", 400)
+    if idempotency_key != body.get("idempotency_key"):
+        _error("IDEMPOTENCY_KEY_MISMATCH", "header_must_match_body_idempotency_key", 409)
     errors = sorted(_request_validator.iter_errors(body), key=lambda e: list(e.path))
     if errors:
         _error("SCHEMA_INVALID", [{"path": list(e.path), "message": e.message} for e in errors], 422)
     validate_timestamp(body["timestamp"])
     request_digest = sha256_digest(body)
     verify_request_signature(body, x_hhj_signature)
-    idem = body["idempotency_key"]
-    prior = _idempotency.get(idem)
-    if prior is not None:
-        prior_digest, prior_response = prior
-        if prior_digest != request_digest:
-            _error("IDEMPOTENCY_KEY_REUSED", "same_key_with_different_request_digest", 409)
-        return {**prior_response, "replayed": True}
-    trace_id = "trace_" + uuid.uuid4().hex
-    response = make_decision(body, trace_id)
-    decision_errors = sorted(_decision_validator.iter_errors(response), key=lambda e: list(e.path))
-    if decision_errors:
-        _error("INTERNAL_CONTRACT_VIOLATION", [e.message for e in decision_errors], 500)
-    _idempotency[idem] = (request_digest, response)
-    _audit.append({"correlation_id": trace_id, "raw_request": body, "request_digest": request_digest, "validation": "VALID", "decision_digest": response["decision_digest"], "decision": response["decision"]})
+
+    # Reserve the idempotency key atomically before constructing the response.
+    # The in-memory ledger is intentionally POC-only and must be replaced by a
+    # durable shared store before multi-worker or multi-instance deployment.
+    with _idempotency_lock:
+        prior = _idempotency.get(idempotency_key)
+        if prior is not None:
+            prior_digest, prior_response = prior
+            if prior_digest != request_digest:
+                _error("IDEMPOTENCY_KEY_REUSED", "same_key_with_different_request_digest", 409)
+            return {**prior_response, "replayed": True}
+        trace_id = "trace_" + uuid.uuid4().hex
+        response = make_decision(body, trace_id)
+        decision_errors = sorted(_decision_validator.iter_errors(response), key=lambda e: list(e.path))
+        if decision_errors:
+            _error("INTERNAL_CONTRACT_VIOLATION", [e.message for e in decision_errors], 500)
+        _idempotency[idempotency_key] = (request_digest, response)
+        _audit.append({
+            "correlation_id": trace_id,
+            "raw_request": body,
+            "request_digest": request_digest,
+            "validation": "VALID",
+            "decision_digest": response["decision_digest"],
+            "decision": response["decision"],
+        })
     return {**response, "replayed": False}
 
 
