@@ -1,5 +1,4 @@
 import importlib
-import os
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -33,14 +32,15 @@ def request_body(event_id="evt-001", action="read"):
     }
 
 
-def signed_headers(module, body):
+def signed_headers(module, body, *, api_key="test-api-key", secret="test-secret", idem=None):
     from action_gate.contract import hmac_sha256, sha256_digest
     payload = {"contract_version": "PR-0.1", "request_digest": sha256_digest(body)}
     return {
-        "X-API-Key": "test-api-key",
+        "X-API-Key": api_key,
         "X-HHJ-Canonicalization": "JCS-LITE-0.1",
         "X-HHJ-Key-Id": module.HMAC_KEY_ID,
-        "X-HHJ-Signature": hmac_sha256(payload, "test-secret"),
+        "X-HHJ-Signature": hmac_sha256(payload, secret),
+        "Idempotency-Key": idem or body["idempotency_key"],
     }
 
 
@@ -75,6 +75,22 @@ async def test_idempotency_key_cannot_bind_two_requests(monkeypatch):
 
 
 @pytest.mark.anyio
+async def test_idempotency_header_is_required_and_must_match_body(monkeypatch):
+    module = load_app(monkeypatch)
+    body = request_body()
+    headers = signed_headers(module, body)
+    headers.pop("Idempotency-Key")
+    async with AsyncClient(transport=ASGITransport(app=module.app), base_url="http://test") as client:
+        missing = await client.post("/decide", json=body, headers=headers)
+        headers = signed_headers(module, body, idem="different-key")
+        mismatch = await client.post("/decide", json=body, headers=headers)
+    assert missing.status_code == 400
+    assert missing.json()["detail"]["code"] == "IDEMPOTENCY_KEY_REQUIRED"
+    assert mismatch.status_code == 409
+    assert mismatch.json()["detail"]["code"] == "IDEMPOTENCY_KEY_MISMATCH"
+
+
+@pytest.mark.anyio
 async def test_signature_failure_is_rejected(monkeypatch):
     module = load_app(monkeypatch)
     body = request_body()
@@ -87,12 +103,25 @@ async def test_signature_failure_is_rejected(monkeypatch):
 
 
 @pytest.mark.anyio
+async def test_authentication_and_hmac_are_fail_closed(monkeypatch):
+    monkeypatch.delenv("HHJ_CSG_API_KEY", raising=False)
+    monkeypatch.delenv("HHJ_CSG_HMAC_SECRET", raising=False)
+    import action_gate.contract_app as module
+    module = importlib.reload(module)
+    body = request_body("evt-unconfigured")
+    async with AsyncClient(transport=ASGITransport(app=module.app), base_url="http://test") as client:
+        response = await client.post("/decide", json=body)
+    assert response.status_code == 503
+    assert response.json()["detail"]["code"] == "AUTHENTICATION_NOT_CONFIGURED"
+
+
+@pytest.mark.anyio
 async def test_schema_and_timestamp_boundaries(monkeypatch):
     module = load_app(monkeypatch)
     malformed = request_body()
     del malformed["agent_id"]
     async with AsyncClient(transport=ASGITransport(app=module.app), base_url="http://test") as client:
-        bad_schema = await client.post("/decide", json=malformed, headers={"X-API-Key": "test-api-key"})
+        bad_schema = await client.post("/decide", json=malformed, headers=signed_headers(module, malformed))
         stale = request_body("evt-stale")
         stale["timestamp"] = (datetime.now(timezone.utc) - timedelta(seconds=301)).isoformat()
         stale_headers = signed_headers(module, stale)
