@@ -1,0 +1,28 @@
+{
+  "experiment_id": "EXP-001",
+  "vector_id": "EXP-001-V001",
+  "vector_sha256": "54af954904c54efc7b70bdfe00ecf6b7b80bc8a9cdc628cfcba6e1beb068f16c4e620a",
+  "source_sha": {
+    "V-A": "1c71fd77b7bf3cde5665a7eb413d3a55aac0e402",
+    "V-B": "3cf67fec9a95198a1045dab98ee0ce6016d90e54",
+    "V-C": "226c748173c98017d65446735c0fe87f09506073",
+    "V-D": "589ab1e0e0330d0efaff088ef67bb79a8e86f04d"
+  },
+  "trajectory_fingerprint_sha256": {
+    "V-A": "96b00bb0b22024ceb46d8698c5e4b3ae4a2729c8853d5c5c7f6e2d7a64b45d62",
+    "V-B": "33db870eb03492ce753a57387cd12e132fee7d3d56de86fc6b6a197a0295e4c1",
+    "V-C": "a74624165bfe2bc6df31303113a735eddc9261c399014bda98c0fb3a83586f73",
+    "V-D": "dd5fe180e945c41a7c70bdfe00ec1f18d61dac1ecf300ac2d7f17234fd1a50f7"
+  },
+  "pairwise": {
+    "V-A vs V-B": {"max_state_euclidean_divergence": 0.05, "verdict": "DIVERGENT"},
+    "V-A vs V-C": {"max_state_euclidean_divergence": 0.10242466, "verdict": "DIVERGENT"},
+    "V-A vs V-D": {"max_state_euclidean_divergence": 1.54626586, "verdict": "DIVERGENT_STRUCTURAL"},
+    "V-B vs V-C": {"max_state_euclidean_divergence": 0.07470482, "verdict": "DIVERGENT"},
+    "V-B vs V-D": {"max_state_euclidean_divergence": 1.57271658, "verdict": "DIVERGENT_STRUCTURAL"},
+    "V-C vs V-D": {"max_state_euclidean_divergence": 1.64533122, "verdict": "DIVERGENT_STRUCTURAL"}
+  },
+  "overall_verdict": "NO_CANONICAL_EQUIVALENCE_ESTABLISHED",
+  "replay_status": "DETERMINISTIC_FOR_FROZEN_VECTOR",
+  "interpretation": "All four variants execute under the experiment adapter contract, but none of the pairwise trajectories are exactly equivalent. V-D uses materially different absolute dynamics and phase semantics; its numerical divergence is not a quality ranking."
+}
