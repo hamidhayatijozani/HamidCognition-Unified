@@ -32,20 +32,32 @@ jobs:
         run: |
           python replay.py > /tmp/exp001-replay.json
           grep '"identical_fingerprints": true' /tmp/exp001-replay.json
-      - name: Verify EXP-003 fixture harness
+      - name: Verify EXP-003 external snapshot harness
         run: |
           test -f RESEARCH/EXP003EXTERNAL_REPLAY.py
           test -f RESEARCH/fixtures/externalfeed.json
-      - name: Run EXP-003 mechanism replay
+          python - <<'PY'
+          import json
+          p = json.load(open('RESEARCH/fixtures/externalfeed.json', encoding='utf-8'))
+          assert p['fixture_status'] == 'EXTERNAL_SOURCE_SNAPSHOT'
+          assert p['provenance']['source_type'] == 'external'
+          assert p['provenance']['external_source_claimed'] is True
+          assert p['provenance']['source_url']
+          assert p['provenance']['retrieved_at_utc']
+          assert p['provenance']['preprocessing']
+          assert len(p['feed']) >= 2
+          PY
+      - name: Run EXP-003 real-source replay
         run: python RESEARCH/EXP003EXTERNAL_REPLAY.py
-      - name: Validate EXP-003 mechanism result
+      - name: Validate EXP-003 real-source result
         run: |
           test -f RESEARCH/EXP003RESULT.json
           python -m json.tool RESEARCH/EXP003RESULT.json
-          grep '"experiment_status": "MECHANISM_LEVEL_EXECUTED"' RESEARCH/EXP003RESULT.json
+          grep '"experiment_status": "REAL_EXTERNAL_SNAPSHOT_REPLAY_EXECUTED"' RESEARCH/EXP003RESULT.json
+          grep '"external_source_provenance_present": true' RESEARCH/EXP003RESULT.json
           grep '"deterministic_replay": true' RESEARCH/EXP003RESULT.json
-          grep '"external_feed_sensitivity": true' RESEARCH/EXP003RESULT.json
-          grep '"result_class": "SUPPORTED_MECHANISM_ONLY"' RESEARCH/EXP003RESULT.json
+          grep '"real_external_snapshot_input_sensitivity": true' RESEARCH/EXP003RESULT.json
+          grep '"result_class": "SUPPORTED_REAL_SOURCE_REPLAY_MECHANISM"' RESEARCH/EXP003RESULT.json
       - name: Upload EXP-003 result
         uses: actions/upload-artifact@v4
         with:
