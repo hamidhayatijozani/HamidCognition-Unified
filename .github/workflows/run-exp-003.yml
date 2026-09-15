@@ -1,0 +1,40 @@
+name: EXP-003 External Feed Replay
+
+on:
+  workflow_dispatch:
+
+jobs:
+  exp-003:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Verify Python
+        run: python --version
+
+      - name: Verify EXP-003 files
+        run: |
+          test -f RESEARCH/EXP003EXTERNAL_REPLAY.py
+          test -f RESEARCH/fixtures/externalfeed.json
+
+      - name: Run EXP-003
+        run: |
+          python RESEARCH/EXP003EXTERNAL_REPLAY.py
+
+      - name: Validate result
+        run: |
+          test -f RESEARCH/EXP003RESULT.json
+          python -m json.tool RESEARCH/EXP003RESULT.json
+
+      - name: Upload EXP-003 result
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp-003-result
+          path: RESEARCH/EXP003RESULT.json
