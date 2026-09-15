@@ -1,4 +1,4 @@
-import hashlib, json, math, platform, statistics, time, urllib.parse, urllib.request
+import hashlib, json, platform, random, statistics, time, urllib.parse, urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -11,6 +11,8 @@ HORIZONS_MIN = (5, 10, 20)
 LOOKBACK_BARS = 20
 FRICTION = 0.0002
 MIN_OBS = 500
+BOOTSTRAP_RESAMPLES = 1000
+PERMUTATION_RESAMPLES = 1000
 SOURCE_REPO = 'https://github.com/hamidhayatijozani/hamidcognition-realtime/blob/main/models/predictor.py'
 AUDITED_SOURCE_SHA = 'df584043edb5fa5a2037adbc72f1bf90568ac9da'
 
@@ -21,14 +23,12 @@ def sha(b):
 
 def fetch(period1, period2):
     params = urllib.parse.urlencode({
-        'period1': int(period1),
-        'period2': int(period2),
-        'interval': INTERVAL,
-        'includePrePost': 'false',
+        'period1': int(period1), 'period2': int(period2),
+        'interval': INTERVAL, 'includePrePost': 'false',
         'events': 'div,splits,capitalGains',
     })
     url = YAHOO + '?' + params
-    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 HamidCognition-EXP004/2.1'})
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 HamidCognition-EXP004/2.2'})
     with urllib.request.urlopen(req, timeout=30) as r:
         return url, r.read()
 
@@ -44,8 +44,7 @@ def parse(raw):
     ts = result.get('timestamp', [])
     q = (result.get('indicators', {}).get('quote') or [{}])[0]
     closes = q.get('close', [])
-    rows = sorted({int(t): float(c) for t, c in zip(ts, closes) if c is not None}.items())
-    return rows
+    return sorted({int(t): float(c) for t, c in zip(ts, closes) if c is not None}.items())
 
 
 def slope(xs):
@@ -57,13 +56,11 @@ def slope(xs):
 
 
 def predictor_direction(window, minute, current):
-    # Exact direction-producing path of ForexPredictor.predict_future(), with
-    # cognitive_bias frozen to zero: current + slope * minute.
     s = slope(window)
-    predicted = current + s * minute
+    predicted = current + s * minute  # cognitive_bias = 0
     if abs(predicted - current) < current * 0.0001:
-        return 0, predicted, s
-    return (1 if predicted > current else -1), predicted, s
+        return 0
+    return 1 if predicted > current else -1
 
 
 def majority_direction(prices):
@@ -75,35 +72,21 @@ def persistence_direction(prices):
     return 1 if prices[-1] > prices[-2] else -1
 
 
-def bootstrap_ci(values, seed=20260915, n=4000):
-    if not values:
-        return [None, None]
-    state = seed & 0x7fffffff
-    samples = []
+def bootstrap_ci(values, seed=20260915, n=BOOTSTRAP_RESAMPLES):
+    rng = random.Random(seed)
     m = len(values)
-    for _ in range(n):
-        total = 0.0
-        for _ in range(m):
-            state = (1103515245 * state + 12345) & 0x7fffffff
-            total += values[state % m]
-        samples.append(total / m)
-    samples.sort()
-    return [samples[int(0.025 * (n - 1))], samples[int(0.975 * (n - 1))]]
+    means = [sum(rng.choices(values, k=m)) / m for _ in range(n)]
+    means.sort()
+    return [means[int(0.025 * (n - 1))], means[int(0.975 * (n - 1))]]
 
 
-def permutation_pvalue(values, seed=20260915, n=4000):
-    if not values:
-        return None
+def permutation_pvalue(values, seed=20260915, n=PERMUTATION_RESAMPLES):
+    rng = random.Random(seed)
     observed = abs(sum(values) / len(values))
-    state = seed & 0x7fffffff
     extreme = 0
-    m = len(values)
     for _ in range(n):
-        total = 0.0
-        for v in values:
-            state = (1103515245 * state + 12345) & 0x7fffffff
-            total += v if (state & 1) else -v
-        if abs(total / m) >= observed - 1e-15:
+        total = sum(v if rng.getrandbits(1) else -v for v in values)
+        if abs(total / len(values)) >= observed - 1e-15:
             extreme += 1
     return (extreme + 1) / (n + 1)
 
@@ -117,13 +100,12 @@ def evaluate(rows):
         model_correct, base_correct, pers_correct = [], [], []
         cost_return = 0.0
         for i in range(LOOKBACK_BARS, len(prices) - horizon):
-            window = prices[i-LOOKBACK_BARS:i]
             current = prices[i]
             actual_move = prices[i+horizon] - current
             if actual_move == 0:
                 continue
             actual = 1 if actual_move > 0 else -1
-            pred, _, _ = predictor_direction(window, minute, current)
+            pred = predictor_direction(prices[i-LOOKBACK_BARS:i], minute, current)
             base = majority_direction(prices[:i])
             pers = persistence_direction(prices[:i])
             model_correct.append(1 if pred == actual else 0)
@@ -142,8 +124,8 @@ def evaluate(rows):
             'majority_baseline_accuracy': sum(base_correct) / len(base_correct),
             'persistence_baseline_accuracy': sum(pers_correct) / len(pers_correct),
             'accuracy_delta_vs_majority': sum(deltas) / len(deltas),
-            'accuracy_delta_bootstrap_95ci': bootstrap_ci(deltas),
-            'paired_sign_flip_p_value': permutation_pvalue(deltas),
+            'accuracy_delta_bootstrap_95ci': bootstrap_ci(deltas) if minute == 5 else None,
+            'paired_sign_flip_p_value': permutation_pvalue(deltas) if minute == 5 else None,
             'cost_aware_return': cost_return,
             'integrity': {
                 'chronological': all(timestamps[i] < timestamps[i+1] for i in range(len(timestamps)-1)),
@@ -156,8 +138,8 @@ def evaluate(rows):
 
 def main():
     now = int(time.time())
-    # Yahoo currently limits 5m history to roughly the most recent 60 days.
-    # Keep a safety margin: two disjoint 25-day windows entirely inside that limit.
+    # Two disjoint 25-day windows with a safety margin inside Yahoo's recent
+    # 5-minute-history availability boundary.
     windows = [
         ('snapshot_A', now - 27*86400, now - 2*86400),
         ('snapshot_B', now - 55*86400, now - 30*86400),
@@ -212,8 +194,8 @@ def main():
             'secondary_baseline': 'previous-direction persistence',
             'friction_round_trip': FRICTION,
             'independent_snapshots': 2,
-            'permutation_resamples': 4000,
-            'bootstrap_resamples': 4000,
+            'permutation_resamples': PERMUTATION_RESAMPLES,
+            'bootstrap_resamples': BOOTSTRAP_RESAMPLES,
         },
         'snapshots': snapshots,
         'primary_summary': {
