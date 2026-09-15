@@ -35,7 +35,8 @@ def execute(data, tenant=TENANT, action_hash=None, nonce=None, outcome=None):
 
 def test_vb01_canonical_action_binding_is_stable():
     data = evaluate(parameters={"b": 2, "a": 1})
-    assert data["action_hash"] == gate.digest(gate.normalized_action(gate.ActionRequest.model_validate({"tenant_id": TENANT, "agent_id": "vb-agent", "actor_id": "vb-actor", "action": "read_public_file", "target": "/public/info.txt", "parameters": {"a": 1, "b": 2}})))
+    expected = gate.digest(gate.normalized_action(gate.ActionRequest.model_validate({"tenant_id": TENANT, "agent_id": "vb-agent", "actor_id": "vb-actor", "action": "read_public_file", "target": "/public/info.txt", "parameters": {"a": 1, "b": 2}})))
+    assert data["action_hash"] == expected
 
 
 def test_vb02_decision_integrity_signature_verifies():
@@ -65,8 +66,7 @@ def test_vb05_actor_binding_is_recorded_in_evidence():
 def test_vb06_one_time_execution_nonce_is_consumed():
     data = evaluate()
     assert execute(data).status_code == 200
-    replay = execute(data)
-    assert replay.status_code == 409
+    assert execute(data).status_code == 409
 
 
 def test_vb07_attestation_signature_tampering_is_detected():
@@ -88,8 +88,7 @@ def test_vb08_production_authentication_fails_closed():
 
 def test_vb09_evidence_continuity_survives_execution():
     data = evaluate()
-    executed = execute(data)
-    assert executed.status_code == 200
+    assert execute(data).status_code == 200
     evidence = client.get(f"/v1/evidence/{data['decision_id']}?tenant_id={TENANT}").json()
     assert evidence["execution"]["status"] == "EXECUTED"
     assert evidence["outcome"]["ok"] is True
@@ -123,14 +122,17 @@ def test_vb12_persistence_record_is_loadable_and_audited():
 def test_adversarial_parameter_change_changes_authority():
     data = evaluate(parameters={"amount": 10})
     request = gate.ActionRequest.model_validate({"tenant_id": TENANT, "agent_id": "vb-agent", "actor_id": "vb-actor", "action": "read_public_file", "target": "/public/info.txt", "parameters": {"amount": 11}})
-    assert gate.digest(gate.normalized_action(request)) != data["action_hash"]
-    assert execute(data, action_hash=gate.digest(gate.normalized_action(request))).status_code == 409
+    changed_hash = gate.digest(gate.normalized_action(request))
+    assert changed_hash != data["action_hash"]
+    assert execute(data, action_hash=changed_hash).status_code == 409
 
 
 def test_adversarial_expired_decision_is_rejected():
     data = evaluate()
     record = gate.load(data["decision_id"], TENANT)
     record["expires_at"] = "2000-01-01T00:00:00+00:00"
+    record["decision_signature"] = gate.sign({"decision_id": record["decision_id"], "tenant_id": record["tenant_id"], "action_hash": record["action_hash"], "policy_hash": record["policy_hash"], "nonce": record["nonce"], "expires_at": record["expires_at"]})
+    record["evidence_hash"] = gate.digest(record)
     gate.save(record, "TEST_EXPIRE")
     assert execute(data).status_code == 403
 
