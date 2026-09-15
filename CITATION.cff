@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use, discuss, or cite HamidCognition, please cite the project and identify the exact release, commit, or DOI where possible."
+title: "HamidCognition-Unified"
+type: software
+version: "0.1.0-research"
+date-released: 2026-09-15
+url: "https://github.com/hamidhayatijozani/HamidCognition-Unified"
+authors:
+  - family-names: "Jozani"
+    given-names: "Hamid Hayati"
+keywords:
+  - cognitive systems
+  - cognitive state
+  - evidence-aware systems
+  - decision governance
+  - behavioral state transfer
+  - unknown-space exploration
+  - research software
+abstract: "Unified provenance and research record for the HamidCognition program, preserving implementations, hypotheses, experiments, contradictions, unknowns, and source lineage."
+license: "NOASSERTION"
