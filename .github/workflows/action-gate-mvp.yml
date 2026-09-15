@@ -1,0 +1,26 @@
+name: Action Gate MVP
+
+on:
+  push:
+    paths:
+      - 'action_gate/**'
+      - '.github/workflows/action-gate-mvp.yml'
+  pull_request:
+    paths:
+      - 'action_gate/**'
+      - '.github/workflows/action-gate-mvp.yml'
+
+jobs:
+  mvp:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: action_gate
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: pytest -q
+      - run: python demo.py
