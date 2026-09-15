@@ -28,8 +28,6 @@ jobs:
         working-directory: action_gate
         env:
           ACTION_GATE_ENV: development
-          ACTION_GATE_API_TOKEN: ci-csg-token
-          ACTION_GATE_SIGNING_SECRET: ci-csg-secret
         run: pytest -q
       - name: Run Validation Boundary conformance suite
         working-directory: action_gate
@@ -39,13 +37,12 @@ jobs:
       - name: Run real HTTP enforcement integration
         working-directory: action_gate
         run: python enforcement_integration.py
-      # MCP integration owns its complete local Gate/tool/proxy topology.
       - name: Run real MCP enforcement integration
         working-directory: action_gate
         run: python mcp_integration.py
       - name: Compile runtime
         working-directory: action_gate
-        run: python -m py_compile app.py storage.py rate_limit.py canonicalization.py csg_contract.py csg_ingress.py csg_routes.py agentrq_simulator.py csg_acceptance.py enforcement_integration.py mcp_integration.py test_validation_boundary_conformance.py
+        run: python -m py_compile app.py storage.py rate_limit.py canonicalization.py csg_contract.py csg_ingress.py csg_routes.py csg_validation_handler.py agentrq_simulator.py csg_acceptance.py enforcement_integration.py mcp_integration.py test_validation_boundary_conformance.py
       - name: Validate production Compose
         working-directory: action_gate
         env:
@@ -84,21 +81,8 @@ jobs:
         run: |
           python - <<'PY'
           import json, os
-          pack = {
-              "product": "HamidCognition Action Gate",
-              "validation": "Action Gate Validation Boundary + HHJ-CSG Contract-First Vertical Slice",
-              "repository": "hamidhayatijozani/HamidCognition-Unified",
-              "branch": os.environ.get("GITHUB_REF_NAME"),
-              "commit": os.environ.get("GITHUB_SHA"),
-              "workflow": os.environ.get("GITHUB_WORKFLOW"),
-              "run_id": os.environ.get("GITHUB_RUN_ID"),
-              "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
-              "event": os.environ.get("GITHUB_EVENT_NAME"),
-              "status": "EVIDENCE_CAPTURED",
-              "claim_boundary": "The product gates establish only the tested decision-to-enforcement-to-tool-to-outcome path and the HHJ-CSG contract, authenticity, idempotency and replay properties exercised here; they do not establish general agent safety, policy correctness, infrastructure security, or downstream outcome safety.",
-          }
-          with open("validation-evidence-pack.json", "w", encoding="utf-8") as f:
-              json.dump(pack, f, indent=2, sort_keys=True)
+          pack = {"product": "HamidCognition Action Gate", "validation": "Action Gate Validation Boundary + HHJ-CSG Contract-First Vertical Slice", "repository": "hamidhayatijozani/HamidCognition-Unified", "branch": os.environ.get("GITHUB_REF_NAME"), "commit": os.environ.get("GITHUB_SHA"), "workflow": os.environ.get("GITHUB_WORKFLOW"), "run_id": os.environ.get("GITHUB_RUN_ID"), "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"), "event": os.environ.get("GITHUB_EVENT_NAME"), "status": "EVIDENCE_CAPTURED", "claim_boundary": "The product gates establish only the tested decision-to-enforcement-to-tool-to-outcome path and the HHJ-CSG contract, authenticity, idempotency and replay properties exercised here; they do not establish general agent safety, policy correctness, infrastructure security, or downstream outcome safety."}
+          with open("validation-evidence-pack.json", "w", encoding="utf-8") as f: json.dump(pack, f, indent=2, sort_keys=True)
           PY
       - name: Upload validation evidence pack
         if: always()
