@@ -24,6 +24,14 @@ try:
         except urllib.error.HTTPError as e:
             return e.code, json.loads(e.read())
 
+    def get(url):
+        req = urllib.request.Request(url)
+        try:
+            with urllib.request.urlopen(req) as r:
+                return r.status, json.loads(r.read())
+        except urllib.error.HTTPError as e:
+            return e.code, json.loads(e.read())
+
     blocked_headers = {"X-Agent-ID": "demo", "X-Action": "delete_file", "X-Action-Target": "/production/data.db"}
     status, blocked = post("http://127.0.0.1:8080/execute", {"x": 1}, blocked_headers)
     assert status == 200 and blocked["enforced"] is False and blocked["decision"]["decision"] == "DENY"
@@ -35,6 +43,8 @@ try:
     bound_headers = {**allowed_headers, "X-HCJ-Decision-ID": decision_id}
     status, executed = post("http://127.0.0.1:8080/execute", {"x": 1}, bound_headers)
     assert status == 200 and executed["tool_executed"] is True
+    status, evidence = get(f"http://127.0.0.1:8000/v1/evidence/{decision_id}")
+    assert status == 200 and evidence["execution"]["status"] == "EXECUTED"
 
     altered_headers = {**allowed_headers, "X-HCJ-Decision-ID": decision_id, "X-Action-Target": "/other-target"}
     status, mismatch = post("http://127.0.0.1:8080/execute", {"x": 1}, altered_headers)
