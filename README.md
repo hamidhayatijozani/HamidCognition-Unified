@@ -13,6 +13,15 @@ HamidCognition فقط یک مجموعه کد نیست. این مخزن باید 
 
 هدف Unified بنابراین «یکسان‌سازی مصنوعی» نیست؛ هدف، ساختن یک **ردیابی قابل بازسازی از تکامل ایده تا آزمون و نتیجه** است.
 
+## Current evidence state
+
+- **EXP-001 P/S/T conformance:** executed; replay verified for the frozen vector; no canonical equivalence established.
+- **EXP-002 predictor audit:** static leakage audit established; real historical walk-forward evidence still required.
+- **EXP-003 external-feed replay:** protocol ready; immutable fixture required.
+- **EXP-004 scale-breaking retest:** protocol ready; frozen prior data/code required.
+
+See `RESEARCH/COMPLETION_STATUS.md` for the current promotion boundary. Open blockers are tracked as GitHub issues rather than hidden as unfinished work.
+
 ## Core research lines
 
 - **P/S/T Cognitive State Engine** — محاسبه و بررسی وضعیت شناختی و رفتارهای مشتق‌شده.
@@ -68,8 +77,9 @@ CANONICALIZATION or ARCHIVE
 - **Claim Strength Gate** — شدت ادعا نباید از قدرت evidence فراتر برود.
 - **Provenance Seal** — اتصال نسخه پژوهشی به commit و release برای جلوگیری از ابهام درباره اینکه «کدام نسخه» مورد استناد بوده است.
 - **Mutation / Falsification Lab** — تغییر کنترل‌شده فرضیات برای تلاش فعالانه جهت شکست مدل.
+- **Executable contradiction guard** — تناقض‌های unresolved اجازه promotion به VERIFIED نمی‌گیرند.
 
-جزئیات در `RESEARCH/INNOVATION_ARCHITECTURE.md` ثبت شده است.
+جزئیات در `RESEARCH/INNOVATION_ARCHITECTURE.md` و `RESEARCH/COMPLETION_STATUS.md` ثبت شده است.
 
 ## Project lineage
 
@@ -96,12 +106,19 @@ CANONICALIZATION or ARCHIVE
 - `PROJECT_CATALOG.md` — کاتالوگ رسمی خطوط پروژه
 - `RIGHTS_AND_PROVENANCE.md` — provenance، انتساب و حقوق
 - `CITATION.cff` — فرمت machine-readable برای citation
+- `RESEARCH/COMPLETION_STATUS.md` — وضعیت واقعی شواهد و blockers
+- `RESEARCH/REGISTRY.yaml` — registry و promotion state
+- `RESEARCH/CONTRADICTION_LEDGER.py` — validator اجرایی تناقض‌ها
 - `RESEARCH/INNOVATION_ARCHITECTURE.md` — معماری پژوهشی و نوآوری‌های زیرساختی
 - `RESEARCH/IDEA_REGISTRY.md` — رجیستری ایده‌ها
 - `RESEARCH/RESEARCH_GRAPH.md` — گراف مفهومی و lineage
 - `RESEARCH/EXPERIMENT_PROTOCOL.md` — پروتکل آزمایش
 - `RESEARCH/UNKNOWN_SPACE.md` — فضای ناشناخته و پرسش‌های باز
 - `RESEARCH/CANONICALIZATION_GATE.md` — معیار ارتقای implementation به canonical
+- `experiments/EXP-001/` — P/S/T conformance and replay evidence
+- `experiments/EXP-002/` — predictor leakage/walk-forward audit
+- `experiments/EXP-003/` — external-feed replay protocol
+- `experiments/EXP-004/` — amplitude-dependent restoring-force retest
 - `MIGRATION/` — lineage، تضادها و تصمیم‌های ادغام
 
 ## Citation
