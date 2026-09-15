@@ -34,4 +34,10 @@ jobs:
         run: python -m py_compile app.py storage.py enforcement_integration.py mcp_integration.py
       - name: Validate production Compose
         working-directory: action_gate
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml config
