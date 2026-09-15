@@ -71,7 +71,28 @@ jobs:
           DOMAIN: localhost
         run: |
           docker compose -f docker-compose.production.yml ps
-          docker compose -f docker-compose.production.yml exec -T action-gate python -c 'import json,urllib.request; h={"Authorization":"Bearer ci-action-gate-token"}; health=json.load(urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:8000/health",headers=h))); assert health["status"]=="ok" and health["storage"]["backend"]=="postgresql", health; payload={"tenant_id":"compose-tenant","agent_id":"compose-agent","actor_id":"compose-actor","action":"read_public_file","target":"/public/info.txt","parameters":{}}; r=urllib.request.Request("http://enforcement:8080/execute",data=json.dumps(payload["parameters"]).encode(),headers={"Content-Type":"application/json","X-Agent-ID":"compose-agent","X-Actor-ID":"compose-actor","X-Tenant-ID":"compose-tenant","X-Action":"read_public_file","X-Action-Target":"/public/info.txt"}); out=json.load(urllib.request.urlopen(r)); assert out["enforced"] is True, out; did=out["decision"]["decision_id"]; e=json.load(urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:8000/v1/evidence/"+did+"?tenant_id=compose-tenant",headers=h))); assert e["execution"]["status"]=="EXECUTED" and e["tenant_id"]=="compose-tenant", e; print("REAL_POSTGRES_E2E_SMOKE_PASS")'
+          docker compose -f docker-compose.production.yml exec -T action-gate python - <<'PY'
+          import json, socket, time, urllib.request
+          h={"Authorization":"Bearer ci-action-gate-token"}
+          for _ in range(30):
+              try:
+                  s=socket.create_connection(("enforcement",8080),2); s.close(); break
+              except OSError: time.sleep(1)
+          else: raise RuntimeError("enforcement_service_not_ready")
+          health=json.load(urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:8000/health",headers=h)))
+          assert health["status"]=="ok" and health["storage"]["backend"]=="postgresql", health
+          payload={"tenant_id":"compose-tenant","agent_id":"compose-agent","actor_id":"compose-actor","action":"read_public_file","target":"/public/info.txt","parameters":{}}
+          r=urllib.request.Request("http://enforcement:8080/execute",data=json.dumps(payload["parameters"]).encode(),headers={"Content-Type":"application/json","X-Agent-ID":"compose-agent","X-Actor-ID":"compose-actor","X-Tenant-ID":"compose-tenant","X-Action":"read_public_file","X-Action-Target":"/public/info.txt"})
+          try:
+              out=json.load(urllib.request.urlopen(r))
+          except Exception as exc:
+              print("ENFORCEMENT_REQUEST_FAILED", repr(exc)); raise
+          assert out["enforced"] is True, out
+          did=out["decision"]["decision_id"]
+          e=json.load(urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:8000/v1/evidence/"+did+"?tenant_id=compose-tenant",headers=h)))
+          assert e["execution"]["status"]=="EXECUTED" and e["tenant_id"]=="compose-tenant", e
+          print("REAL_POSTGRES_E2E_SMOKE_PASS")
+          PY
       - name: HHJ-CSG 200-event replay acceptance
         working-directory: action_gate
         run: docker compose -f docker-compose.production.yml exec -T action-gate python csg_acceptance.py
