@@ -44,6 +44,10 @@ def permitted(decision_id: str, expected_action_hash: str) -> bool:
         return False
 
 
+def record_execution(decision_id: str, expected_action_hash: str, outcome: dict):
+    return post_json(GATE_URL + f"/v1/action/{decision_id}/execution", {"action_hash": expected_action_hash, "outcome": outcome})
+
+
 class HTTPHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         try:
@@ -54,6 +58,10 @@ class HTTPHandler(BaseHTTPRequestHandler):
                 if not permitted(decision_id, expected_hash):
                     self.send_response(403); self.end_headers(); self.wfile.write(b'{"error":"action_gate_denied_or_binding_mismatch"}'); return
                 status, out = post_json(TOOL_URL + self.path, payload)
+                try:
+                    record_execution(decision_id, expected_hash, {"http_status": status, "tool_response": out})
+                except Exception:
+                    self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
                 self.send_response(status); self.end_headers(); self.wfile.write(json.dumps(out).encode()); return
             result = post_json(GATE_URL + "/v1/action/evaluate", {"agent_id": self.headers.get("X-Agent-ID", "unknown"), "action": action, "target": target, "parameters": payload})[1]
             result["enforcement_action_hash"] = expected_hash
@@ -68,11 +76,17 @@ class MCPHandler(BaseHTTPRequestHandler):
             size = int(self.headers.get("Content-Length", "0")); message = json.loads(self.rfile.read(size) or b"{}")
             if message.get("method") != "tools/call":
                 self.send_response(400); self.end_headers(); self.wfile.write(json.dumps({"error": "MCP demo proxy only permits tools/call"}).encode()); return
-            params = message.get("params", {}); tool = params.get("name", "unknown"); args = params.get("arguments", {})
-            result = post_json(GATE_URL + "/v1/action/evaluate", {"agent_id": self.headers.get("X-Agent-ID", "unknown"), "action": tool, "target": args.get("target"), "parameters": args})[1]
+            params = message.get("params", {}); tool = params.get("name", "unknown"); args = params.get("arguments", {}); target = args.get("target")
+            result = post_json(GATE_URL + "/v1/action/evaluate", {"agent_id": self.headers.get("X-Agent-ID", "unknown"), "action": tool, "target": target, "parameters": args})[1]
             if result["decision"] not in {"ALLOW", "SANDBOX"}:
                 self.send_response(200); self.end_headers(); self.wfile.write(json.dumps({"jsonrpc": "2.0", "id": message.get("id"), "result": {"blocked_by_action_gate": True, "decision": result}}).encode()); return
-            status, out = post_json(TOOL_URL, message); self.send_response(status); self.end_headers(); self.wfile.write(json.dumps(out).encode())
+            expected_hash = result["action_hash"]
+            status, out = post_json(TOOL_URL, message)
+            try:
+                record_execution(result["decision_id"], expected_hash, {"http_status": status, "tool_response": out, "protocol": "MCP", "method": "tools/call", "tool": tool})
+            except Exception:
+                self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
+            self.send_response(status); self.end_headers(); self.wfile.write(json.dumps(out).encode())
         except Exception:
             self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"action_gate_or_tool_unreachable"}')
 
