@@ -27,6 +27,8 @@ permissions:
 jobs:
   repository:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -49,8 +51,6 @@ jobs:
               print(f'{path}: schema PASS')
           PY
       - name: Run Action Gate test suite
-        env:
-          PYTHONPATH: action_gate
         run: pytest -q action_gate
       - name: Run EXP-001 structural and replay checks
         working-directory: experiments/EXP-001
