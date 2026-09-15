@@ -8,7 +8,7 @@
 
 HamidCognition is a research and engineering program exploring cognitive-state computation, evidence-aware decision systems, behavioral state transfer, unknown-space exploration, safety governance, and experimental market/forecasting systems.
 
-HamidCognition-Unified is the provenance and integration record for these lines of work. It is not merely a code dump. It records the relationship between ideas, implementations, hypotheses, experiments, failures, unknowns, and source repositories.
+HamidCognition-Unified is the provenance and integration record for these lines of work. It is not merely a code dump. It records the relationship between ideas, implementations, hypotheses, experiments, failures, unknowns, contradictions, and their lineage.
 
 ## Research lines
 
@@ -43,6 +43,20 @@ A falsifiable hypothesis concerning whether restoring behavior in some systems d
 ### Cognitive Trading / EUR/USD Research
 
 Experimental market and EUR/USD simulation work combining market features, predictive models, cognitive-state heuristics, and simulated execution. Simulation results must not be represented as live-market evidence.
+
+## Research infrastructure
+
+Unified now treats research traceability as a first-class layer rather than as ordinary documentation:
+
+- **Evidence-to-Claim Graph** — اتصال claim به evidence، experiment، code و commit.
+- **Claim Ledger** — جداسازی صریح description، observation، inference، hypothesis و verified claim.
+- **Contradiction Ledger** — حفظ تناقض‌ها و شرایط آنها به‌عنوان داده پژوهشی.
+- **Unknown-Space Ledger** — نگهداری پرسش‌ها و رفتارهای توضیح‌نشده بدون forced interpretation.
+- **Experiment Fingerprint** — اتصال dataset، preprocessing، parameters، seed، code، environment و output.
+- **Novelty Register** — ثبت candidate novelty بدون تبدیل آن به ادعای «اولین بودن» پیش از prior-art review.
+- **Reproducibility Standard** — سطوح R0 تا R4 برای تفکیک narrative از independent reproduction و stress testing.
+- **Research Decision Log** — حفظ علت تصمیم‌های معماری و پژوهشی.
+- **Canonicalization Gate** — جلوگیری از canonical شدن یک implementation صرفاً به دلیل جدیدتر یا بزرگ‌تر بودن.
 
 ## Research status model
 
