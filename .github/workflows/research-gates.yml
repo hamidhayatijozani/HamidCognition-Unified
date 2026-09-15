@@ -32,3 +32,22 @@ jobs:
         run: |
           python replay.py > /tmp/exp001-replay.json
           grep '"identical_fingerprints": true' /tmp/exp001-replay.json
+      - name: Verify EXP-003 fixture harness
+        run: |
+          test -f RESEARCH/EXP003EXTERNAL_REPLAY.py
+          test -f RESEARCH/fixtures/externalfeed.json
+      - name: Run EXP-003 fixture execution
+        run: python RESEARCH/EXP003EXTERNAL_REPLAY.py
+      - name: Validate EXP-003 result
+        run: |
+          test -f RESEARCH/EXP003RESULT.json
+          python -m json.tool RESEARCH/EXP003RESULT.json
+          grep '"experiment_status": "FIXTURE_EXECUTION_ONLY"' RESEARCH/EXP003RESULT.json
+          grep '"external_feed_reproducibility"' RESEARCH/EXP003RESULT.json
+          grep '"replay_determinism"' RESEARCH/EXP003RESULT.json
+          grep '"external_feed_sensitivity"' RESEARCH/EXP003RESULT.json
+      - name: Upload EXP-003 result
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp-003-result
+          path: RESEARCH/EXP003RESULT.json
