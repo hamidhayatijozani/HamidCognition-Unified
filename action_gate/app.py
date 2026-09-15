@@ -11,9 +11,11 @@ from typing import Any
 from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
-APP_VERSION = "0.3.0-mvp"
+APP_VERSION = "0.2.0-secure-multitenant-mvp"
 DB_PATH = os.getenv("ACTION_GATE_DB", "action_gate.db")
 API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
+ENVIRONMENT = os.getenv("ACTION_GATE_ENV", "development").lower()
+DECISION_TTL_SECONDS = int(os.getenv("ACTION_GATE_DECISION_TTL_SECONDS", "300"))
 APPROVAL_TTL_SECONDS = int(os.getenv("ACTION_GATE_APPROVAL_TTL_SECONDS", "300"))
 POLICY_SNAPSHOT = {
     "policy_version": "builtin-v1",
@@ -39,6 +41,8 @@ def digest(obj: Any) -> str:
 
 
 def require_auth(authorization: str | None) -> None:
+    if ENVIRONMENT == "production" and not API_TOKEN:
+        raise HTTPException(503, "production_authentication_not_configured")
     if API_TOKEN is not None and authorization != f"Bearer {API_TOKEN}":
         raise HTTPException(401, "invalid_action_gate_credentials")
 
@@ -46,12 +50,16 @@ def require_auth(authorization: str | None) -> None:
 def db():
     con = sqlite3.connect(DB_PATH)
     con.execute("CREATE TABLE IF NOT EXISTS records (decision_id TEXT PRIMARY KEY, trace_id TEXT, record TEXT NOT NULL)")
+    con.execute("CREATE TABLE IF NOT EXISTS audit_events (event_id TEXT PRIMARY KEY, decision_id TEXT, event_type TEXT NOT NULL, event TEXT NOT NULL, previous_hash TEXT NOT NULL, event_hash TEXT NOT NULL, created_at TEXT NOT NULL)")
+    con.commit()
     return con
 
 
 class ActionRequest(BaseModel):
     request_id: str | None = None
+    tenant_id: str
     agent_id: str
+    actor_id: str | None = None
     action: str
     target: str | None = None
     parameters: dict[str, Any] = Field(default_factory=dict)
@@ -65,11 +73,15 @@ class Approval(BaseModel):
     approved: bool
     reason: str | None = None
     action_hash: str
+    tenant_id: str
+    policy_version: str
     ttl_seconds: int | None = None
 
 
 class ExecutionOutcome(BaseModel):
     action_hash: str
+    tenant_id: str
+    nonce: str
     outcome: dict[str, Any] = Field(default_factory=dict)
 
 
@@ -106,76 +118,93 @@ def decide(req: ActionRequest, risk: str, snapshot: dict[str, Any] = POLICY_SNAP
 
 
 def normalized_action(req: ActionRequest):
-    return {"action": req.action.lower(), "target": req.target, "parameters": req.parameters}
+    return {"tenant_id": req.tenant_id, "actor_id": req.actor_id, "action": req.action.lower(), "target": req.target, "parameters": req.parameters}
 
 
-def save(record: dict[str, Any]) -> None:
+def append_audit(con, decision_id: str, event_type: str, event: dict[str, Any]) -> str:
+    previous = con.execute("SELECT event_hash FROM audit_events ORDER BY rowid DESC LIMIT 1").fetchone()
+    previous_hash = previous[0] if previous else "GENESIS"
+    event_hash = digest({"decision_id": decision_id, "event_type": event_type, "event": event, "previous_hash": previous_hash})
+    con.execute("INSERT INTO audit_events VALUES (?,?,?,?,?,?,?)", (f"evt_{uuid.uuid4().hex}", decision_id, event_type, canonical(event), previous_hash, event_hash, now()))
+    return event_hash
+
+
+def save(record: dict[str, Any], event_type: str) -> None:
     con = db()
     con.execute("INSERT OR REPLACE INTO records VALUES (?,?,?)", (record["decision_id"], record["trace_id"], canonical(record)))
+    audit_hash = append_audit(con, record["decision_id"], event_type, {"decision": record["decision"], "tenant_id": record["tenant_id"], "action_hash": record["action_hash"]})
+    record["audit_event_hash"] = audit_hash
+    con.execute("UPDATE records SET record=? WHERE decision_id=?", (canonical(record), record["decision_id"]))
     con.commit(); con.close()
 
 
-def load(decision_id: str):
+def load(decision_id: str, tenant_id: str):
     con = db(); row = con.execute("SELECT record FROM records WHERE decision_id=?", (decision_id,)).fetchone(); con.close()
     if not row: raise HTTPException(404, "decision_not_found")
-    return json.loads(row[0])
+    record = json.loads(row[0])
+    if record["tenant_id"] != tenant_id:
+        raise HTTPException(404, "decision_not_found")
+    return record
 
 
-def parse_time(value: str) -> datetime:
-    return datetime.fromisoformat(value)
+def ensure_live(record: dict[str, Any]):
+    if record.get("consumed_at") is not None:
+        raise HTTPException(409, "decision_nonce_already_consumed")
+    if datetime.fromisoformat(record["expires_at"]) <= datetime.now(timezone.utc):
+        raise HTTPException(403, "decision_expired")
 
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "product": "HamidCognition Action Gate", "version": APP_VERSION, "policy_hash": POLICY_HASH}
+    return {"status": "ok", "product": "HamidCognition Action Gate", "version": APP_VERSION, "policy_hash": POLICY_HASH, "environment": ENVIRONMENT}
 
 
 @app.post("/v1/action/evaluate")
 def evaluate(req: ActionRequest, authorization: str | None = Header(default=None)):
     require_auth(authorization)
     request_id = req.request_id or f"req_{uuid.uuid4().hex}"
-    decision_id = f"dec_{uuid.uuid4().hex}"; trace_id = f"trace_{uuid.uuid4().hex}"
+    decision_id = f"dec_{uuid.uuid4().hex}"; trace_id = f"trace_{uuid.uuid4().hex}"; nonce = uuid.uuid4().hex
     risk, risk_reasons = evaluate_risk(req); decision, policy_checks = decide(req, risk); normalized = normalized_action(req)
-    record = {"schema_version": "action-gate-evidence-1.2", "product_version": APP_VERSION, "decision_id": decision_id, "trace_id": trace_id, "request_id": request_id, "request": req.model_dump(), "identity": {"agent_id": req.agent_id}, "normalized_action": normalized, "action_hash": digest(normalized), "policy_version": POLICY_SNAPSHOT["policy_version"], "policy_snapshot": POLICY_SNAPSHOT, "policy_hash": POLICY_HASH, "risk_assessment": {"level": risk, "reasons": risk_reasons, "agent_risk_hint": req.risk_hint}, "evidence": req.evidence, "decision": decision, "policy_checks": policy_checks, "approval": None, "execution": None, "outcome": None, "timestamp": now()}
-    record["evidence_hash"] = digest(record); save(record)
-    return {k: record[k] for k in ("decision", "decision_id", "request_id", "risk_assessment", "policy_checks", "evidence", "trace_id", "timestamp", "evidence_hash", "action_hash", "policy_version", "policy_hash")} | {"reason": policy_checks[0]["reason"]}
+    created = now(); expires = (datetime.now(timezone.utc) + timedelta(seconds=DECISION_TTL_SECONDS)).isoformat()
+    if DECISION_TTL_SECONDS <= 0 or DECISION_TTL_SECONDS > 86400: raise HTTPException(500, "invalid_server_decision_ttl")
+    record = {"schema_version": "action-gate-evidence-2.0", "product_version": APP_VERSION, "decision_id": decision_id, "trace_id": trace_id, "request_id": request_id, "tenant_id": req.tenant_id, "actor_id": req.actor_id, "request": req.model_dump(), "identity": {"agent_id": req.agent_id, "actor_id": req.actor_id}, "normalized_action": normalized, "action_hash": digest(normalized), "nonce": nonce, "policy_version": POLICY_SNAPSHOT["policy_version"], "policy_snapshot": POLICY_SNAPSHOT, "policy_hash": POLICY_HASH, "risk_assessment": {"level": risk, "reasons": risk_reasons, "agent_risk_hint": req.risk_hint}, "evidence": req.evidence, "decision": decision, "policy_checks": policy_checks, "constraints": [], "approval": None, "execution": None, "outcome": None, "created_at": created, "expires_at": expires, "consumed_at": None, "replay_reference": f"/v1/replay/{decision_id}", "decision_signature": digest({"decision_id": decision_id, "tenant_id": req.tenant_id, "action_hash": digest(normalized), "policy_hash": POLICY_HASH, "nonce": nonce, "expires_at": expires})}
+    record["evidence_hash"] = digest(record); save(record, "DECISION_CREATED")
+    return {k: record[k] for k in ("decision", "decision_id", "request_id", "tenant_id", "risk_assessment", "policy_checks", "evidence", "trace_id", "created_at", "expires_at", "nonce", "action_hash", "policy_version", "policy_hash", "decision_signature", "evidence_hash")} | {"reason": policy_checks[0]["reason"]}
 
 
 @app.post("/v1/action/{decision_id}/approve")
 def approve(decision_id: str, approval: Approval, authorization: str | None = Header(default=None)):
-    require_auth(authorization); record = load(decision_id)
+    require_auth(authorization); record = load(decision_id, approval.tenant_id); ensure_live(record)
     if record["decision"] != "ASK": raise HTTPException(409, "decision_is_not_awaiting_approval")
-    if approval.action_hash != record["action_hash"]:
-        raise HTTPException(409, "approval_action_binding_mismatch")
+    if approval.action_hash != record["action_hash"]: raise HTTPException(409, "approval_action_binding_mismatch")
+    if approval.policy_version != record["policy_version"]: raise HTTPException(409, "approval_policy_binding_mismatch")
     ttl = approval.ttl_seconds if approval.ttl_seconds is not None else APPROVAL_TTL_SECONDS
-    if ttl <= 0 or ttl > 86400:
-        raise HTTPException(422, "invalid_approval_ttl")
+    if ttl <= 0 or ttl > 86400: raise HTTPException(422, "invalid_approval_ttl")
     expires_at = (datetime.now(timezone.utc) + timedelta(seconds=ttl)).isoformat()
     record["approval"] = {**approval.model_dump(), "timestamp": now(), "expires_at": expires_at}
-    record["decision"] = "ALLOW" if approval.approved else "DENY"; record["evidence_hash"] = digest(record); save(record); return record
+    record["decision"] = "ALLOW" if approval.approved else "DENY"; record["evidence_hash"] = digest(record); save(record, "APPROVAL_RECORDED"); return record
 
 
 @app.post("/v1/action/{decision_id}/execution")
 def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | None = Header(default=None)):
-    require_auth(authorization); record = load(decision_id)
+    require_auth(authorization); record = load(decision_id, outcome.tenant_id); ensure_live(record)
     if record["decision"] not in {"ALLOW", "SANDBOX"}: raise HTTPException(403, "execution_not_permitted_by_gate")
     if outcome.action_hash != record["action_hash"]: raise HTTPException(409, "execution_action_binding_mismatch")
-    if record["approval"] and record["approval"].get("approved"):
-        if parse_time(record["approval"]["expires_at"]) <= datetime.now(timezone.utc):
-            raise HTTPException(403, "approval_expired")
-    record["execution"] = {"timestamp": now(), "status": "EXECUTED", "action_hash": record["action_hash"]}; record["outcome"] = outcome.outcome; record["evidence_hash"] = digest(record); save(record); return record
+    if outcome.nonce != record["nonce"]: raise HTTPException(409, "execution_nonce_mismatch")
+    if record["approval"] and record["approval"].get("approved") and datetime.fromisoformat(record["approval"]["expires_at"]) <= datetime.now(timezone.utc): raise HTTPException(403, "approval_expired")
+    record["execution"] = {"timestamp": now(), "status": "EXECUTED", "action_hash": record["action_hash"], "nonce": record["nonce"]}; record["outcome"] = outcome.outcome; record["consumed_at"] = now(); record["evidence_hash"] = digest(record); save(record, "EXECUTION_RECORDED"); return record
 
 
 @app.get("/v1/replay/{decision_id}")
-def replay(decision_id: str, authorization: str | None = Header(default=None)):
-    require_auth(authorization); record = load(decision_id); req = ActionRequest.model_validate(record["request"]); snapshot = record["policy_snapshot"]
+def replay(decision_id: str, tenant_id: str, authorization: str | None = Header(default=None)):
+    require_auth(authorization); record = load(decision_id, tenant_id); req = ActionRequest.model_validate(record["request"]); snapshot = record["policy_snapshot"]
     policy_hash_match = digest(snapshot) == record["policy_hash"]; action_hash_match = digest(normalized_action(req)) == record["action_hash"]
     risk, _ = evaluate_risk(req, snapshot); decision, checks = decide(req, risk, snapshot); original = record["decision"]
     expected = "ASK" if record["approval"] is not None and original in {"ALLOW", "DENY"} else original
     match = decision == expected and policy_hash_match and action_hash_match
-    return {"decision_id": decision_id, "trace_id": record["trace_id"], "replayed_decision": decision, "recorded_preapproval_decision": expected, "match": match, "risk": risk, "policy_checks": checks, "policy_hash": record["policy_hash"], "policy_hash_match": policy_hash_match, "action_hash": record["action_hash"], "action_hash_match": action_hash_match, "evidence_hash": record["evidence_hash"]}
+    return {"decision_id": decision_id, "trace_id": record["trace_id"], "replayed_decision": decision, "recorded_preapproval_decision": expected, "match": match, "risk": risk, "policy_checks": checks, "policy_hash": record["policy_hash"], "policy_hash_match": policy_hash_match, "action_hash": record["action_hash"], "action_hash_match": action_hash_match, "evidence_hash": record["evidence_hash"], "audit_event_hash": record.get("audit_event_hash")}
 
 
 @app.get("/v1/evidence/{decision_id}")
-def evidence(decision_id: str, authorization: str | None = Header(default=None)):
-    require_auth(authorization); return load(decision_id)
+def evidence(decision_id: str, tenant_id: str, authorization: str | None = Header(default=None)):
+    require_auth(authorization); return load(decision_id, tenant_id)
