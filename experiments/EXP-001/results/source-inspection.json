@@ -1,0 +1,40 @@
+{
+  "experiment_id": "EXP-001",
+  "inspection_basis": "direct GitHub source inspection",
+  "variants": {
+    "V-A": {
+      "class": "HamidCognition",
+      "initial_defaults": {"P": 0.88, "S": 0.78, "T": 0.40},
+      "transition": "incremental P/S/T update with pressure and novelty",
+      "clipping": {"P": [0.1, 0.95], "S": [0.1, 0.95], "T": [0.1, 0.8]},
+      "phase_thresholds": {"rupture_abs_PS_lt": 0.15, "unstable_T_lt": 0.45, "synthesis_P_gt": 0.85, "synthesis_S_gt": 0.8},
+      "source_sha": "1c71fd77b7bf3cde5665a7eb413d3a55aac0e402"
+    },
+    "V-B": {
+      "class": "HamidCognition",
+      "initial_defaults": {"P": 0.75, "S": 0.65, "T": 0.50},
+      "transition": "market_context -> pressure/novelty -> incremental P/S/T update",
+      "clipping": {"P": [0.1, 0.95], "S": [0.1, 0.95], "T": [0.1, 0.85]},
+      "phase_thresholds": {"rupture_abs_PS_lt": 0.12, "unstable_T_lt": 0.40, "synthesis_P_gt": 0.80, "synthesis_S_gt": 0.75},
+      "trend_strength_effective_in_transition": false,
+      "source_sha": "3cf67fec9a95198a1045dab98ee0ce6016d90e54"
+    },
+    "V-C": {
+      "class": "HamidCognition",
+      "initial_defaults": {"P": 0.88, "S": 0.78, "T": 0.40},
+      "transition": "incremental P/S/T update",
+      "clipping": {"P": [0.0, 1.0], "S": [0.0, 1.0], "T": [0.0, 1.0]},
+      "phase_thresholds": {"rupture_abs_PS_lt": 0.10, "unstable_T_lt": 0.45, "synthesis_P_gt": 0.85, "synthesis_S_gt": 0.8},
+      "source_sha": "226c748173c98017d65446735c0fe87f09506073"
+    },
+    "V-D": {
+      "class": "HamidCognition",
+      "initial_defaults": null,
+      "transition": "P *= pressure; S *= novelty; T /= freedom",
+      "clipping": {"P": [0.0, null], "S": [0.0, null], "T": [0.0, 1.0]},
+      "phase_thresholds": {"P": 1.5, "S": 1.5, "T": 0.3},
+      "semantic_family": "absolute multiplicative state transition",
+      "source_sha": "589ab1e0e0330d0efaff088ef67bb79a8e86f04d"
+    }
+  }
+}
