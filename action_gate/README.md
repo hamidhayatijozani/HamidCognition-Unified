@@ -4,9 +4,9 @@
 
 This directory contains the executable MVP product candidate. It is deliberately narrower than the broader HamidCognition research program.
 
-## Flow
+## Product contract
 
-`Agent -> Action Gate -> Decision -> Tool`
+`Agent -> Action Gate -> Decision -> Enforcement -> Tool -> Outcome -> Evidence -> Replay`
 
 The Gate independently evaluates risk. `risk_hint` from an agent is recorded as untrusted context and cannot lower intrinsic risk.
 
@@ -28,6 +28,8 @@ GET  /v1/evidence/{decision_id}
 GET  /v1/replay/{decision_id}
 GET  /health
 ```
+
+Approvals are bound to the exact `action_hash` and have a bounded TTL. Execution must present the same action hash, so changing the target or parameters cannot reuse an approval.
 
 ## Run locally
 
@@ -55,13 +57,21 @@ financial transfer       => SANDBOX
 
 `enforcement_proxy.py` provides an executable HTTP enforcement mode and an MCP `tools/call` interception mode. The proxy evaluates the action before forwarding it to the tool target.
 
+The repository CI runs both HTTP and MCP integration tests against a live local tool server. It also tests a fabricated decision ID and action-hash mismatch so the enforcement path fails closed.
+
 This is an MVP enforcement adapter, not a claim of protocol-complete MCP production compatibility.
 
 ## Evidence and replay
 
-Each evaluation creates an Evidence Record containing request, identity, normalized action, policy version, independent risk assessment, evidence, decision, approval, execution, outcome, timestamp and trace ID. The record is persisted with a SHA-256 evidence fingerprint.
+Each evaluation creates an Evidence Record containing request, identity, normalized action, action hash, policy version and hash, independent risk assessment, evidence, decision, approval, execution, outcome, timestamp and trace ID. The record is persisted with a SHA-256 evidence fingerprint.
 
 Replay reconstructs the **pre-approval** decision from the recorded request and policy inputs. It does not claim to reproduce arbitrary external-world state.
+
+## Security boundary
+
+For production deployments set `ACTION_GATE_API_TOKEN`. The CI environment uses a test token. Secrets are not committed to the repository.
+
+SQLite is an MVP persistence mechanism. Production deployment still requires durable, concurrent storage, tenant isolation, identity integration, secret management, rate limiting, observability and security hardening.
 
 ## Scope boundary
 
