@@ -40,12 +40,18 @@ def make_event(i: int) -> dict[str, Any]:
     }
 
 
-def sign_headers(body: dict[str, Any], secret: str = "sim-secret") -> dict[str, str]:
+def sign_headers(
+    body: dict[str, Any],
+    secret: str = "sim-secret",
+    api_key: str = "sim-api-key",
+) -> dict[str, str]:
     payload = {"contract_version": "PR-0.1", "request_digest": sha256_digest(body)}
     return {
+        "X-API-Key": api_key,
         "X-HHJ-Canonicalization": "JCS-LITE-0.1",
         "X-HHJ-Key-Id": "poc-key-1",
         "X-HHJ-Signature": hmac_sha256(payload, secret),
+        "Idempotency-Key": body["idempotency_key"],
     }
 
 
