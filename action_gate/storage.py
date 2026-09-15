@@ -25,17 +25,15 @@ def connect():
 def init_db() -> None:
     con = connect()
     try:
-        if backend() == "postgresql":
-            con.execute("CREATE TABLE IF NOT EXISTS records (decision_id TEXT PRIMARY KEY, trace_id TEXT, record TEXT NOT NULL)")
-            con.execute("CREATE TABLE IF NOT EXISTS record_versions (version_id TEXT PRIMARY KEY, decision_id TEXT NOT NULL, version INTEGER NOT NULL, event_type TEXT NOT NULL, record TEXT NOT NULL, created_at TEXT NOT NULL, UNIQUE(decision_id, version))")
-            con.execute("CREATE TABLE IF NOT EXISTS audit_events (event_id TEXT PRIMARY KEY, decision_id TEXT, event_type TEXT NOT NULL, event TEXT NOT NULL, previous_hash TEXT NOT NULL, event_hash TEXT NOT NULL, created_at TEXT NOT NULL)")
-        else:
-            con.execute("CREATE TABLE IF NOT EXISTS records (decision_id TEXT PRIMARY KEY, trace_id TEXT, record TEXT NOT NULL)")
-            con.execute("CREATE TABLE IF NOT EXISTS record_versions (version_id TEXT PRIMARY KEY, decision_id TEXT NOT NULL, version INTEGER NOT NULL, event_type TEXT NOT NULL, record TEXT NOT NULL, created_at TEXT NOT NULL, UNIQUE(decision_id, version))")
-            con.execute("CREATE TABLE IF NOT EXISTS audit_events (event_id TEXT PRIMARY KEY, decision_id TEXT, event_type TEXT NOT NULL, event TEXT NOT NULL, previous_hash TEXT NOT NULL, event_hash TEXT NOT NULL, created_at TEXT NOT NULL)")
+        con.execute("CREATE TABLE IF NOT EXISTS records (decision_id TEXT PRIMARY KEY, trace_id TEXT, record TEXT NOT NULL)")
+        con.execute("CREATE TABLE IF NOT EXISTS record_versions (version_id TEXT PRIMARY KEY, decision_id TEXT NOT NULL, version INTEGER NOT NULL, event_type TEXT NOT NULL, record TEXT NOT NULL, created_at TEXT NOT NULL, UNIQUE(decision_id, version))")
+        con.execute("CREATE TABLE IF NOT EXISTS audit_events (event_id TEXT PRIMARY KEY, decision_id TEXT, event_type TEXT NOT NULL, event TEXT NOT NULL, previous_hash TEXT NOT NULL, event_hash TEXT NOT NULL, created_at TEXT NOT NULL)")
+        con.execute("CREATE TABLE IF NOT EXISTS idempotency_keys (tenant_id TEXT NOT NULL, idempotency_key TEXT NOT NULL, request_digest TEXT NOT NULL, response TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY (tenant_id, idempotency_key))")
+        con.commit()
+        if backend() == "sqlite":
             con.execute("CREATE TRIGGER IF NOT EXISTS audit_events_no_update BEFORE UPDATE ON audit_events BEGIN SELECT RAISE(ABORT, 'audit_events_are_append_only'); END")
             con.execute("CREATE TRIGGER IF NOT EXISTS audit_events_no_delete BEFORE DELETE ON audit_events BEGIN SELECT RAISE(ABORT, 'audit_events_are_append_only'); END")
-        con.commit()
+            con.commit()
     finally:
         con.close()
 
@@ -47,6 +45,35 @@ def health() -> dict[str, Any]:
         return {"status": "ok", "backend": backend()}
     except Exception as exc:
         return {"status": "degraded", "backend": backend(), "error": type(exc).__name__}
+    finally:
+        con.close()
+
+
+def load_idempotency(tenant_id: str, idempotency_key: str) -> tuple[str, str] | None:
+    con = connect()
+    try:
+        if backend() == "postgresql":
+            row = con.execute("SELECT request_digest, response FROM idempotency_keys WHERE tenant_id=%s AND idempotency_key=%s", (tenant_id, idempotency_key)).fetchone()
+        else:
+            row = con.execute("SELECT request_digest, response FROM idempotency_keys WHERE tenant_id=? AND idempotency_key=?", (tenant_id, idempotency_key)).fetchone()
+        return (row[0], row[1]) if row else None
+    finally:
+        con.close()
+
+
+def save_idempotency(tenant_id: str, idempotency_key: str, request_digest: str, response: str, created_at: str) -> bool:
+    con = connect()
+    try:
+        if backend() == "postgresql":
+            con.execute("INSERT INTO idempotency_keys VALUES (%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING", (tenant_id, idempotency_key, request_digest, response, created_at))
+        else:
+            con.execute("INSERT OR IGNORE INTO idempotency_keys VALUES (?,?,?,?,?)", (tenant_id, idempotency_key, request_digest, response, created_at))
+        changed = con.execute("SELECT changes()" if backend() == "sqlite" else "SELECT 1").fetchone()[0]
+        con.commit()
+        return bool(changed)
+    except Exception:
+        con.rollback()
+        raise
     finally:
         con.close()
 
@@ -97,6 +124,4 @@ def load_record(decision_id: str) -> str | None:
         con.close()
 
 
-# Initialize the schema at import time so legacy TestClient-based integrations are valid
-# even when lifespan/startup events are not entered.
 init_db()
