@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import hashlib
 import hmac
-import json
 import os
 from datetime import datetime, timezone
 
@@ -22,24 +21,17 @@ def sign(payload: dict) -> str:
 
 def payload(request_id="evt-001", action="read_public"):
     return {
-        "contract_version": "hhj-csg/1.0",
-        "request_id": request_id,
-        "tenant_id": "tenant-a",
-        "agent_id": "agentrq-poc",
-        "actor_id": "actor-1",
-        "action": action,
-        "target": "public-resource",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "parameters": {"limit": 10},
-        "context": {"source": "simulator"},
+        "contract_version": "hhj-csg/1.0", "request_id": request_id, "tenant_id": "tenant-a", "agent_id": "agentrq-poc",
+        "actor_id": "actor-1", "action": action, "target": "public-resource",
+        "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "parameters": {"limit": 10}, "context": {"source": "simulator"},
     }
 
 
 def test_contract_first_allow_and_idempotency():
     client = TestClient(app)
     body = payload()
-    signature = sign(body)
-    headers = {"Authorization": "Bearer ci-csg-token", "Idempotency-Key": "evt-001", "X-HCJ-Request-Signature": signature}
+    headers = {"Authorization": "Bearer ci-csg-token", "Idempotency-Key": "evt-001", "X-HCJ-Request-Signature": sign(body)}
     first = client.post("/v1/csg/decide", json=body, headers=headers)
     second = client.post("/v1/csg/decide", json=body, headers=headers)
     assert first.status_code == 200, first.text
@@ -76,8 +68,7 @@ def test_risk_decisions_are_deterministic_and_fail_closed():
     cases = [("transfer_funds", "SANDBOX"), ("delete_database", "DENY"), ("send_email", "ASK"), ("read_public", "ALLOW")]
     for index, (action, expected) in enumerate(cases, start=10):
         body = payload(f"evt-{index}", action)
-        if action == "delete_database":
-            body["target"] = "production-db"
+        if action == "delete_database": body["target"] = "production-db"
         headers = {"Authorization": "Bearer ci-csg-token", "Idempotency-Key": body["request_id"], "X-HCJ-Request-Signature": sign(body)}
         response = client.post("/v1/csg/decide", json=body, headers=headers)
         assert response.status_code == 200, response.text
