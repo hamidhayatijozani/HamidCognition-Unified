@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Validate contradiction ledger
-        run: python RESEARCH/CONTRADICTION_LEDGER.py
+        run: python RESEARCH/CONTRADICTION_LEDGER.py validate
       - name: Run EXP-002 static leakage audit
         run: python experiments/EXP-002/audit.py
       - name: Run EXP-001 structural checks
@@ -38,26 +38,43 @@ jobs:
           test -f RESEARCH/fixtures/externalfeed.json
           python - <<'PY'
           import json
+          from datetime import datetime
           p = json.load(open('RESEARCH/fixtures/externalfeed.json', encoding='utf-8'))
           assert p['fixture_status'] == 'EXTERNAL_SOURCE_SNAPSHOT'
-          assert p['provenance']['source_type'] == 'external'
-          assert p['provenance']['external_source_claimed'] is True
-          assert p['provenance']['source_url']
-          assert p['provenance']['retrieved_at_utc']
-          assert p['provenance']['preprocessing']
-          assert len(p['feed']) >= 2
+          prov = p['provenance']
+          assert prov['source_type'] == 'external'
+          assert prov['external_source_claimed'] is True
+          assert prov['source_url']
+          assert prov['retrieved_at_utc']
+          datetime.fromisoformat(prov['retrieved_at_utc'].replace('Z', '+00:00'))
+          assert prov['preprocessing']
+          feed = p['feed']
+          assert len(feed) >= 2
+          assert all(row['symbol'] == 'EURUSD' for row in feed)
+          assert all(isinstance(row['value'], (int, float)) for row in feed)
           PY
       - name: Run EXP-003 real-source replay
         run: python RESEARCH/EXP003EXTERNAL_REPLAY.py
       - name: Validate EXP-003 real-source result
         run: |
           test -f RESEARCH/EXP003RESULT.json
-          python -m json.tool RESEARCH/EXP003RESULT.json
-          grep '"experiment_status": "REAL_EXTERNAL_SNAPSHOT_REPLAY_EXECUTED"' RESEARCH/EXP003RESULT.json
-          grep '"external_source_provenance_present": true' RESEARCH/EXP003RESULT.json
-          grep '"deterministic_replay": true' RESEARCH/EXP003RESULT.json
-          grep '"real_external_snapshot_input_sensitivity": true' RESEARCH/EXP003RESULT.json
-          grep '"result_class": "SUPPORTED_REAL_SOURCE_REPLAY_MECHANISM"' RESEARCH/EXP003RESULT.json
+          python -m json.tool RESEARCH/EXP003RESULT.json >/dev/null
+          python - <<'PY'
+          import json
+          p = json.load(open('RESEARCH/EXP003RESULT.json', encoding='utf-8'))
+          assert p['experiment'] == 'EXP-003'
+          assert p['experiment_status'] == 'REAL_EXTERNAL_SNAPSHOT_REPLAY_EXECUTED'
+          assert p['fixture_status'] == 'EXTERNAL_SOURCE_SNAPSHOT'
+          assert p['tests']['fixture_integrity'] is True
+          assert p['tests']['external_source_provenance_present'] is True
+          assert p['tests']['deterministic_replay'] is True
+          assert p['tests']['real_external_snapshot_input_sensitivity'] is True
+          assert p['result_class'] == 'SUPPORTED_REAL_SOURCE_REPLAY_MECHANISM'
+          assert p['runs']['run_a']['fingerprint'] == p['runs']['run_b']['fingerprint']
+          assert p['runs']['run_a']['fingerprint'] != p['runs']['run_c_modified_input']['fingerprint']
+          forbidden = {'external_world_reproducibility', 'scientific_validity_of_external_feed_behavior', 'reproduction_of_external_provider_internal_process', 'predictive_skill_or_trading_value'}
+          assert forbidden.issubset(set(p['claims_not_verified']))
+          PY
       - name: Run EXP-004 real-source walk-forward
         run: python RESEARCH/EXP004_WALKFORWARD.py
       - name: Validate EXP-004 result
