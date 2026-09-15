@@ -5,26 +5,55 @@ on:
     paths:
       - 'action_gate/**'
       - 'RESEARCH/ACTION_GATE_VALIDATION_BOUNDARY.md'
+      - 'RESEARCH/EXECUTION_RECEIPT_SPEC.md'
       - '.github/workflows/action-gate-validation-boundary.yml'
   pull_request:
     paths:
       - 'action_gate/**'
       - 'RESEARCH/ACTION_GATE_VALIDATION_BOUNDARY.md'
+      - 'RESEARCH/EXECUTION_RECEIPT_SPEC.md'
       - '.github/workflows/action-gate-validation-boundary.yml'
 
 jobs:
-  validation-boundary:
+  boundary:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Install Action Gate test dependencies
+        run: python -m pip install -r action_gate/requirements.txt
       - name: Run Validation Boundary adversarial suite
-        run: python action_gate/test_validation_boundary.py
+        working-directory: action_gate
+        run: pytest -q test_validation_boundary.py
+      - name: Run Execution Receipt adversarial suite
+        working-directory: action_gate
+        run: pytest -q test_execution_receipt.py
+      - name: Run Execution Latch suite
+        working-directory: action_gate
+        run: pytest -q test_execution_latch.py
       - name: Assert boundary specification is present
         run: |
           test -f RESEARCH/ACTION_GATE_VALIDATION_BOUNDARY.md
+          test -f RESEARCH/EXECUTION_RECEIPT_SPEC.md
           grep -q 'No validation bypass' RESEARCH/ACTION_GATE_VALIDATION_BOUNDARY.md
           grep -q 'Exact-request binding' RESEARCH/ACTION_GATE_VALIDATION_BOUNDARY.md
           grep -q 'No label authority' RESEARCH/ACTION_GATE_VALIDATION_BOUNDARY.md
+      - name: Enforce fail-closed invariants
+        working-directory: action_gate
+        run: |
+          python - <<'PY'
+          from datetime import datetime, timezone
+          from validation_boundary import make_decision, validate_execution_attempt
+          r={"request_id":"ci","action":"read","target":"fixture","parameters":{},"requester":"ci-agent","timestamp":"2026-09-15T15:58:00+00:00"}
+          e={"state":"PRESENT","artifact_ref":"ci/evidence","sha256":"a"*64}
+          now=datetime(2026,9,15,16,0,tzinfo=timezone.utc)
+          for state in ("DENY","ASK","DEFER"):
+              d=make_decision(r,state,"2026-09-15T15:59:00+00:00",e)
+              assert not validate_execution_attempt(r,d,now=now).valid
+          d=make_decision(r,"ALLOW","2026-09-15T15:59:00+00:00",e)
+          r["target"]="mutated-after-validation"
+          assert not validate_execution_attempt(r,d,now=now).valid
+          print("fail-closed invariants: PASS")
+          PY
