@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hamidcognition.local/contracts/decision.schema.json",
+  "title": "HHJ-CSG Decision Object",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "decision_id", "request_id", "tenant_id", "decision", "risk_level", "request_digest", "decision_digest", "signature", "signature_algorithm", "key_id", "canonicalization_version", "policy_version", "algorithm_version", "issued_at", "expires_at", "nonce"],
+  "properties": {
+    "contract_version": {"type": "string", "const": "hhj-csg/1.0"},
+    "decision_id": {"type": "string", "pattern": "^dec_[A-Za-z0-9]{8,128}$"},
+    "request_id": {"type": "string", "maxLength": 128},
+    "tenant_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "decision": {"type": "string", "enum": ["ALLOW", "DENY", "ASK", "SANDBOX"]},
+    "risk_level": {"type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]},
+    "request_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "decision_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "signature": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "signature_algorithm": {"type": "string", "const": "HMAC-SHA256"},
+    "key_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "canonicalization_version": {"type": "string", "const": "JCS-LIKE-1"},
+    "policy_version": {"type": "string", "minLength": 1, "maxLength": 128},
+    "algorithm_version": {"type": "string", "const": "hhj-csg-decision/1.0"},
+    "issued_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "nonce": {"type": "string", "pattern": "^[a-f0-9]{32}$"},
+    "metrics_snapshot": {"type": "object", "additionalProperties": true},
+    "execution_receipt": {"type": ["object", "null"], "additionalProperties": true},
+    "constraints": {"type": "array", "maxItems": 100, "items": {"type": "string", "maxLength": 512}}
+  }
+}
