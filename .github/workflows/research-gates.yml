@@ -58,8 +58,19 @@ jobs:
           grep '"deterministic_replay": true' RESEARCH/EXP003RESULT.json
           grep '"real_external_snapshot_input_sensitivity": true' RESEARCH/EXP003RESULT.json
           grep '"result_class": "SUPPORTED_REAL_SOURCE_REPLAY_MECHANISM"' RESEARCH/EXP003RESULT.json
-      - name: Upload EXP-003 result
+      - name: Run EXP-004 real-source walk-forward
+        run: python RESEARCH/EXP004_WALKFORWARD.py
+      - name: Validate EXP-004 result
+        run: |
+          test -f RESEARCH/EXP004RESULT.json
+          python -m json.tool RESEARCH/EXP004RESULT.json
+          grep '"experiment": "EXP-004"' RESEARCH/EXP004RESULT.json
+          grep '"status": "EXECUTED_REAL_EXTERNAL_WALK_FORWARD"' RESEARCH/EXP004RESULT.json
+          grep '"future_features_used": false' RESEARCH/EXP004RESULT.json
+          grep '"test_tuning": false' RESEARCH/EXP004RESULT.json
+          grep '"interpretation": "SURVIVES_PRELIMINARY"' RESEARCH/EXP004RESULT.json
+      - name: Upload research results
         uses: actions/upload-artifact@v4
         with:
-          name: exp-003-result
-          path: RESEARCH/EXP003RESULT.json
+          name: exp-004-result
+          path: RESEARCH/EXP004RESULT.json
