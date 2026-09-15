@@ -5,6 +5,7 @@ The POC uses a versioned contract-first vertical slice.
 - `permission_request.schema.json` defines the ingress shape and bounds.
 - `decision.schema.json` defines the Decision Object and explicitly separates digest fields from the HMAC signature.
 - `../canonicalization.py` implements `JCS-LIKE-1`: UTF-8 JSON, sorted keys, compact separators, `ensure_ascii=false`, `allow_nan=false`.
+- Permission-request timestamps are contractually represented as UTC RFC3339 strings ending in `Z`.
 
 Digest and signature semantics:
 
