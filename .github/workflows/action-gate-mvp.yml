@@ -25,3 +25,4 @@ jobs:
       - run: pytest -q
       - run: nohup uvicorn app:app --host 127.0.0.1 --port 8000 >/tmp/action-gate.log 2>&1 &
       - run: sleep 2 && python demo.py
+      - run: python enforcement_integration.py
