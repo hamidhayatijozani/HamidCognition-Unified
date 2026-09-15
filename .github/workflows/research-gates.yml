@@ -36,16 +36,16 @@ jobs:
         run: |
           test -f RESEARCH/EXP003EXTERNAL_REPLAY.py
           test -f RESEARCH/fixtures/externalfeed.json
-      - name: Run EXP-003 fixture execution
+      - name: Run EXP-003 mechanism replay
         run: python RESEARCH/EXP003EXTERNAL_REPLAY.py
-      - name: Validate EXP-003 result
+      - name: Validate EXP-003 mechanism result
         run: |
           test -f RESEARCH/EXP003RESULT.json
           python -m json.tool RESEARCH/EXP003RESULT.json
-          grep '"experiment_status": "FIXTURE_EXECUTION_ONLY"' RESEARCH/EXP003RESULT.json
-          grep '"external_feed_reproducibility"' RESEARCH/EXP003RESULT.json
-          grep '"replay_determinism"' RESEARCH/EXP003RESULT.json
-          grep '"external_feed_sensitivity"' RESEARCH/EXP003RESULT.json
+          grep '"experiment_status": "MECHANISM_LEVEL_EXECUTED"' RESEARCH/EXP003RESULT.json
+          grep '"deterministic_replay": true' RESEARCH/EXP003RESULT.json
+          grep '"external_feed_sensitivity": true' RESEARCH/EXP003RESULT.json
+          grep '"result_class": "SUPPORTED_MECHANISM_ONLY"' RESEARCH/EXP003RESULT.json
       - name: Upload EXP-003 result
         uses: actions/upload-artifact@v4
         with:
