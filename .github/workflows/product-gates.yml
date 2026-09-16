@@ -42,62 +42,38 @@ jobs:
         run: python mcp_integration.py
       - name: Compile runtime
         working-directory: action_gate
-        run: python -m py_compile app.py storage.py rate_limit.py canonicalization.py csg_contract.py csg_ingress.py csg_routes.py csg_validation_handler.py agentrq_simulator.py csg_acceptance.py enforcement_integration.py mcp_integration.py test_validation_boundary_conformance.py
+        run: python -m py_compile app.py storage.py rate_limit.py canonicalization.py csg_contract.py csg_ingress.py csg_routes.py csg_validation_handler.py agentrq_simulator.py csg_acceptance.py enforcement_integration.py mcp_integration.py test_validation_boundary_conformance.py production_e2e_smoke.py
       - name: Validate production Compose
         working-directory: action_gate
         env:
-          POSTGRES_PASSWORD: ci-postgres-password
-          ACTION_GATE_API_TOKEN: ci-action-gate-token
-          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
-          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          ACTION_GATE_API_TOKEN: ${{ secrets.ACTION_GATE_API_TOKEN }}
+          ACTION_GATE_SIGNING_SECRET: ${{ secrets.ACTION_GATE_SIGNING_SECRET }}
+          ACTION_GATE_ENFORCEMENT_SECRET: ${{ secrets.ACTION_GATE_ENFORCEMENT_SECRET }}
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml config
       - name: Start production stack
         working-directory: action_gate
         env:
-          POSTGRES_PASSWORD: ci-postgres-password
-          ACTION_GATE_API_TOKEN: ci-action-gate-token
-          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
-          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          ACTION_GATE_API_TOKEN: ${{ secrets.ACTION_GATE_API_TOKEN }}
+          ACTION_GATE_SIGNING_SECRET: ${{ secrets.ACTION_GATE_SIGNING_SECRET }}
+          ACTION_GATE_ENFORCEMENT_SECRET: ${{ secrets.ACTION_GATE_ENFORCEMENT_SECRET }}
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml up -d --build
       - name: Production PostgreSQL and E2E smoke
         working-directory: action_gate
         env:
-          POSTGRES_PASSWORD: ci-postgres-password
-          ACTION_GATE_API_TOKEN: ci-action-gate-token
-          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
-          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          ACTION_GATE_API_TOKEN: ${{ secrets.ACTION_GATE_API_TOKEN }}
+          ACTION_GATE_SIGNING_SECRET: ${{ secrets.ACTION_GATE_SIGNING_SECRET }}
+          ACTION_GATE_ENFORCEMENT_SECRET: ${{ secrets.ACTION_GATE_ENFORCEMENT_SECRET }}
           DOMAIN: localhost
-        run: |
-          docker compose -f docker-compose.production.yml ps
-          docker compose -f docker-compose.production.yml exec -T action-gate python - <<'PY'
-          import json, socket, time, urllib.request
-          h={"Authorization":"Bearer ci-action-gate-token"}
-          for _ in range(30):
-              try:
-                  s=socket.create_connection(("enforcement",8080),2); s.close(); break
-              except OSError: time.sleep(1)
-          else: raise RuntimeError("enforcement_service_not_ready")
-          health=json.load(urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:8000/health",headers=h)))
-          assert health["status"]=="ok" and health["storage"]["backend"]=="postgresql", health
-          payload={"tenant_id":"compose-tenant","agent_id":"compose-agent","actor_id":"compose-actor","action":"read_public_file","target":"/public/info.txt","parameters":{}}
-          r=urllib.request.Request("http://enforcement:8080/execute",data=json.dumps(payload["parameters"]).encode(),headers={"Content-Type":"application/json","X-Agent-ID":"compose-agent","X-Actor-ID":"compose-actor","X-Tenant-ID":"compose-tenant","X-Action":"read_public_file","X-Action-Target":"/public/info.txt"})
-          try:
-              out=json.load(urllib.request.urlopen(r))
-          except Exception as exc:
-              print("ENFORCEMENT_REQUEST_FAILED", repr(exc)); raise
-          print("E2E_ENFORCEMENT_RESPONSE", json.dumps(out, sort_keys=True))
-          assert out["enforced"] is True, out
-          did=out["decision"]["decision_id"]
-          e=json.load(urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:8000/v1/evidence/"+did+"?tenant_id=compose-tenant",headers=h)))
-          print("E2E_EVIDENCE_RESPONSE", json.dumps(e, sort_keys=True))
-          assert e.get("execution") is not None, e
-          assert e["execution"].get("status")=="EXECUTED" and e["tenant_id"]=="compose-tenant", e
-          print("REAL_POSTGRES_E2E_SMOKE_PASS")
-          PY
+        run: docker compose -f docker-compose.production.yml exec -T action-gate python production_e2e_smoke.py
       - name: HHJ-CSG 200-event replay acceptance
         working-directory: action_gate
+        env:
+          ACTION_GATE_API_TOKEN: ${{ secrets.ACTION_GATE_API_TOKEN }}
         run: docker compose -f docker-compose.production.yml exec -T action-gate python csg_acceptance.py
       - name: Build validation evidence pack
         if: always()
@@ -121,9 +97,9 @@ jobs:
         if: always()
         working-directory: action_gate
         env:
-          POSTGRES_PASSWORD: ci-postgres-password
-          ACTION_GATE_API_TOKEN: ci-action-gate-token
-          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
-          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          ACTION_GATE_API_TOKEN: ${{ secrets.ACTION_GATE_API_TOKEN }}
+          ACTION_GATE_SIGNING_SECRET: ${{ secrets.ACTION_GATE_SIGNING_SECRET }}
+          ACTION_GATE_ENFORCEMENT_SECRET: ${{ secrets.ACTION_GATE_ENFORCEMENT_SECRET }}
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml down -v
