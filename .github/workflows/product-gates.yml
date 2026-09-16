@@ -92,6 +92,7 @@ jobs:
           path: |
             action_gate/validation-boundary-junit.xml
             action_gate/validation-evidence-pack.json
+            action_gate/csg-acceptance-result.json
           if-no-files-found: warn
       - name: Stop production stack
         if: always()
