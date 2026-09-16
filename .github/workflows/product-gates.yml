@@ -46,34 +46,34 @@ jobs:
       - name: Validate production Compose
         working-directory: action_gate
         env:
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          ACTION_GATE_API_TOKEN: ${{ secrets.ACTION_GATE_API_TOKEN }}
-          ACTION_GATE_SIGNING_SECRET: ${{ secrets.ACTION_GATE_SIGNING_SECRET }}
-          ACTION_GATE_ENFORCEMENT_SECRET: ${{ secrets.ACTION_GATE_ENFORCEMENT_SECRET }}
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml config
       - name: Start production stack
         working-directory: action_gate
         env:
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          ACTION_GATE_API_TOKEN: ${{ secrets.ACTION_GATE_API_TOKEN }}
-          ACTION_GATE_SIGNING_SECRET: ${{ secrets.ACTION_GATE_SIGNING_SECRET }}
-          ACTION_GATE_ENFORCEMENT_SECRET: ${{ secrets.ACTION_GATE_ENFORCEMENT_SECRET }}
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml up -d --build
       - name: Production PostgreSQL and E2E smoke
         working-directory: action_gate
         env:
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          ACTION_GATE_API_TOKEN: ${{ secrets.ACTION_GATE_API_TOKEN }}
-          ACTION_GATE_SIGNING_SECRET: ${{ secrets.ACTION_GATE_SIGNING_SECRET }}
-          ACTION_GATE_ENFORCEMENT_SECRET: ${{ secrets.ACTION_GATE_ENFORCEMENT_SECRET }}
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml exec -T action-gate python production_e2e_smoke.py
       - name: HHJ-CSG 200-event replay acceptance
         working-directory: action_gate
         env:
-          ACTION_GATE_API_TOKEN: ${{ secrets.ACTION_GATE_API_TOKEN }}
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
         run: docker compose -f docker-compose.production.yml exec -T action-gate python csg_acceptance.py
       - name: Build validation evidence pack
         if: always()
@@ -97,9 +97,9 @@ jobs:
         if: always()
         working-directory: action_gate
         env:
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          ACTION_GATE_API_TOKEN: ${{ secrets.ACTION_GATE_API_TOKEN }}
-          ACTION_GATE_SIGNING_SECRET: ${{ secrets.ACTION_GATE_SIGNING_SECRET }}
-          ACTION_GATE_ENFORCEMENT_SECRET: ${{ secrets.ACTION_GATE_ENFORCEMENT_SECRET }}
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml down -v
