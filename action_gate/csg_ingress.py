@@ -53,6 +53,10 @@ def deterministic_decision(req: PermissionRequest) -> tuple[str, str, list[str]]
     return "ALLOW", "LOW", ["no_blocking_policy_matched"]
 
 
+def utc_z(value: datetime) -> str:
+    return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
 def build_decision(req: PermissionRequest, request_digest: str) -> DecisionObject:
     decision, risk, constraints = deterministic_decision(req)
     issued = utc_now()
@@ -63,7 +67,7 @@ def build_decision(req: PermissionRequest, request_digest: str) -> DecisionObjec
         "tenant_id": req.tenant_id, "decision": decision, "risk_level": risk, "request_digest": request_digest,
         "signature_algorithm": SIGNATURE_ALGORITHM, "key_id": KEY_ID, "canonicalization_version": CANONICALIZATION_VERSION,
         "policy_version": "hhj-csg-policy/1.0", "algorithm_version": ALGORITHM_VERSION,
-        "issued_at": issued.isoformat(), "expires_at": expires.isoformat(), "nonce": nonce,
+        "issued_at": utc_z(issued), "expires_at": utc_z(expires), "nonce": nonce,
         "metrics_snapshot": {"validation": "PASS", "decision_determinism": "deterministic-v1"},
         "execution_receipt": None, "constraints": constraints,
     }
