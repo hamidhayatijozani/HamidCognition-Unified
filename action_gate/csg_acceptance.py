@@ -15,6 +15,7 @@ from canonicalization import canonicalize
 TOKEN = os.getenv("ACTION_GATE_API_TOKEN", "ci-csg-token")
 SECRET = os.getenv("ACTION_GATE_SIGNING_SECRET", "ci-csg-secret")
 BASE_URL = os.getenv("ACTION_GATE_URL", "http://127.0.0.1:8000")
+RESULT_PATH = os.getenv("CSG_ACCEPTANCE_RESULT_PATH", "csg-acceptance-result.json")
 
 
 def sign(payload: dict) -> str:
@@ -106,4 +107,9 @@ def run(count: int = 200) -> dict:
 
 
 if __name__ == "__main__":
-    print(json.dumps(run(int(os.getenv("CSG_ACCEPTANCE_EVENTS", "200"))), sort_keys=True))
+    result = run(int(os.getenv("CSG_ACCEPTANCE_EVENTS", "200")))
+    result["timestamp_utc"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    result["contract_version"] = "hhj-csg/1.0"
+    with open(RESULT_PATH, "w", encoding="utf-8") as handle:
+        json.dump(result, handle, indent=2, sort_keys=True)
+    print(json.dumps(result, sort_keys=True))
