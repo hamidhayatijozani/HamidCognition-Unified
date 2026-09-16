@@ -78,9 +78,17 @@ def test_risk_decisions_are_deterministic_and_fail_closed():
         assert response.json()["signature_algorithm"] == "HMAC-SHA256"
 
 
-def test_malformed_contract_is_rejected():
+def test_malformed_contract_is_rejected_with_correlation_id():
     client = TestClient(app)
     body = payload("evt-malformed")
     body.pop("contract_version")
-    response = client.post("/v1/csg/decide", json=body, headers={"Authorization": "Bearer ci-csg-token", "Idempotency-Key": "evt-malformed"})
+    response = client.post("/v1/csg/decide", json=body, headers={"Authorization": "Bearer ci-csg-token", "Idempotency-Key": "evt-malformed", "X-Correlation-ID": "corr-malformed"})
     assert response.status_code == 422
+    assert response.json() == {"detail": "schema_validation_failed", "correlation_id": "corr-malformed"}
+
+
+def test_invalid_json_is_rejected_with_correlation_id():
+    client = TestClient(app)
+    response = client.post("/v1/csg/decide", content=b"{not-json", headers={"Authorization": "Bearer ci-csg-token", "Idempotency-Key": "evt-invalid-json", "X-Correlation-ID": "corr-invalid-json", "Content-Type": "application/json"})
+    assert response.status_code == 400
+    assert response.json() == {"detail": "invalid_json", "correlation_id": "corr-invalid-json"}
