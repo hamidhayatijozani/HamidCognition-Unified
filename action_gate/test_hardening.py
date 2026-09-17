@@ -7,7 +7,7 @@ os.environ["ACTION_GATE_ENV"] = "development"
 from fastapi.testclient import TestClient
 import app
 
-client = TestClient(app.app)
+client = TestClient(app.app, headers={"Authorization": "Bearer dev-action-gate-token"})
 TENANT = "tenant-hardening"
 
 
