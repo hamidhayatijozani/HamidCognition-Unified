@@ -29,6 +29,13 @@ def verify_decision_authority(
     if decision.key_id != KEY_ID:
         raise DecisionAuthorityError("decision_key_id_not_current")
 
+    request_id = request_payload.get("request_id")
+    tenant_id = request_payload.get("tenant_id")
+    if request_id != decision.request_id:
+        raise DecisionAuthorityError("decision_request_id_mismatch")
+    if tenant_id != decision.tenant_id:
+        raise DecisionAuthorityError("decision_tenant_id_mismatch")
+
     request_digest = sha256_digest(request_payload)
     if request_digest != decision.request_digest:
         raise DecisionAuthorityError("decision_request_digest_mismatch")
