@@ -9,8 +9,9 @@ import urllib.request
 ROOT = os.path.dirname(__file__)
 TENANT = "integration-tenant"
 OTHER_TENANT = "other-tenant"
+API_TOKEN = os.environ.get("ACTION_GATE_API_TOKEN", "ci-test-token")
 env = os.environ.copy()
-env.update({"ACTION_GATE_DB": "/tmp/action-gate-integration.db", "PYTHONPATH": ROOT, "ACTION_GATE_ENV": "development", "ACTION_GATE_ENFORCEMENT_SECRET": "dev-enforcement-secret"})
+env.update({"ACTION_GATE_DB": "/tmp/action-gate-integration.db", "PYTHONPATH": ROOT, "ACTION_GATE_ENV": "development", "ACTION_GATE_ENFORCEMENT_SECRET": "dev-enforcement-secret", "ACTION_GATE_API_TOKEN": API_TOKEN})
 procs = [
     subprocess.Popen([sys.executable, "-m", "uvicorn", "app:app", "--host", "127.0.0.1", "--port", "8000"], cwd=ROOT, env=env),
     subprocess.Popen([sys.executable, "tool_server.py"], cwd=ROOT, env=env),
@@ -27,14 +28,15 @@ try:
         except urllib.error.HTTPError as e:
             return e.code, json.loads(e.read())
 
-    def get(url):
-        req = urllib.request.Request(url)
+    def get(url, headers=None):
+        req = urllib.request.Request(url, headers=headers or {})
         try:
             with urllib.request.urlopen(req) as r:
                 return r.status, json.loads(r.read())
         except urllib.error.HTTPError as e:
             return e.code, json.loads(e.read())
 
+    gate_headers = {"Authorization": f"Bearer {API_TOKEN}"}
     common = {"X-Agent-ID": "demo", "X-Actor-ID": "actor-1", "X-Tenant-ID": TENANT}
     blocked_headers = {**common, "X-Action": "delete_file", "X-Action-Target": "/production/data.db"}
     status, blocked = post("http://127.0.0.1:8080/execute", {"x": 1}, blocked_headers)
@@ -47,7 +49,7 @@ try:
     bound_headers = {**allowed_headers, "X-HCJ-Decision-ID": decision_id}
     status, executed = post("http://127.0.0.1:8080/execute", {"x": 1}, bound_headers)
     assert status == 200 and executed["tool_executed"] is True
-    status, evidence = get(f"http://127.0.0.1:8000/v1/evidence/{decision_id}?tenant_id={TENANT}")
+    status, evidence = get(f"http://127.0.0.1:8000/v1/evidence/{decision_id}?tenant_id={TENANT}", gate_headers)
     assert status == 200 and evidence["execution"]["status"] == "EXECUTED"
 
     # Replay reaches the Gate, which rejects the consumed nonce; the enforcement layer must fail closed.
@@ -58,7 +60,7 @@ try:
     status, mismatch = post("http://127.0.0.1:8080/execute", {"x": 1}, altered_headers)
     assert status == 403 and mismatch["error"] == "action_gate_denied_or_binding_mismatch"
 
-    status, cross_tenant = get(f"http://127.0.0.1:8000/v1/evidence/{decision_id}?tenant_id={OTHER_TENANT}")
+    status, cross_tenant = get(f"http://127.0.0.1:8000/v1/evidence/{decision_id}?tenant_id={OTHER_TENANT}", gate_headers)
     assert status == 404
 
     status, forged = post("http://127.0.0.1:8080/execute", {"x": 1}, {**common, "X-HCJ-Decision-ID": "fabricated", "X-Action": "read_public_file", "X-Action-Target": "/public/info.txt"})
