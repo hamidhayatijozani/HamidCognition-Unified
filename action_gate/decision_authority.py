@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import hmac
+import os
 from datetime import datetime, timezone
 from typing import Any
 
-from canonicalization import KEY_ID, hmac_sha256, sha256_digest, verify_hmac
+from canonicalization import KEY_ID, sha256_digest, verify_hmac
 from csg_contract import DecisionObject
 
 
@@ -33,7 +35,7 @@ def verify_decision_authority(
 
     payload = decision.model_dump(mode="json", exclude_none=True)
     expected_digest = DecisionObject.digest_without_digest_fields(payload)
-    if not _constant_time_equal(expected_digest, decision.decision_digest):
+    if not hmac.compare_digest(expected_digest, decision.decision_digest):
         raise DecisionAuthorityError("decision_digest_invalid")
 
     signed_fields = {
@@ -43,7 +45,7 @@ def verify_decision_authority(
         "tenant_id": decision.tenant_id,
         "nonce": decision.nonce,
     }
-    secret = __import__("os").getenv("ACTION_GATE_SIGNING_SECRET")
+    secret = os.getenv("ACTION_GATE_SIGNING_SECRET")
     if not secret:
         raise DecisionAuthorityError("decision_signing_secret_not_configured")
     if not verify_hmac(signed_fields, decision.signature, secret):
@@ -55,9 +57,3 @@ def verify_decision_authority(
             raise DecisionAuthorityError("decision_expired")
         if decision.issued_at > reference:
             raise DecisionAuthorityError("decision_not_yet_valid")
-
-
-def _constant_time_equal(left: str, right: str) -> bool:
-    return hmac_sha256({"value": left}, "decision-authority-compare") == hmac_sha256(
-        {"value": right}, "decision-authority-compare"
-    )
