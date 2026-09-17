@@ -1,25 +1,22 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://hamidcognition.dev/schemas/permission_request-0.1.json",
+  "$id": "https://hamidcognition.local/contracts/permission_request.schema.json",
   "title": "HHJ-CSG Permission Request",
   "type": "object",
   "additionalProperties": false,
-  "required": ["contract_version", "request_id", "tenant_id", "agent_id", "action", "target", "parameters", "timestamp", "idempotency_key"],
+  "required": ["contract_version", "request_id", "tenant_id", "agent_id", "action", "timestamp", "parameters", "context"],
   "properties": {
-    "contract_version": {"const": "PR-0.1"},
-    "request_id": {"type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9._:-]+$"},
+    "contract_version": {"type": "string", "const": "hhj-csg/1.0"},
+    "request_id": {"type": "string", "pattern": "^[A-Za-z0-9._:-]{1,128}$"},
     "tenant_id": {"type": "string", "minLength": 1, "maxLength": 128},
     "agent_id": {"type": "string", "minLength": 1, "maxLength": 128},
-    "action": {"type": "string", "minLength": 1, "maxLength": 128},
-    "target": {"type": "string", "minLength": 1, "maxLength": 512},
-    "parameters": {"type": "object", "maxProperties": 64},
-    "context": {"type": "object", "maxProperties": 64},
-    "evidence": {"type": "array", "maxItems": 64, "items": {"type": "object", "maxProperties": 32}},
-    "risk_hint": {"type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]},
-    "timestamp": {"type": "string", "format": "date-time"},
-    "idempotency_key": {"type": "string", "minLength": 1, "maxLength": 128}
-  },
-  "allOf": [
-    {"if": {"properties": {"idempotency_key": {"type": "string"}}}, "then": {"required": ["idempotency_key"]}}
-  ]
+    "actor_id": {"type": ["string", "null"], "maxLength": 128},
+    "action": {"type": "string", "minLength": 1, "maxLength": 256},
+    "target": {"type": ["string", "null"], "maxLength": 2048},
+    "timestamp": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T.*Z$", "format": "date-time"},
+    "parameters": {"type": "object", "maxProperties": 100},
+    "context": {"type": "object", "maxProperties": 100},
+    "evidence": {"type": "array", "maxItems": 100, "items": {"type": "object", "maxProperties": 50}},
+    "risk_hint": {"type": ["string", "null"], "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL", null]}
+  }
 }

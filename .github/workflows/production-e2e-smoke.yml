@@ -1,0 +1,45 @@
+name: Action Gate Production E2E Smoke
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'action_gate/production_e2e_smoke.py'
+      - 'action_gate/enforcement_proxy.py'
+      - 'action_gate/app.py'
+      - 'action_gate/storage.py'
+      - 'action_gate/docker-compose.production.yml'
+permissions:
+  contents: read
+jobs:
+  production-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start production stack
+        working-directory: action_gate
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          DOMAIN: localhost
+        run: docker compose -f docker-compose.production.yml up -d --build
+      - name: Run production E2E smoke
+        working-directory: action_gate
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          DOMAIN: localhost
+        run: docker compose -f docker-compose.production.yml exec -T action-gate python production_e2e_smoke.py
+      - name: Stop production stack
+        if: always()
+        working-directory: action_gate
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          DOMAIN: localhost
+        run: docker compose -f docker-compose.production.yml down -v

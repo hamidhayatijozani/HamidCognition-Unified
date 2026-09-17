@@ -5,7 +5,6 @@ import json
 import os
 
 ENFORCEMENT_SECRET = os.getenv("ACTION_GATE_ENFORCEMENT_SECRET", "dev-enforcement-secret")
-PORT = int(os.getenv("TOOL_PORT", "9000"))
 
 
 def attestation(decision_id, action_hash, nonce):
@@ -14,15 +13,6 @@ def attestation(decision_id, action_hash, nonce):
 
 
 class Tool(BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == "/health":
-            self.send_response(200)
-            self.end_headers()
-            self.wfile.write(b'{"status":"ok","enforcement":"required"}')
-            return
-        self.send_response(404)
-        self.end_headers()
-
     def do_POST(self):
         decision_id = self.headers.get("X-HCJ-Decision-ID")
         action_hash = self.headers.get("X-HCJ-Action-Hash")
@@ -41,4 +31,4 @@ class Tool(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps({"tool_executed": True, "received": body}).encode())
 
 
-ThreadingHTTPServer(("127.0.0.1", PORT), Tool).serve_forever()
+ThreadingHTTPServer(("0.0.0.0", 9000), Tool).serve_forever()

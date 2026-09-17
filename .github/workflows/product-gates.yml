@@ -1,0 +1,111 @@
+name: Action Gate Product Gates
+
+on:
+  push:
+    paths:
+      - 'action_gate/**'
+      - '.github/workflows/product-gates.yml'
+  pull_request:
+    paths:
+      - 'action_gate/**'
+      - '.github/workflows/product-gates.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  product-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Action Gate dependencies
+        working-directory: action_gate
+        run: pip install -r requirements.txt
+      - name: Run product tests
+        working-directory: action_gate
+        env:
+          ACTION_GATE_ENV: development
+        run: pytest -q
+      - name: Run Validation Boundary conformance suite
+        working-directory: action_gate
+        env:
+          ACTION_GATE_ENV: development
+        run: pytest -q test_validation_boundary_conformance.py --junitxml=validation-boundary-junit.xml
+      - name: Run real HTTP enforcement integration
+        working-directory: action_gate
+        run: python enforcement_integration.py
+      - name: Run real MCP enforcement integration
+        working-directory: action_gate
+        run: python mcp_integration.py
+      - name: Compile runtime
+        working-directory: action_gate
+        run: python -m py_compile app.py storage.py rate_limit.py canonicalization.py csg_contract.py csg_ingress.py csg_routes.py csg_validation_handler.py agentrq_simulator.py csg_acceptance.py enforcement_integration.py mcp_integration.py test_validation_boundary_conformance.py production_e2e_smoke.py
+      - name: Validate production Compose
+        working-directory: action_gate
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          DOMAIN: localhost
+        run: docker compose -f docker-compose.production.yml config
+      - name: Start production stack
+        working-directory: action_gate
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          DOMAIN: localhost
+        run: docker compose -f docker-compose.production.yml up -d --build
+      - name: Production PostgreSQL and E2E smoke
+        working-directory: action_gate
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          DOMAIN: localhost
+        run: docker compose -f docker-compose.production.yml exec -T action-gate python production_e2e_smoke.py
+      - name: HHJ-CSG 200-event decision replay acceptance
+        working-directory: action_gate
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          DOMAIN: localhost
+          ACTION_GATE_URL: http://action-gate:8000
+        run: docker compose -f docker-compose.production.yml exec -T action-gate python csg_acceptance.py
+      - name: Build validation evidence pack
+        if: always()
+        working-directory: action_gate
+        run: |
+          python - <<'PY'
+          import json, os
+          pack = {"product": "HamidCognition Action Gate", "validation": "Action Gate Validation Boundary + HHJ-CSG Contract-First Vertical Slice", "repository": "hamidhayatijozani/HamidCognition-Unified", "branch": os.environ.get("GITHUB_REF_NAME"), "commit": os.environ.get("GITHUB_SHA"), "workflow": os.environ.get("GITHUB_WORKFLOW"), "run_id": os.environ.get("GITHUB_RUN_ID"), "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"), "event": os.environ.get("GITHUB_EVENT_NAME"), "status": "EVIDENCE_CAPTURED", "claim_boundary": "The product gates establish only the tested decision-to-enforcement-to-tool-to-outcome path and the HHJ-CSG contract, authenticity, idempotency and decision replay properties exercised here; they do not establish general agent safety, policy correctness, infrastructure security, or downstream outcome safety. Decision replay does not replay external world state or repeat side effects."}
+          with open("validation-evidence-pack.json", "w", encoding="utf-8") as f: json.dump(pack, f, indent=2, sort_keys=True)
+          PY
+      - name: Upload validation evidence pack
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: action-gate-validation-evidence-${{ github.run_id }}
+          path: |
+            action_gate/validation-boundary-junit.xml
+            action_gate/validation-evidence-pack.json
+            action_gate/csg-acceptance-result.json
+          if-no-files-found: warn
+      - name: Stop production stack
+        if: always()
+        working-directory: action_gate
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          DOMAIN: localhost
+        run: docker compose -f docker-compose.production.yml down -v

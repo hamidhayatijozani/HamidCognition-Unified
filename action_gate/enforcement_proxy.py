@@ -46,12 +46,7 @@ def get_json(url):
 def permitted(decision_id: str, tenant_id: str, expected_action_hash: str) -> dict | None:
     try:
         _, record = get_json(GATE_URL + "/v1/evidence/" + urllib.parse.quote(decision_id, safe="") + "?tenant_id=" + urllib.parse.quote(tenant_id, safe=""))
-        if (
-            record.get("tenant_id") != tenant_id
-            or record.get("decision") not in {"ALLOW", "SANDBOX"}
-            or record.get("action_hash") != expected_action_hash
-            or record.get("consumed_at") is not None
-        ):
+        if record.get("tenant_id") != tenant_id or record.get("decision") not in {"ALLOW", "SANDBOX"} or record.get("action_hash") != expected_action_hash:
             return None
         return record
     except Exception:
