@@ -17,7 +17,7 @@ jobs:
   product-gates:
     runs-on: ubuntu-latest
     env:
-      PYTHONPATH: action_gate
+      PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
