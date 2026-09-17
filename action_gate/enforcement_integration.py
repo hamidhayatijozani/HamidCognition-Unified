@@ -12,6 +12,7 @@ TOOL_PORT = "19000"
 PROXY_PORT = "18080"
 SECRET = "integration-enforcement-secret"
 DB = "/tmp/action-gate-integration.db"
+API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
 
 env = os.environ.copy()
 env.update({
@@ -40,8 +41,6 @@ def wait_for(url, timeout=10):
             with urllib.request.urlopen(url, timeout=0.5):
                 return
         except urllib.error.HTTPError:
-            # An HTTP response, including 501 from the minimal proxy's GET path,
-            # proves the listener is alive. Connection errors do not.
             return
         except Exception:
             time.sleep(0.1)
@@ -58,7 +57,8 @@ def post(url, payload, headers=None):
 
 
 def get(url):
-    req = urllib.request.Request(url)
+    headers = {"Authorization": f"Bearer {API_TOKEN}"} if API_TOKEN else {}
+    req = urllib.request.Request(url, headers=headers)
     try:
         with urllib.request.urlopen(req) as r:
             return r.status, json.loads(r.read())
