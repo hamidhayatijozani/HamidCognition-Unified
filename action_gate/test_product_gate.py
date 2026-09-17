@@ -48,7 +48,9 @@ def test_missing_model_metadata_fails_closed():
 
 def test_stale_observation_enters_safe_mode_at_boundary():
     current = datetime.now(timezone.utc)
-    proposal, observation, boundary = valid(current - timedelta(seconds=6))
+    stale_time = current - timedelta(seconds=6)
+    proposal, observation, _ = valid(stale_time)
+    boundary = validate_observation(observation, now=current)
     result = evaluate_product_gate(proposal, observation, boundary, now=current)
     assert boundary.permitted is False
     assert result.permitted is False
