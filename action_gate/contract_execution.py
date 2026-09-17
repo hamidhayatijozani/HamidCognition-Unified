@@ -40,6 +40,14 @@ def _parse_time(value: str) -> datetime:
     return parsed.astimezone(timezone.utc)
 
 
+def _decision_digest_payload(decision: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        k: v
+        for k, v in decision.items()
+        if k not in {"decision_digest", "signature", "replayed"}
+    }
+
+
 def validate_execution_authorization(
     request: Mapping[str, Any],
     decision: Mapping[str, Any],
@@ -52,7 +60,7 @@ def validate_execution_authorization(
         expected_request_digest = sha256_digest(dict(request))
         if decision.get("request_digest") != expected_request_digest:
             errors.append("binding:request_digest_mismatch")
-        expected_decision_digest = sha256_digest({k: v for k, v in decision.items() if k not in {"decision_digest", "signature"}})
+        expected_decision_digest = sha256_digest(_decision_digest_payload(decision))
         if decision.get("decision_digest") != expected_decision_digest:
             errors.append("integrity:decision_digest_mismatch")
         if not verify_hmac(decision_signing_payload(decision), str(decision.get("signature", "")), secret):
