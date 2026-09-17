@@ -101,6 +101,25 @@ def decide(req: PermissionRequest, authorization: str | None, idempotency_key: s
         if old_digest != request_digest:
             raise HTTPException(409, "idempotency_key_reused_for_different_request")
         return DecisionObject.model_validate_json(old_response), correlation_id or f"corr_{uuid.uuid4().hex}"
+
     decision = build_decision(req, request_digest)
-    save_idempotency(req.tenant_id, idempotency_key, request_digest, decision.model_dump_json(), utc_now().isoformat())
-    return decision, correlation_id or f"corr_{uuid.uuid4().hex}"
+    inserted = save_idempotency(
+        req.tenant_id,
+        idempotency_key,
+        request_digest,
+        decision.model_dump_json(),
+        utc_now().isoformat(),
+    )
+    if inserted:
+        return decision, correlation_id or f"corr_{uuid.uuid4().hex}"
+
+    # A concurrent request won the tenant+idempotency-key race. Recover the
+    # committed canonical decision instead of surfacing a transient 500 or
+    # minting a second authority-bearing decision.
+    winner = load_idempotency(req.tenant_id, idempotency_key)
+    if winner is None:
+        raise HTTPException(503, "idempotency_commit_not_visible")
+    winner_digest, winner_response = winner
+    if winner_digest != request_digest:
+        raise HTTPException(409, "idempotency_key_reused_for_different_request")
+    return DecisionObject.model_validate_json(winner_response), correlation_id or f"corr_{uuid.uuid4().hex}"
