@@ -31,4 +31,4 @@ class Tool(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps({"tool_executed": True, "received": body}).encode())
 
 
-ThreadingHTTPServer(("127.0.0.1", 9000), Tool).serve_forever()
+ThreadingHTTPServer(("0.0.0.0", 9000), Tool).serve_forever()
