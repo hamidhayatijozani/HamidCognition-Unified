@@ -162,10 +162,10 @@ jobs:
         with:
           name: action-gate-validation-evidence-${{ github.run_id }}
           path: |
-            validation-boundary-junit.xml
-            validation-evidence-pack.json
-            csg-acceptance-result.json
-            csg-persistence-replay-result.json
+            action_gate/validation-boundary-junit.xml
+            action_gate/validation-evidence-pack.json
+            action_gate/csg-acceptance-result.json
+            action_gate/csg-persistence-replay-result.json
           if-no-files-found: error
       - name: Stop production stack
         if: always()
