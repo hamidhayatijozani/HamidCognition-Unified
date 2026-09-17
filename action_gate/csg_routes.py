@@ -14,6 +14,7 @@ from pydantic import ValidationError
 from canonicalization import canonicalize
 from csg_contract import PermissionRequest
 from csg_ingress import decide, deterministic_decision
+from decision_authority import DecisionAuthorityError, verify_decision_authority
 from storage import load_idempotency, load_validation_request, save_validation_event
 
 router = APIRouter(prefix="/v1/csg", tags=["HHJ-CSG"])
@@ -104,20 +105,32 @@ async def csg_replay(
     if digest != stored_digest:
         raise HTTPException(500, "stored_csg_request_digest_mismatch")
 
+    try:
+        from csg_contract import DecisionObject
+
+        stored_decision = DecisionObject.model_validate_json(stored_response)
+        verify_decision_authority(
+            stored_decision,
+            payload,
+            require_unexpired=False,
+        )
+    except (DecisionAuthorityError, ValidationError, ValueError) as exc:
+        raise HTTPException(500, f"stored_csg_decision_authority_invalid:{exc}") from exc
+
     decision, risk, _ = deterministic_decision(req)
-    stored_decision = json.loads(stored_response)
-    decision_match = stored_decision.get("decision") == decision
-    request_match = stored_decision.get("request_digest") == digest
+    decision_match = stored_decision.decision == decision
+    request_match = stored_decision.request_digest == digest
     return {
         "request_id": request_id,
         "tenant_id": tenant_id,
         "replayed_decision": decision,
-        "recorded_decision": stored_decision.get("decision"),
+        "recorded_decision": stored_decision.decision,
         "risk": risk,
         "request_digest": digest,
-        "recorded_request_digest": stored_decision.get("request_digest"),
+        "recorded_request_digest": stored_decision.request_digest,
         "decision_match": decision_match,
         "request_digest_match": request_match,
+        "decision_authority_verified": True,
         "match": decision_match and request_match,
         "side_effect_executed": False,
         "world_state_replay": False,
