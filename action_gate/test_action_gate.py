@@ -7,7 +7,7 @@ os.environ["ACTION_GATE_ENV"] = "development"
 from fastapi.testclient import TestClient
 from app import app, canonical, digest
 
-client = TestClient(app)
+client = TestClient(app, headers={"Authorization": "Bearer dev-action-gate-token"})
 TENANT = "tenant-a"
 
 
@@ -39,6 +39,8 @@ def test_external_email_requires_bound_approval_then_replay_matches():
     assert replay.json()["match"] is True
     execution = client.post(f"/v1/action/{decision_id}/execution", json={"tenant_id": TENANT, "action_hash": data["action_hash"], "nonce": data["nonce"], "outcome": {"sent": True}})
     assert execution.status_code == 200
+    assert execution.json()["execution"]["boundary"] == "validation_latch"
+    assert execution.json()["execution_receipt"]["status"] == "EXECUTED"
     replayed_nonce = client.post(f"/v1/action/{decision_id}/execution", json={"tenant_id": TENANT, "action_hash": data["action_hash"], "nonce": data["nonce"], "outcome": {"sent": True}})
     assert replayed_nonce.status_code == 409
 
@@ -142,4 +144,4 @@ def test_evidence_versions_are_append_only():
 def test_health_version():
     r = client.get("/health")
     assert r.status_code == 200
-    assert r.json()["version"] == "0.2.1-secure-multitenant-mvp"
+    assert r.json()["version"] == "0.2.3-validation-boundary-mvp"
