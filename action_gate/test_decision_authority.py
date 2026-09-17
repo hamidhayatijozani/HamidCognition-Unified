@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 import pytest
 
+from canonicalization import sha256_digest
 from csg_contract import PermissionRequest
 from csg_ingress import build_decision
 from decision_authority import DecisionAuthorityError, verify_decision_authority
@@ -29,7 +30,7 @@ def test_valid_decision_is_bound_to_exact_request(monkeypatch):
     now = datetime.now(timezone.utc)
     request = make_request(now)
     payload = request.model_dump(mode="json", exclude_none=True)
-    decision = build_decision(request, __import__("canonicalization").sha256_digest(payload))
+    decision = build_decision(request, sha256_digest(payload))
 
     verify_decision_authority(decision, payload, now=now)
 
@@ -39,7 +40,7 @@ def test_request_parameter_tampering_invalidates_authority(monkeypatch):
     now = datetime.now(timezone.utc)
     request = make_request(now)
     payload = request.model_dump(mode="json", exclude_none=True)
-    decision = build_decision(request, __import__("canonicalization").sha256_digest(payload))
+    decision = build_decision(request, sha256_digest(payload))
     tampered = dict(payload)
     tampered["parameters"] = {"subject": "tampered"}
 
@@ -52,7 +53,7 @@ def test_decision_digest_tampering_is_rejected(monkeypatch):
     now = datetime.now(timezone.utc)
     request = make_request(now)
     payload = request.model_dump(mode="json", exclude_none=True)
-    decision = build_decision(request, __import__("canonicalization").sha256_digest(payload))
+    decision = build_decision(request, sha256_digest(payload))
     tampered = decision.model_copy(update={"decision": "ALLOW"})
 
     with pytest.raises(DecisionAuthorityError, match="decision_digest_invalid"):
@@ -64,7 +65,7 @@ def test_signature_tampering_is_rejected(monkeypatch):
     now = datetime.now(timezone.utc)
     request = make_request(now)
     payload = request.model_dump(mode="json", exclude_none=True)
-    decision = build_decision(request, __import__("canonicalization").sha256_digest(payload))
+    decision = build_decision(request, sha256_digest(payload))
     tampered = decision.model_copy(update={"signature": "0" * 64})
 
     with pytest.raises(DecisionAuthorityError, match="decision_signature_invalid"):
@@ -73,14 +74,13 @@ def test_signature_tampering_is_rejected(monkeypatch):
 
 def test_expired_decision_cannot_authorize_execution_but_can_be_replayed(monkeypatch):
     monkeypatch.setenv("ACTION_GATE_SIGNING_SECRET", "test-secret")
-    issued = datetime.now(timezone.utc) - timedelta(seconds=30)
+    issued = datetime.now(timezone.utc)
     request = make_request(issued)
     payload = request.model_dump(mode="json", exclude_none=True)
-    decision = build_decision(request, __import__("canonicalization").sha256_digest(payload))
-    expired_at = issued + timedelta(seconds=10)
-    decision = decision.model_copy(update={"issued_at": issued, "expires_at": expired_at})
+    decision = build_decision(request, sha256_digest(payload))
+    future = decision.expires_at.replace(microsecond=0) + __import__("datetime").timedelta(seconds=1)
 
     with pytest.raises(DecisionAuthorityError, match="decision_expired"):
-        verify_decision_authority(decision, payload, now=datetime.now(timezone.utc))
+        verify_decision_authority(decision, payload, now=future)
 
-    verify_decision_authority(decision, payload, now=datetime.now(timezone.utc), require_unexpired=False)
+    verify_decision_authority(decision, payload, now=future, require_unexpired=False)
