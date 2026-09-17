@@ -90,8 +90,15 @@ jobs:
           DOMAIN: localhost
         run: |
           docker compose -f docker-compose.production.yml restart action-gate
-          sleep 3
-          docker compose -f docker-compose.production.yml ps action-gate
+          for attempt in $(seq 1 30); do
+            container_id="$(docker compose -f docker-compose.production.yml ps -q action-gate)"
+            health="$(docker inspect -f '{{.State.Health.Status}}' "$container_id")"
+            echo "action-gate health: $health"
+            [ "$health" = "healthy" ] && exit 0
+            sleep 1
+          done
+          echo "action-gate did not become healthy after restart"
+          exit 1
       - name: Replay 200 persisted decisions after service restart
         working-directory: action_gate
         env:
@@ -105,6 +112,12 @@ jobs:
       - name: Collect replay evidence from production container
         if: always()
         working-directory: action_gate
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          DOMAIN: localhost
         run: |
           docker compose -f docker-compose.production.yml cp action-gate:/app/csg-acceptance-result.json ./csg-acceptance-result.json
           docker compose -f docker-compose.production.yml cp action-gate:/app/csg-persistence-replay-result.json ./csg-persistence-replay-result.json
