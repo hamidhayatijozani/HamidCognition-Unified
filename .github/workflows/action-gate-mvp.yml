@@ -27,6 +27,8 @@ jobs:
       - run: sleep 2 && python demo.py
         env:
           ACTION_GATE_API_TOKEN: ci-test-token
+      - name: Stop demo server before isolated integration
+        run: pkill -f 'uvicorn app:app --host 127.0.0.1 --port 8000' || true
       - run: python enforcement_integration.py
         env:
           ACTION_GATE_API_TOKEN: ci-test-token
