@@ -49,5 +49,10 @@ def load_schema(name: str) -> dict[str, Any]:
 
 
 def decision_signing_payload(decision: Mapping[str, Any]) -> dict[str, Any]:
-    """Return the immutable Decision Object fields covered by HMAC."""
-    return {k: decision[k] for k in decision if k not in {"signature"}}
+    """Return immutable Decision Object fields covered by HMAC.
+
+    ``replayed`` is transport metadata added by the idempotency endpoint after
+    the signed Decision Object is constructed. It is deliberately excluded from
+    authenticity and digest calculations because it is not decision authority.
+    """
+    return {k: decision[k] for k in decision if k not in {"signature", "replayed"}}
