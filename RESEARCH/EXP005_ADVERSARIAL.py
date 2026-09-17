@@ -21,7 +21,11 @@ def main():
     cases = {}
     p = copy.deepcopy(canonical); p["interpretation"]="SURVIVES_PRELIMINARY"; p["promotion"]="BLOCKED_PENDING_INDEPENDENT_REPRODUCTION"; p["primary_summary"]["all_snapshots_positive"]=True; cases["forged_survival_label"]=p
     p = copy.deepcopy(canonical); p["primary_summary"]["all_snapshots_positive"]=True; cases["forged_positive_aggregate"]=p
-    p = copy.deepcopy(canonical); s=p["snapshots"]["snapshot_A"]["metrics"]["5"]; s["model_accuracy"]=s["majority_baseline_accuracy"]+0.01; s["accuracy_delta_vs_majority"]=0.01; p["primary_summary"]["snapshot_deltas_vs_majority"][0]=0.01; cases["one_positive_snapshot"]=p
+    p = copy.deepcopy(canonical)
+    for name in ("snapshot_A", "snapshot_B"):
+        s=p["snapshots"][name]["metrics"]["5"]; s["model_accuracy"]=s["majority_baseline_accuracy"]+0.01; s["accuracy_delta_vs_majority"]=0.01; s["cost_aware_return"]=0.01
+    p["primary_summary"]["snapshot_deltas_vs_majority"]=[0.01,0.01]; p["primary_summary"]["all_snapshots_positive"]=True
+    cases["both_snapshots_positive_but_falsified_label"]=p
     p = copy.deepcopy(canonical); p["snapshots"]["snapshot_A"]["metrics"]["5"]["accuracy_delta_vs_majority"]=0.01; cases["forged_delta"]=p
     p = copy.deepcopy(canonical); p["integrity"]["snapshots_disjoint"]=False; cases["overlap"]=p
     p = copy.deepcopy(canonical); p["snapshots"]["snapshot_B"]["metrics"]["5"]["integrity"]["future_features_used"]=True; cases["future_features"]=p
