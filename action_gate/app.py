@@ -15,7 +15,7 @@ from rate_limit import SlidingWindowRateLimiter
 from storage import health as storage_health, init_db, load_record, save_record
 from csg_routes import router as csg_router
 
-APP_VERSION = "0.3.0-production-storage"
+APP_VERSION = "0.4.0"
 API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
 SIGNING_SECRET = os.getenv("ACTION_GATE_SIGNING_SECRET")
 ENVIRONMENT = os.getenv("ACTION_GATE_ENV", "development").lower()
