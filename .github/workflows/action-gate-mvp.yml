@@ -13,6 +13,8 @@ on:
 jobs:
   mvp:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
     defaults:
       run:
         working-directory: action_gate
