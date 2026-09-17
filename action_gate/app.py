@@ -14,15 +14,20 @@ from pydantic import BaseModel, Field
 
 from rate_limit import SlidingWindowRateLimiter
 try:
-    from .execution_guard import validate_legacy_execution
+    from .execution_receipt import make_receipt, validate_receipt
+    from .legacy_boundary_adapter import authorize_legacy_execution
 except ImportError:
-    from execution_guard import validate_legacy_execution
+    from execution_receipt import make_receipt, validate_receipt
+    from legacy_boundary_adapter import authorize_legacy_execution
 
-APP_VERSION = "0.2.2-secure-multitenant-mvp"
+APP_VERSION = "0.2.3-validation-boundary-mvp"
 DB_PATH = os.getenv("ACTION_GATE_DB", "action_gate.db")
+ENVIRONMENT = os.getenv("ACTION_GATE_ENV", "development").lower()
 API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
 SIGNING_SECRET = os.getenv("ACTION_GATE_SIGNING_SECRET")
-ENVIRONMENT = os.getenv("ACTION_GATE_ENV", "development").lower()
+if ENVIRONMENT == "development":
+    API_TOKEN = API_TOKEN or "dev-action-gate-token"
+    SIGNING_SECRET = SIGNING_SECRET or "dev-action-gate-signing-secret"
 DECISION_TTL_SECONDS = int(os.getenv("ACTION_GATE_DECISION_TTL_SECONDS", "300"))
 APPROVAL_TTL_SECONDS = int(os.getenv("ACTION_GATE_APPROVAL_TTL_SECONDS", "300"))
 RATE_LIMIT_PER_MINUTE = int(os.getenv("ACTION_GATE_RATE_LIMIT_PER_MINUTE", "120"))
@@ -228,12 +233,69 @@ def approve(decision_id: str, approval: Approval, authorization: str | None = He
 
 @app.post("/v1/action/{decision_id}/execution")
 def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | None = Header(default=None)):
-    require_auth(authorization); enforce_rate_limit(authorization, outcome.tenant_id); record = load(decision_id, outcome.tenant_id)
-    allowed, reason = validate_legacy_execution(record, action_hash=outcome.action_hash, nonce=outcome.nonce, signature_valid=verify_signature(record))
-    if not allowed:
-        status = 409 if reason in {"execution_action_binding_mismatch", "execution_nonce_mismatch", "decision_nonce_already_consumed"} else 403
+    require_auth(authorization); enforce_rate_limit(authorization, outcome.tenant_id)
+    record = load(decision_id, outcome.tenant_id)
+    ensure_live(record)
+    boundary_auth, boundary_request, boundary_decision = authorize_legacy_execution(
+        record,
+        action_hash=outcome.action_hash,
+        nonce=outcome.nonce,
+        now=datetime.now(timezone.utc),
+    )
+    if not boundary_auth.permitted:
+        reason = boundary_auth.reason
+        status = 409 if reason in {
+            "execution_action_binding_mismatch",
+            "execution_nonce_mismatch",
+            "decision_nonce_already_consumed",
+        } else 403
         raise HTTPException(status, reason)
-    record["execution"] = {"timestamp": now(), "status": "EXECUTED", "action_hash": record["action_hash"], "nonce": record["nonce"], "boundary": "execution_guard"}; record["outcome"] = outcome.outcome; record["consumed_at"] = now(); record["evidence_hash"] = digest(record); save(record, "EXECUTION_RECORDED"); return record
+
+    started_at = now()
+    finished_at = now()
+    decision_digest = digest(boundary_decision)
+    receipt = make_receipt(
+        request=boundary_request,
+        request_digest=boundary_auth.request_digest,
+        decision_id=boundary_auth.decision_id,
+        decision_digest=decision_digest,
+        action_hash=record["action_hash"],
+        nonce=record["nonce"],
+        executor_id="action-gate-legacy-endpoint",
+        started_at=started_at,
+        finished_at=finished_at,
+        status="EXECUTED",
+        outcome=outcome.outcome,
+    )
+    receipt_result = validate_receipt(
+        receipt,
+        request=boundary_request,
+        request_digest=boundary_auth.request_digest,
+        decision_id=boundary_auth.decision_id,
+        decision_digest=decision_digest,
+        action_hash=record["action_hash"],
+        nonce=record["nonce"],
+        expected_executor_id="action-gate-legacy-endpoint",
+    )
+    if not receipt_result.valid:
+        raise HTTPException(500, {"code": "execution_receipt_invalid", "errors": list(receipt_result.errors)})
+
+    record["execution"] = {
+        "timestamp": finished_at,
+        "status": "EXECUTED",
+        "action_hash": record["action_hash"],
+        "nonce": record["nonce"],
+        "boundary": "validation_latch",
+        "boundary_version": boundary_auth.boundary_version,
+        "authorization": boundary_auth.as_dict(),
+        "decision_digest": decision_digest,
+    }
+    record["outcome"] = outcome.outcome
+    record["execution_receipt"] = receipt
+    record["consumed_at"] = finished_at
+    record["evidence_hash"] = digest(record)
+    save(record, "EXECUTION_RECORDED")
+    return record
 
 
 @app.get("/v1/replay/{decision_id}")
