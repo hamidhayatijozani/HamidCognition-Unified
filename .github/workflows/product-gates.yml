@@ -16,6 +16,8 @@ permissions:
 jobs:
   product-gates:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -40,9 +42,12 @@ jobs:
       - name: Run real MCP enforcement integration
         working-directory: action_gate
         run: python mcp_integration.py
+      - name: Run sellable product readiness gate
+        working-directory: action_gate
+        run: python sellable_gate.py
       - name: Compile runtime
         working-directory: action_gate
-        run: python -m py_compile app.py storage.py rate_limit.py canonicalization.py csg_contract.py csg_ingress.py csg_routes.py decision_authority.py csg_validation_handler.py agentrq_simulator.py csg_acceptance.py csg_persistence_replay.py enforcement_integration.py mcp_integration.py test_validation_boundary_conformance.py production_e2e_smoke.py
+        run: python -m py_compile app.py storage.py rate_limit.py canonicalization.py csg_contract.py csg_ingress.py csg_routes.py decision_authority.py csg_validation_handler.py agentrq_simulator.py csg_acceptance.py csg_persistence_replay.py enforcement_integration.py mcp_integration.py test_validation_boundary_conformance.py production_e2e_smoke.py sellable_gate.py security_authority.py
       - name: Validate production Compose
         working-directory: action_gate
         env:
@@ -126,7 +131,12 @@ jobs:
         working-directory: action_gate
         run: |
           python - <<'PY'
-          import json, os
+          import json, os, sys
+          required = ("csg-acceptance-result.json", "csg-persistence-replay-result.json", "validation-boundary-junit.xml")
+          missing = [p for p in required if not os.path.exists(p)]
+          if missing:
+              print("MISSING_REQUIRED_EVIDENCE=" + ",".join(missing))
+              sys.exit(1)
           pack = {
               "product": "HamidCognition Action Gate",
               "validation": "Action Gate Validation Boundary + HHJ-CSG Contract-First Vertical Slice",
@@ -141,11 +151,8 @@ jobs:
               "claim_boundary": "The product gates establish only the tested decision-to-enforcement-to-tool-to-outcome path and the HHJ-CSG contract, authenticity, idempotency and decision replay properties exercised here; they do not establish general agent safety, policy correctness, infrastructure security, or downstream outcome safety. Decision replay does not replay external world state or repeat side effects.",
           }
           for filename in ("csg-acceptance-result.json", "csg-persistence-replay-result.json"):
-              try:
-                  with open(filename, encoding="utf-8") as f:
-                      pack[filename.removesuffix(".json")] = json.load(f)
-              except FileNotFoundError:
-                  pack[filename.removesuffix(".json")] = {"present": False}
+              with open(filename, encoding="utf-8") as f:
+                  pack[filename.removesuffix(".json")] = json.load(f)
           with open("validation-evidence-pack.json", "w", encoding="utf-8") as f:
               json.dump(pack, f, indent=2, sort_keys=True)
           PY
@@ -159,7 +166,7 @@ jobs:
             action_gate/validation-evidence-pack.json
             action_gate/csg-acceptance-result.json
             action_gate/csg-persistence-replay-result.json
-          if-no-files-found: warn
+          if-no-files-found: error
       - name: Stop production stack
         if: always()
         working-directory: action_gate

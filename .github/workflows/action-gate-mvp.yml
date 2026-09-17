@@ -16,6 +16,8 @@ jobs:
     defaults:
       run:
         working-directory: action_gate
+    env:
+      PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
