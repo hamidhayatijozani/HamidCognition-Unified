@@ -70,10 +70,15 @@ jobs:
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml exec -T action-gate python production_e2e_smoke.py
-      - name: HHJ-CSG 200-event replay acceptance
+      - name: HHJ-CSG 200-event decision replay acceptance
         working-directory: action_gate
         env:
+          POSTGRES_PASSWORD: ci-postgres-password
           ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          DOMAIN: localhost
+          ACTION_GATE_URL: http://action-gate:8000
         run: docker compose -f docker-compose.production.yml exec -T action-gate python csg_acceptance.py
       - name: Build validation evidence pack
         if: always()
@@ -81,7 +86,7 @@ jobs:
         run: |
           python - <<'PY'
           import json, os
-          pack = {"product": "HamidCognition Action Gate", "validation": "Action Gate Validation Boundary + HHJ-CSG Contract-First Vertical Slice", "repository": "hamidhayatijozani/HamidCognition-Unified", "branch": os.environ.get("GITHUB_REF_NAME"), "commit": os.environ.get("GITHUB_SHA"), "workflow": os.environ.get("GITHUB_WORKFLOW"), "run_id": os.environ.get("GITHUB_RUN_ID"), "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"), "event": os.environ.get("GITHUB_EVENT_NAME"), "status": "EVIDENCE_CAPTURED", "claim_boundary": "The product gates establish only the tested decision-to-enforcement-to-tool-to-outcome path and the HHJ-CSG contract, authenticity, idempotency and replay properties exercised here; they do not establish general agent safety, policy correctness, infrastructure security, or downstream outcome safety."}
+          pack = {"product": "HamidCognition Action Gate", "validation": "Action Gate Validation Boundary + HHJ-CSG Contract-First Vertical Slice", "repository": "hamidhayatijozani/HamidCognition-Unified", "branch": os.environ.get("GITHUB_REF_NAME"), "commit": os.environ.get("GITHUB_SHA"), "workflow": os.environ.get("GITHUB_WORKFLOW"), "run_id": os.environ.get("GITHUB_RUN_ID"), "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"), "event": os.environ.get("GITHUB_EVENT_NAME"), "status": "EVIDENCE_CAPTURED", "claim_boundary": "The product gates establish only the tested decision-to-enforcement-to-tool-to-outcome path and the HHJ-CSG contract, authenticity, idempotency and decision replay properties exercised here; they do not establish general agent safety, policy correctness, infrastructure security, or downstream outcome safety. Decision replay does not replay external world state or repeat side effects."}
           with open("validation-evidence-pack.json", "w", encoding="utf-8") as f: json.dump(pack, f, indent=2, sort_keys=True)
           PY
       - name: Upload validation evidence pack
