@@ -95,6 +95,18 @@ def save_validation_event(*, correlation_id: str, tenant_id: str | None, request
         con.close()
 
 
+def load_validation_request(tenant_id: str, request_id: str) -> str | None:
+    con = connect()
+    try:
+        if backend() == "postgresql":
+            row = con.execute("SELECT raw_request FROM validation_events WHERE tenant_id=%s AND request_id=%s AND validation_result='PASS' ORDER BY created_at DESC LIMIT 1", (tenant_id, request_id)).fetchone()
+        else:
+            row = con.execute("SELECT raw_request FROM validation_events WHERE tenant_id=? AND request_id=? AND validation_result='PASS' ORDER BY created_at DESC LIMIT 1", (tenant_id, request_id)).fetchone()
+        return row[0] if row else None
+    finally:
+        con.close()
+
+
 def save_record(record: dict[str, Any], event_type: str, digest_fn, canonical_fn, now_fn) -> None:
     con = connect()
     try:
