@@ -40,7 +40,10 @@ def verify_decision_authority(
     if request_digest != decision.request_digest:
         raise DecisionAuthorityError("decision_request_digest_mismatch")
 
-    payload = decision.model_dump(mode="json", exclude_none=True)
+    # build_decision signs the complete unsigned object, including explicit
+    # null fields such as execution_receipt. Preserve those fields here so
+    # verification uses the exact same canonical representation.
+    payload = decision.model_dump(mode="json", exclude_none=False)
     expected_digest = DecisionObject.digest_without_digest_fields(payload)
     if not hmac.compare_digest(expected_digest, decision.decision_digest):
         raise DecisionAuthorityError("decision_digest_invalid")
