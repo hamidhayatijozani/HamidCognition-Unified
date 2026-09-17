@@ -1,7 +1,6 @@
 """Product Gate: deterministic pre-execution control for HamidCognition-Pro.
 
-This gate is intentionally narrower than a model. It consumes an already-formed
-proposal plus explicit runtime evidence and returns a bounded control decision.
+This gate consumes a validated Observation Boundary result plus a proposal.
 It never executes an action and never grants authority by itself.
 """
 from __future__ import annotations
@@ -9,6 +8,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Mapping
+
+from observation_boundary import ObservationBoundaryResult
 
 
 ALLOWED_ACTIONS = frozenset({
@@ -37,7 +38,7 @@ class ProductGateResult:
     permitted: bool
     decision: str
     reasons: tuple[str, ...]
-    gate_version: str = "PG-0.1"
+    gate_version: str = "PG-0.2"
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -56,29 +57,37 @@ def _parse_timestamp(value: Any) -> datetime | None:
     except ValueError:
         return None
     if parsed.tzinfo is None:
-        return parsed.replace(tzinfo=timezone.utc)
+        return None
     return parsed.astimezone(timezone.utc)
 
 
 def evaluate_product_gate(
     proposal: Mapping[str, Any],
     observation: Mapping[str, Any],
+    observation_boundary: ObservationBoundaryResult,
     *,
     now: datetime | None = None,
     max_observation_age_seconds: int = 5,
     max_drawdown: float = 0.10,
     max_anomaly_score: float = 0.80,
 ) -> ProductGateResult:
-    """Evaluate whether a proposal is eligible to reach the Action Gate.
+    """Evaluate eligibility after the Observation Boundary has admitted the input.
 
-    The result is advisory authority only. A caller must still pass the returned
-    eligible proposal through the Action/Execution Boundary before side effects.
-    Missing or malformed evidence fails closed.
+    The boundary result is mandatory. A raw observation cannot self-authorize
+    Product Gate evaluation. A caller must still pass any allowed proposal
+    through the Action/Execution Boundary before side effects.
     """
+    if not observation_boundary.permitted:
+        decision = observation_boundary.decision if observation_boundary.decision in {"SAFE_MODE", "DENY"} else "DENY"
+        return ProductGateResult(False, decision, ("observation_boundary_rejected", *observation_boundary.reasons))
+
     reasons: list[str] = []
     action = proposal.get("action")
     if action not in ALLOWED_ACTIONS:
         return ProductGateResult(False, "DENY", ("unsupported_action",))
+
+    if not observation_boundary.observation_hash:
+        return ProductGateResult(False, "SAFE_MODE", ("observation_boundary_missing_hash",))
 
     if proposal.get("model_version") in (None, ""):
         reasons.append("missing_model_version")
@@ -86,6 +95,9 @@ def evaluate_product_gate(
         reasons.append("missing_feature_version")
     if proposal.get("input_hash") in (None, ""):
         reasons.append("missing_input_hash")
+
+    if proposal.get("input_hash") != observation_boundary.observation_hash:
+        reasons.append("input_hash_mismatch")
 
     timestamp = _parse_timestamp(observation.get("timestamp"))
     reference_now = now or datetime.now(timezone.utc)
@@ -98,9 +110,6 @@ def evaluate_product_gate(
 
     if observation.get("connection_status") != "CONNECTED":
         reasons.append("data_connection_not_healthy")
-
-    if observation.get("input_hash") != proposal.get("input_hash"):
-        reasons.append("input_hash_mismatch")
 
     anomaly_score = observation.get("anomaly_score")
     if not isinstance(anomaly_score, (int, float)):
