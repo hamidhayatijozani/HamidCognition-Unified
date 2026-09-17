@@ -2,7 +2,7 @@ FROM python:3.12-slim
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY app.py storage.py rate_limit.py canonicalization.py csg_contract.py csg_ingress.py csg_routes.py csg_acceptance.py agentrq_simulator.py ./
+COPY app.py storage.py rate_limit.py canonicalization.py csg_contract.py csg_ingress.py csg_routes.py csg_acceptance.py agentrq_simulator.py production_e2e_smoke.py ./
 RUN mkdir -p /data
 ENV ACTION_GATE_DB=/data/action_gate.db
 EXPOSE 8000
