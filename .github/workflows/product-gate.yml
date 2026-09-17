@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'action_gate/product_gate.py'
+      - 'action_gate/observation_boundary.py'
       - 'action_gate/test_product_gate.py'
       - '.github/workflows/product-gate.yml'
   workflow_dispatch:
@@ -31,32 +32,43 @@ jobs:
           python - <<'PY'
           import json
           from datetime import datetime, timezone
+          from observation_boundary import validate_observation
           from product_gate import evaluate_product_gate
 
           now = datetime.now(timezone.utc)
+          stamp = now.isoformat()
+          observation = {
+              "timestamp": stamp,
+              "symbol": "EURUSD",
+              "bid": 1.1000,
+              "ask": 1.1002,
+              "tick_id": "evidence-tick-001",
+              "sequence": 100,
+              "broker_timestamp": stamp,
+              "local_timestamp": stamp,
+              "connection_status": "CONNECTED",
+              "anomaly_score": 0.10,
+              "drawdown": 0.02,
+          }
+          boundary = validate_observation(observation, now=now)
           proposal = {
               "action": "BUY_SMALL",
               "model_version": "evidence-model-001",
               "feature_version": "evidence-features-001",
-              "input_hash": "evidence-input-001",
+              "input_hash": boundary.observation_hash,
           }
-          observation = {
-              "timestamp": now.isoformat(),
-              "connection_status": "CONNECTED",
-              "input_hash": "evidence-input-001",
-              "anomaly_score": 0.10,
-              "drawdown": 0.02,
-          }
-          result = evaluate_product_gate(proposal, observation, now=now)
+          result = evaluate_product_gate(proposal, observation, boundary, now=now)
           evidence = {
-              "schema": "product-gate-evidence-0.1",
+              "schema": "product-gate-evidence-0.2",
               "created_at": now.isoformat(),
+              "observation_boundary": boundary.as_dict(),
               "proposal": proposal,
               "observation": observation,
               "result": result.as_dict(),
           }
           with open("product_gate_evidence.json", "w", encoding="utf-8") as handle:
               json.dump(evidence, handle, sort_keys=True, indent=2)
+          assert boundary.permitted is True
           assert result.permitted is True
           PY
       - name: Upload Product Gate evidence
