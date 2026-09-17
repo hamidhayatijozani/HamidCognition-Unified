@@ -63,8 +63,8 @@ def main() -> int:
     try:
         wait_for_health(proc)
 
-        status, _ = request("GET", "/health", token=None)
-        assert status == 401, "production authentication must be mandatory"
+        status, _ = request("GET", "/v1/evidence/nonexistent?tenant_id=sellable-tenant", token=None)
+        assert status == 401, "production authentication must be mandatory on protected endpoints"
 
         evaluate_payload = {
             "tenant_id": "sellable-tenant",
