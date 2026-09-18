@@ -89,6 +89,7 @@ def main() -> int:
 
         execution = {
             "tenant_id": "sellable-tenant",
+            "actor_id": decision["actor_id"],
             "action_hash": decision["action_hash"],
             "nonce": decision["nonce"],
             "outcome": {"status": "synthetic-success", "gate": "sellable"},
