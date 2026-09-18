@@ -115,6 +115,7 @@ class Approval(BaseModel):
 class ExecutionOutcome(BaseModel):
     action_hash: str
     tenant_id: str
+    actor_id: str | None = None
     nonce: str
     outcome: dict[str, Any] = Field(default_factory=dict)
 
@@ -234,7 +235,7 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
     }
     record["evidence_hash"] = digest(record)
     save(record, "DECISION_CREATED")
-    return {k: record[k] for k in ("decision", "decision_id", "request_id", "tenant_id", "risk_assessment", "policy_checks", "evidence", "trace_id", "created_at", "expires_at", "nonce", "action_hash", "policy_version", "policy_hash", "decision_signature", "evidence_hash")} | {"reason": policy_checks[0]["reason"]}
+    return {k: record[k] for k in ("decision", "decision_id", "request_id", "tenant_id", "actor_id", "risk_assessment", "policy_checks", "evidence", "trace_id", "created_at", "expires_at", "nonce", "action_hash", "policy_version", "policy_hash", "decision_signature", "evidence_hash")} | {"reason": policy_checks[0]["reason"]}
 
 
 @app.post("/v1/action/{decision_id}/approve")
@@ -270,6 +271,8 @@ def execution_reserve(decision_id: str, outcome: ExecutionOutcome, authorization
         raise HTTPException(403, "execution_not_permitted_by_gate")
     if outcome.action_hash != record["action_hash"]:
         raise HTTPException(409, "execution_action_binding_mismatch")
+    if record.get("actor_id") is not None and outcome.actor_id != record.get("actor_id"):
+        raise HTTPException(409, "execution_actor_binding_mismatch")
     if outcome.nonce != record["nonce"]:
         raise HTTPException(409, "execution_nonce_mismatch")
     if record["approval"] and record["approval"].get("approved") and datetime.fromisoformat(record["approval"]["expires_at"]) <= datetime.now(timezone.utc):
@@ -297,6 +300,8 @@ def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | 
         raise HTTPException(403, "execution_not_permitted_by_gate")
     if outcome.action_hash != record["action_hash"]:
         raise HTTPException(409, "execution_action_binding_mismatch")
+    if record.get("actor_id") is not None and outcome.actor_id != record.get("actor_id"):
+        raise HTTPException(409, "execution_actor_binding_mismatch")
     if outcome.nonce != record["nonce"]:
         raise HTTPException(409, "execution_nonce_mismatch")
     if record["approval"] and record["approval"].get("approved") and datetime.fromisoformat(record["approval"]["expires_at"]) <= datetime.now(timezone.utc):
