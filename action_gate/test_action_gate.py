@@ -85,10 +85,12 @@ def test_authentication_fail_closed_in_production():
         module.ENVIRONMENT, module.API_TOKEN = old_env, old_token
 
 
-def test_signing_secret_required_in_production():
+def test_signing_secret_required_in_production(monkeypatch):
     import app as module
     old_env, old_token, old_secret = module.ENVIRONMENT, module.API_TOKEN, module.SIGNING_SECRET
     module.ENVIRONMENT, module.API_TOKEN, module.SIGNING_SECRET = "production", "ci-token", None
+    monkeypatch.delenv("ACTION_GATE_SIGNING_SECRET", raising=False)
+    monkeypatch.delenv("ACTION_GATE_SIGNING_KEYS", raising=False)
     try:
         assert client.post("/v1/action/evaluate", headers={"Authorization": "Bearer ci-token"}, json={"tenant_id": TENANT, "agent_id": "a", "action": "read_public_file"}).status_code == 503
     finally:
