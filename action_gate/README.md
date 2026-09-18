@@ -1,5 +1,7 @@
 # HamidCognition Action Gate v1.0.0
 
+**Release validation status:** repository CI is the authoritative promotion gate for this release.
+
 **Runtime Action Governance with Replayable Decision Evidence**
 
 This directory contains the executable product. It is deliberately narrower than the broader HamidCognition research program.
