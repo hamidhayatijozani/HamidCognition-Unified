@@ -16,24 +16,17 @@ from pydantic import BaseModel, Field
 from rate_limit import SlidingWindowRateLimiter
 from storage import health as storage_health, init_db, load_record, save_record, consume_nonce, reserve_execution, allow_rate_limit
 from csg_routes import router as csg_router
+from keyring import configured_key_ids, current_key_id, current_secret, verify_with_keyring
+from policy_store import load_policy, policy_hash
 
 APP_VERSION = Path(__file__).with_name("VERSION").read_text(encoding="utf-8").strip()
 API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
-SIGNING_SECRET = os.getenv("ACTION_GATE_SIGNING_SECRET")
 ENVIRONMENT = os.getenv("ACTION_GATE_ENV", "development").lower()
 DECISION_TTL_SECONDS = int(os.getenv("ACTION_GATE_DECISION_TTL_SECONDS", "300"))
 APPROVAL_TTL_SECONDS = int(os.getenv("ACTION_GATE_APPROVAL_TTL_SECONDS", "300"))
 RATE_LIMIT_PER_MINUTE = int(os.getenv("ACTION_GATE_RATE_LIMIT_PER_MINUTE", "120"))
 
-POLICY_SNAPSHOT = {
-    "policy_version": "builtin-v1",
-    "high_risk": ["delete_file", "delete_customer", "delete_database", "transfer_funds", "transfer_money"],
-    "external": ["send_email", "send_external_email", "http_post_external"],
-    "critical": ["transfer_funds", "transfer_money"],
-    "rules": ["critical financial action -> SANDBOX", "critical destructive production action -> DENY", "high-risk destructive or external communication -> ASK", "otherwise -> ALLOW"],
-}
-POLICY_HASH = hashlib.sha256(json.dumps(POLICY_SNAPSHOT, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
-app = FastAPI(title="HamidCognition Action Gate", version=APP_VERSION)
+POLICY_SNAPSHOT = load_policy()\nPOLICY_HASH = policy_hash(POLICY_SNAPSHOT)\napp = FastAPI(title="HamidCognition Action Gate", version=APP_VERSION)
 app.include_router(csg_router)
 limiter = SlidingWindowRateLimiter(RATE_LIMIT_PER_MINUTE, 60)
 
@@ -56,17 +49,17 @@ def digest(obj: Any) -> str:
 
 
 def sign(obj: Any) -> str:
-    if not SIGNING_SECRET:
+    secret = current_secret()
+    if not secret:
         if ENVIRONMENT == "production":
             raise HTTPException(503, "production_signing_secret_not_configured")
         return digest(obj)
-    return hmac.new(SIGNING_SECRET.encode(), canonical(obj).encode(), hashlib.sha256).hexdigest()
+    return hmac.new(secret.encode(), canonical(obj).encode(), hashlib.sha256).hexdigest()
 
 
 def verify_signature(record: dict[str, Any]) -> bool:
     payload = {"decision_id": record["decision_id"], "tenant_id": record["tenant_id"], "action_hash": record["action_hash"], "policy_hash": record["policy_hash"], "nonce": record["nonce"], "expires_at": record["expires_at"]}
-    expected = sign(payload)
-    return hmac.compare_digest(expected, record.get("decision_signature", ""))
+    return verify_with_keyring(payload, record.get("decision_signature", ""), record.get("key_id", current_key_id()))
 
 
 def require_auth(authorization: str | None) -> None:
@@ -94,6 +87,7 @@ class ActionRequest(BaseModel):
     tenant_id: str
     agent_id: str
     actor_id: str | None = None
+    session_id: str | None = None
     action: str
     target: str | None = None
     parameters: dict[str, Any] = Field(default_factory=dict)
@@ -116,6 +110,7 @@ class ExecutionOutcome(BaseModel):
     action_hash: str
     tenant_id: str
     actor_id: str | None = None
+    session_id: str | None = None
     nonce: str
     outcome: dict[str, Any] = Field(default_factory=dict)
 
@@ -153,7 +148,7 @@ def decide(req: ActionRequest, risk: str, snapshot: dict[str, Any] = POLICY_SNAP
 
 
 def normalized_action(req: ActionRequest):
-    return {"tenant_id": req.tenant_id, "actor_id": req.actor_id, "action": req.action.lower(), "target": req.target, "parameters": req.parameters}
+    return {"tenant_id": req.tenant_id, "actor_id": req.actor_id, "session_id": req.session_id, "action": req.action.lower(), "target": req.target, "parameters": req.parameters}
 
 
 def save(record: dict[str, Any], event_type: str) -> None:
@@ -183,7 +178,7 @@ def ensure_live(record: dict[str, Any]):
 def health():
     db_health = storage_health()
     status = "ok" if db_health["status"] == "ok" else "degraded"
-    return {"status": status, "product": "HamidCognition Action Gate", "version": APP_VERSION, "policy_hash": POLICY_HASH, "environment": ENVIRONMENT, "storage": db_health}
+    return {"status": status, "product": "HamidCognition Action Gate", "version": APP_VERSION, "policy_hash": POLICY_HASH, "policy_version": POLICY_SNAPSHOT["policy_version"], "key_ids": configured_key_ids(), "current_key_id": current_key_id(), "environment": ENVIRONMENT, "storage": db_health}
 
 
 @app.post("/v1/action/evaluate")
@@ -212,13 +207,14 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
         "tenant_id": req.tenant_id,
         "actor_id": req.actor_id,
         "request": req.model_dump(),
-        "identity": {"agent_id": req.agent_id, "actor_id": req.actor_id},
+        "identity": {"agent_id": req.agent_id, "actor_id": req.actor_id, "session_id": req.session_id},
         "normalized_action": normalized,
         "action_hash": action_hash,
         "nonce": nonce,
         "policy_version": POLICY_SNAPSHOT["policy_version"],
         "policy_snapshot": POLICY_SNAPSHOT,
         "policy_hash": POLICY_HASH,
+        "key_id": current_key_id(),
         "risk_assessment": {"level": risk, "reasons": risk_reasons, "agent_risk_hint": req.risk_hint},
         "evidence": req.evidence,
         "decision": decision,
@@ -273,6 +269,8 @@ def execution_reserve(decision_id: str, outcome: ExecutionOutcome, authorization
         raise HTTPException(409, "execution_action_binding_mismatch")
     if record.get("actor_id") is not None and outcome.actor_id != record.get("actor_id"):
         raise HTTPException(409, "execution_actor_binding_mismatch")
+    if record.get("request", {}).get("session_id") is not None and outcome.session_id != record["request"].get("session_id"):
+        raise HTTPException(409, "execution_session_binding_mismatch")
     if outcome.nonce != record["nonce"]:
         raise HTTPException(409, "execution_nonce_mismatch")
     if record["approval"] and record["approval"].get("approved") and datetime.fromisoformat(record["approval"]["expires_at"]) <= datetime.now(timezone.utc):
