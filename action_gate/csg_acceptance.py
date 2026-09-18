@@ -26,7 +26,7 @@ def event(index: int, tenant: str = "tenant-acceptance") -> dict:
     action = ["read_public", "send_email", "delete_file", "transfer_funds"][index % 4]
     return {
         "contract_version": "hhj-csg/1.0", "request_id": f"accept-{index:04d}", "tenant_id": tenant,
-        "agent_id": "agentrq-acceptance", "actor_id": "acceptance", "action": action,
+        "agent_id": "agentrq-acceptance", "actor_id": "acceptance", "session_id": "acceptance-session", "action": action,
         "target": "production-db" if action == "delete_file" and index % 8 == 0 else "public-resource",
         "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "parameters": {"index": index}, "context": {"suite": "csg-acceptance"},
