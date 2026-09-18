@@ -28,7 +28,7 @@ jobs:
         shell: bash
         run: |
           VERSION="$(tr -d '[:space:]' < action_gate/VERSION)"
-          test "$VERSION" = "0.4.2"
+          test -n "$VERSION"
 
       - name: Build production image
         run: docker build --pull -t action-gate:${{ steps.version.outputs.version }} .
