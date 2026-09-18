@@ -1,6 +1,8 @@
 # Action Gate Deployment Contract
 
-Version: 0.4.2 baseline
+Version: 1.0.0 baseline
+
+The current deployment contract targets Action Gate 1.0.0. Historical 0.4.x records remain historical evidence and are not relabeled as 1.0.0 execution evidence.
 
 This document defines the minimum deployment boundary for a customer installation. It is an operational contract, not a compliance certification.
 
@@ -29,7 +31,7 @@ Never commit production secrets, signing keys, database passwords, bearer tokens
 
 ## Storage
 
-PostgreSQL is the production persistence target validated by the 0.4.2 evidence run. SQLite may be useful for local development but must not silently become the production persistence layer.
+PostgreSQL is the production persistence target for this deployment contract. The exact release evidence must be retained with the candidate being deployed. SQLite may be useful for local development but must not silently become the production persistence layer.
 
 ## Upgrade rule
 
