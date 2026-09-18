@@ -3,6 +3,7 @@ import hmac
 import json
 import os
 import tempfile
+import pytest
 
 os.environ["ACTION_GATE_DB"] = os.path.join(tempfile.gettempdir(), "hamidcognition-enterprise-security.db")
 
@@ -11,11 +12,16 @@ import app as gate
 
 client = TestClient(gate.app)
 
-gate.ENVIRONMENT = "production"
-gate.API_TOKEN = "enterprise-token"
-gate.SIGNING_SECRET = "legacy-secret"
-gate.APPROVAL_SECRET = "approval-secret"
-gate.REQUIRE_SESSION_BINDING = True
+@pytest.fixture(autouse=True)
+def enterprise_runtime():
+    old = (gate.ENVIRONMENT, gate.API_TOKEN, gate.SIGNING_SECRET, gate.APPROVAL_SECRET, gate.REQUIRE_SESSION_BINDING)
+    gate.ENVIRONMENT = "production"
+    gate.API_TOKEN = "enterprise-token"
+    gate.SIGNING_SECRET = "legacy-secret"
+    gate.APPROVAL_SECRET = "approval-secret"
+    gate.REQUIRE_SESSION_BINDING = True
+    yield
+    gate.ENVIRONMENT, gate.API_TOKEN, gate.SIGNING_SECRET, gate.APPROVAL_SECRET, gate.REQUIRE_SESSION_BINDING = old
 
 
 def payload(**extra):
