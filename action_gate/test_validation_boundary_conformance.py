@@ -122,6 +122,12 @@ def test_vb12_persistence_record_is_loadable_and_audited():
     assert record["evidence_hash"]
 
 
+def test_adversarial_actor_change_cannot_redeem_authority():
+    data = evaluate()
+    wrong_actor = client.post(f"/v1/action/{data["decision_id"]}/execution/reserve", json={"tenant_id": TENANT, "actor_id": "attacker", "action_hash": data["action_hash"], "nonce": data["nonce"]})
+    assert wrong_actor.status_code == 409
+
+
 def test_adversarial_parameter_change_changes_authority():
     data = evaluate(parameters={"amount": 10})
     request = gate.ActionRequest.model_validate({"tenant_id": TENANT, "agent_id": "vb-agent", "actor_id": "vb-actor", "action": "read_public_file", "target": "/public/info.txt", "parameters": {"amount": 11}})
