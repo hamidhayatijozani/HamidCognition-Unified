@@ -125,7 +125,7 @@ def test_vb12_persistence_record_is_loadable_and_audited():
 
 def test_adversarial_actor_change_cannot_redeem_authority():
     data = evaluate()
-    wrong_actor = client.post(f"/v1/action/{data["decision_id"]}/execution/reserve", json={"tenant_id": TENANT, "actor_id": "attacker", "action_hash": data["action_hash"], "nonce": data["nonce"]})
+    wrong_actor = client.post(f"/v1/action/{data['decision_id']}/execution/reserve", json={"tenant_id": TENANT, "actor_id": "attacker", "action_hash": data["action_hash"], "nonce": data["nonce"]})
     assert wrong_actor.status_code == 409
 
 
