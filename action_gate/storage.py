@@ -30,6 +30,8 @@ def init_db() -> None:
         con.execute("CREATE TABLE IF NOT EXISTS audit_events (event_id TEXT PRIMARY KEY, decision_id TEXT, event_type TEXT NOT NULL, event TEXT NOT NULL, previous_hash TEXT NOT NULL, event_hash TEXT NOT NULL, created_at TEXT NOT NULL)")
         con.execute("CREATE TABLE IF NOT EXISTS idempotency_keys (tenant_id TEXT NOT NULL, idempotency_key TEXT NOT NULL, request_digest TEXT NOT NULL, response TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY (tenant_id, idempotency_key))")
         con.execute("CREATE TABLE IF NOT EXISTS validation_events (event_id TEXT PRIMARY KEY, correlation_id TEXT NOT NULL, tenant_id TEXT, request_id TEXT, idempotency_key TEXT, request_digest TEXT, validation_result TEXT NOT NULL, error_code TEXT, raw_request TEXT NOT NULL, created_at TEXT NOT NULL)")
+        con.execute("CREATE TABLE IF NOT EXISTS rate_limit_events (event_id TEXT PRIMARY KEY, rate_key TEXT NOT NULL, created_at REAL NOT NULL)")
+        con.execute("CREATE INDEX IF NOT EXISTS idx_rate_limit_events_key_time ON rate_limit_events(rate_key, created_at)")
         con.commit()
         if backend() == "sqlite":
             con.execute("CREATE TRIGGER IF NOT EXISTS audit_events_no_update BEFORE UPDATE ON audit_events BEGIN SELECT RAISE(ABORT, 'audit_events_are_append_only'); END")
@@ -162,6 +164,38 @@ def consume_nonce(decision_id: str, nonce: str, consumed_at: str) -> bool:
             row = (decision_id,) if row.rowcount == 1 else None
         con.commit()
         return bool(row)
+    except Exception:
+        con.rollback()
+        raise
+    finally:
+        con.close()
+
+
+def allow_rate_limit(rate_key: str, limit: int, window_seconds: int, now_ts: float) -> bool:
+    """Atomically enforce a shared rate limit using the configured database."""
+    if limit <= 0 or window_seconds <= 0:
+        return False
+    con = connect()
+    try:
+        cutoff = now_ts - window_seconds
+        if backend() == "postgresql":
+            con.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", (rate_key,))
+            con.execute("DELETE FROM rate_limit_events WHERE rate_key=%s AND created_at<=%s", (rate_key, cutoff))
+            count = con.execute("SELECT COUNT(*) FROM rate_limit_events WHERE rate_key=%s", (rate_key,)).fetchone()[0]
+            if count >= limit:
+                con.rollback()
+                return False
+            con.execute("INSERT INTO rate_limit_events VALUES (%s,%s,%s)", (f"rl_{uuid.uuid4().hex}", rate_key, now_ts))
+        else:
+            con.execute("BEGIN IMMEDIATE")
+            con.execute("DELETE FROM rate_limit_events WHERE rate_key=? AND created_at<=?", (rate_key, cutoff))
+            count = con.execute("SELECT COUNT(*) FROM rate_limit_events WHERE rate_key=?", (rate_key,)).fetchone()[0]
+            if count >= limit:
+                con.rollback()
+                return False
+            con.execute("INSERT INTO rate_limit_events VALUES (?,?,?)", (f"rl_{uuid.uuid4().hex}", rate_key, now_ts))
+        con.commit()
+        return True
     except Exception:
         con.rollback()
         raise
