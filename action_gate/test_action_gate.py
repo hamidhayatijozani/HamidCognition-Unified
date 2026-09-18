@@ -17,6 +17,10 @@ def evaluate(payload):
     return r.json()
 
 
+def reserve(data):
+    return client.post(f"/v1/action/{data['decision_id']}/execution/reserve", json={"tenant_id": TENANT, "action_hash": data["action_hash"], "nonce": data["nonce"]})
+
+
 def test_delete_production_is_denied():
     data = evaluate({"agent_id": "a", "action": "delete_file", "target": "/production/data.db"})
     assert data["decision"] == "DENY"
@@ -34,6 +38,7 @@ def test_external_email_requires_bound_approval_then_replay_matches():
     assert approved.status_code == 200
     assert approved.json()["decision"] == "ALLOW"
     assert client.get(f"/v1/replay/{decision_id}?tenant_id={TENANT}").json()["match"] is True
+    assert reserve(data).status_code == 200
     execution = client.post(f"/v1/action/{decision_id}/execution", json={"tenant_id": TENANT, "action_hash": data["action_hash"], "nonce": data["nonce"], "outcome": {"sent": True}})
     assert execution.status_code == 200
     replayed = client.post(f"/v1/action/{decision_id}/execution", json={"tenant_id": TENANT, "action_hash": data["action_hash"], "nonce": data["nonce"], "outcome": {"sent": True}})
@@ -59,6 +64,7 @@ def test_denied_action_cannot_execute():
 
 def test_allowed_execution_requires_exact_hash_and_nonce():
     data = evaluate({"agent_id": "a", "action": "read_public_file", "target": "/public/info.txt"})
+    assert reserve(data).status_code == 200
     assert client.post(f"/v1/action/{data['decision_id']}/execution", json={"tenant_id": TENANT, "action_hash": "tampered", "nonce": data["nonce"]}).status_code == 409
     assert client.post(f"/v1/action/{data['decision_id']}/execution", json={"tenant_id": TENANT, "action_hash": data["action_hash"], "nonce": "tampered"}).status_code == 409
     assert client.post(f"/v1/action/{data['decision_id']}/execution", json={"tenant_id": TENANT, "action_hash": data["action_hash"], "nonce": data["nonce"], "outcome": {"ok": True}}).status_code == 200
