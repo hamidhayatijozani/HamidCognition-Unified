@@ -283,6 +283,8 @@ def execution_reserve(decision_id: str, outcome: ExecutionOutcome, authorization
         raise HTTPException(409, "execution_actor_binding_mismatch")
     if record.get("request", {}).get("session_id") is not None and outcome.session_id != record["request"].get("session_id"):
         raise HTTPException(409, "execution_session_binding_mismatch")
+    if record.get("request", {}).get("session_id") is not None and outcome.session_id != record["request"].get("session_id"):
+        raise HTTPException(409, "execution_session_binding_mismatch")
     if outcome.nonce != record["nonce"]:
         raise HTTPException(409, "execution_nonce_mismatch")
     if record["approval"] and record["approval"].get("approved") and datetime.fromisoformat(record["approval"]["expires_at"]) <= datetime.now(timezone.utc):
