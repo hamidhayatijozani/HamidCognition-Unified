@@ -53,13 +53,13 @@ def permitted(decision_id: str, tenant_id: str, expected_action_hash: str) -> di
         return None
 
 
-def reserve_execution(decision_id: str, tenant_id: str, action_hash_value: str, nonce: str):
+def reserve_execution(decision_id: str, tenant_id: str, actor_id: str | None, action_hash_value: str, nonce: str):
     return post_json(GATE_URL + f"/v1/action/{urllib.parse.quote(decision_id, safe='')}/execution/reserve",
-                     {"tenant_id": tenant_id, "action_hash": action_hash_value, "nonce": nonce})[1]
+                     {"tenant_id": tenant_id, "actor_id": actor_id, "action_hash": action_hash_value, "nonce": nonce})[1]
 
 
-def record_execution(decision_id: str, tenant_id: str, action_hash_value: str, nonce: str, outcome: dict):
-    return post_json(GATE_URL + f"/v1/action/{urllib.parse.quote(decision_id, safe='')}/execution", {"tenant_id": tenant_id, "action_hash": action_hash_value, "nonce": nonce, "outcome": outcome})
+def record_execution(decision_id: str, tenant_id: str, actor_id: str | None, action_hash_value: str, nonce: str, outcome: dict):
+    return post_json(GATE_URL + f"/v1/action/{urllib.parse.quote(decision_id, safe='')}/execution", {"tenant_id": tenant_id, "actor_id": actor_id, "action_hash": action_hash_value, "nonce": nonce, "outcome": outcome})
 
 
 def tool_headers(decision_id, action_hash_value, nonce):
@@ -77,10 +77,10 @@ class HTTPHandler(BaseHTTPRequestHandler):
                 record = permitted(decision_id, tenant_id, expected_hash)
                 if not record:
                     self.send_response(403); self.end_headers(); self.wfile.write(b'{"error":"action_gate_denied_or_binding_mismatch"}'); return
-                reserve_execution(decision_id, tenant_id, expected_hash, record["nonce"])
+                reserve_execution(decision_id, tenant_id, actor_id, expected_hash, record["nonce"])
                 status, out = post_json(TOOL_URL + self.path, payload, tool_headers(decision_id, expected_hash, record["nonce"]))
                 try:
-                    record_execution(decision_id, tenant_id, expected_hash, record["nonce"], {"http_status": status, "tool_response": out})
+                    record_execution(decision_id, tenant_id, actor_id, expected_hash, record["nonce"], {"http_status": status, "tool_response": out})
                 except Exception:
                     self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
                 self.send_response(status); self.end_headers(); self.wfile.write(json.dumps(out).encode()); return
@@ -102,10 +102,10 @@ class MCPHandler(BaseHTTPRequestHandler):
             result = post_json(GATE_URL + "/v1/action/evaluate", {"agent_id": agent_id, "actor_id": actor_id, "tenant_id": tenant_id, "action": tool, "target": target, "parameters": args})[1]
             if result["decision"] not in {"ALLOW", "SANDBOX"}:
                 self.send_response(200); self.end_headers(); self.wfile.write(json.dumps({"jsonrpc": "2.0", "id": message.get("id"), "result": {"blocked_by_action_gate": True, "decision": result}}).encode()); return
-            reserve_execution(result["decision_id"], tenant_id, result["action_hash"], result["nonce"])
+            reserve_execution(result["decision_id"], tenant_id, actor_id, result["action_hash"], result["nonce"])
             status, out = post_json(TOOL_URL, message, tool_headers(result["decision_id"], result["action_hash"], result["nonce"]))
             try:
-                record_execution(result["decision_id"], tenant_id, result["action_hash"], result["nonce"], {"http_status": status, "tool_response": out, "protocol": "MCP", "method": "tools/call", "tool": tool})
+                record_execution(result["decision_id"], tenant_id, actor_id, result["action_hash"], result["nonce"], {"http_status": status, "tool_response": out, "protocol": "MCP", "method": "tools/call", "tool": tool})
             except Exception:
                 self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
             self.send_response(status); self.end_headers(); self.wfile.write(json.dumps(out).encode())
