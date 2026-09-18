@@ -43,6 +43,18 @@ class ActionGateClient:
             "context": context or {}, "evidence": evidence or [],
         })
 
+    def self_audit(self, *, tenant_id: str, actor_id: str, session_id: str, action: str,
+                   target: str | None = None, claim: str | None = None,
+                   evidence: list[dict[str, Any]] | None = None,
+                   external_side_effect: bool = False, mutating: bool = False,
+                   requires_model_internal_access: bool = False) -> dict[str, Any]:
+        return self._request("POST", "/v1/self-audit", {
+            "tenant_id": tenant_id, "actor_id": actor_id, "session_id": session_id,
+            "action": action, "target": target, "claim": claim,
+            "evidence": evidence or [], "external_side_effect": external_side_effect,
+            "mutating": mutating, "requires_model_internal_access": requires_model_internal_access,
+        })
+
     def evidence(self, decision_id: str, tenant_id: str) -> dict[str, Any]:
         return self._request("GET", f"/v1/evidence/{decision_id}?tenant_id={tenant_id}")
 
