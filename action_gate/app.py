@@ -27,7 +27,9 @@ DECISION_TTL_SECONDS = int(os.getenv("ACTION_GATE_DECISION_TTL_SECONDS", "300"))
 APPROVAL_TTL_SECONDS = int(os.getenv("ACTION_GATE_APPROVAL_TTL_SECONDS", "300"))
 RATE_LIMIT_PER_MINUTE = int(os.getenv("ACTION_GATE_RATE_LIMIT_PER_MINUTE", "120"))
 
-POLICY_SNAPSHOT = load_policy()\nPOLICY_HASH = policy_hash(POLICY_SNAPSHOT)\napp = FastAPI(title="HamidCognition Action Gate", version=APP_VERSION)
+POLICY_SNAPSHOT = load_policy()
+POLICY_HASH = policy_hash(POLICY_SNAPSHOT)
+app = FastAPI(title="HamidCognition Action Gate", version=APP_VERSION)
 app.include_router(csg_router)
 limiter = SlidingWindowRateLimiter(RATE_LIMIT_PER_MINUTE, 60)
 
