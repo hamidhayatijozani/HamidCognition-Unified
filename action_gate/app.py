@@ -263,6 +263,61 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
     return {k: record[k] for k in ("decision", "decision_id", "request_id", "tenant_id", "actor_id", "session_id", "risk_assessment", "policy_checks", "evidence", "trace_id", "created_at", "expires_at", "nonce", "action_hash", "policy_version", "policy_hash", "decision_signature", "evidence_hash")} | {"reason": policy_checks[0]["reason"]}
 
 
+
+
+from self_audit import Evidence as SelfAuditEvidence, SelfAuditRequest, audit as self_audit
+
+
+class SelfAuditEvidenceItem(BaseModel):
+    source: str
+    verified: bool = False
+    supports: list[str] = Field(default_factory=list)
+    note: str | None = None
+
+
+class SelfAuditActionRequest(BaseModel):
+    tenant_id: str
+    actor_id: str
+    session_id: str
+    action: str
+    target: str | None = None
+    claim: str | None = None
+    evidence: list[SelfAuditEvidenceItem] = Field(default_factory=list)
+    external_side_effect: bool = False
+    mutating: bool = False
+    requires_model_internal_access: bool = False
+
+
+@app.post("/v1/self-audit")
+def self_audit_endpoint(req: SelfAuditActionRequest, authorization: str | None = Header(default=None)):
+    require_auth(authorization)
+    enforce_rate_limit(authorization, req.tenant_id)
+    result = self_audit(SelfAuditRequest(
+        actor_id=req.actor_id,
+        session_id=req.session_id,
+        action=req.action,
+        target=req.target,
+        claim=req.claim,
+        evidence=tuple(SelfAuditEvidence(
+            source=item.source,
+            verified=item.verified,
+            supports=tuple(item.supports),
+            note=item.note,
+        ) for item in req.evidence),
+        external_side_effect=req.external_side_effect,
+        mutating=req.mutating,
+        requires_model_internal_access=req.requires_model_internal_access,
+    ))
+    return {
+        "decision": result.decision.value,
+        "executable": result.executable,
+        "reasons": list(result.reasons),
+        "evidence_coverage": result.evidence_coverage,
+        "claim_evidence_gap": result.claim_evidence_gap,
+        "action_hash": result.action_hash,
+    }
+
+
 @app.post("/v1/action/{decision_id}/approve")
 def approve(decision_id: str, approval: Approval, authorization: str | None = Header(default=None)):
     require_auth(authorization)
