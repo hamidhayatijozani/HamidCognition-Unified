@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field
 
 from rate_limit import SlidingWindowRateLimiter
 from storage import health as storage_health, init_db, load_record, save_record, consume_nonce, reserve_execution, allow_rate_limit
-from canonicalization import KEY_ID, signing_secret_for_key
+from canonicalization import KEY_ID, current_signing_secret, signing_secret_for_key
 from csg_routes import router as csg_router
 
 APP_VERSION = Path(__file__).with_name("VERSION").read_text(encoding="utf-8").strip()
@@ -59,11 +59,12 @@ def digest(obj: Any) -> str:
 
 
 def sign(obj: Any) -> str:
-    if not SIGNING_SECRET:
+    secret = current_signing_secret() or SIGNING_SECRET
+    if not secret:
         if ENVIRONMENT == "production":
             raise HTTPException(503, "production_signing_secret_not_configured")
         return digest(obj)
-    return hmac.new(SIGNING_SECRET.encode(), canonical(obj).encode(), hashlib.sha256).hexdigest()
+    return hmac.new(secret.encode(), canonical(obj).encode(), hashlib.sha256).hexdigest()
 
 
 def approval_payload(approval: Approval) -> dict[str, Any]:
