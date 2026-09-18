@@ -94,15 +94,18 @@ def test_signing_key_rotation_verifies_old_decision():
     import decision_authority
     old_keys = os.environ.get("ACTION_GATE_SIGNING_KEYS")
     old_key_id = os.environ.get("ACTION_GATE_KEY_ID")
+    old_gate_key_id = gate.KEY_ID
     try:
         os.environ["ACTION_GATE_SIGNING_KEYS"] = json.dumps({"key-old": "old-secret", "key-new": "new-secret"})
         os.environ["ACTION_GATE_KEY_ID"] = "key-old"
         canonicalization.KEY_ID = "key-old"
+        gate.KEY_ID = "key-old"
         d = client.post("/v1/action/evaluate", headers=auth(), json=payload()).json()
         record = gate.load(d["decision_id"], "enterprise-tenant")
         assert record["key_id"] == "key-old"
         os.environ["ACTION_GATE_KEY_ID"] = "key-new"
         canonicalization.KEY_ID = "key-new"
+        gate.KEY_ID = "key-new"
         assert gate.verify_signature(record)
     finally:
         if old_keys is None:
@@ -114,3 +117,4 @@ def test_signing_key_rotation_verifies_old_decision():
         else:
             os.environ["ACTION_GATE_KEY_ID"] = old_key_id
         canonicalization.KEY_ID = old_key_id or "hhj-csg-1"
+        gate.KEY_ID = old_gate_key_id
