@@ -263,7 +263,7 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
     }
     record["evidence_hash"] = digest(record)
     save(record, "DECISION_CREATED")
-    return {k: record[k] for k in ("decision", "decision_id", "request_id", "tenant_id", "actor_id", "risk_assessment", "policy_checks", "evidence", "trace_id", "created_at", "expires_at", "nonce", "action_hash", "policy_version", "policy_hash", "decision_signature", "evidence_hash")} | {"reason": policy_checks[0]["reason"]}
+    return {k: record[k] for k in ("decision", "decision_id", "request_id", "tenant_id", "actor_id", "session_id", "risk_assessment", "policy_checks", "evidence", "trace_id", "created_at", "expires_at", "nonce", "action_hash", "policy_version", "policy_hash", "decision_signature", "evidence_hash")} | {"reason": policy_checks[0]["reason"]}
 
 
 @app.post("/v1/action/{decision_id}/approve")
