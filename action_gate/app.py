@@ -5,6 +5,7 @@ import hmac
 import json
 import os
 import uuid
+import time
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
@@ -12,7 +13,7 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
 from rate_limit import SlidingWindowRateLimiter
-from storage import health as storage_health, init_db, load_record, save_record, consume_nonce
+from storage import health as storage_health, init_db, load_record, save_record, consume_nonce, allow_rate_limit
 from csg_routes import router as csg_router
 
 APP_VERSION = "0.4.0"
@@ -76,7 +77,14 @@ def require_auth(authorization: str | None) -> None:
 
 def enforce_rate_limit(authorization: str | None, tenant_id: str | None) -> None:
     key = f"{tenant_id or 'unknown'}:{authorization or 'anonymous'}"
-    if not limiter.allow(key):
+    if ENVIRONMENT == "production":
+        try:
+            allowed = allow_rate_limit(key, RATE_LIMIT_PER_MINUTE, 60, time.time())
+        except Exception as exc:
+            raise HTTPException(503, "rate_limit_store_unavailable") from exc
+    else:
+        allowed = limiter.allow(key)
+    if not allowed:
         raise HTTPException(429, "action_gate_rate_limit_exceeded")
 
 
