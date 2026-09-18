@@ -31,7 +31,7 @@ jobs:
           test -n "$VERSION"
 
       - name: Build production image
-        run: docker build --pull -t action-gate:${{ steps.version.outputs.version }} .
+        run: docker build --pull -f action_gate/Dockerfile -t action-gate:${{ steps.version.outputs.version }} action_gate
 
       - name: Export image archive
         run: docker save action-gate:${{ steps.version.outputs.version }} -o action-gate-${{ steps.version.outputs.version }}.tar
