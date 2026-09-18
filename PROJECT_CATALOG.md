@@ -1,66 +1,64 @@
 # HamidCognition Project Catalog
 
 **Originator:** Hamid Hayati Jozani  
-**Unified record:** HamidCognition-Unified  
-**Record date:** 2026-09-15
+**Canonical record:** HamidCognition-Unified  
+**Current release:** v1.0.0
 
-## What this is
+## Purpose
 
-HamidCognition is a research and engineering program exploring cognitive-state computation, evidence-aware decision systems, behavioral state transfer, unknown-space exploration, safety governance, and experimental market/forecasting systems.
+HamidCognition is a research and engineering program exploring computational cognitive-state models, evidence-aware decision systems, execution governance, behavioral state transfer, unknown-space exploration, and experimental forecasting and trading.
 
-HamidCognition-Unified is the provenance and integration record for these lines of work. It is not merely a code dump. It records the relationship between ideas, implementations, hypotheses, experiments, failures, unknowns, contradictions, and their lineage.
+HamidCognition-Unified is the canonical integration and provenance record. It connects concepts, implementations, hypotheses, experiments, failures, unknowns, contradictions, and evidence without treating historical implementations as automatically equivalent.
 
-## Research lines
+## Integrated research lines
 
-### HamidCognition P/S/T Cognitive State Engine
+### P/S/T Cognitive State Engine
 
-A computational state model built around Pressure (P), Stability (S), and Tension/Freedom-related state (T), with derived energy, phase, confidence, and behavioral bias. Multiple implementations exist and are retained as variants until behavioral testing establishes whether one should become canonical.
+Computational models built around Pressure (P), Stability (S), and Tension/Freedom-related state (T), with derived energy, phase, confidence, and behavioral bias. Multiple implementations remain variants unless behavioral evidence establishes canonical equivalence.
 
-### HHJ-CSG / Cognitive Safety Gateway
+### HHJ-CSG / Action Gate
 
-A proposed governance runtime for evaluating agent decisions before high-impact tool execution. It includes decision outcomes such as ALLOW, DENY, ASK, SANDBOX, and DEFER, together with evidence, replay, provenance, and safety metrics. Claims about maturity or benchmark performance remain subject to evidence verification.
+An execution-governance runtime that evaluates permission requests before high-impact tool execution. The current executable policy surface is ALLOW, DENY, ASK, and SANDBOX, with evidence, replay, provenance, and enforcement controls.
 
 ### ClaimLab
 
-An evidence-oriented layer for separating observations, inferences, explanations, ontology claims, overclaiming, and confidence/evidence gaps.
+An evidence-oriented layer separating observations, inferences, explanations, ontology claims, overclaiming, and confidence/evidence gaps.
 
 ### LUMEN / Behavioral State Transfer
 
-Research into whether behavioral continuity can be transferred as structured state rather than reconstructed solely from narrative context. Current status: experimental/hypothetical, not established fact.
+Research into whether behavioral continuity can be transferred as structured state rather than reconstructed solely from narrative context. Current status remains experimental where not independently verified.
 
 ### KIRGANDE / Unknown-Space Explorer
 
-A research direction focused on discovering anomalies, contradictions, unexplained behaviors, and genuinely new candidate structures rather than merely reproducing known architectures.
+A research direction focused on anomalies, contradictions, unexplained behavior, and genuinely new candidate structures rather than reproduction of known architectures alone.
 
 ### Farahoosh-Prime
 
-An exploratory architecture concept for generation, mutation, recombination, experiment execution, anomaly discovery, falsification, and preservation of unexplained results. Earlier architecture-factory formulations were rejected or superseded where appropriate.
+An exploratory framework concept for generation, mutation, recombination, experiment execution, anomaly discovery, falsification, and preservation of unexplained results.
 
 ### Scale-Breaking / Amplitude-Dependent Recovery
 
-A falsifiable hypothesis concerning whether restoring behavior in some systems depends on shock amplitude and therefore violates amplitude-invariant normalization assumptions. Current evidence is insufficient for confirmation.
+A falsifiable hypothesis concerning whether restoring behavior in some systems depends on shock amplitude and therefore violates amplitude-invariant normalization assumptions. Evidence remains bounded by the documented experiments.
 
-### Cognitive Trading / EUR/USD Research
+### Trading / EUR/USD Research
 
-Experimental market and EUR/USD simulation work combining market features, predictive models, cognitive-state heuristics, and simulated execution. Simulation results must not be represented as live-market evidence.
+Experimental market and EUR/USD simulation work combining market features, predictive models, cognitive-state heuristics, and simulated execution. Simulation must never be represented as live-market evidence.
 
 ## Research infrastructure
 
-Unified now treats research traceability as a first-class layer rather than as ordinary documentation:
+- **Evidence-to-Claim Graph** — connects claims to evidence, experiments, code, and commits.
+- **Claim Ledger** — separates descriptions, observations, inferences, hypotheses, and verified claims.
+- **Contradiction Ledger** — preserves contradictions and their conditions as research data.
+- **Unknown-Space Ledger** — preserves unexplained questions and behaviors without forced interpretation.
+- **Experiment Fingerprint** — binds dataset, preprocessing, parameters, seed, code, environment, and output.
+- **Novelty Register** — records candidate novelty without asserting priority before prior-art review.
+- **Reproducibility Standard** — separates narrative claims from independent reproduction and stress testing.
+- **Research Decision Log** — preserves reasons for research and architecture decisions.
+- **Canonicalization Gate** — prevents an implementation from becoming canonical merely because it is newer or larger.
 
-- **Evidence-to-Claim Graph** — اتصال claim به evidence، experiment، code و commit.
-- **Claim Ledger** — جداسازی صریح description، observation، inference، hypothesis و verified claim.
-- **Contradiction Ledger** — حفظ تناقض‌ها و شرایط آنها به‌عنوان داده پژوهشی.
-- **Unknown-Space Ledger** — نگهداری پرسش‌ها و رفتارهای توضیح‌نشده بدون forced interpretation.
-- **Experiment Fingerprint** — اتصال dataset، preprocessing، parameters، seed، code، environment و output.
-- **Novelty Register** — ثبت candidate novelty بدون تبدیل آن به ادعای «اولین بودن» پیش از prior-art review.
-- **Reproducibility Standard** — سطوح R0 تا R4 برای تفکیک narrative از independent reproduction و stress testing.
-- **Research Decision Log** — حفظ علت تصمیم‌های معماری و پژوهشی.
-- **Canonicalization Gate** — جلوگیری از canonical شدن یک implementation صرفاً به دلیل جدیدتر یا بزرگ‌تر بودن.
+## Epistemic status model
 
-## Research status model
-
-Each claim or artifact is assigned an epistemic status where appropriate:
+Where appropriate, artifacts and claims use:
 
 - VERIFIED
 - IMPLEMENTED
@@ -71,16 +69,8 @@ Each claim or artifact is assigned an epistemic status where appropriate:
 
 The existence of a project name or implementation does not imply that its underlying hypothesis is true.
 
-## Source lineage
+## Integration principle
 
-The Unified repository preserves lineage to the original HamidCognition repositories rather than silently collapsing them into one implementation. Exact duplicates, variants, generated artifacts, conflicts, and provenance are recorded separately.
+Historical repositories are not deleted or rewritten merely to create a cleaner story. Their lineage, conflicts, variants, and exact source locations are preserved in `MIGRATION/` and in the repository-governance record.
 
-## How to introduce the project
-
-For a short introduction, use this description:
-
-> **HamidCognition** is an original research and engineering program by **Hamid Hayati Jozani** investigating computational cognitive states, evidence-aware decision systems, behavioral continuity, unknown-space exploration, and experimental forecasting/trading systems. **HamidCognition-Unified** serves as the public provenance, research, and integration record, preserving ideas, implementations, hypotheses, experiments, contradictions, and their lineage instead of presenting unverified concepts as established facts.
-
-## Citation
-
-Use `CITATION.cff` for machine-readable citation metadata. For formal research citation, prefer the persistent DOI associated with an archived release when available.
+The canonical integration point is this repository. Historical repositories remain citable as historical source artifacts.
