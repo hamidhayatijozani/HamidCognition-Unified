@@ -110,19 +110,44 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p clean-room-evidence
+          version="$(tr -d '[:space:]' < action_gate/VERSION)"
           {
             echo "product=Action Gate"
-            echo "version=$(tr -d '[:space:]' < action_gate/VERSION)"
+            echo "version=$version"
             echo "commit=$GITHUB_SHA"
+            echo "run_id=$GITHUB_RUN_ID"
+            echo "run_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "workflow_ref=$GITHUB_WORKFLOW_REF"
+            echo "runner_os=$RUNNER_OS"
+            echo "runner_arch=$RUNNER_ARCH"
             echo "python=$(python3 --version)"
             echo "docker=$(docker --version)"
             echo "verification=clean-room"
           } > clean-room-evidence/manifest.txt
-          sha256sum clean-room-evidence/manifest.txt | tee clean-room-evidence/manifest.sha256
+          {
+            echo '{'
+            printf '  "product": "Action Gate",\n'
+            printf '  "version": "%s",\n' "$version"
+            printf '  "commit_sha": "%s",\n' "$GITHUB_SHA"
+            printf '  "workflow_run_id": "%s",\n' "$GITHUB_RUN_ID"
+            printf '  "run_url": "%s/%s/actions/runs/%s",\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
+            printf '  "workflow_ref": "%s",\n' "$GITHUB_WORKFLOW_REF"
+            printf '  "runner_os": "%s",\n' "$RUNNER_OS"
+            printf '  "runner_arch": "%s",\n' "$RUNNER_ARCH"
+            printf '  "timestamp_utc": "%s"\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo '}'
+          } > clean-room-evidence/attestation.json
+          sha256sum clean-room-evidence/manifest.txt > clean-room-evidence/manifest.sha256
+          sha256sum clean-room-evidence/attestation.json > clean-room-evidence/attestation.sha256
+          tar -czf clean-room-evidence.tar.gz clean-room-evidence
+          sha256sum clean-room-evidence.tar.gz | tee clean-room-evidence.tar.gz.sha256
 
       - name: Upload clean-room evidence
         uses: actions/upload-artifact@v4
         with:
-          name: action-gate-clean-room-evidence-${{ github.sha }}
-          path: clean-room-evidence/
+          name: action-gate-clean-room-evidence-${{ steps.version.outputs.version }}-${{ github.sha }}
+          path: |
+            clean-room-evidence.tar.gz
+            clean-room-evidence.tar.gz.sha256
+          if-no-files-found: error
           retention-days: 30
