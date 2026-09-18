@@ -4,11 +4,13 @@ import hashlib
 import hmac
 import json
 import os
+
+from keyring import current_key_id
 from typing import Any
 
 CANONICALIZATION_VERSION = "JCS-LIKE-1"
 SIGNATURE_ALGORITHM = "HMAC-SHA256"
-KEY_ID = os.getenv("ACTION_GATE_KEY_ID", "hhj-csg-poc-1")
+KEY_ID = current_key_id()
 
 
 def canonicalize(value: Any) -> bytes:

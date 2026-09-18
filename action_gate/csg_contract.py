@@ -19,6 +19,7 @@ class PermissionRequest(BaseModel):
     tenant_id: str = Field(min_length=1, max_length=128)
     agent_id: str = Field(min_length=1, max_length=128)
     actor_id: str | None = Field(default=None, max_length=128)
+    session_id: str | None = Field(default=None, max_length=128)
     action: str = Field(min_length=1, max_length=256)
     target: str | None = Field(default=None, max_length=2048)
     timestamp: datetime
@@ -49,6 +50,7 @@ class DecisionObject(BaseModel):
     decision_id: str = Field(pattern=r"^dec_[A-Za-z0-9]{8,128}$")
     request_id: str = Field(max_length=128)
     tenant_id: str = Field(min_length=1, max_length=128)
+    session_id: str | None = Field(default=None, max_length=128)
     decision: Literal["ALLOW", "DENY", "ASK", "SANDBOX"]
     risk_level: Literal["LOW", "MEDIUM", "HIGH", "CRITICAL"]
     request_digest: str = Field(pattern=r"^[a-f0-9]{64}$")

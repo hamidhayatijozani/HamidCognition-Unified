@@ -8,6 +8,7 @@ from typing import Any
 from fastapi import HTTPException
 
 from canonicalization import KEY_ID, SIGNATURE_ALGORITHM, hmac_sha256, sha256_digest, verify_hmac
+from keyring import current_secret
 from csg_contract import ALGORITHM_VERSION, CANONICALIZATION_VERSION, CONTRACT_VERSION, DecisionObject, PermissionRequest
 from storage import load_idempotency, save_idempotency
 
@@ -20,7 +21,7 @@ def utc_now() -> datetime:
 
 
 def signing_secret() -> str | None:
-    return os.getenv("ACTION_GATE_SIGNING_SECRET")
+    return current_secret()
 
 
 def authenticate(authorization: str | None) -> None:
@@ -64,7 +65,7 @@ def build_decision(req: PermissionRequest, request_digest: str) -> DecisionObjec
     nonce = uuid.uuid4().hex
     unsigned = {
         "contract_version": CONTRACT_VERSION, "decision_id": f"dec_{uuid.uuid4().hex}", "request_id": req.request_id,
-        "tenant_id": req.tenant_id, "decision": decision, "risk_level": risk, "request_digest": request_digest,
+        "tenant_id": req.tenant_id, "session_id": req.session_id, "decision": decision, "risk_level": risk, "request_digest": request_digest,
         "signature_algorithm": SIGNATURE_ALGORITHM, "key_id": KEY_ID, "canonicalization_version": CANONICALIZATION_VERSION,
         "policy_version": "hhj-csg-policy/1.0", "algorithm_version": ALGORITHM_VERSION,
         "issued_at": utc_z(issued), "expires_at": utc_z(expires), "nonce": nonce,

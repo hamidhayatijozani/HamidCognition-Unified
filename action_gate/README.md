@@ -1,4 +1,4 @@
-# HamidCognition Action Gate v0.4.2
+# HamidCognition Action Gate v0.5.0
 
 **Runtime Action Governance with Replayable Decision Evidence**
 
@@ -18,7 +18,10 @@ Runtime decisions: `ALLOW`, `DENY`, `ASK`, `SANDBOX`. `DEFER` remains outside th
 - tenant-bound evidence access and cross-tenant denial
 - immutable policy snapshot plus policy hash inside each decision record
 - action hash bound to tenant, actor, action, target and parameters
-- cryptographic decision signature material
+- cryptographic decision signature material with environment-driven key rotation and historical-key verification
+- explicit session identity binding from request through execution
+- versioned policy configuration with deterministic policy hash
+- dependency-free Python SDK for the core HTTP contract
 - decision expiry and one-time execution nonce
 - approval bound to tenant, action hash and policy version
 - append-only audit events linked by a SHA-256 hash chain
@@ -77,7 +80,7 @@ Internet -> Caddy TLS -> enforcement -> Action Gate -> PostgreSQL
 
 Caddy terminates HTTPS and obtains certificates for the configured domain. PostgreSQL is not exposed to the host. The tool service is not exposed to the host. The enforcement service is also private to the Compose network and is reached through the TLS edge.
 
-Do not commit production secrets.
+Do not commit production secrets. For rotation, configure `ACTION_GATE_SIGNING_KEYS` as a JSON object of key IDs to secrets and set `ACTION_GATE_KEY_ID` to the active key. Existing decisions remain verifiable while their key remains configured.
 
 ## Integration tests
 
@@ -91,7 +94,7 @@ The integration gates exercise real processes rather than mocks. They cover deni
 
 ## Current product boundary
 
-This release moves the runtime to a production-oriented PostgreSQL/TLS deployment path and hardens one-time execution against concurrent replay with a durable database-backed nonce claim. It does **not** claim full enterprise readiness. External identity federation, distributed rate limiting, managed key rotation/HSM integration, SIEM connectors, HA orchestration and customer-specific compliance evidence remain deployment/customer layers rather than fabricated features.
+This release moves the runtime to a production-oriented PostgreSQL/TLS deployment path and hardens one-time execution against concurrent replay with a durable database-backed nonce claim. It adds session-bound execution, database-backed production rate limiting, configurable versioned policy snapshots, signing-key rotation with historical-key verification, and a dependency-free Python SDK. HSM/KMS custody, external identity federation, SIEM integration and HA orchestration remain deployment-specific controls and are not represented as implemented features.
 
 `SANDBOX` means **sandbox-required decision state**. It is not proof that a real isolation sandbox has been provisioned.
 
