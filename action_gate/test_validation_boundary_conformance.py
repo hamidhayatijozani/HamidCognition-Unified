@@ -29,6 +29,7 @@ def execute(data, tenant=TENANT, action_hash=None, nonce=None, outcome=None):
         f"/v1/action/{data['decision_id']}/execution",
         json={
             "tenant_id": tenant,
+            "actor_id": data.get("actor_id"),
             "action_hash": action_hash or data["action_hash"],
             "nonce": nonce or data["nonce"],
             "outcome": outcome or {"ok": True},
