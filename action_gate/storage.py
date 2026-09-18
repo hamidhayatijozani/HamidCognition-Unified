@@ -113,10 +113,12 @@ def save_record(record: dict[str, Any], event_type: str, digest_fn, canonical_fn
     con = connect()
     try:
         if backend() == "postgresql":
+            con.execute("SELECT pg_advisory_xact_lock(%s)", (2147483000,))
             con.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", (record["decision_id"],))
             current = con.execute("SELECT COALESCE(MAX(version), 0) FROM record_versions WHERE decision_id=%s", (record["decision_id"],)).fetchone()[0]
             previous = con.execute("SELECT event_hash FROM audit_events ORDER BY created_at DESC, event_id DESC LIMIT 1").fetchone()
         else:
+            con.execute("BEGIN IMMEDIATE")
             current = con.execute("SELECT COALESCE(MAX(version), 0) FROM record_versions WHERE decision_id=?", (record["decision_id"],)).fetchone()[0]
             previous = con.execute("SELECT event_hash FROM audit_events ORDER BY rowid DESC LIMIT 1").fetchone()
         version = current + 1
