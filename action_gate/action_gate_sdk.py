@@ -34,11 +34,11 @@ class ActionGateClient:
         except Exception as exc:
             raise ActionGateError(str(exc)) from exc
 
-    def evaluate(self, *, tenant_id: str, agent_id: str, actor_id: str | None, action: str,
+    def evaluate(self, *, tenant_id: str, agent_id: str, actor_id: str | None, session_id: str | None = None, action: str,
                  target: str | None = None, parameters: dict[str, Any] | None = None,
                  context: dict[str, Any] | None = None, evidence: list[dict[str, Any]] | None = None) -> dict[str, Any]:
         return self._request("POST", "/v1/action/evaluate", {
-            "tenant_id": tenant_id, "agent_id": agent_id, "actor_id": actor_id,
+            "tenant_id": tenant_id, "agent_id": agent_id, "actor_id": actor_id, "session_id": session_id,
             "action": action, "target": target, "parameters": parameters or {},
             "context": context or {}, "evidence": evidence or [],
         })

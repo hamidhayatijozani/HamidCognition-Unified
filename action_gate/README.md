@@ -1,4 +1,4 @@
-# HamidCognition Action Gate v0.5.0
+# HamidCognition Action Gate v1.0.0
 
 **Runtime Action Governance with Replayable Decision Evidence**
 
@@ -19,7 +19,8 @@ Runtime decisions: `ALLOW`, `DENY`, `ASK`, `SANDBOX`. `DEFER` remains outside th
 - immutable policy snapshot plus policy hash inside each decision record
 - action hash bound to tenant, actor, action, target and parameters
 - cryptographic decision signature material with environment-driven key rotation and historical-key verification
-- explicit session identity binding from request through execution
+- explicit actor and session identity binding from request through execution
+- production approval signatures bound to approver, tenant, action and policy
 - versioned policy configuration with deterministic policy hash
 - dependency-free Python SDK for the core HTTP contract
 - decision expiry and one-time execution nonce
@@ -68,6 +69,8 @@ export POSTGRES_PASSWORD='<strong-random-password>'
 export ACTION_GATE_API_TOKEN='<strong-random-token>'
 export ACTION_GATE_SIGNING_SECRET='<strong-random-secret>'
 export ACTION_GATE_ENFORCEMENT_SECRET='<strong-random-secret>'
+export ACTION_GATE_APPROVAL_SECRET='<strong-random-secret>'
+export ACTION_GATE_REQUIRE_SESSION_BINDING='1'
 docker compose -f docker-compose.production.yml up -d --build
 ```
 
@@ -94,7 +97,7 @@ The integration gates exercise real processes rather than mocks. They cover deni
 
 ## Current product boundary
 
-This release moves the runtime to a production-oriented PostgreSQL/TLS deployment path and hardens one-time execution against concurrent replay with a durable database-backed nonce claim. It adds session-bound execution, database-backed production rate limiting, configurable versioned policy snapshots, signing-key rotation with historical-key verification, and a dependency-free Python SDK. HSM/KMS custody, external identity federation, SIEM integration and HA orchestration remain deployment-specific controls and are not represented as implemented features.
+This release is the production Action Gate runtime boundary. It adds actor/session-bound execution, cryptographically bound production approvals, database-backed replay protection and rate limiting, configurable versioned policy snapshots, signing-key rotation with historical-key verification, and a dependency-free Python SDK. HSM/KMS custody, external identity federation, SIEM integration and HA orchestration remain deployment-specific controls and are not represented as implemented features.
 
 `SANDBOX` means **sandbox-required decision state**. It is not proof that a real isolation sandbox has been provisioned.
 

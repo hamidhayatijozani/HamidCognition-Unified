@@ -26,6 +26,8 @@ ENVIRONMENT = os.getenv("ACTION_GATE_ENV", "development").lower()
 DECISION_TTL_SECONDS = int(os.getenv("ACTION_GATE_DECISION_TTL_SECONDS", "300"))
 APPROVAL_TTL_SECONDS = int(os.getenv("ACTION_GATE_APPROVAL_TTL_SECONDS", "300"))
 RATE_LIMIT_PER_MINUTE = int(os.getenv("ACTION_GATE_RATE_LIMIT_PER_MINUTE", "120"))
+APPROVAL_SECRET = os.getenv("ACTION_GATE_APPROVAL_SECRET")
+REQUIRE_SESSION_BINDING = os.getenv("ACTION_GATE_REQUIRE_SESSION_BINDING", "0") == "1"
 
 POLICY_SNAPSHOT = load_policy()
 POLICY_HASH = policy_hash(POLICY_SNAPSHOT)
@@ -58,6 +60,17 @@ def sign(obj: Any) -> str:
             raise HTTPException(503, "production_signing_secret_not_configured")
         return digest(obj)
     return hmac.new(secret.encode(), canonical(obj).encode(), hashlib.sha256).hexdigest()
+
+
+def approval_payload(approval: Approval) -> dict[str, Any]:
+    return {k: v for k, v in approval.model_dump(exclude_none=True).items() if k != "approval_signature"}
+
+
+def verify_approval_signature(approval: Approval) -> bool:
+    if not APPROVAL_SECRET:
+        return False
+    expected = hmac.new(APPROVAL_SECRET.encode(), canonical(approval_payload(approval)).encode(), hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, approval.approval_signature or "")
 
 
 def verify_signature(record: dict[str, Any]) -> bool:
@@ -112,6 +125,7 @@ class Approval(BaseModel):
     tenant_id: str
     policy_version: str
     ttl_seconds: int | None = None
+    approval_signature: str | None = None
 
 
 class ExecutionOutcome(BaseModel):
@@ -194,6 +208,12 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
     require_auth(authorization)
     enforce_rate_limit(authorization, req.tenant_id)
     request_id = req.request_id or f"req_{uuid.uuid4().hex}"
+    if ENVIRONMENT == "production" and not (SIGNING_SECRET or current_secret()):
+        raise HTTPException(503, "production_signing_secret_not_configured")
+    if ENVIRONMENT == "production" and not req.actor_id:
+        raise HTTPException(422, "actor_id_required")
+    if REQUIRE_SESSION_BINDING and not req.session_id:
+        raise HTTPException(422, "session_id_required")
     decision_id = f"dec_{uuid.uuid4().hex}"
     trace_id = f"trace_{uuid.uuid4().hex}"
     nonce = uuid.uuid4().hex
@@ -214,6 +234,7 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
         "request_id": request_id,
         "tenant_id": req.tenant_id,
         "actor_id": req.actor_id,
+        "session_id": req.session_id,
         "request": req.model_dump(),
         "identity": {"agent_id": req.agent_id, "actor_id": req.actor_id, "session_id": req.session_id},
         "normalized_action": normalized,
@@ -239,7 +260,7 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
     }
     record["evidence_hash"] = digest(record)
     save(record, "DECISION_CREATED")
-    return {k: record[k] for k in ("decision", "decision_id", "request_id", "tenant_id", "actor_id", "risk_assessment", "policy_checks", "evidence", "trace_id", "created_at", "expires_at", "nonce", "action_hash", "policy_version", "policy_hash", "decision_signature", "evidence_hash")} | {"reason": policy_checks[0]["reason"]}
+    return {k: record[k] for k in ("decision", "decision_id", "request_id", "tenant_id", "actor_id", "session_id", "risk_assessment", "policy_checks", "evidence", "trace_id", "created_at", "expires_at", "nonce", "action_hash", "policy_version", "policy_hash", "decision_signature", "evidence_hash")} | {"reason": policy_checks[0]["reason"]}
 
 
 @app.post("/v1/action/{decision_id}/approve")
@@ -254,6 +275,11 @@ def approve(decision_id: str, approval: Approval, authorization: str | None = He
         raise HTTPException(409, "approval_action_binding_mismatch")
     if approval.policy_version != record["policy_version"]:
         raise HTTPException(409, "approval_policy_binding_mismatch")
+    if ENVIRONMENT == "production":
+        if not APPROVAL_SECRET:
+            raise HTTPException(503, "production_approval_secret_not_configured")
+        if not verify_approval_signature(approval):
+            raise HTTPException(401, "approval_signature_invalid")
     ttl = approval.ttl_seconds if approval.ttl_seconds is not None else APPROVAL_TTL_SECONDS
     if ttl <= 0 or ttl > 86400:
         raise HTTPException(422, "invalid_approval_ttl")

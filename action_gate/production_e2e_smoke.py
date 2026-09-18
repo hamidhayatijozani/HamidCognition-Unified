@@ -32,8 +32,8 @@ else:
 health = get(BASE + "/health")
 assert health["status"] == "ok" and health["storage"]["backend"] == "postgresql", health
 
-payload = {"tenant_id": TENANT, "agent_id": "compose-agent", "actor_id": "compose-actor", "action": "read_public_file", "target": "/public/info.txt", "parameters": {}}
-headers = {"Content-Type": "application/json", "X-Agent-ID": "compose-agent", "X-Actor-ID": "compose-actor", "X-Tenant-ID": TENANT, "X-Action": "read_public_file", "X-Action-Target": "/public/info.txt"}
+payload = {"tenant_id": TENANT, "agent_id": "compose-agent", "actor_id": "compose-actor", "session_id": "compose-session", "action": "read_public_file", "target": "/public/info.txt", "parameters": {}}
+headers = {"Content-Type": "application/json", "X-Agent-ID": "compose-agent", "X-Actor-ID": "compose-actor", "X-Session-ID": "compose-session", "X-Tenant-ID": TENANT, "X-Action": "read_public_file", "X-Action-Target": "/public/info.txt"}
 
 # Phase 1: evaluate only. The proxy deliberately does not execute the tool without a bound decision id.
 out = post(ENFORCEMENT + "/execute", payload["parameters"], headers)

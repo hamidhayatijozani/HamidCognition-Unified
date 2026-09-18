@@ -17,6 +17,8 @@ ENV.update({
     "ACTION_GATE_ENV": "production",
     "ACTION_GATE_API_TOKEN": TOKEN,
     "ACTION_GATE_SIGNING_SECRET": "sellable-signing-secret",
+    "ACTION_GATE_APPROVAL_SECRET": "sellable-approval-secret",
+    "ACTION_GATE_REQUIRE_SESSION_BINDING": "1",
     "ACTION_GATE_DB": DB,
     "PYTHONPATH": ROOT,
 })
@@ -70,6 +72,7 @@ def main() -> int:
             "tenant_id": "sellable-tenant",
             "agent_id": "sellable-agent",
             "actor_id": "sellable-actor",
+            "session_id": "sellable-session",
             "action": "read_public_file",
             "target": "/public/info.txt",
             "parameters": {"probe": "sellable-gate"},
@@ -90,6 +93,7 @@ def main() -> int:
         execution = {
             "tenant_id": "sellable-tenant",
             "actor_id": decision["actor_id"],
+            "session_id": decision["session_id"],
             "action_hash": decision["action_hash"],
             "nonce": decision["nonce"],
             "outcome": {"status": "synthetic-success", "gate": "sellable"},
@@ -113,6 +117,11 @@ def main() -> int:
             "tenant_id": ask["tenant_id"],
             "policy_version": ask["policy_version"],
         }
+        approval["approval_signature"] = __import__("hmac").new(
+            ENV["ACTION_GATE_APPROVAL_SECRET"].encode(),
+            json.dumps(approval, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(),
+            __import__("hashlib").sha256,
+        ).hexdigest()
         status, approved = request("POST", f"/v1/action/{ask['decision_id']}/approve", approval)
         assert status == 200 and approved["decision"] == "ALLOW"
 
