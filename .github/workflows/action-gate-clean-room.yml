@@ -80,6 +80,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          version="$(tr -d '[:space:]' < action_gate/VERSION)"
           required=(
             PRODUCT/ACTION_GATE_PRODUCT_SPEC.md
             PRODUCT/COMMERCIAL_READINESS.md
