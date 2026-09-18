@@ -59,7 +59,7 @@ def reserve_execution(decision_id: str, tenant_id: str, actor_id: str | None, se
 
 
 def record_execution(decision_id: str, tenant_id: str, actor_id: str | None, session_id: str | None, action_hash_value: str, nonce: str, outcome: dict):
-    return post_json(GATE_URL + f"/v1/action/{urllib.parse.quote(decision_id, safe='')}/execution", {"tenant_id": tenant_id, "actor_id": actor_id, "action_hash": action_hash_value, "nonce": nonce, "outcome": outcome})
+    return post_json(GATE_URL + f"/v1/action/{urllib.parse.quote(decision_id, safe='')}/execution", {"tenant_id": tenant_id, "actor_id": actor_id, "session_id": session_id, "action_hash": action_hash_value, "nonce": nonce, "outcome": outcome})
 
 
 def tool_headers(decision_id, action_hash_value, nonce):
