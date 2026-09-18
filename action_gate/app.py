@@ -294,12 +294,14 @@ def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | 
     enforce_rate_limit(authorization, outcome.tenant_id)
     record = load(decision_id, outcome.tenant_id)
     ensure_live(record)
-    if record["decision"] not in {"ALLOW", "SANDBOX"}:
+    if record["decision"] != "ALLOW":
         raise HTTPException(403, "execution_not_permitted_by_gate")
     if outcome.action_hash != record["action_hash"]:
         raise HTTPException(409, "execution_action_binding_mismatch")
     if record.get("actor_id") is not None and outcome.actor_id != record.get("actor_id"):
         raise HTTPException(409, "execution_actor_binding_mismatch")
+    if record.get("request", {}).get("session_id") is not None and outcome.session_id != record["request"].get("session_id"):
+        raise HTTPException(409, "execution_session_binding_mismatch")
     if outcome.nonce != record["nonce"]:
         raise HTTPException(409, "execution_nonce_mismatch")
     if record["approval"] and record["approval"].get("approved") and datetime.fromisoformat(record["approval"]["expires_at"]) <= datetime.now(timezone.utc):
