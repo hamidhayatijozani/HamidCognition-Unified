@@ -47,7 +47,7 @@ jobs:
         run: python sellable_gate.py
       - name: Compile runtime
         working-directory: action_gate
-        run: python -m py_compile app.py storage.py rate_limit.py canonicalization.py csg_contract.py csg_ingress.py csg_routes.py decision_authority.py csg_validation_handler.py agentrq_simulator.py csg_acceptance.py csg_persistence_replay.py enforcement_integration.py mcp_integration.py test_validation_boundary_conformance.py production_e2e_smoke.py sellable_gate.py security_authority.py
+        run: python -m py_compile app.py storage.py rate_limit.py canonicalization.py keyring.py policy_store.py action_gate_sdk.py csg_contract.py csg_ingress.py csg_routes.py decision_authority.py csg_validation_handler.py agentrq_simulator.py csg_acceptance.py csg_persistence_replay.py enforcement_integration.py mcp_integration.py test_validation_boundary_conformance.py production_e2e_smoke.py sellable_gate.py security_authority.py
       - name: Validate production Compose
         working-directory: action_gate
         env:
