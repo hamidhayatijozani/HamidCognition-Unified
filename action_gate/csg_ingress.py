@@ -8,6 +8,7 @@ from typing import Any
 from fastapi import HTTPException
 
 from canonicalization import KEY_ID, SIGNATURE_ALGORITHM, hmac_sha256, sha256_digest, verify_hmac
+from keyring import current_secret
 from csg_contract import ALGORITHM_VERSION, CANONICALIZATION_VERSION, CONTRACT_VERSION, DecisionObject, PermissionRequest
 from storage import load_idempotency, save_idempotency
 
@@ -20,7 +21,7 @@ def utc_now() -> datetime:
 
 
 def signing_secret() -> str | None:
-    return os.getenv("ACTION_GATE_SIGNING_SECRET")
+    return current_secret()
 
 
 def authenticate(authorization: str | None) -> None:
