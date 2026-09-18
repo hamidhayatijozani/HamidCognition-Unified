@@ -159,7 +159,7 @@ def test_approval_is_bound_to_exact_action_and_policy():
 def test_sandbox_cannot_cross_production_execution_boundary():
     data = evaluate("transfer_funds", "account-1", parameters={"amount": 1000})
     assert data["decision"] == "SANDBOX"
-    response = client.post(f"/v1/action/{data["decision_id"]}/execution/reserve", json={"tenant_id": TENANT, "actor_id": data.get("actor_id"), "action_hash": data["action_hash"], "nonce": data["nonce"]})
+    response = client.post(f"/v1/action/{data['decision_id']}/execution/reserve", json={"tenant_id": TENANT, "actor_id": data.get("actor_id"), "action_hash": data["action_hash"], "nonce": data["nonce"]})
     assert response.status_code == 403
 
 
