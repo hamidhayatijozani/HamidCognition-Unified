@@ -12,7 +12,7 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
 from rate_limit import SlidingWindowRateLimiter
-from storage import health as storage_health, init_db, load_record, save_record
+from storage import health as storage_health, init_db, load_record, save_record, consume_nonce
 from csg_routes import router as csg_router
 
 APP_VERSION = "0.4.0"
@@ -265,9 +265,12 @@ def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | 
         raise HTTPException(409, "execution_nonce_mismatch")
     if record["approval"] and record["approval"].get("approved") and datetime.fromisoformat(record["approval"]["expires_at"]) <= datetime.now(timezone.utc):
         raise HTTPException(403, "approval_expired")
-    record["execution"] = {"timestamp": now(), "status": "EXECUTED", "action_hash": record["action_hash"], "nonce": record["nonce"]}
+    consumed_at = now()
+    if not consume_nonce(decision_id, outcome.nonce, consumed_at):
+        raise HTTPException(409, "decision_nonce_already_consumed")
+    record["execution"] = {"timestamp": consumed_at, "status": "EXECUTED", "action_hash": record["action_hash"], "nonce": record["nonce"]}
     record["outcome"] = outcome.outcome
-    record["consumed_at"] = now()
+    record["consumed_at"] = consumed_at
     record["evidence_hash"] = digest(record)
     save(record, "EXECUTION_RECORDED")
     return record
