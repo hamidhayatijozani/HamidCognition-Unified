@@ -80,7 +80,7 @@ def build_decision(req: PermissionRequest, request_digest: str) -> DecisionObjec
 
 
 def verify_request_signature(payload: dict[str, Any], signature: str | None) -> None:
-    secret = signing_secret()
+    secret = current_signing_secret()
     if not secret:
         raise HTTPException(503, "csg_signing_secret_not_configured")
     if not signature or not verify_hmac(payload, signature, secret):
