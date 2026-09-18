@@ -10,8 +10,8 @@
 - [x] Production container starts.
 - [x] PostgreSQL persistence passes.
 - [x] Replay/persistence checks pass.
-- [x] Evidence artifact retained.
-- [x] Artifact SHA256 recorded.
+- [ ] Evidence artifact retained for the exact release baseline.
+- [ ] Artifact SHA256 recorded for the exact release baseline.
 
 ## Security
 
