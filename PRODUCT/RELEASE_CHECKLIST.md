@@ -2,16 +2,16 @@
 
 ## Engineering
 
-- [ ] Canonical version updated.
-- [ ] Runtime tests pass.
-- [ ] Validation Boundary tests pass.
-- [ ] HTTP enforcement passes.
-- [ ] MCP enforcement passes.
-- [ ] Production container starts.
-- [ ] PostgreSQL persistence passes.
-- [ ] Replay/persistence checks pass.
-- [ ] Evidence artifact retained.
-- [ ] Artifact SHA256 recorded.
+- [x] Canonical version updated.
+- [x] Runtime tests pass.
+- [x] Validation Boundary tests pass.
+- [x] HTTP enforcement passes.
+- [x] MCP enforcement passes.
+- [x] Production container starts.
+- [x] PostgreSQL persistence passes.
+- [x] Replay/persistence checks pass.
+- [x] Evidence artifact retained.
+- [x] Artifact SHA256 recorded.
 
 ## Security
 
