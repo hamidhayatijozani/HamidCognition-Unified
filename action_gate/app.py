@@ -63,7 +63,7 @@ def sign(obj: Any) -> str:
 
 
 def approval_payload(approval: Approval) -> dict[str, Any]:
-    return {k: v for k, v in approval.model_dump().items() if k != "approval_signature"}
+    return {k: v for k, v in approval.model_dump(exclude_none=True).items() if k != "approval_signature"}
 
 
 def verify_approval_signature(approval: Approval) -> bool:
@@ -208,6 +208,8 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
     require_auth(authorization)
     enforce_rate_limit(authorization, req.tenant_id)
     request_id = req.request_id or f"req_{uuid.uuid4().hex}"
+    if ENVIRONMENT == "production" and not (SIGNING_SECRET or current_secret()):
+        raise HTTPException(503, "production_signing_secret_not_configured")
     if ENVIRONMENT == "production" and not req.actor_id:
         raise HTTPException(422, "actor_id_required")
     if REQUIRE_SESSION_BINDING and not req.session_id:
