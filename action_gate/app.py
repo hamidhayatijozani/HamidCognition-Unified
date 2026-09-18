@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 
 from rate_limit import SlidingWindowRateLimiter
 from storage import health as storage_health, init_db, load_record, save_record, consume_nonce, reserve_execution, allow_rate_limit
+from canonicalization import KEY_ID, signing_secret_for_key
 from csg_routes import router as csg_router
 
 APP_VERSION = Path(__file__).with_name("VERSION").read_text(encoding="utf-8").strip()
@@ -94,6 +95,7 @@ class ActionRequest(BaseModel):
     tenant_id: str
     agent_id: str
     actor_id: str | None = None
+    session_id: str | None = None
     action: str
     target: str | None = None
     parameters: dict[str, Any] = Field(default_factory=dict)
@@ -116,6 +118,7 @@ class ExecutionOutcome(BaseModel):
     action_hash: str
     tenant_id: str
     actor_id: str | None = None
+    session_id: str | None = None
     nonce: str
     outcome: dict[str, Any] = Field(default_factory=dict)
 
