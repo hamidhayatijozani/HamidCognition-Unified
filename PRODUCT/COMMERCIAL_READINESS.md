@@ -1,7 +1,7 @@
 # Action Gate Commercial Readiness
 
 ## Release baseline
-Action Gate v0.4.2 is the engineering baseline for commercial packaging.
+**HamidCognition Action Gate v1.0.0** is the current engineering and commercial-delivery baseline.
 
 ## Included
 - Action Gate runtime
@@ -35,10 +35,7 @@ ENTERPRISE means self-hosted or managed deployment plus negotiated support, secu
 The repository does not assert prices. Pricing is a business decision and must not be confused with technical readiness.
 
 ## Acceptance evidence
-The v0.4.2 baseline is anchored to commit 6a8aa17a28ba50c73de1ba714f25bfc04e3268c9 and Product Gates run 35365796829.
-
-Evidence artifact SHA-256:
-c20b1bb41631e6f585228208f53fa3485203d05ea51b78e10bd3ce05f8fb3f34
+The current v1.0.0 baseline is anchored to the direct main-head clean-room and release-candidate executions. Exact run IDs, artifact IDs, and SHA-256 digests are preserved in the release evidence package.
 
 ## Not included by default
 - customer-specific legal compliance certification;
