@@ -1,7 +1,7 @@
 # Action Gate Customer Acceptance Test
 
 ## Purpose
-This procedure verifies that a customer deployment preserves the security and execution boundary demonstrated by v0.4.2.
+This procedure verifies that a customer deployment preserves the security and execution boundary demonstrated by v1.0.0.
 
 ## Required tests
 
@@ -11,7 +11,7 @@ This procedure verifies that a customer deployment preserves the security and ex
 - changing session identity when session binding is enabled cannot execute the decision.
 
 ### Decision integrity
-- decision signature verifies;
+- decision integrity verification succeeds;
 - action hash matches the execution request;
 - tenant mismatch cannot retrieve or execute another tenant's decision;
 - expired decisions are rejected;
