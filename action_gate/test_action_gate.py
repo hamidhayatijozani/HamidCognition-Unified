@@ -90,7 +90,7 @@ def test_signing_secret_required_in_production():
     old_env, old_token, old_secret = module.ENVIRONMENT, module.API_TOKEN, module.SIGNING_SECRET
     module.ENVIRONMENT, module.API_TOKEN, module.SIGNING_SECRET = "production", "ci-token", None
     try:
-        assert client.post("/v1/action/evaluate", headers={"Authorization": "Bearer ci-token"}, json={"tenant_id": TENANT, "agent_id": "a", "action": "read_public_file"}).status_code == 503
+        assert client.post("/v1/action/evaluate", headers={"Authorization": "Bearer ci-token"}, json={"tenant_id": TENANT, "agent_id": "a", "actor_id": "test-actor", "session_id": "test-session", "action": "read_public_file"}).status_code == 503
     finally:
         module.ENVIRONMENT, module.API_TOKEN, module.SIGNING_SECRET = old_env, old_token, old_secret
 
