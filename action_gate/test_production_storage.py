@@ -29,8 +29,8 @@ def test_sqlite_storage_roundtrip():
 
 
 def test_production_compose_uses_postgres_and_tls():
-    compose = open("docker-compose.production.yml", encoding="utf-8").read()
-    caddy = open("Caddyfile", encoding="utf-8").read()
+    compose = open("action_gate/docker-compose.production.yml", encoding="utf-8").read()
+    caddy = open("action_gate/Caddyfile", encoding="utf-8").read()
     assert "postgres:17-alpine" in compose
     assert "ACTION_GATE_DATABASE_URL: postgresql://" in compose
     assert '"443:443"' in compose
