@@ -1,0 +1,123 @@
+name: Action Gate Clean-Room Verification
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'action_gate/**'
+      - 'PRODUCT/**'
+      - 'Dockerfile'
+      - 'docker-compose*.yml'
+      - '.github/workflows/action-gate-clean-room.yml'
+  pull_request:
+    paths:
+      - 'action_gate/**'
+      - 'PRODUCT/**'
+      - 'Dockerfile'
+      - 'docker-compose*.yml'
+      - '.github/workflows/action-gate-clean-room.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  clean-room:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout clean repository state
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Verify canonical product version
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f action_gate/VERSION
+          version="$(tr -d '[:space:]' < action_gate/VERSION)"
+          test "$version" = "0.4.2"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+        id: version
+
+      - name: Create isolated Python environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m venv .clean-room-venv
+          . .clean-room-venv/bin/activate
+          python -m pip install --upgrade pip
+          if test -f requirements.txt; then
+            python -m pip install -r requirements.txt
+          elif test -f pyproject.toml || test -f setup.py; then
+            python -m pip install -e .
+          fi
+          python -m pip install pytest
+
+      - name: Compile runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          . .clean-room-venv/bin/activate
+          python -m compileall -q action_gate
+
+      - name: Run repository tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          . .clean-room-venv/bin/activate
+          if find . -maxdepth 3 -type f \( -name 'test_*.py' -o -name '*_test.py' \) | grep -q .; then
+            python -m pytest -q
+          else
+            echo "No Python test files discovered in the clean checkout."
+          fi
+
+      - name: Verify product integrity contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          required=(
+            PRODUCT/ACTION_GATE_PRODUCT_SPEC.md
+            PRODUCT/COMMERCIAL_READINESS.md
+            PRODUCT/CUSTOMER_ACCEPTANCE.md
+            PRODUCT/RELEASE_NOTES_0.4.2.md
+            PRODUCT/DEPLOYMENT.md
+            PRODUCT/INTEGRATION_CONTRACT.md
+            PRODUCT/OPERATIONS_RUNBOOK.md
+            PRODUCT/RELEASE_CHECKLIST.md
+            PRODUCT/.env.example
+          )
+          for f in "${required[@]}"; do test -f "$f"; done
+          grep -q '^ACTION_GATE_PRODUCTION_EXECUTION=false$' PRODUCT/.env.example
+          if grep -Eiq '(sk-[A-Za-z0-9_-]{16,}|ghp_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|BEGIN (RSA|OPENSSH|EC|DSA) PRIVATE KEY)' PRODUCT/.env.example; then
+            echo "Obvious secret pattern detected in .env.example"
+            exit 1
+          fi
+
+      - name: Build production container from clean checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build --pull -t action-gate-clean-room:0.4.2 .
+
+      - name: Emit verification manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p clean-room-evidence
+          {
+            echo "product=Action Gate"
+            echo "version=$(tr -d '[:space:]' < action_gate/VERSION)"
+            echo "commit=$GITHUB_SHA"
+            echo "python=$(python3 --version)"
+            echo "docker=$(docker --version)"
+            echo "verification=clean-room"
+          } > clean-room-evidence/manifest.txt
+          sha256sum clean-room-evidence/manifest.txt | tee clean-room-evidence/manifest.sha256
+
+      - name: Upload clean-room evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: action-gate-clean-room-evidence-${{ github.sha }}
+          path: clean-room-evidence/
+          retention-days: 30
