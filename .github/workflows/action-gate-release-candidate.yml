@@ -1,0 +1,64 @@
+name: Action Gate Release Candidate
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "action-gate-v*"
+
+permissions:
+  contents: read
+
+jobs:
+  release-candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read canonical version
+        id: version
+        shell: bash
+        run: |
+          VERSION="$(tr -d '[:space:]' < action_gate/VERSION)"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Action Gate version: $VERSION"
+
+      - name: Validate expected release baseline
+        shell: bash
+        run: |
+          VERSION="$(tr -d '[:space:]' < action_gate/VERSION)"
+          test "$VERSION" = "0.4.2"
+
+      - name: Build production image
+        run: docker build --pull -t action-gate:${{ steps.version.outputs.version }} .
+
+      - name: Export image archive
+        run: docker save action-gate:${{ steps.version.outputs.version }} -o action-gate-${{ steps.version.outputs.version }}.tar
+
+      - name: Generate SHA256
+        shell: bash
+        run: sha256sum action-gate-${{ steps.version.outputs.version }}.tar | tee action-gate-${{ steps.version.outputs.version }}.tar.sha256
+
+      - name: Create release manifest
+        shell: bash
+        run: |
+          cat > action-gate-${{ steps.version.outputs.version }}.manifest.txt <<EOF
+          product=HamidCognition Action Gate
+          version=${{ steps.version.outputs.version }}
+          commit=${{ github.sha }}
+          image=action-gate:${{ steps.version.outputs.version }}
+          archive=action-gate-${{ steps.version.outputs.version }}.tar
+          generated_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          EOF
+
+      - name: Upload release candidate evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: action-gate-release-candidate-${{ steps.version.outputs.version }}-${{ github.sha }}
+          path: |
+            action-gate-${{ steps.version.outputs.version }}.tar
+            action-gate-${{ steps.version.outputs.version }}.tar.sha256
+            action-gate-${{ steps.version.outputs.version }}.manifest.txt
+          if-no-files-found: error
+          retention-days: 30
