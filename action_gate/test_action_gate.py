@@ -80,7 +80,7 @@ def test_authentication_fail_closed_in_production():
     old_env, old_token = module.ENVIRONMENT, module.API_TOKEN
     module.ENVIRONMENT, module.API_TOKEN = "production", None
     try:
-        assert client.post("/v1/action/evaluate", json={"tenant_id": TENANT, "agent_id": "a", "action": "read_public_file"}).status_code == 503
+        assert client.post("/v1/action/evaluate", json={"tenant_id": TENANT, "agent_id": "a", "actor_id": "test-actor", "session_id": "test-session", "action": "read_public_file"}).status_code == 503
     finally:
         module.ENVIRONMENT, module.API_TOKEN = old_env, old_token
 
