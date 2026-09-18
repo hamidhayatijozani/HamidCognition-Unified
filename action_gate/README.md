@@ -10,7 +10,7 @@ This directory contains the executable product. It is deliberately narrower than
 
 The Gate independently evaluates risk. `risk_hint` from an agent is untrusted and cannot lower intrinsic risk.
 
-Decisions: `ALLOW`, `DENY`, `ASK`, `SANDBOX`, `DEFER`.
+Runtime decisions: `ALLOW`, `DENY`, `ASK`, `SANDBOX`. `DEFER` remains outside the current executable policy surface.
 
 ## Enforced controls
 
