@@ -1,4 +1,4 @@
-# HamidCognition Action Gate v0.4.2
+# HamidCognition Action Gate v1.0.0
 
 **Runtime Action Governance with Replayable Decision Evidence**
 
@@ -20,7 +20,9 @@ Runtime decisions: `ALLOW`, `DENY`, `ASK`, `SANDBOX`. `DEFER` remains outside th
 - action hash bound to tenant, actor, action, target and parameters
 - cryptographic decision signature material
 - decision expiry and one-time execution nonce
-- approval bound to tenant, action hash and policy version
+- approval cryptographically bound to tenant, action hash and policy version
+- production actor + session binding at evaluation and execution
+- versioned signing keyring with key-id based verification and rotation compatibility
 - append-only audit events linked by a SHA-256 hash chain
 - durable PostgreSQL storage for production deployments, SQLite retained only for local development
 - HTTP enforcement adapter and MCP `tools/call` adapter
@@ -64,11 +66,14 @@ export DOMAIN=gate.example.com
 export POSTGRES_PASSWORD='<strong-random-password>'
 export ACTION_GATE_API_TOKEN='<strong-random-token>'
 export ACTION_GATE_SIGNING_SECRET='<strong-random-secret>'
+export ACTION_GATE_APPROVAL_SECRET='<strong-random-secret>'
+export ACTION_GATE_KEY_ID='hhj-csg-1'
+export ACTION_GATE_REQUIRE_SESSION_BINDING='1'
 export ACTION_GATE_ENFORCEMENT_SECRET='<strong-random-secret>'
 docker compose -f docker-compose.production.yml up -d --build
 ```
 
-The production stack is:
+For key rotation, set `ACTION_GATE_SIGNING_KEYS` to a JSON object such as `{"hhj-csg-1":"old-secret","hhj-csg-2":"new-secret"}` and deploy with `ACTION_GATE_KEY_ID=hhj-csg-2`. Existing decisions retain their `key_id` and remain verifiable while the old key remains in the configured keyring.
 
 ```text
 Internet -> Caddy TLS -> enforcement -> Action Gate -> PostgreSQL
@@ -89,9 +94,13 @@ pytest -q
 
 The integration gates exercise real processes rather than mocks. They cover denied actions, allowed execution, exact action binding, forged decisions, one-time nonce replay and direct-tool bypass rejection. `test_production_storage.py` verifies the storage abstraction and production deployment configuration.
 
-## Current product boundary
+## Product boundary
 
-This release moves the runtime to a production-oriented PostgreSQL/TLS deployment path and hardens one-time execution against concurrent replay with a durable database-backed nonce claim. It does **not** claim full enterprise readiness. External identity federation, distributed rate limiting, managed key rotation/HSM integration, SIEM connectors, HA orchestration and customer-specific compliance evidence remain deployment/customer layers rather than fabricated features.
+v1.0.0 is the production release of the Action Gate runtime boundary implemented and exercised in this repository. The validated boundary covers authenticated multi-tenant decisions, actor/session binding, policy/action binding, cryptographic authority, approval authority, atomic one-time execution reservation, replay evidence, PostgreSQL persistence, HTTP/MCP enforcement and production Compose deployment.
+
+The release does not pretend that an application can manufacture an HSM, an external identity provider, Kubernetes HA, SIEM ingestion or downstream business-outcome safety from Python files. Those are integration boundaries. The runtime therefore exposes explicit configuration points and fails closed where required instead of silently substituting weaker controls.
+
+`SANDBOX` means **sandbox-required decision state**. It is not proof that a real isolation sandbox has been provisioned.
 
 `SANDBOX` means **sandbox-required decision state**. It is not proof that a real isolation sandbox has been provisioned.
 
