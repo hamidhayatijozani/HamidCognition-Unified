@@ -2,7 +2,7 @@ FROM python:3.12-slim
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY VERSION app.py storage.py rate_limit.py canonicalization.py keyring.py policy_store.py action_gate_sdk.py csg_contract.py csg_ingress.py csg_routes.py decision_authority.py csg_acceptance.py csg_persistence_replay.py agentrq_simulator.py production_e2e_smoke.py ./
+COPY VERSION app.py storage.py self_audit.py rate_limit.py canonicalization.py keyring.py policy_store.py action_gate_sdk.py csg_contract.py csg_ingress.py csg_routes.py decision_authority.py csg_acceptance.py csg_persistence_replay.py agentrq_simulator.py production_e2e_smoke.py ./
 RUN useradd --create-home --uid 10001 appuser && mkdir -p /data && chown -R appuser:appuser /data
 ENV ACTION_GATE_DB=/data/action_gate.db
 USER appuser
