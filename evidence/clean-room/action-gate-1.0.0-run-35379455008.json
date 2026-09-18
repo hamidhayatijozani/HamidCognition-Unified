@@ -1,0 +1,29 @@
+{
+  "evidence_type": "clean_room_verification_attestation",
+  "product": "HamidCognition Action Gate",
+  "version": "1.0.0",
+  "pull_request": 40,
+  "pr_head_sha": "7c49e79215d0b4f6f0fca520dca22f4df09ca034",
+  "execution_commit_sha": "6e4614a2e180fe9a8b9240c2862b4ddb5d2b7677",
+  "workflow": "Action Gate Clean-Room Verification",
+  "workflow_run_id": 35379455008,
+  "workflow_run_url": "https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/35379455008",
+  "artifact_id": 10561747395,
+  "artifact_name": "action-gate-clean-room-evidence-1.0.0-6e4614a2e180fe9a8b9240c2862b4ddb5d2b7677",
+  "artifact_sha256": "3406044847ff4f392d59de9f27b4194ad3716102b29ca8d8a62187a4a0fdd85d",
+  "artifact_expired": false,
+  "evidence_bundle_sha256": "01f15b8b27fef2a9daf5c7b55dc6cf2caf70dba9960e3a3324361dcd604fe0ca",
+  "timestamp_utc": "2026-09-18T18:19:43Z",
+  "verification_result": "success",
+  "verified_conditions": [
+    "canonical Action Gate version is 1.0.0",
+    "isolated Python environment created",
+    "103 repository tests passed",
+    "product integrity contract passed",
+    "production container built from action_gate/Dockerfile",
+    "evidence bundle uploaded successfully"
+  ],
+  "signer": null,
+  "signature_status": "not_cryptographically_signed",
+  "provenance_note": "GitHub Actions provides the observed run and artifact digest. This record does not claim an independent cryptographic signature."
+}
