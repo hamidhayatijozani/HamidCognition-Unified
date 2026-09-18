@@ -54,6 +54,8 @@ jobs:
           POSTGRES_PASSWORD: ci-postgres-password
           ACTION_GATE_API_TOKEN: ci-action-gate-token
           ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
+          ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml config
@@ -63,6 +65,8 @@ jobs:
           POSTGRES_PASSWORD: ci-postgres-password
           ACTION_GATE_API_TOKEN: ci-action-gate-token
           ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
+          ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml up -d --build
@@ -72,6 +76,8 @@ jobs:
           POSTGRES_PASSWORD: ci-postgres-password
           ACTION_GATE_API_TOKEN: ci-action-gate-token
           ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
+          ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml exec -T action-gate python production_e2e_smoke.py
@@ -81,6 +87,8 @@ jobs:
           POSTGRES_PASSWORD: ci-postgres-password
           ACTION_GATE_API_TOKEN: ci-action-gate-token
           ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
+          ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           DOMAIN: localhost
           ACTION_GATE_URL: http://action-gate:8000
@@ -91,6 +99,8 @@ jobs:
           POSTGRES_PASSWORD: ci-postgres-password
           ACTION_GATE_API_TOKEN: ci-action-gate-token
           ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
+          ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           DOMAIN: localhost
         run: |
@@ -110,6 +120,8 @@ jobs:
           POSTGRES_PASSWORD: ci-postgres-password
           ACTION_GATE_API_TOKEN: ci-action-gate-token
           ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
+          ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           DOMAIN: localhost
           ACTION_GATE_URL: http://action-gate:8000
@@ -121,6 +133,8 @@ jobs:
           POSTGRES_PASSWORD: ci-postgres-password
           ACTION_GATE_API_TOKEN: ci-action-gate-token
           ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
+          ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           DOMAIN: localhost
         run: |
@@ -174,6 +188,8 @@ jobs:
           POSTGRES_PASSWORD: ci-postgres-password
           ACTION_GATE_API_TOKEN: ci-action-gate-token
           ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
+          ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml down -v
