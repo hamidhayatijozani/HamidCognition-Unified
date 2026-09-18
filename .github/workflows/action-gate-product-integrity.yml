@@ -1,0 +1,65 @@
+name: Action Gate Product Integrity
+
+on:
+  push:
+    paths:
+      - "action_gate/**"
+      - "PRODUCT/**"
+      - "Dockerfile"
+      - "docker-compose.yml"
+      - ".github/workflows/action-gate-product-integrity.yml"
+  pull_request:
+    paths:
+      - "action_gate/**"
+      - "PRODUCT/**"
+      - "Dockerfile"
+      - "docker-compose.yml"
+      - ".github/workflows/action-gate-product-integrity.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify canonical version file
+        shell: bash
+        run: |
+          test -s action_gate/VERSION
+          VERSION="$(tr -d '[:space:]' < action_gate/VERSION)"
+          test "$VERSION" = "0.4.2"
+
+      - name: Compile Python runtime
+        shell: bash
+        run: python -m compileall -q action_gate
+
+      - name: Check product package
+        shell: bash
+        run: |
+          test -s PRODUCT/ACTION_GATE_PRODUCT_SPEC.md
+          test -s PRODUCT/COMMERCIAL_READINESS.md
+          test -s PRODUCT/CUSTOMER_ACCEPTANCE.md
+          test -s PRODUCT/RELEASE_NOTES_0.4.2.md
+          test -s PRODUCT/DEPLOYMENT.md
+          test -s PRODUCT/INTEGRATION_CONTRACT.md
+          test -s PRODUCT/OPERATIONS_RUNBOOK.md
+          test -s PRODUCT/RELEASE_CHECKLIST.md
+          test -s PRODUCT/.env.example
+
+      - name: Reject obvious secret placeholders in product template
+        shell: bash
+        run: |
+          if grep -Eiq '(BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|ghp_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16})' PRODUCT/.env.example; then
+            echo "Potential credential material found in example configuration."
+            exit 1
+          fi
+
+      - name: Validate environment template is non-production
+        shell: bash
+        run: |
+          grep -q '^ACTION_GATE_PRODUCTION_EXECUTION=false$' PRODUCT/.env.example
+          grep -q 'REPLACE_IN_SECRET_MANAGER' PRODUCT/.env.example
