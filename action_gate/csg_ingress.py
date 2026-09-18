@@ -65,7 +65,7 @@ def build_decision(req: PermissionRequest, request_digest: str) -> DecisionObjec
     nonce = uuid.uuid4().hex
     unsigned = {
         "contract_version": CONTRACT_VERSION, "decision_id": f"dec_{uuid.uuid4().hex}", "request_id": req.request_id,
-        "tenant_id": req.tenant_id, "decision": decision, "risk_level": risk, "request_digest": request_digest,
+        "tenant_id": req.tenant_id, "session_id": req.session_id, "decision": decision, "risk_level": risk, "request_digest": request_digest,
         "signature_algorithm": SIGNATURE_ALGORITHM, "key_id": KEY_ID, "canonicalization_version": CANONICALIZATION_VERSION,
         "policy_version": "hhj-csg-policy/1.0", "algorithm_version": ALGORITHM_VERSION,
         "issued_at": utc_z(issued), "expires_at": utc_z(expires), "nonce": nonce,
