@@ -46,7 +46,7 @@ def get_json(url):
 def permitted(decision_id: str, tenant_id: str, expected_action_hash: str) -> dict | None:
     try:
         _, record = get_json(GATE_URL + "/v1/evidence/" + urllib.parse.quote(decision_id, safe="") + "?tenant_id=" + urllib.parse.quote(tenant_id, safe=""))
-        if record.get("tenant_id") != tenant_id or record.get("decision") not in {"ALLOW", "SANDBOX"} or record.get("action_hash") != expected_action_hash:
+        if record.get("tenant_id") != tenant_id or record.get("decision") != "ALLOW" or record.get("action_hash") != expected_action_hash:
             return None
         return record
     except Exception:
@@ -86,7 +86,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
                 self.send_response(status); self.end_headers(); self.wfile.write(json.dumps(out).encode()); return
             result = post_json(GATE_URL + "/v1/action/evaluate", {"agent_id": agent_id, "actor_id": actor_id, "tenant_id": tenant_id, "action": action, "target": target, "parameters": payload})[1]
             result["enforcement_action_hash"] = expected_hash
-            self.send_response(200); self.end_headers(); self.wfile.write(json.dumps({"enforced": result["decision"] in {"ALLOW", "SANDBOX"}, "decision": result}).encode())
+            self.send_response(200); self.end_headers(); self.wfile.write(json.dumps({"enforced": result["decision"] == "ALLOW", "decision": result}).encode())
         except Exception:
             self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"action_gate_or_tool_unreachable"}')
 
@@ -100,7 +100,7 @@ class MCPHandler(BaseHTTPRequestHandler):
             params = message.get("params", {}); tool = params.get("name", "unknown"); args = params.get("arguments", {})
             tenant_id = self.headers.get("X-Tenant-ID", "default"); actor_id = self.headers.get("X-Actor-ID"); agent_id = self.headers.get("X-Agent-ID", "unknown"); target = args.get("target")
             result = post_json(GATE_URL + "/v1/action/evaluate", {"agent_id": agent_id, "actor_id": actor_id, "tenant_id": tenant_id, "action": tool, "target": target, "parameters": args})[1]
-            if result["decision"] not in {"ALLOW", "SANDBOX"}:
+            if result["decision"] != "ALLOW":
                 self.send_response(200); self.end_headers(); self.wfile.write(json.dumps({"jsonrpc": "2.0", "id": message.get("id"), "result": {"blocked_by_action_gate": True, "decision": result}}).encode()); return
             reserve_execution(result["decision_id"], tenant_id, actor_id, result["action_hash"], result["nonce"])
             status, out = post_json(TOOL_URL, message, tool_headers(result["decision_id"], result["action_hash"], result["nonce"]))
