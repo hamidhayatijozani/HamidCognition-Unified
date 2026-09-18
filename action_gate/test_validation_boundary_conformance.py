@@ -22,7 +22,7 @@ def evaluate(action="read_public_file", target="/public/info.txt", **extra):
 
 
 def execute(data, tenant=TENANT, action_hash=None, nonce=None, outcome=None):
-    reserve = client.post(f"/v1/action/{data['decision_id']}/execution/reserve", json={"tenant_id": tenant, "action_hash": action_hash or data["action_hash"], "nonce": nonce or data["nonce"]})
+    reserve = client.post(f"/v1/action/{data['decision_id']}/execution/reserve", json={"tenant_id": tenant, "actor_id": data.get("actor_id"), "action_hash": action_hash or data["action_hash"], "nonce": nonce or data["nonce"]})
     if reserve.status_code != 200:
         return reserve
     return client.post(
