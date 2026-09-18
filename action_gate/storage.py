@@ -143,6 +143,37 @@ def save_record(record: dict[str, Any], event_type: str, digest_fn, canonical_fn
         con.close()
 
 
+def reserve_execution(decision_id: str, nonce: str, started_at: str) -> bool:
+    """Atomically reserve a one-time execution before any external side effect."""
+    con = connect()
+    try:
+        if backend() == "postgresql":
+            con.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", (decision_id,))
+            row = con.execute(
+                "UPDATE records SET record = jsonb_set(record::jsonb, '{execution_started_at}', to_jsonb(%s::text), false)::text "
+                "WHERE decision_id=%s AND (record::jsonb->>'nonce')=%s "
+                "AND (record::jsonb->>'consumed_at') IS NULL AND (record::jsonb->>'execution_started_at') IS NULL "
+                "RETURNING decision_id",
+                (started_at, decision_id, nonce),
+            ).fetchone()
+        else:
+            con.execute("BEGIN IMMEDIATE")
+            row = con.execute(
+                "UPDATE records SET record = json_set(record, '$.execution_started_at', ?) "
+                "WHERE decision_id=? AND json_extract(record, '$.nonce')=? "
+                "AND json_extract(record, '$.consumed_at') IS NULL AND json_extract(record, '$.execution_started_at') IS NULL",
+                (started_at, decision_id, nonce),
+            )
+            row = (decision_id,) if row.rowcount == 1 else None
+        con.commit()
+        return bool(row)
+    except Exception:
+        con.rollback()
+        raise
+    finally:
+        con.close()
+
+
 def consume_nonce(decision_id: str, nonce: str, consumed_at: str) -> bool:
     """Atomically claim a decision nonce exactly once across processes/replicas."""
     con = connect()

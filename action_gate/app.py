@@ -13,7 +13,7 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
 from rate_limit import SlidingWindowRateLimiter
-from storage import health as storage_health, init_db, load_record, save_record, consume_nonce, allow_rate_limit
+from storage import health as storage_health, init_db, load_record, save_record, consume_nonce, reserve_execution, allow_rate_limit
 from csg_routes import router as csg_router
 
 APP_VERSION = "0.4.0"
@@ -259,6 +259,33 @@ def approve(decision_id: str, approval: Approval, authorization: str | None = He
     return record
 
 
+@app.post("/v1/action/{decision_id}/execution/reserve")
+def execution_reserve(decision_id: str, outcome: ExecutionOutcome, authorization: str | None = Header(default=None)):
+    require_auth(authorization)
+    enforce_rate_limit(authorization, outcome.tenant_id)
+    record = load(decision_id, outcome.tenant_id)
+    ensure_live(record)
+    if record["decision"] not in {"ALLOW", "SANDBOX"}:
+        raise HTTPException(403, "execution_not_permitted_by_gate")
+    if outcome.action_hash != record["action_hash"]:
+        raise HTTPException(409, "execution_action_binding_mismatch")
+    if outcome.nonce != record["nonce"]:
+        raise HTTPException(409, "execution_nonce_mismatch")
+    if record["approval"] and record["approval"].get("approved") and datetime.fromisoformat(record["approval"]["expires_at"]) <= datetime.now(timezone.utc):
+        raise HTTPException(403, "approval_expired")
+    started_at = now()
+    try:
+        reserved = reserve_execution(decision_id, outcome.nonce, started_at)
+    except Exception as exc:
+        raise HTTPException(503, "execution_reservation_store_unavailable") from exc
+    if not reserved:
+        raise HTTPException(409, "execution_already_reserved_or_consumed")
+    record["execution_started_at"] = started_at
+    record["execution"] = {"timestamp": started_at, "status": "RESERVED", "action_hash": record["action_hash"], "nonce": record["nonce"]}
+    save(record, "EXECUTION_RESERVED")
+    return record
+
+
 @app.post("/v1/action/{decision_id}/execution")
 def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | None = Header(default=None)):
     require_auth(authorization)
@@ -273,6 +300,8 @@ def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | 
         raise HTTPException(409, "execution_nonce_mismatch")
     if record["approval"] and record["approval"].get("approved") and datetime.fromisoformat(record["approval"]["expires_at"]) <= datetime.now(timezone.utc):
         raise HTTPException(403, "approval_expired")
+    if record.get("execution_started_at") is None:
+        raise HTTPException(409, "execution_not_reserved")
     consumed_at = now()
     if not consume_nonce(decision_id, outcome.nonce, consumed_at):
         raise HTTPException(409, "decision_nonce_already_consumed")
