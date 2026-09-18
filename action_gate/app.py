@@ -238,6 +238,7 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
         "request_id": request_id,
         "tenant_id": req.tenant_id,
         "actor_id": req.actor_id,
+        "session_id": req.session_id,
         "request": req.model_dump(),
         "identity": {"agent_id": req.agent_id, "actor_id": req.actor_id, "session_id": req.session_id},
         "key_id": KEY_ID,
