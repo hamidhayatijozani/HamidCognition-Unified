@@ -7,7 +7,7 @@ from typing import Any
 
 from fastapi import HTTPException
 
-from canonicalization import KEY_ID, SIGNATURE_ALGORITHM, hmac_sha256, sha256_digest, verify_hmac
+from canonicalization import KEY_ID, SIGNATURE_ALGORITHM, current_signing_secret, hmac_sha256, sha256_digest, signing_secret_for_key, verify_hmac
 from csg_contract import ALGORITHM_VERSION, CANONICALIZATION_VERSION, CONTRACT_VERSION, DecisionObject, PermissionRequest
 from storage import load_idempotency, save_idempotency
 
@@ -72,7 +72,7 @@ def build_decision(req: PermissionRequest, request_digest: str) -> DecisionObjec
         "execution_receipt": None, "constraints": constraints,
     }
     decision_digest = sha256_digest(unsigned)
-    secret = signing_secret()
+    secret = current_signing_secret()
     if not secret:
         raise HTTPException(503, "csg_signing_secret_not_configured")
     signature = hmac_sha256({"request_digest": request_digest, "decision_digest": decision_digest, "decision_id": unsigned["decision_id"], "tenant_id": req.tenant_id, "nonce": nonce}, secret)
