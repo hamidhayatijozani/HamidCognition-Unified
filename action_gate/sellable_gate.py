@@ -93,6 +93,8 @@ def main() -> int:
             "nonce": decision["nonce"],
             "outcome": {"status": "synthetic-success", "gate": "sellable"},
         }
+        status, reserved = request("POST", f"/v1/action/{decision_id}/execution/reserve", execution)
+        assert status == 200 and reserved["execution"]["status"] == "RESERVED"
         status, executed = request("POST", f"/v1/action/{decision_id}/execution", execution)
         assert status == 200 and executed["execution"]["status"] == "EXECUTED"
 
