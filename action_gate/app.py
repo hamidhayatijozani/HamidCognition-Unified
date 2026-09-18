@@ -267,7 +267,7 @@ def execution_reserve(decision_id: str, outcome: ExecutionOutcome, authorization
     enforce_rate_limit(authorization, outcome.tenant_id)
     record = load(decision_id, outcome.tenant_id)
     ensure_live(record)
-    if record["decision"] not in {"ALLOW", "SANDBOX"}:
+    if record["decision"] != "ALLOW":
         raise HTTPException(403, "execution_not_permitted_by_gate")
     if outcome.action_hash != record["action_hash"]:
         raise HTTPException(409, "execution_action_binding_mismatch")
