@@ -66,7 +66,11 @@ def sign(obj: Any) -> str:
 
 def verify_signature(record: dict[str, Any]) -> bool:
     payload = {"decision_id": record["decision_id"], "tenant_id": record["tenant_id"], "action_hash": record["action_hash"], "policy_hash": record["policy_hash"], "nonce": record["nonce"], "expires_at": record["expires_at"]}
-    expected = sign(payload)
+    key_id = record.get("key_id", KEY_ID)
+    secret = signing_secret_for_key(key_id)
+    if not secret:
+        return False
+    expected = hmac.new(secret.encode(), canonical(payload).encode(), hashlib.sha256).hexdigest()
     return hmac.compare_digest(expected, record.get("decision_signature", ""))
 
 
@@ -156,7 +160,7 @@ def decide(req: ActionRequest, risk: str, snapshot: dict[str, Any] = POLICY_SNAP
 
 
 def normalized_action(req: ActionRequest):
-    return {"tenant_id": req.tenant_id, "actor_id": req.actor_id, "action": req.action.lower(), "target": req.target, "parameters": req.parameters}
+    return {"tenant_id": req.tenant_id, "actor_id": req.actor_id, "session_id": req.session_id, "action": req.action.lower(), "target": req.target, "parameters": req.parameters}
 
 
 def save(record: dict[str, Any], event_type: str) -> None:
@@ -215,7 +219,8 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
         "tenant_id": req.tenant_id,
         "actor_id": req.actor_id,
         "request": req.model_dump(),
-        "identity": {"agent_id": req.agent_id, "actor_id": req.actor_id},
+        "identity": {"agent_id": req.agent_id, "actor_id": req.actor_id, "session_id": req.session_id},
+        "key_id": KEY_ID,
         "normalized_action": normalized,
         "action_hash": action_hash,
         "nonce": nonce,
