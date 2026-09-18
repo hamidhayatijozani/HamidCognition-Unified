@@ -31,8 +31,10 @@ The current release evidence covers:
 - end-to-end smoke validation;
 - 200-event decision replay;
 - restart/persistence replay;
-- clean-room validation on the direct main branch;
+- clean-room validation on a release-candidate commit;
 - release-candidate container artifact generation.
+
+Direct main-head verification is tracked separately and must not be inferred from a pull-request run.
 
 Evidence references are recorded in the release and workflow artifacts for the exact release baseline.
 
