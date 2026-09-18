@@ -29,6 +29,7 @@ def execute(data, tenant=TENANT, action_hash=None, nonce=None, outcome=None):
         f"/v1/action/{data['decision_id']}/execution",
         json={
             "tenant_id": tenant,
+            "actor_id": data.get("actor_id"),
             "action_hash": action_hash or data["action_hash"],
             "nonce": nonce or data["nonce"],
             "outcome": outcome or {"ok": True},
@@ -124,7 +125,7 @@ def test_vb12_persistence_record_is_loadable_and_audited():
 
 def test_adversarial_actor_change_cannot_redeem_authority():
     data = evaluate()
-    wrong_actor = client.post(f"/v1/action/{data["decision_id"]}/execution/reserve", json={"tenant_id": TENANT, "actor_id": "attacker", "action_hash": data["action_hash"], "nonce": data["nonce"]})
+    wrong_actor = client.post(f"/v1/action/{data['decision_id']}/execution/reserve", json={"tenant_id": TENANT, "actor_id": "attacker", "action_hash": data["action_hash"], "nonce": data["nonce"]})
     assert wrong_actor.status_code == 409
 
 
@@ -158,7 +159,7 @@ def test_approval_is_bound_to_exact_action_and_policy():
 def test_sandbox_cannot_cross_production_execution_boundary():
     data = evaluate("transfer_funds", "account-1", parameters={"amount": 1000})
     assert data["decision"] == "SANDBOX"
-    response = client.post(f"/v1/action/{data["decision_id"]}/execution/reserve", json={"tenant_id": TENANT, "actor_id": data.get("actor_id"), "action_hash": data["action_hash"], "nonce": data["nonce"]})
+    response = client.post(f"/v1/action/{data['decision_id']}/execution/reserve", json={"tenant_id": TENANT, "actor_id": data.get("actor_id"), "action_hash": data["action_hash"], "nonce": data["nonce"]})
     assert response.status_code == 403
 
 
