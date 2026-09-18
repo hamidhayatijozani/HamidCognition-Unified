@@ -22,7 +22,7 @@ def sign(payload: dict) -> str:
 def payload(request_id="evt-001", action="read_public"):
     return {
         "contract_version": "hhj-csg/1.0", "request_id": request_id, "tenant_id": "tenant-a", "agent_id": "agentrq-poc",
-        "actor_id": "actor-1", "action": action, "target": "public-resource",
+        "actor_id": "actor-1", "session_id": "session-1", "action": action, "target": "public-resource",
         "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "parameters": {"limit": 10}, "context": {"source": "simulator"},
     }
