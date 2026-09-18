@@ -26,7 +26,7 @@ The agent-supplied risk hint is retained as evidence but is not authoritative fo
 2. Decision signatures bind decision ID, tenant, action digest, policy digest, nonce, and expiry.
 3. Tenant mismatch does not reveal another tenant's decision record.
 4. Action and nonce bindings are checked again at execution time.
-5. A consumed nonce cannot be executed twice.
+5. A consumed nonce cannot be executed twice, including concurrent requests sharing the production database.
 6. Approval is bound to tenant, action digest, policy version, and approval expiry.
 7. HTTP and MCP execution are routed through the gate before tool invocation.
 8. Direct tool access is rejected unless the enforcement attestation is valid.
@@ -55,4 +55,4 @@ Secrets must be injected by the deployment platform's secret manager, not commit
 
 This repository now contains a testable product runtime and production deployment path. "Sellable" here means a customer can deploy and exercise the documented governance boundary with deterministic evidence. It is not a claim of regulatory certification, universal security, or guaranteed safety of downstream tools.
 
-Remaining enterprise hardening is intentionally separated from the core product contract: asymmetric key rotation, durable distributed replay protection, authenticated principal/session binding, rate-limit coordination across replicas, structured observability, and a versioned customer policy management surface.
+Remaining enterprise hardening is intentionally separated from the core product contract: asymmetric key rotation, authenticated principal/session binding, rate-limit coordination across replicas, structured observability, and a versioned customer policy management surface. One-time execution replay protection is now durable and concurrency-safe through the shared database transaction boundary.

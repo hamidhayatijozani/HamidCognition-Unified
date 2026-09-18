@@ -1,4 +1,4 @@
-# HamidCognition Action Gate v0.3
+# HamidCognition Action Gate v0.4.0
 
 **Runtime Action Governance with Replayable Decision Evidence**
 
@@ -89,7 +89,7 @@ The integration gates exercise real processes rather than mocks. They cover deni
 
 ## Current product boundary
 
-This release moves the runtime from an MVP-only SQLite deployment to a production-oriented PostgreSQL/TLS deployment path. It does **not** claim full enterprise readiness. External identity federation, distributed rate limiting, managed key rotation/HSM integration, SIEM connectors, HA orchestration and customer-specific compliance evidence remain deployment/customer layers rather than fabricated features.
+This release moves the runtime to a production-oriented PostgreSQL/TLS deployment path and hardens one-time execution against concurrent replay with a durable database-backed nonce claim. It does **not** claim full enterprise readiness. External identity federation, distributed rate limiting, managed key rotation/HSM integration, SIEM connectors, HA orchestration and customer-specific compliance evidence remain deployment/customer layers rather than fabricated features.
 
 `SANDBOX` means **sandbox-required decision state**. It is not proof that a real isolation sandbox has been provisioned.
 
