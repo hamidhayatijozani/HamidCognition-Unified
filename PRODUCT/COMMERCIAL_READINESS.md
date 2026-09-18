@@ -35,7 +35,7 @@ ENTERPRISE means self-hosted or managed deployment plus negotiated support, secu
 The repository does not assert prices. Pricing is a business decision and must not be confused with technical readiness.
 
 ## Acceptance evidence
-The current v1.0.0 baseline is anchored to the direct main-head clean-room and release-candidate executions. Exact run IDs, artifact IDs, and SHA-256 digests are preserved in the release evidence package.
+The current v1.0.0 baseline has observed clean-room and product-gate evidence. Direct main-head verification and release-candidate execution are separate evidence conditions and must be linked to the exact release commit before final release claims are made.
 
 ## Not included by default
 - customer-specific legal compliance certification;
