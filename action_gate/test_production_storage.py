@@ -1,6 +1,7 @@
 import json
 import os
 import tempfile
+from pathlib import Path
 
 
 def test_sqlite_storage_roundtrip():
@@ -29,8 +30,9 @@ def test_sqlite_storage_roundtrip():
 
 
 def test_production_compose_uses_postgres_and_tls():
-    compose = open("action_gate/docker-compose.production.yml", encoding="utf-8").read()
-    caddy = open("action_gate/Caddyfile", encoding="utf-8").read()
+    runtime_dir = Path(__file__).resolve().parent
+    compose = (runtime_dir / "docker-compose.production.yml").read_text(encoding="utf-8")
+    caddy = (runtime_dir / "Caddyfile").read_text(encoding="utf-8")
     assert "postgres:17-alpine" in compose
     assert "ACTION_GATE_DATABASE_URL: postgresql://" in compose
     assert '"443:443"' in compose
