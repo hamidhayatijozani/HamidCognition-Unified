@@ -53,7 +53,8 @@ def test_meta_validation_unverified_non_mutating_claim_defers():
 
 def test_meta_validation_identity_is_mandatory():
     response = audit(actor_id="")
-    assert response.status_code == 422
+    assert response.status_code == 200
+    assert response.json()["decision"] == "DENY"
 
 
 def test_meta_validation_is_deterministic_for_same_request():
