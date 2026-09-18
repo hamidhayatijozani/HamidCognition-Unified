@@ -5,7 +5,7 @@ proposed action against explicit evidence, identity/session binding, and claim s
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass
 from enum import Enum
 from typing import Any
 import hashlib
@@ -39,7 +39,6 @@ class SelfAuditRequest:
     external_side_effect: bool = False
     mutating: bool = False
     requires_model_internal_access: bool = False
-    requested_decision: GateDecision | None = None
 
 
 @dataclass(frozen=True)
@@ -53,6 +52,10 @@ class SelfAuditResult:
 
 
 def _canonical(value: Any) -> str:
+    if hasattr(value, "__dataclass_fields__"):
+        value = asdict(value)
+    if isinstance(value, Enum):
+        value = value.value
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
 
