@@ -141,6 +141,34 @@ def save_record(record: dict[str, Any], event_type: str, digest_fn, canonical_fn
         con.close()
 
 
+def consume_nonce(decision_id: str, nonce: str, consumed_at: str) -> bool:
+    """Atomically claim a decision nonce exactly once across processes/replicas."""
+    con = connect()
+    try:
+        if backend() == "postgresql":
+            row = con.execute(
+                "UPDATE records SET record = jsonb_set(record::jsonb, '{consumed_at}', to_jsonb(%s::text), false)::text "
+                "WHERE decision_id=%s AND (record::jsonb->>'nonce')=%s AND (record::jsonb->>'consumed_at') IS NULL "
+                "RETURNING decision_id",
+                (consumed_at, decision_id, nonce),
+            ).fetchone()
+        else:
+            row = con.execute(
+                "UPDATE records SET record = json_set(record, '$.consumed_at', ?) "
+                "WHERE decision_id=? AND json_extract(record, '$.nonce')=? "
+                "AND json_extract(record, '$.consumed_at') IS NULL",
+                (consumed_at, decision_id, nonce),
+            )
+            row = (decision_id,) if row.rowcount == 1 else None
+        con.commit()
+        return bool(row)
+    except Exception:
+        con.rollback()
+        raise
+    finally:
+        con.close()
+
+
 def load_record(decision_id: str) -> str | None:
     con = connect()
     try:
