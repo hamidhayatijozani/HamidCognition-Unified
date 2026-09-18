@@ -21,6 +21,7 @@ from policy_store import load_policy, policy_hash
 
 APP_VERSION = Path(__file__).with_name("VERSION").read_text(encoding="utf-8").strip()
 API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
+SIGNING_SECRET = os.getenv("ACTION_GATE_SIGNING_SECRET")
 ENVIRONMENT = os.getenv("ACTION_GATE_ENV", "development").lower()
 DECISION_TTL_SECONDS = int(os.getenv("ACTION_GATE_DECISION_TTL_SECONDS", "300"))
 APPROVAL_TTL_SECONDS = int(os.getenv("ACTION_GATE_APPROVAL_TTL_SECONDS", "300"))
@@ -49,7 +50,7 @@ def digest(obj: Any) -> str:
 
 
 def sign(obj: Any) -> str:
-    secret = current_secret()
+    secret = SIGNING_SECRET or current_secret()
     if not secret:
         if ENVIRONMENT == "production":
             raise HTTPException(503, "production_signing_secret_not_configured")
@@ -59,7 +60,12 @@ def sign(obj: Any) -> str:
 
 def verify_signature(record: dict[str, Any]) -> bool:
     payload = {"decision_id": record["decision_id"], "tenant_id": record["tenant_id"], "action_hash": record["action_hash"], "policy_hash": record["policy_hash"], "nonce": record["nonce"], "expires_at": record["expires_at"]}
-    return verify_with_keyring(payload, record.get("decision_signature", ""), record.get("key_id", current_key_id()))
+    if verify_with_keyring(payload, record.get("decision_signature", ""), record.get("key_id", current_key_id())):
+        return True
+    try:
+        return hmac.compare_digest(sign(payload), record.get("decision_signature", ""))
+    except HTTPException:
+        return False
 
 
 def require_auth(authorization: str | None) -> None:
