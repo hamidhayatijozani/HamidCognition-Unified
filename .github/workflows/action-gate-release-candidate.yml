@@ -3,6 +3,8 @@ name: Action Gate Release Candidate
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     tags:
       - "action-gate-v*"
 
