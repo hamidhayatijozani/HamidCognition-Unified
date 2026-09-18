@@ -5,16 +5,17 @@ import os
 import tempfile
 
 os.environ["ACTION_GATE_DB"] = os.path.join(tempfile.gettempdir(), "hamidcognition-enterprise-security.db")
-os.environ["ACTION_GATE_ENV"] = "production"
-os.environ["ACTION_GATE_API_TOKEN"] = "enterprise-token"
-os.environ["ACTION_GATE_SIGNING_SECRET"] = "legacy-secret"
-os.environ["ACTION_GATE_APPROVAL_SECRET"] = "approval-secret"
-os.environ["ACTION_GATE_REQUIRE_SESSION_BINDING"] = "1"
 
 from fastapi.testclient import TestClient
 import app as gate
 
 client = TestClient(gate.app)
+
+gate.ENVIRONMENT = "production"
+gate.API_TOKEN = "enterprise-token"
+gate.SIGNING_SECRET = "legacy-secret"
+gate.APPROVAL_SECRET = "approval-secret"
+gate.REQUIRE_SESSION_BINDING = True
 
 
 def payload(**extra):
