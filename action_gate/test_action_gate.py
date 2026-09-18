@@ -120,6 +120,7 @@ def test_rate_limit_is_enforced():
 def test_health_reports_new_product_version_and_storage_backend():
     data = client.get("/health")
     assert data.status_code == 200
-    assert data.json()["version"] == "0.3.0-production-storage"
+    canonical_version = open(os.path.join(os.path.dirname(__file__), "VERSION"), encoding="utf-8").read().strip()
+    assert data.json()["version"] == canonical_version
     assert data.json()["storage"]["status"] == "ok"
     assert data.json()["storage"]["backend"] == "sqlite"
