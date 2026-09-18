@@ -5,7 +5,8 @@ import os
 from datetime import datetime, timezone
 from typing import Any
 
-from canonicalization import KEY_ID, sha256_digest, verify_hmac
+from canonicalization import sha256_digest
+from keyring import verify_with_keyring
 from csg_contract import DecisionObject
 
 
@@ -26,9 +27,6 @@ def verify_decision_authority(
     reconstructs historical authority evidence and does not re-authorize a
     new execution. Execution paths must keep the default expiry check.
     """
-    if decision.key_id != KEY_ID:
-        raise DecisionAuthorityError("decision_key_id_not_current")
-
     request_id = request_payload.get("request_id")
     tenant_id = request_payload.get("tenant_id")
     if request_id != decision.request_id:
@@ -55,11 +53,8 @@ def verify_decision_authority(
         "tenant_id": decision.tenant_id,
         "nonce": decision.nonce,
     }
-    secret = os.getenv("ACTION_GATE_SIGNING_SECRET")
-    if not secret:
-        raise DecisionAuthorityError("decision_signing_secret_not_configured")
-    if not verify_hmac(signed_fields, decision.signature, secret):
-        raise DecisionAuthorityError("decision_signature_invalid")
+    if not verify_with_keyring(signed_fields, decision.signature, decision.key_id):
+        raise DecisionAuthorityError("decision_signature_invalid_or_unknown_key")
 
     if require_unexpired:
         reference = now or datetime.now(timezone.utc)
