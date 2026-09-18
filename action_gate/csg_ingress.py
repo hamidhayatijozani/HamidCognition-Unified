@@ -93,6 +93,11 @@ def decide(req: PermissionRequest, authorization: str | None, idempotency_key: s
     if not idempotency_key or len(idempotency_key) > 128:
         raise HTTPException(400, "idempotency_key_required")
     validate_timestamp(req.timestamp)
+    if os.getenv("ACTION_GATE_ENV", "development").lower() == "production":
+        if not req.actor_id:
+            raise HTTPException(422, "actor_id_required")
+        if not req.session_id:
+            raise HTTPException(422, "session_id_required")
     payload = raw_payload if raw_payload is not None else request_payload(req)
     verify_request_signature(payload, request_signature)
     request_digest = sha256_digest(payload)
