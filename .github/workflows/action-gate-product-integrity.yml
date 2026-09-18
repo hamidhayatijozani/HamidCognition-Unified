@@ -40,15 +40,20 @@ jobs:
       - name: Check product package
         shell: bash
         run: |
-          test -s PRODUCT/ACTION_GATE_PRODUCT_SPEC.md
-          test -s PRODUCT/COMMERCIAL_READINESS.md
-          test -s PRODUCT/CUSTOMER_ACCEPTANCE.md
-          test -s "PRODUCT/RELEASE_NOTES_${VERSION}.md"
-          test -s PRODUCT/DEPLOYMENT.md
-          test -s PRODUCT/INTEGRATION_CONTRACT.md
-          test -s PRODUCT/OPERATIONS_RUNBOOK.md
-          test -s PRODUCT/RELEASE_CHECKLIST.md
-          test -s PRODUCT/.env.example
+          required=(
+            PRODUCT/ACTION_GATE_PRODUCT_SPEC.md
+            PRODUCT/COMMERCIAL_READINESS.md
+            PRODUCT/CUSTOMER_ACCEPTANCE.md
+            "PRODUCT/RELEASE_NOTES_${VERSION}.md"
+            PRODUCT/DEPLOYMENT.md
+            PRODUCT/INTEGRATION_CONTRACT.md
+            PRODUCT/OPERATIONS_RUNBOOK.md
+            PRODUCT/RELEASE_CHECKLIST.md
+            PRODUCT/.env.example
+          )
+          for file in "${required[@]}"; do
+            test -s "$file"
+          done
 
       - name: Reject obvious secret placeholders in product template
         shell: bash

@@ -47,12 +47,15 @@ jobs:
           python3 -m venv .clean-room-venv
           . .clean-room-venv/bin/activate
           python -m pip install --upgrade pip
-          if test -f requirements.txt; then
+          if test -f action_gate/requirements.txt; then
+            python -m pip install -r action_gate/requirements.txt
+          elif test -f requirements.txt; then
             python -m pip install -r requirements.txt
           elif test -f pyproject.toml || test -f setup.py; then
             python -m pip install -e .
+          else
+            python -m pip install pytest
           fi
-          python -m pip install pytest
 
       - name: Compile runtime
         shell: bash
@@ -66,6 +69,7 @@ jobs:
         run: |
           set -euo pipefail
           . .clean-room-venv/bin/activate
+          export PYTHONPATH="$GITHUB_WORKSPACE/action_gate"
           if find . -maxdepth 3 -type f \( -name 'test_*.py' -o -name '*_test.py' \) | grep -q .; then
             python -m pytest -q
           else
