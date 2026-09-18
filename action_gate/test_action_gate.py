@@ -39,7 +39,7 @@ def test_external_email_requires_bound_approval_then_replay_matches():
     assert approved.json()["decision"] == "ALLOW"
     assert client.get(f"/v1/replay/{decision_id}?tenant_id={TENANT}").json()["match"] is True
     assert reserve(data).status_code == 200
-    execution = client.post(f"/v1/action/{decision_id}/execution", json={"tenant_id": TENANT, "action_hash": data["action_hash"], "nonce": data["nonce"], "outcome": {"sent": True}})
+    execution = client.post(f"/v1/action/{decision_id}/execution", json={"tenant_id": TENANT, "actor_id": data.get("actor_id"), "action_hash": data["action_hash"], "nonce": data["nonce"], "outcome": {"sent": True}})
     assert execution.status_code == 200
     replayed = client.post(f"/v1/action/{decision_id}/execution", json={"tenant_id": TENANT, "action_hash": data["action_hash"], "nonce": data["nonce"], "outcome": {"sent": True}})
     assert replayed.status_code == 409
