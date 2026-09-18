@@ -25,6 +25,7 @@ Decisions: `ALLOW`, `DENY`, `ASK`, `SANDBOX`, `DEFER`.
 - durable PostgreSQL storage for production deployments, SQLite retained only for local development
 - HTTP enforcement adapter and MCP `tools/call` adapter
 - forged decision, altered action and replay attempts rejected
+- execution is reserved atomically before the HTTP/MCP tool side effect; final outcome is recorded only after the tool response
 - direct tool calls rejected unless a Gate-issued HMAC attestation is present
 - production Compose stack with PostgreSQL and Caddy TLS termination
 
@@ -33,6 +34,7 @@ Decisions: `ALLOW`, `DENY`, `ASK`, `SANDBOX`, `DEFER`.
 ```text
 POST /v1/action/evaluate
 POST /v1/action/{decision_id}/approve
+POST /v1/action/{decision_id}/execution/reserve
 POST /v1/action/{decision_id}/execution
 GET  /v1/evidence/{decision_id}?tenant_id=...
 GET  /v1/replay/{decision_id}?tenant_id=...
