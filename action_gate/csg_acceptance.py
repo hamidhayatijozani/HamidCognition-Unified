@@ -15,7 +15,7 @@ from canonicalization import canonicalize
 TOKEN = os.getenv("ACTION_GATE_API_TOKEN", "ci-csg-token")
 SECRET = os.getenv("ACTION_GATE_SIGNING_SECRET", "ci-csg-secret")
 BASE_URL = os.getenv("ACTION_GATE_URL", "http://127.0.0.1:8000")
-RESULT_PATH = os.getenv("CSG_ACCEPTANCE_RESULT_PATH", "csg-acceptance-result.json")
+RESULT_PATH = os.getenv("CSG_ACCEPTANCE_RESULT_PATH", "/tmp/csg-acceptance-result.json")
 
 
 def sign(payload: dict) -> str:
