@@ -117,3 +117,31 @@ def test_approval_signature_is_bound_to_policy_and_action():
     approval["approval_signature"] = sign_approval(approval)
     approval["action_hash"] = "0" * 64
     assert client.post(f"/v1/action/{decision['decision_id']}/approve", headers=headers(), json=approval).status_code == 409
+
+
+def test_csg_production_requires_session_identity(monkeypatch):
+    monkeypatch.setenv("ACTION_GATE_ENV", "production")
+    monkeypatch.setenv("ACTION_GATE_API_TOKEN", "csg-final-token")
+    monkeypatch.setenv("ACTION_GATE_SIGNING_SECRET", "csg-final-secret")
+    from datetime import datetime, timezone
+    body = {
+        "contract_version": "hhj-csg/1.0",
+        "request_id": "csg-final-identity",
+        "tenant_id": "csg-final-tenant",
+        "agent_id": "csg-final-agent",
+        "actor_id": "csg-final-actor",
+        "action": "read_public",
+        "target": "public-resource",
+        "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "parameters": {},
+        "context": {},
+    }
+    raw = json.dumps(body, separators=(",", ":"), ensure_ascii=False).encode()
+    signature = hmac.new(b"csg-final-secret", raw, hashlib.sha256).hexdigest()
+    response = client.post("/v1/csg/decide", headers={
+        "Authorization": "Bearer csg-final-token",
+        "Idempotency-Key": "csg-final-identity",
+        "X-HCJ-Request-Signature": signature,
+    }, json=body)
+    assert response.status_code == 422
+    assert response.json()["detail"] == "session_id_required"
