@@ -103,7 +103,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          docker build --pull -t action-gate-clean-room:${version} .
+          docker build --pull -f action_gate/Dockerfile -t action-gate-clean-room:${{ steps.version.outputs.version }} action_gate
 
       - name: Emit verification manifest
         shell: bash
