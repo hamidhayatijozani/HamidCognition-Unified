@@ -31,7 +31,7 @@ jobs:
         run: |
           test -s action_gate/VERSION
           VERSION="$(tr -d '[:space:]' < action_gate/VERSION)"
-          test "$VERSION" = "0.4.2"
+          test -n "$VERSION"
 
       - name: Compile Python runtime
         shell: bash
@@ -43,7 +43,7 @@ jobs:
           test -s PRODUCT/ACTION_GATE_PRODUCT_SPEC.md
           test -s PRODUCT/COMMERCIAL_READINESS.md
           test -s PRODUCT/CUSTOMER_ACCEPTANCE.md
-          test -s PRODUCT/RELEASE_NOTES_0.4.2.md
+          test -s "PRODUCT/RELEASE_NOTES_${VERSION}.md"
           test -s PRODUCT/DEPLOYMENT.md
           test -s PRODUCT/INTEGRATION_CONTRACT.md
           test -s PRODUCT/OPERATIONS_RUNBOOK.md
