@@ -36,7 +36,7 @@ jobs:
           set -euo pipefail
           test -f action_gate/VERSION
           version="$(tr -d '[:space:]' < action_gate/VERSION)"
-          test "$version" = "0.4.2"
+          test -n "$version"
           echo "version=$version" >> "$GITHUB_OUTPUT"
         id: version
 
@@ -80,7 +80,7 @@ jobs:
             PRODUCT/ACTION_GATE_PRODUCT_SPEC.md
             PRODUCT/COMMERCIAL_READINESS.md
             PRODUCT/CUSTOMER_ACCEPTANCE.md
-            PRODUCT/RELEASE_NOTES_0.4.2.md
+            PRODUCT/RELEASE_NOTES_${version}.md
             PRODUCT/DEPLOYMENT.md
             PRODUCT/INTEGRATION_CONTRACT.md
             PRODUCT/OPERATIONS_RUNBOOK.md
@@ -98,7 +98,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          docker build --pull -t action-gate-clean-room:0.4.2 .
+          docker build --pull -t action-gate-clean-room:${version} .
 
       - name: Emit verification manifest
         shell: bash
