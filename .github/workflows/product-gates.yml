@@ -124,8 +124,8 @@ jobs:
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           DOMAIN: localhost
         run: |
-          docker compose -f docker-compose.production.yml cp action-gate:/app/csg-acceptance-result.json ./csg-acceptance-result.json
-          docker compose -f docker-compose.production.yml cp action-gate:/app/csg-persistence-replay-result.json ./csg-persistence-replay-result.json
+          docker compose -f docker-compose.production.yml cp action-gate:/tmp/csg-acceptance-result.json ./csg-acceptance-result.json
+          docker compose -f docker-compose.production.yml cp action-gate:/tmp/csg-persistence-replay-result.json ./csg-persistence-replay-result.json
       - name: Build validation evidence pack
         if: always()
         working-directory: action_gate
