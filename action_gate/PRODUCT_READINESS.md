@@ -26,7 +26,7 @@ The agent-supplied risk hint is retained as evidence but is not authoritative fo
 2. Decision signatures bind decision ID, tenant, action digest, policy digest, nonce, and expiry.
 3. Tenant mismatch does not reveal another tenant's decision record.
 4. Action and nonce bindings are checked again at execution time.
-5. A consumed nonce cannot be executed twice.
+5. A consumed nonce cannot be executed twice, including concurrent requests sharing the production database.
 6. Approval is bound to tenant, action digest, policy version, and approval expiry.
 7. HTTP and MCP execution are routed through the gate before tool invocation.
 8. Direct tool access is rejected unless the enforcement attestation is valid.
