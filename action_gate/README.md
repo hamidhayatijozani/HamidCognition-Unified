@@ -1,4 +1,4 @@
-# HamidCognition Action Gate v0.4.1
+# HamidCognition Action Gate v0.4.2
 
 **Runtime Action Governance with Replayable Decision Evidence**
 
