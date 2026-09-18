@@ -117,6 +117,11 @@ def main() -> int:
             "tenant_id": ask["tenant_id"],
             "policy_version": ask["policy_version"],
         }
+        approval["approval_signature"] = __import__("hmac").new(
+            ENV["ACTION_GATE_APPROVAL_SECRET"].encode(),
+            json.dumps(approval, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(),
+            __import__("hashlib").sha256,
+        ).hexdigest()
         status, approved = request("POST", f"/v1/action/{ask['decision_id']}/approve", approval)
         assert status == 200 and approved["decision"] == "ALLOW"
 
