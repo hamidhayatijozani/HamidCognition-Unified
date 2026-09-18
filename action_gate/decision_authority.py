@@ -5,7 +5,7 @@ import os
 from datetime import datetime, timezone
 from typing import Any
 
-from canonicalization import KEY_ID, sha256_digest, verify_hmac
+from canonicalization import KEY_ID, sha256_digest, signing_secret_for_key, verify_hmac
 from csg_contract import DecisionObject
 
 
@@ -55,7 +55,7 @@ def verify_decision_authority(
         "tenant_id": decision.tenant_id,
         "nonce": decision.nonce,
     }
-    secret = os.getenv("ACTION_GATE_SIGNING_SECRET")
+    secret = signing_secret_for_key(decision.key_id)
     if not secret:
         raise DecisionAuthorityError("decision_signing_secret_not_configured")
     if not verify_hmac(signed_fields, decision.signature, secret):
