@@ -10,7 +10,7 @@ import httpx
 TOKEN = os.getenv("ACTION_GATE_API_TOKEN", "ci-csg-token")
 BASE_URL = os.getenv("ACTION_GATE_URL", "http://127.0.0.1:8000")
 COUNT = int(os.getenv("CSG_ACCEPTANCE_EVENTS", "200"))
-RESULT_PATH = os.getenv("CSG_PERSISTENCE_RESULT_PATH", "csg-persistence-replay-result.json")
+RESULT_PATH = os.getenv("CSG_PERSISTENCE_RESULT_PATH", "/tmp/csg-persistence-replay-result.json")
 
 
 def percentile(values: list[float], p: float) -> float:
