@@ -52,6 +52,7 @@ jobs:
             PRODUCT/.env.example
           )
           for file in "${required[@]}"; do
+            echo "Checking required product file: $file"
             test -s "$file"
           done
 
