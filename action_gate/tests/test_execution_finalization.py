@@ -25,7 +25,6 @@ def test_finalize_execution_is_atomic_and_persists_outcome(tmp_path):
     finally:
         con.close()
 
-    digest = lambda value: "digest:" + storage.json.dumps(value, sort_keys=True, default=str) if False else "d"
     canonical = lambda value: json.dumps(value, sort_keys=True, separators=(",", ":"))
     now = lambda: "2026-09-19T10:01:00+00:00"
     result = storage.finalize_execution(record, "nonce-finalize", now(),
