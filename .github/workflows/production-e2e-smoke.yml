@@ -2,6 +2,7 @@ name: Action Gate Production E2E Smoke
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     paths:
       - 'action_gate/production_e2e_smoke.py'
       - 'action_gate/enforcement_proxy.py'
@@ -22,6 +23,7 @@ jobs:
           ACTION_GATE_API_TOKEN: ci-action-gate-token
           ACTION_GATE_SIGNING_SECRET: ci-signing-secret
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          ACTION_GATE_APPROVAL_SECRET: ci-only-approval-secret-not-for-production
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml up -d --build
       - name: Run production E2E smoke
@@ -31,6 +33,7 @@ jobs:
           ACTION_GATE_API_TOKEN: ci-action-gate-token
           ACTION_GATE_SIGNING_SECRET: ci-signing-secret
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          ACTION_GATE_APPROVAL_SECRET: ci-only-approval-secret-not-for-production
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml exec -T action-gate python production_e2e_smoke.py
       - name: Stop production stack
@@ -41,5 +44,6 @@ jobs:
           ACTION_GATE_API_TOKEN: ci-action-gate-token
           ACTION_GATE_SIGNING_SECRET: ci-signing-secret
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          ACTION_GATE_APPROVAL_SECRET: ci-only-approval-secret-not-for-production
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml down -v
