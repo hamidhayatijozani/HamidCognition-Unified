@@ -14,7 +14,7 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
 from rate_limit import SlidingWindowRateLimiter
-from storage import health as storage_health, init_db, load_record, save_record, consume_nonce, reserve_execution, allow_rate_limit
+from storage import health as storage_health, init_db, load_record, save_record, finalize_execution, reserve_execution, allow_rate_limit
 from csg_routes import router as csg_router
 from keyring import configured_key_ids, current_key_id, current_secret, verify_with_keyring
 from policy_store import load_policy, policy_hash
@@ -27,7 +27,7 @@ DECISION_TTL_SECONDS = int(os.getenv("ACTION_GATE_DECISION_TTL_SECONDS", "300"))
 APPROVAL_TTL_SECONDS = int(os.getenv("ACTION_GATE_APPROVAL_TTL_SECONDS", "300"))
 RATE_LIMIT_PER_MINUTE = int(os.getenv("ACTION_GATE_RATE_LIMIT_PER_MINUTE", "120"))
 APPROVAL_SECRET = os.getenv("ACTION_GATE_APPROVAL_SECRET")
-REQUIRE_SESSION_BINDING = os.getenv("ACTION_GATE_REQUIRE_SESSION_BINDING", "0") == "1"
+REQUIRE_SESSION_BINDING = os.getenv("ACTION_GATE_REQUIRE_SESSION_BINDING", "1" if ENVIRONMENT == "production" else "0") == "1"
 
 POLICY_SNAPSHOT = load_policy()
 POLICY_HASH = policy_hash(POLICY_SNAPSHOT)
@@ -91,7 +91,7 @@ def require_auth(authorization: str | None) -> None:
 
 
 def enforce_rate_limit(authorization: str | None, tenant_id: str | None) -> None:
-    key = f"{tenant_id or 'unknown'}:{authorization or 'anonymous'}"
+    credential_fingerprint = hashlib.sha256((authorization or "anonymous").encode()).hexdigest()\n    key = f"{tenant_id or 'unknown'}:{credential_fingerprint}"
     if ENVIRONMENT == "production":
         try:
             allowed = allow_rate_limit(key, RATE_LIMIT_PER_MINUTE, 60, time.time())
@@ -398,14 +398,13 @@ def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | 
     if record.get("execution_started_at") is None:
         raise HTTPException(409, "execution_not_reserved")
     consumed_at = now()
-    if not consume_nonce(decision_id, outcome.nonce, consumed_at):
-        raise HTTPException(409, "decision_nonce_already_consumed")
-    record["execution"] = {"timestamp": consumed_at, "status": "EXECUTED", "action_hash": record["action_hash"], "nonce": record["nonce"]}
-    record["outcome"] = outcome.outcome
-    record["consumed_at"] = consumed_at
-    record["evidence_hash"] = digest(record)
-    save(record, "EXECUTION_RECORDED")
-    return record
+    try:
+        finalized = finalize_execution(record, outcome.nonce, consumed_at, digest, canonical, now, outcome.outcome)
+    except Exception as exc:
+        raise HTTPException(503, "execution_finalization_store_unavailable") from exc
+    if not finalized:
+        raise HTTPException(409, "decision_nonce_already_consumed_or_execution_not_reserved")
+    return finalized
 
 
 @app.get("/v1/replay/{decision_id}")
