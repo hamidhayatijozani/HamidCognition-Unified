@@ -17,7 +17,8 @@ def request(method,path,payload=None):
     try:
         with urllib.request.urlopen(req,timeout=10) as r: return r.status,json.loads(r.read())
     except urllib.error.HTTPError as exc:
-        raise RuntimeError(f"{method} {path}: HTTP {exc.code}: {exc.read().decode(errors="replace")}") from exc
+        detail=exc.read().decode(errors="replace")
+        raise RuntimeError(f"{method} {path}: HTTP {exc.code}: {detail}") from exc
 def fail(message):
     print(json.dumps({"status":"FAIL","error":message},sort_keys=True)); raise SystemExit(1)
 def main():
@@ -29,7 +30,7 @@ def main():
         required=["decision_id","tenant_id","nonce","action_hash","policy_hash"]
         missing=[k for k in required if not decision.get(k)]
         if missing: fail(f"decision missing required fields: {missing}")
-        if decision.get("decision")!="ALLOW": fail(f"inert acceptance action was not allowed: {decision.get("decision")}")
+        if decision.get("decision")!="ALLOW": fail("inert acceptance action was not allowed: "+str(decision.get("decision")))
         did=decision["decision_id"]
         execution={"tenant_id":TENANT,"actor_id":ACTOR,"session_id":SESSION,"action_hash":decision["action_hash"],"nonce":decision["nonce"],"outcome":{"status":"acceptance_smoke_ok","side_effect":False}}
         _,reserved=request("POST",f"/v1/action/{did}/execution/reserve",execution)
