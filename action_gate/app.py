@@ -27,7 +27,7 @@ DECISION_TTL_SECONDS = int(os.getenv("ACTION_GATE_DECISION_TTL_SECONDS", "300"))
 APPROVAL_TTL_SECONDS = int(os.getenv("ACTION_GATE_APPROVAL_TTL_SECONDS", "300"))
 RATE_LIMIT_PER_MINUTE = int(os.getenv("ACTION_GATE_RATE_LIMIT_PER_MINUTE", "120"))
 APPROVAL_SECRET = os.getenv("ACTION_GATE_APPROVAL_SECRET")
-REQUIRE_SESSION_BINDING = os.getenv("ACTION_GATE_REQUIRE_SESSION_BINDING", "0") == "1"
+REQUIRE_SESSION_BINDING = os.getenv("ACTION_GATE_REQUIRE_SESSION_BINDING", "1" if ENVIRONMENT == "production" else "0") == "1"
 
 POLICY_SNAPSHOT = load_policy()
 POLICY_HASH = policy_hash(POLICY_SNAPSHOT)
@@ -91,7 +91,7 @@ def require_auth(authorization: str | None) -> None:
 
 
 def enforce_rate_limit(authorization: str | None, tenant_id: str | None) -> None:
-    key = f"{tenant_id or 'unknown'}:{authorization or 'anonymous'}"
+    credential_fingerprint = hashlib.sha256((authorization or "anonymous").encode()).hexdigest()\n    key = f"{tenant_id or 'unknown'}:{credential_fingerprint}"
     if ENVIRONMENT == "production":
         try:
             allowed = allow_rate_limit(key, RATE_LIMIT_PER_MINUTE, 60, time.time())
