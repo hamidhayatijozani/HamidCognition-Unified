@@ -52,12 +52,19 @@ jobs:
           )
 
           for attempt in $(seq 1 180); do
-            runs="$(curl -fsSL               -H "Authorization: Bearer $GH_TOKEN"               -H "Accept: application/vnd.github+json"               "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$GITHUB_SHA&per_page=100")"
-            checks="$(curl -fsSL               -H "Authorization: Bearer $GH_TOKEN"               -H "Accept: application/vnd.github+json"               "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/check-runs?per_page=100")"
+            runs="$(curl -fsSL \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$GITHUB_SHA&per_page=100")"
+            checks="$(curl -fsSL \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/check-runs?per_page=100")"
 
             missing=0
             for workflow in "${required_workflows[@]}"; do
-              count="$(printf '%s' "$runs" | jq -r --arg name "$workflow"                 '[.workflow_runs[] | select(.name==$name and .conclusion=="success" and .head_sha=="'"$GITHUB_SHA"'")] | length')"
+              count="$(printf '%s' "$runs" | jq -r --arg name "$workflow" --arg sha "$GITHUB_SHA" \
+                '[.workflow_runs[] | select(.name==$name and .conclusion=="success" and .head_sha==$sha)] | length')"
               if [ "$count" -lt 1 ]; then
                 missing=1
                 echo "Waiting for successful same-SHA prerequisite: $workflow"
@@ -76,8 +83,10 @@ jobs:
               echo "All release prerequisites verified for $GITHUB_SHA"
 
               for workflow in "${required_workflows[@]}"; do
-                run_id="$(printf '%s' "$runs" | jq -r --arg name "$workflow"                   '[.workflow_runs[] | select(.name==$name and .conclusion=="success" and .head_sha=="'"$GITHUB_SHA"'")] | sort_by(.run_started_at) | last | .id')"
-                run_sha="$(printf '%s' "$runs" | jq -r --arg name "$workflow"                   '[.workflow_runs[] | select(.name==$name and .conclusion=="success" and .head_sha=="'"$GITHUB_SHA"'")] | sort_by(.run_started_at) | last | .head_sha')"
+                run_id="$(printf '%s' "$runs" | jq -r --arg name "$workflow" --arg sha "$GITHUB_SHA" \
+                  '[.workflow_runs[] | select(.name==$name and .conclusion=="success" and .head_sha==$sha)] | sort_by(.run_started_at) | last | .id')"
+                run_sha="$(printf '%s' "$runs" | jq -r --arg name "$workflow" --arg sha "$GITHUB_SHA" \
+                  '[.workflow_runs[] | select(.name==$name and .conclusion=="success" and .head_sha==$sha)] | sort_by(.run_started_at) | last | .head_sha')"
                 case "$workflow" in
                   "Action Gate Clean-Room Verification") key="clean_room" ;;
                   "Action Gate Product Integrity") key="product_integrity" ;;
