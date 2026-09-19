@@ -11,6 +11,7 @@ on:
 permissions:
   contents: read
   actions: read
+  security-events: read
 
 jobs:
   release-candidate:
@@ -60,6 +61,10 @@ jobs:
               -H "Authorization: Bearer $GH_TOKEN" \
               -H "Accept: application/vnd.github+json" \
               "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/check-runs?per_page=100")"
+            alerts="$(curl -fsSL \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/code-scanning/alerts?state=open&per_page=100")"
 
             missing=0
             for workflow in "${required_workflows[@]}"; do
@@ -78,6 +83,16 @@ jobs:
                 echo "Waiting for successful CodeQL check on $GITHUB_SHA: $check"
               fi
             done
+
+            severe_open="$(printf '%s' "$alerts" | jq -r '
+              [.[] | select(
+                (.rule.security_severity_level // "" | ascii_downcase) == "high" or
+                (.rule.security_severity_level // "" | ascii_downcase) == "critical"
+              )] | length')"
+            if [ "$severe_open" -gt 0 ]; then
+              missing=1
+              echo "Release blocked: $severe_open open high/critical CodeQL findings."
+            fi
 
             if [ "$missing" -eq 0 ]; then
               echo "All release prerequisites verified for $GITHUB_SHA"
