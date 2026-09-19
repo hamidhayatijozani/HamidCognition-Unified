@@ -14,7 +14,7 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
 from rate_limit import SlidingWindowRateLimiter
-from storage import health as storage_health, init_db, load_record, save_record, consume_nonce, reserve_execution, allow_rate_limit
+from storage import health as storage_health, init_db, load_record, save_record, finalize_execution, reserve_execution, allow_rate_limit
 from csg_routes import router as csg_router
 from keyring import configured_key_ids, current_key_id, current_secret, verify_with_keyring
 from policy_store import load_policy, policy_hash
@@ -398,13 +398,16 @@ def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | 
     if record.get("execution_started_at") is None:
         raise HTTPException(409, "execution_not_reserved")
     consumed_at = now()
-    if not consume_nonce(decision_id, outcome.nonce, consumed_at):
-        raise HTTPException(409, "decision_nonce_already_consumed")
+    try:
+        finalized = finalize_execution(record, outcome.nonce, consumed_at, digest, canonical, now, outcome.outcome)
+    except Exception as exc:
+        raise HTTPException(503, "execution_finalization_store_unavailable") from exc
+    if not finalized:
+        raise HTTPException(409, "decision_nonce_already_consumed_or_execution_not_reserved")
     record["execution"] = {"timestamp": consumed_at, "status": "EXECUTED", "action_hash": record["action_hash"], "nonce": record["nonce"]}
     record["outcome"] = outcome.outcome
     record["consumed_at"] = consumed_at
     record["evidence_hash"] = digest(record)
-    save(record, "EXECUTION_RECORDED")
     return record
 
 
