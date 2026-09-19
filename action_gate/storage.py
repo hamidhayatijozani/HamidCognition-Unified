@@ -182,6 +182,7 @@ def finalize_execution(record: dict[str, Any], nonce: str, consumed_at: str, dig
     try:
         decision_id = record["decision_id"]
         if backend() == "postgresql":
+            con.execute("SELECT pg_advisory_xact_lock(%s)", (2147483000,))
             con.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", (decision_id,))
             row = con.execute(
                 "SELECT record FROM records WHERE decision_id=%s", (decision_id,)
