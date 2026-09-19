@@ -33,26 +33,52 @@ jobs:
           VERSION="$(tr -d '[:space:]' < action_gate/VERSION)"
           test -n "$VERSION"
 
-      - name: Require successful Clean-Room, Product Integrity, and Production E2E for this commit
+      - name: Require same-SHA release prerequisites
+        id: prerequisites
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          for attempt in $(seq 1 60); do
+
+          required_workflows=(
+            "Action Gate Clean-Room Verification"
+            "Action Gate Product Integrity"
+            "Action Gate Production E2E Smoke"
+            "CodeQL"
+          )
+
+          for attempt in $(seq 1 180); do
             runs="$(curl -fsSL               -H "Authorization: Bearer $GH_TOKEN"               -H "Accept: application/vnd.github+json"               "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$GITHUB_SHA&per_page=100")"
-            clean_ok="$(printf '%s' "$runs" | jq -r '[.workflow_runs[] | select(.name=="Action Gate Clean-Room Verification" and .conclusion=="success")] | length')"
-            integrity_ok="$(printf '%s' "$runs" | jq -r '[.workflow_runs[] | select(.name=="Action Gate Product Integrity" and .conclusion=="success")] | length')"
-            production_e2e_ok="$(printf '%s' "$runs" | jq -r '[.workflow_runs[] | select(.name=="Action Gate Production E2E Smoke" and .conclusion=="success")] | length')"
-            if [ "$clean_ok" -ge 1 ] && [ "$integrity_ok" -ge 1 ] && [ "$production_e2e_ok" -ge 1 ]; then
-              echo "Release prerequisites verified for $GITHUB_SHA"
+
+            missing=0
+            for workflow in "${required_workflows[@]}"; do
+              count="$(printf '%s' "$runs" | jq -r --arg name "$workflow"                 '[.workflow_runs[] | select(.name==$name and .conclusion=="success")] | length')"
+              if [ "$count" -lt 1 ]; then
+                missing=1
+                echo "Waiting for successful same-SHA prerequisite: $workflow"
+              fi
+            done
+
+            if [ "$missing" -eq 0 ]; then
+              echo "All release prerequisites verified for $GITHUB_SHA"
+
+              for workflow in "${required_workflows[@]}"; do
+                run_id="$(printf '%s' "$runs" | jq -r --arg name "$workflow"                   '[.workflow_runs[] | select(.name==$name and .conclusion=="success")] | sort_by(.run_started_at) | last | .id')"
+                run_sha="$(printf '%s' "$runs" | jq -r --arg name "$workflow"                   '[.workflow_runs[] | select(.name==$name and .conclusion=="success")] | sort_by(.run_started_at) | last | .head_sha')"
+                test "$run_sha" = "$GITHUB_SHA"
+                key="$(printf '%s' "$workflow" | tr '[:upper:] ' '[:lower:]_' | tr -cd '[:alnum:]_')"
+                echo "${key}_run_id=$run_id" >> "$GITHUB_OUTPUT"
+                echo "${key}_run_sha=$run_sha" >> "$GITHUB_OUTPUT"
+              done
               exit 0
             fi
+
             sleep 10
           done
-          echo "Release blocked: successful Clean-Room, Product Integrity, and Production E2E runs for $GITHUB_SHA were not observed."
-          exit 1
 
+          echo "Release blocked: same-SHA prerequisite evidence was not observed."
+          exit 1
 
       - name: Build production image
         run: docker build --pull -f action_gate/Dockerfile -t action-gate:${{ steps.version.outputs.version }} action_gate
@@ -73,6 +99,10 @@ jobs:
           commit=${{ github.sha }}
           image=action-gate:${{ steps.version.outputs.version }}
           archive=action-gate-${{ steps.version.outputs.version }}.tar
+          clean_room_run_id=${{ steps.prerequisites.outputs.action_gate_clean_room_verification_run_id }}
+          product_integrity_run_id=${{ steps.prerequisites.outputs.action_gate_product_integrity_run_id }}
+          production_e2e_run_id=${{ steps.prerequisites.outputs.action_gate_production_e2e_smoke_run_id }}
+          codeql_run_id=${{ steps.prerequisites.outputs.codeql_run_id }}
           generated_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
           EOF
 
