@@ -404,11 +404,7 @@ def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | 
         raise HTTPException(503, "execution_finalization_store_unavailable") from exc
     if not finalized:
         raise HTTPException(409, "decision_nonce_already_consumed_or_execution_not_reserved")
-    record["execution"] = {"timestamp": consumed_at, "status": "EXECUTED", "action_hash": record["action_hash"], "nonce": record["nonce"]}
-    record["outcome"] = outcome.outcome
-    record["consumed_at"] = consumed_at
-    record["evidence_hash"] = digest(record)
-    return record
+    return finalized
 
 
 @app.get("/v1/replay/{decision_id}")
