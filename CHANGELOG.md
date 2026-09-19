@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.1 — Execution Evidence Integrity
+
+- Atomically finalize execution outcome, one-time consumption, record version, and audit event in one database transaction.
+- Preserve the append-only audit hash chain during concurrent execution finalization.
+- Make production session binding fail-closed by default unless explicitly configured otherwise.
+- Stop persisting raw bearer credentials in production rate-limit keys by storing a deterministic credential fingerprint instead.
+- Added regression coverage for atomic finalization and one-time finalization semantics.
+
+
 ## 0.4.1 — Execution Boundary Hardening
 
 - Added durable database-backed production rate limiting with tenant-scoped keys.

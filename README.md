@@ -4,7 +4,7 @@
 
 **Originator:** Hamid Hayati Jozani  
 **Status:** Public research, engineering, integration, and provenance record  
-**Canonical release:** v1.0.0
+**Canonical release:** v1.0.1
 
 ## What this repository is
 
@@ -29,9 +29,9 @@ Historical repositories are integrated by lineage and preserved as historical ar
 
 ## Current product boundary
 
-**HamidCognition Action Gate v1.0.0** is the current production-oriented software boundary in this repository.
+**HamidCognition Action Gate v1.0.1** is the current production-oriented software boundary in this repository.
 
-The validated engineering boundary includes production authentication, tenant isolation, actor/session binding, decision integrity, one-time nonce protection, HTTP and MCP enforcement, fail-closed evidence handling, persistent PostgreSQL operation, replay and persistence replay, production containerization, and executable validation evidence.
+The validated engineering boundary includes production authentication, tenant isolation, actor/session binding, decision integrity, one-time nonce protection, HTTP and MCP enforcement, fail-closed evidence handling, persistent PostgreSQL operation, replay and persistence replay, production containerization, atomic execution finalization, and executable validation evidence.
 
 These are evidence-backed engineering claims for the tested boundary. They are not universal safety, legal-compliance, downstream-correctness, or business-outcome guarantees.
 
