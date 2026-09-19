@@ -1,4 +1,4 @@
-# HamidCognition Action Gate v1.0.0
+# HamidCognition Action Gate v1.0.1
 
 **Runtime Action Governance with Replayable Decision Evidence**
 
@@ -29,7 +29,7 @@ Runtime decisions: `ALLOW`, `DENY`, `ASK`, `SANDBOX`. `DEFER` remains outside th
 - durable PostgreSQL storage for production deployments, SQLite retained only for local development
 - HTTP enforcement adapter and MCP `tools/call` adapter
 - forged decision, altered action and replay attempts rejected
-- execution is reserved atomically before the HTTP/MCP tool side effect; final outcome is recorded only after the tool response
+- execution is reserved atomically before the HTTP/MCP tool side effect; final outcome, consumed state, record version, and audit event are committed atomically after the tool response
 - direct tool calls rejected unless a Gate-issued HMAC attestation is present
 - production Compose stack with PostgreSQL and Caddy TLS termination
 
@@ -97,7 +97,7 @@ The integration gates exercise real processes rather than mocks. They cover deni
 
 ## Current product boundary
 
-This release is the production Action Gate runtime boundary. It adds actor/session-bound execution, cryptographically bound production approvals, database-backed replay protection and rate limiting, configurable versioned policy snapshots, signing-key rotation with historical-key verification, and a dependency-free Python SDK. HSM/KMS custody, external identity federation, SIEM integration and HA orchestration remain deployment-specific controls and are not represented as implemented features.
+This release is the production Action Gate runtime boundary. It adds actor/session-bound execution, cryptographically bound production approvals, database-backed replay protection and rate limiting, configurable versioned policy snapshots; atomic execution finalization and production-default session binding, signing-key rotation with historical-key verification, and a dependency-free Python SDK. HSM/KMS custody, external identity federation, SIEM integration and HA orchestration remain deployment-specific controls and are not represented as implemented features.
 
 `SANDBOX` means **sandbox-required decision state**. It is not proof that a real isolation sandbox has been provisioned.
 
