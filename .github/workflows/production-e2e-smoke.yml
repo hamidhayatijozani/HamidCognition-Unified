@@ -3,12 +3,6 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - 'action_gate/production_e2e_smoke.py'
-      - 'action_gate/enforcement_proxy.py'
-      - 'action_gate/app.py'
-      - 'action_gate/storage.py'
-      - 'action_gate/docker-compose.production.yml'
 permissions:
   contents: read
 jobs:
