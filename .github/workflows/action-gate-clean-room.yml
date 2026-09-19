@@ -36,7 +36,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$GITHUB_REF" = "refs/heads/main"
-                echo "verified_main_head=$GITHUB_SHA"
+          echo "verified_main_head=$GITHUB_SHA"
           echo "clean_room_head_sha=$GITHUB_SHA"
 
       - name: Verify canonical product version
