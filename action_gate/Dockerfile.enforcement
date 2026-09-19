@@ -1,7 +1,8 @@
 FROM python:3.12-slim
 WORKDIR /app
 RUN useradd --create-home --uid 10001 appuser
-COPY enforcement_proxy.py .
+RUN mkdir -p /app/action_gate
+COPY enforcement_proxy.py ssrf_guard.py /app/action_gate/
 USER appuser
 EXPOSE 8080
-CMD ["python", "enforcement_proxy.py"]
+CMD ["python", "-m", "action_gate.enforcement_proxy"]

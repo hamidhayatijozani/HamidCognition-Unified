@@ -5,6 +5,7 @@ import numpy as np
 from datetime import datetime
 import threading
 import time
+import os
 
 app = Flask(__name__)
 
@@ -116,4 +117,4 @@ def api_data():
 if __name__ == "__main__":
     print("🚀 پلتفرم HamidCognition فعال شد!")
     print("🌐 برو به: http://127.0.0.1:5000")
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=os.environ.get("FLASK_DEBUG") == "1", host='0.0.0.0', port=5000)

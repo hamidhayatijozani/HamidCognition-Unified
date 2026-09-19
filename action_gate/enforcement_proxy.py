@@ -7,6 +7,11 @@ import os
 import urllib.error
 import urllib.parse
 import urllib.request
+
+try:
+    from .ssrf_guard import require_safe_url
+except ImportError:  # direct script execution in the enforcement image/CI
+    from ssrf_guard import require_safe_url
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 GATE_URL = os.getenv("GATE_URL", "http://127.0.0.1:8000")
@@ -32,13 +37,15 @@ def auth_headers():
 
 
 def post_json(url, payload, headers=None):
-    req = urllib.request.Request(url, data=json.dumps(payload).encode(), headers={"Content-Type": "application/json", **auth_headers(), **(headers or {})})
+    safe_url = require_safe_url(url)
+    req = urllib.request.Request(safe_url, data=json.dumps(payload).encode(), headers={"Content-Type": "application/json", **auth_headers(), **(headers or {})})
     with urllib.request.urlopen(req) as r:
         return r.status, json.loads(r.read())
 
 
 def get_json(url):
-    req = urllib.request.Request(url, headers=auth_headers())
+    safe_url = require_safe_url(url)
+    req = urllib.request.Request(safe_url, headers=auth_headers())
     with urllib.request.urlopen(req) as r:
         return r.status, json.loads(r.read())
 

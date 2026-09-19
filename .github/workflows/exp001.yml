@@ -1,5 +1,8 @@
 name: EXP-001 P-S-T Conformance
 
+permissions:
+  contents: read
+
 on:
   push:
     paths:
