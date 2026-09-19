@@ -33,23 +33,24 @@ jobs:
           VERSION="$(tr -d '[:space:]' < action_gate/VERSION)"
           test -n "$VERSION"
 
-      - name: Require successful Clean-Room and Product Integrity for this commit
+      - name: Require successful Clean-Room, Product Integrity, and Production E2E for this commit
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          for attempt in $(seq 1 30); do
+          for attempt in $(seq 1 60); do
             runs="$(curl -fsSL               -H "Authorization: Bearer $GH_TOKEN"               -H "Accept: application/vnd.github+json"               "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$GITHUB_SHA&per_page=100")"
             clean_ok="$(printf '%s' "$runs" | jq -r '[.workflow_runs[] | select(.name=="Action Gate Clean-Room Verification" and .conclusion=="success")] | length')"
             integrity_ok="$(printf '%s' "$runs" | jq -r '[.workflow_runs[] | select(.name=="Action Gate Product Integrity" and .conclusion=="success")] | length')"
-            if [ "$clean_ok" -ge 1 ] && [ "$integrity_ok" -ge 1 ]; then
+            production_e2e_ok="$(printf '%s' "$runs" | jq -r '[.workflow_runs[] | select(.name=="Action Gate Production E2E Smoke" and .conclusion=="success")] | length')"
+            if [ "$clean_ok" -ge 1 ] && [ "$integrity_ok" -ge 1 ] && [ "$production_e2e_ok" -ge 1 ]; then
               echo "Release prerequisites verified for $GITHUB_SHA"
               exit 0
             fi
             sleep 10
           done
-          echo "Release blocked: successful Clean-Room and Product Integrity runs for $GITHUB_SHA were not observed."
+          echo "Release blocked: successful Clean-Room, Product Integrity, and Production E2E runs for $GITHUB_SHA were not observed."
           exit 1
 
 
