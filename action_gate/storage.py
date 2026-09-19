@@ -176,7 +176,7 @@ def reserve_execution(decision_id: str, nonce: str, started_at: str) -> bool:
         con.close()
 
 
-def finalize_execution(record: dict[str, Any], nonce: str, consumed_at: str, digest_fn, canonical_fn, now_fn, outcome: dict[str, Any]) -> bool:
+def finalize_execution(record: dict[str, Any], nonce: str, consumed_at: str, digest_fn, canonical_fn, now_fn, outcome: dict[str, Any]) -> dict[str, Any] | None:
     """Atomically finalize an execution and persist its outcome/evidence in one DB transaction."""
     con = connect()
     try:
@@ -239,7 +239,7 @@ def finalize_execution(record: dict[str, Any], nonce: str, consumed_at: str, dig
             con.rollback()
             return False
         con.commit()
-        return True
+        return finalized
     except Exception:
         con.rollback()
         raise
