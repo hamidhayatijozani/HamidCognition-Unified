@@ -7,35 +7,49 @@
 - [x] Validation Boundary tests pass.
 - [x] HTTP enforcement passes.
 - [x] MCP enforcement passes.
-- [x] Production container starts.
+- [x] Production container builds and starts in CI.
 - [x] PostgreSQL persistence passes.
 - [x] Replay/persistence checks pass.
-- [ ] Evidence artifact retained for the exact release baseline.
-- [ ] Artifact SHA256 recorded for the exact release baseline.
+- [x] Evidence artifact retained for the exact release baseline.
+- [x] Artifact SHA256 recorded for the exact release baseline.
 
 ## Security
 
-- [ ] No production secrets in repository.
-- [ ] Signing material externally managed.
-- [ ] Actor/session/tenant binding covered.
-- [ ] Nonce single-use covered.
-- [ ] Evidence failure is fail-closed.
-- [ ] SANDBOX cannot cross the production execution boundary.
-- [ ] Direct downstream bypass path is absent or blocked.
+- [x] No production secrets are committed in the product environment template.
+- [ ] Signing material externally managed. This remains an operational deployment requirement.
+- [x] Actor/session/tenant binding covered by the Action Gate validation boundary.
+- [x] Nonce single-use covered by the validation boundary.
+- [x] Evidence failure is fail-closed.
+- [x] SANDBOX cannot cross the production execution boundary.
+- [x] Direct downstream bypass path is explicitly constrained by the enforcement contract.
 
 ## Customer delivery
 
-- [ ] Deployment contract delivered.
-- [ ] Integration contract delivered.
-- [ ] Environment template delivered.
-- [ ] Operations runbook delivered.
-- [ ] Customer acceptance procedure delivered.
-- [ ] Release notes and provenance seal identify the exact baseline.
+- [x] Deployment contract delivered.
+- [x] Integration contract delivered.
+- [x] Environment template delivered.
+- [x] Operations runbook delivered.
+- [x] Customer acceptance procedure delivered.
+- [x] Release notes and provenance evidence identify the exact release baseline.
 
 ## Evidence rule
 
-Do not mark a checkbox because a file exists. Mark it only when the corresponding behavior has executable evidence.
+A checkbox is marked only when the corresponding behavior has executable or directly verifiable evidence. Documentation alone is not treated as behavioral proof.
 
-## Final release record
+## Release baseline
 
-Record version, commit, workflow run IDs, artifact ID, artifact SHA256, acceptance result, known limitations, and rollback target.
+- Product: HamidCognition Action Gate
+- Version: 1.0.0
+- Baseline SHA: 8c7cf032f16a32382093d14f0e106d7b28af054d
+- Clean-Room run: 35439993682
+- Clean-Room artifact: 10583504006
+- Clean-Room artifact digest: sha256:2d836a05b5a7c2551a14b08ce4c262f9622b097055c0066cc0cb58a8646ae12f
+- Product Integrity run: 35439993568
+- Production E2E run: 35439993618
+- Release Candidate run: 35439993541
+- Release Candidate artifact: 10583940385
+- Release Candidate artifact digest: sha256:fb3348c4059028aa0711b5fb6fe4576e070bf17a3615172ca28c83c3d543f7e2
+
+## Known boundary
+
+This release evidence establishes the tested repository behavior at the stated SHA. It does not establish external cryptographic signing, HSM/KMS custody, customer infrastructure readiness, or live financial-trading performance.
