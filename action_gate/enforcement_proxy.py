@@ -8,7 +8,10 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-from action_gate.ssrf_guard import require_safe_url
+try:
+    from .ssrf_guard import require_safe_url
+except ImportError:  # direct script execution in the enforcement image/CI
+    from ssrf_guard import require_safe_url
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 GATE_URL = os.getenv("GATE_URL", "http://127.0.0.1:8000")
