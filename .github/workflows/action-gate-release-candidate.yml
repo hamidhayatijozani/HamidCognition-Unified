@@ -67,7 +67,13 @@ jobs:
                 run_id="$(printf '%s' "$runs" | jq -r --arg name "$workflow"                   '[.workflow_runs[] | select(.name==$name and .conclusion=="success")] | sort_by(.run_started_at) | last | .id')"
                 run_sha="$(printf '%s' "$runs" | jq -r --arg name "$workflow"                   '[.workflow_runs[] | select(.name==$name and .conclusion=="success")] | sort_by(.run_started_at) | last | .head_sha')"
                 test "$run_sha" = "$GITHUB_SHA"
-                key="$(printf '%s' "$workflow" | tr '[:upper:] ' '[:lower:]_' | tr -cd '[:alnum:]_')"
+                case "$workflow" in
+                  "Action Gate Clean-Room Verification") key="clean_room" ;;
+                  "Action Gate Product Integrity") key="product_integrity" ;;
+                  "Action Gate Production E2E Smoke") key="production_e2e" ;;
+                  "CodeQL") key="codeql" ;;
+                  *) echo "Unknown prerequisite: $workflow"; exit 1 ;;
+                esac
                 echo "${key}_run_id=$run_id" >> "$GITHUB_OUTPUT"
                 echo "${key}_run_sha=$run_sha" >> "$GITHUB_OUTPUT"
               done
@@ -99,9 +105,9 @@ jobs:
           commit=${{ github.sha }}
           image=action-gate:${{ steps.version.outputs.version }}
           archive=action-gate-${{ steps.version.outputs.version }}.tar
-          clean_room_run_id=${{ steps.prerequisites.outputs.action_gate_clean_room_verification_run_id }}
-          product_integrity_run_id=${{ steps.prerequisites.outputs.action_gate_product_integrity_run_id }}
-          production_e2e_run_id=${{ steps.prerequisites.outputs.action_gate_production_e2e_smoke_run_id }}
+          clean_room_run_id=${{ steps.prerequisites.outputs.clean_room_run_id }}
+          product_integrity_run_id=${{ steps.prerequisites.outputs.product_integrity_run_id }}
+          production_e2e_run_id=${{ steps.prerequisites.outputs.production_e2e_run_id }}
           codeql_run_id=${{ steps.prerequisites.outputs.codeql_run_id }}
           generated_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
           EOF
