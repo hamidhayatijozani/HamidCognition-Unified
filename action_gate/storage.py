@@ -176,6 +176,77 @@ def reserve_execution(decision_id: str, nonce: str, started_at: str) -> bool:
         con.close()
 
 
+def finalize_execution(record: dict[str, Any], nonce: str, consumed_at: str, digest_fn, canonical_fn, now_fn, outcome: dict[str, Any]) -> bool:
+    """Atomically finalize an execution and persist its outcome/evidence in one DB transaction."""
+    con = connect()
+    try:
+        decision_id = record["decision_id"]
+        if backend() == "postgresql":
+            con.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", (decision_id,))
+            row = con.execute(
+                "SELECT record FROM records WHERE decision_id=%s", (decision_id,)
+            ).fetchone()
+        else:
+            con.execute("BEGIN IMMEDIATE")
+            row = con.execute(
+                "SELECT record FROM records WHERE decision_id=?", (decision_id,)
+            ).fetchone()
+        if not row:
+            con.rollback()
+            return False
+        current = json.loads(row[0])
+        if current.get("nonce") != nonce or current.get("consumed_at") is not None or current.get("execution_started_at") is None:
+            con.rollback()
+            return False
+        finalized = dict(record)
+        finalized["execution"] = {"timestamp": consumed_at, "status": "EXECUTED", "action_hash": current["action_hash"], "nonce": nonce}
+        finalized["outcome"] = outcome
+        finalized["consumed_at"] = consumed_at
+        current_version = con.execute(
+            "SELECT COALESCE(MAX(version), 0) FROM record_versions WHERE decision_id=" + ("%s" if backend() == "postgresql" else "?"),
+            (decision_id,),
+        ).fetchone()[0]
+        previous = con.execute(
+            "SELECT event_hash FROM audit_events ORDER BY created_at DESC, event_id DESC LIMIT 1"
+        ).fetchone()
+        version = current_version + 1
+        previous_hash = previous[0] if previous else "GENESIS"
+        event = {"decision": finalized["decision"], "tenant_id": finalized["tenant_id"], "action_hash": finalized["action_hash"], "version": version}
+        event_hash = digest_fn({"decision_id": decision_id, "event_type": "EXECUTION_RECORDED", "event": event, "previous_hash": previous_hash})
+        finalized["audit_event_hash"] = event_hash
+        finalized["evidence_hash"] = digest_fn(finalized)
+        event_id = f"evt_{uuid.uuid4().hex}"
+        version_id = f"ver_{uuid.uuid4().hex}"
+        timestamp = now_fn()
+        event_json = canonical_fn(event)
+        record_json = canonical_fn(finalized)
+        if backend() == "postgresql":
+            con.execute("INSERT INTO audit_events VALUES (%s,%s,%s,%s,%s,%s,%s)", (event_id, decision_id, "EXECUTION_RECORDED", event_json, previous_hash, event_hash, timestamp))
+            con.execute("INSERT INTO record_versions VALUES (%s,%s,%s,%s,%s,%s)", (version_id, decision_id, version, "EXECUTION_RECORDED", record_json, timestamp))
+            updated = con.execute(
+                "UPDATE records SET trace_id=%s, record=%s WHERE decision_id=%s AND (record::jsonb->>'nonce')=%s AND (record::jsonb->>'consumed_at') IS NULL AND (record::jsonb->>'execution_started_at') IS NOT NULL RETURNING decision_id",
+                (finalized["trace_id"], record_json, decision_id, nonce),
+            ).fetchone()
+        else:
+            con.execute("INSERT INTO audit_events VALUES (?,?,?,?,?,?,?)", (event_id, decision_id, "EXECUTION_RECORDED", event_json, previous_hash, event_hash, timestamp))
+            con.execute("INSERT INTO record_versions VALUES (?,?,?,?,?,?)", (version_id, decision_id, version, "EXECUTION_RECORDED", record_json, timestamp))
+            updated = con.execute(
+                "UPDATE records SET trace_id=?, record=? WHERE decision_id=? AND json_extract(record, '$.nonce')=? AND json_extract(record, '$.consumed_at') IS NULL AND json_extract(record, '$.execution_started_at') IS NOT NULL",
+                (finalized["trace_id"], record_json, decision_id, nonce),
+            )
+            updated = (decision_id,) if updated.rowcount == 1 else None
+        if not updated:
+            con.rollback()
+            return False
+        con.commit()
+        return True
+    except Exception:
+        con.rollback()
+        raise
+    finally:
+        con.close()
+
+
 def consume_nonce(decision_id: str, nonce: str, consumed_at: str) -> bool:
     """Atomically claim a decision nonce exactly once across processes/replicas."""
     con = connect()
