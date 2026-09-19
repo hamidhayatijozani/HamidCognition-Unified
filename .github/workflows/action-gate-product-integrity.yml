@@ -2,12 +2,6 @@ name: Action Gate Product Integrity
 
 on:
   push:
-    paths:
-      - "action_gate/**"
-      - "PRODUCT/**"
-      - "Dockerfile"
-      - "docker-compose.yml"
-      - ".github/workflows/action-gate-product-integrity.yml"
   pull_request:
     paths:
       - "action_gate/**"
