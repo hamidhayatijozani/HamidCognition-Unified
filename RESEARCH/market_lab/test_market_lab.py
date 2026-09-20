@@ -1,7 +1,7 @@
 import unittest
-from maat import MaatOracle, PriceObservation
-from thoth import ThothEngine
-from paper_trader import PaperTrader
+from RESEARCH.market_lab.maat import MaatOracle, PriceObservation
+from RESEARCH.market_lab.thoth import ThothEngine
+from RESEARCH.market_lab.paper_trader import PaperTrader
 
 class MarketLabTests(unittest.TestCase):
     def test_maat_consensus_and_outlier_rejection(self):
