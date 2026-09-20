@@ -84,6 +84,11 @@ jobs:
         run: python RESEARCH/EXP004_VALIDATOR.py
       - name: Run EXP-005 adversarial validator tests
         run: python RESEARCH/EXP005_ADVERSARIAL.py
+      - name: Run Maat / Thoth / Paper Trader research tests
+        working-directory: RESEARCH/market_lab
+        run: python -m unittest discover -s . -p 'test_*.py'
+      - name: Compile research Python modules
+        run: python -m compileall -q RESEARCH/market_lab
       - name: Upload research results
         if: always()
         uses: actions/upload-artifact@v4
