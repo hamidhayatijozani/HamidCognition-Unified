@@ -194,7 +194,7 @@ def finalize_execution(record: dict[str, Any], nonce: str, consumed_at: str, dig
             ).fetchone()
         if not row:
             con.rollback()
-            return False
+            return None
         current = json.loads(row[0])
         if current.get("nonce") != nonce or current.get("consumed_at") is not None or current.get("execution_started_at") is None:
             con.rollback()
@@ -238,7 +238,7 @@ def finalize_execution(record: dict[str, Any], nonce: str, consumed_at: str, dig
             updated = (decision_id,) if updated.rowcount == 1 else None
         if not updated:
             con.rollback()
-            return False
+            return None
         con.commit()
         return finalized
     except Exception:
