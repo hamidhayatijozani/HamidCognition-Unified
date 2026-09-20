@@ -1,0 +1,67 @@
+{
+  "fixture_status": "SYNTHETIC_RESEARCH_FIXTURE",
+  "symbol": "EURUSD",
+  "provenance": {
+    "source_type": "synthetic",
+    "external_source_claimed": false,
+    "source_url": null,
+    "retrieved_at_utc": null,
+    "preprocessing": "none"
+  },
+  "observations": [
+    {
+      "source_id": "source_a",
+      "symbol": "EURUSD",
+      "price": 1.1,
+      "timestamp": "2026-01-01T00:00:00Z"
+    },
+    {
+      "source_id": "source_b",
+      "symbol": "EURUSD",
+      "price": 1.1004,
+      "timestamp": "2026-01-01T00:00:00Z"
+    },
+    {
+      "source_id": "source_c",
+      "symbol": "EURUSD",
+      "price": 1.1002,
+      "timestamp": "2026-01-01T00:00:00Z"
+    },
+    {
+      "source_id": "source_a",
+      "symbol": "EURUSD",
+      "price": 1.101,
+      "timestamp": "2026-01-01T00:01:00Z"
+    },
+    {
+      "source_id": "source_b",
+      "symbol": "EURUSD",
+      "price": 1.1012,
+      "timestamp": "2026-01-01T00:01:00Z"
+    },
+    {
+      "source_id": "source_c",
+      "symbol": "EURUSD",
+      "price": 1.1011,
+      "timestamp": "2026-01-01T00:01:00Z"
+    },
+    {
+      "source_id": "source_a",
+      "symbol": "EURUSD",
+      "price": 1.102,
+      "timestamp": "2026-01-01T00:02:00Z"
+    },
+    {
+      "source_id": "source_b",
+      "symbol": "EURUSD",
+      "price": 1.1023,
+      "timestamp": "2026-01-01T00:02:00Z"
+    },
+    {
+      "source_id": "source_c",
+      "symbol": "EURUSD",
+      "price": 1.1021,
+      "timestamp": "2026-01-01T00:02:00Z"
+    }
+  ]
+}
