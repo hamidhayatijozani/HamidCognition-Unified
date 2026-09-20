@@ -50,6 +50,9 @@ jobs:
       - name: Run sellable product readiness gate
         working-directory: action_gate
         run: python sellable_gate.py
+      - name: Compile entire Action Gate package
+        working-directory: action_gate
+        run: python -m compileall -q action_gate
       - name: Compile runtime
         working-directory: action_gate
         run: python -m py_compile app.py storage.py self_audit.py test_meta_validation.py rate_limit.py canonicalization.py keyring.py policy_store.py action_gate_sdk.py csg_contract.py csg_ingress.py csg_routes.py decision_authority.py csg_validation_handler.py agentrq_simulator.py csg_acceptance.py csg_persistence_replay.py enforcement_integration.py mcp_integration.py test_validation_boundary_conformance.py production_e2e_smoke.py sellable_gate.py security_authority.py
