@@ -91,7 +91,8 @@ def require_auth(authorization: str | None) -> None:
 
 
 def enforce_rate_limit(authorization: str | None, tenant_id: str | None) -> None:
-    credential_fingerprint = hashlib.sha256((authorization or "anonymous").encode()).hexdigest()\n    key = f"{tenant_id or 'unknown'}:{credential_fingerprint}"
+    credential_fingerprint = hashlib.sha256((authorization or "anonymous").encode()).hexdigest()
+    key = f"{tenant_id or 'unknown'}:{credential_fingerprint}"
     if ENVIRONMENT == "production":
         try:
             allowed = allow_rate_limit(key, RATE_LIMIT_PER_MINUTE, 60, time.time())
