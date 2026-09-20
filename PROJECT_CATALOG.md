@@ -44,6 +44,8 @@ A falsifiable hypothesis concerning whether restoring behavior in some systems d
 
 Experimental market and EUR/USD simulation work combining market features, predictive models, cognitive-state heuristics, and simulated execution. Simulation must never be represented as live-market evidence.
 
+The current executable research harness is `RESEARCH/market_lab/`: Maat performs deterministic multi-source consensus and evidence fingerprinting; Thoth provides a bounded-window research signal; Paper Trader performs fee/slippage-aware simulation. The harness is CI-gated and explicitly excludes claims of live predictive skill or profitability.
+
 ## Research infrastructure
 
 - **Evidence-to-Claim Graph** — connects claims to evidence, experiments, code, and commits.

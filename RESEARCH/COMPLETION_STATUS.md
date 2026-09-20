@@ -1,6 +1,6 @@
 # HamidCognition Research Completion Status
 
-Updated: 2026-09-15
+Updated: 2026-09-20
 
 ## Evidence state
 
@@ -19,6 +19,8 @@ Updated: 2026-09-15
 | External-feed replay | PROTOCOL ONLY | `experiments/EXP-003` |
 | Scale-breaking retest | PROTOCOL ONLY | `experiments/EXP-004` |
 | Contradiction ledger execution | READY | `RESEARCH/CONTRADICTION_LEDGER.py` |
+| Maat / Thoth / Paper Trader harness | IMPLEMENTED + CI-GATED | `RESEARCH/market_lab/` and `RESEARCH/MAAT_THOTH_PAPER_TRADER.md` |
+| Deterministic market-lab replay | CI-EXECUTED | `RESEARCH/fixtures/maat_thoth_snapshot.json` and `RESEARCH/market_lab/run.py` |
 | CI gate | CONFIGURED | `.github/workflows/exp001.yml` |
 | Release candidate | NOT YET | blocked by unresolved canonicalization and missing external-data evidence |
 | DOI | NOT YET | intentionally deferred until evidence package is release-worthy |
