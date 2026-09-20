@@ -51,7 +51,6 @@ jobs:
         working-directory: action_gate
         run: python sellable_gate.py
       - name: Compile entire Action Gate package
-        working-directory: action_gate
         run: python -m compileall -q action_gate
       - name: Compile runtime
         working-directory: action_gate
