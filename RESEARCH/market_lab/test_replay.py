@@ -1,8 +1,8 @@
 import json
 import unittest
 from pathlib import Path
-from .maat import PriceObservation
-from .experiment import run_snapshot_experiment
+from RESEARCH.market_lab.maat import PriceObservation
+from RESEARCH.market_lab.experiment import run_snapshot_experiment
 
 class ReplayTests(unittest.TestCase):
     def test_fixture_replay_is_identical(self):
