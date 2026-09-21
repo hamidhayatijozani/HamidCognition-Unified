@@ -1,4 +1,4 @@
-# HamidCognition Action Gate v1.0.1
+# HamidCognition Action Gate v1.0.2
 
 **Runtime Action Governance with Replayable Decision Evidence**
 
@@ -30,7 +30,7 @@ Runtime decisions: `ALLOW`, `DENY`, `ASK`, `SANDBOX`. `DEFER` remains outside th
 - HTTP enforcement adapter and MCP `tools/call` adapter
 - forged decision, altered action and replay attempts rejected
 - execution is reserved atomically before the HTTP/MCP tool side effect; final outcome, consumed state, record version, and audit event are committed atomically after the tool response
-- direct tool calls rejected unless a Gate-issued HMAC attestation is present
+- direct tool calls rejected unless a Gate-issued, tenant/action/expiry/nonce-bound execution authority is present
 - production Compose stack with PostgreSQL and Caddy TLS termination
 
 ## API
@@ -68,7 +68,6 @@ export DOMAIN=gate.example.com
 export POSTGRES_PASSWORD='<strong-random-password>'
 export ACTION_GATE_API_TOKEN='<strong-random-token>'
 export ACTION_GATE_SIGNING_SECRET='<strong-random-secret>'
-export ACTION_GATE_ENFORCEMENT_SECRET='<strong-random-secret>'
 export ACTION_GATE_APPROVAL_SECRET='<strong-random-secret>'
 export ACTION_GATE_REQUIRE_SESSION_BINDING='1'
 docker compose -f docker-compose.production.yml up -d --build
