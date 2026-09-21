@@ -49,6 +49,15 @@ class Authority:
         raw = canonical_json(asdict(self)).encode()
         return base64.urlsafe_b64encode(raw).decode().rstrip("=")
 
+    @classmethod
+    def from_token(cls, token: str) -> "Authority":
+        try:
+            padded = token + "=" * (-len(token) % 4)
+            data = json.loads(base64.urlsafe_b64decode(padded.encode()).decode())
+            return cls(**data)
+        except Exception as exc:
+            raise AuthorityError("malformed_authority") from exc
+
 
 def issue_authority(*, secret: bytes, decision_id: str, tenant_id: str,
                     action: Mapping[str, Any], policy: Mapping[str, Any],
