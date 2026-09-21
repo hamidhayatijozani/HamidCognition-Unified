@@ -2,7 +2,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import os
 
-from security_authority import Authority, AuthorityError, verify_authority
+from security_authority import Authority, AuthorityError, verify_authority_envelope
 
 SIGNING_SECRET = os.getenv("ACTION_GATE_SIGNING_SECRET")
 USED_NONCES: set[str] = set()
@@ -29,12 +29,11 @@ class Tool(BaseHTTPRequestHandler):
             authority = Authority.from_token(token)
             if authority.action_digest != action_hash:
                 raise AuthorityError("action_binding_mismatch")
-            verify_authority(
+            verify_authority_envelope(
                 authority=authority,
                 secret=SIGNING_SECRET.encode(),
                 tenant_id=tenant_id,
-                action={"authority_action_digest": action_hash},
-                policy={"authority_policy_digest": authority.policy_digest},
+                action_digest=action_hash,
                 used_nonces=USED_NONCES,
             )
         except AuthorityError:
