@@ -19,8 +19,8 @@ def test_tool_accepts_only_gate_issued_authority(monkeypatch):
         tenant_id="tenant-a",
         action=action,
         policy=policy,
-        decision="ALLOW",
-        now=1000,
+        decision="ALLOW" ,
+        now=int(__import__("time").time()),
         nonce="nonce-1",
         ttl_seconds=300,
     )
@@ -44,8 +44,8 @@ def test_tool_rejects_tampered_authority(monkeypatch):
         tenant_id="tenant-a",
         action=action,
         policy=policy,
-        decision="ALLOW",
-        now=1000,
+        decision="ALLOW" ,
+        now=int(__import__("time").time()),
         nonce="nonce-2",
         ttl_seconds=300,
     )
