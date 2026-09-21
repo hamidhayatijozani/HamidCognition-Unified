@@ -11,7 +11,7 @@ TENANT = "integration-tenant"
 OTHER_TENANT = "other-tenant"
 API_TOKEN = os.environ.get("ACTION_GATE_API_TOKEN", "ci-test-token")
 env = os.environ.copy()
-env.update({"ACTION_GATE_DB": "/tmp/action-gate-integration.db", "PYTHONPATH": ROOT, "ACTION_GATE_ENV": "development", "ACTION_GATE_ENFORCEMENT_SECRET": "dev-enforcement-secret", "ACTION_GATE_API_TOKEN": API_TOKEN})
+env.update({"ACTION_GATE_DB": "/tmp/action-gate-integration.db", "PYTHONPATH": ROOT, "ACTION_GATE_ENV": "development", "ACTION_GATE_SIGNING_SECRET": "dev-signing-secret", "ACTION_GATE_API_TOKEN": API_TOKEN})
 procs = [
     subprocess.Popen([sys.executable, "-m", "uvicorn", "app:app", "--host", "127.0.0.1", "--port", "8000"], cwd=ROOT, env=env),
     subprocess.Popen([sys.executable, "tool_server.py"], cwd=ROOT, env=env),
@@ -66,8 +66,8 @@ try:
     status, forged = post("http://127.0.0.1:8080/execute", {"x": 1}, {**common, "X-HCJ-Decision-ID": "fabricated", "X-Action": "read_public_file", "X-Action-Target": "/public/info.txt"})
     assert status == 403 and forged["error"] == "action_gate_denied_or_binding_mismatch"
 
-    status, attestation_denied = post("http://127.0.0.1:9000/execute", {"x": 1}, {"X-HCJ-Decision-ID": decision_id, "X-HCJ-Action-Hash": evidence["action_hash"], "X-HCJ-Nonce": evidence["nonce"], "X-HCJ-Enforcement-Attestation": "0" * 64})
-    assert status == 403 and attestation_denied["error"] == "direct_tool_access_rejected"
+    status, authority_denied = post("http://127.0.0.1:9000/execute", {"x": 1}, {"X-HCJ-Decision-ID": decision_id, "X-HCJ-Action-Hash": evidence["action_hash"], "X-HCJ-Nonce": evidence["nonce"]})
+    assert status == 403 and attestation_denied["error"] == "execution_authority_invalid"
 
     print("REAL_ENFORCEMENT_INTEGRATION_PASS")
 finally:
