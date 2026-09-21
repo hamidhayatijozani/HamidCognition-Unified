@@ -18,6 +18,7 @@ from storage import health as storage_health, init_db, load_record, save_record,
 from csg_routes import router as csg_router
 from keyring import configured_key_ids, current_key_id, current_secret, verify_with_keyring
 from policy_store import load_policy, policy_hash
+from security_authority import issue_authority
 
 APP_VERSION = Path(__file__).with_name("VERSION").read_text(encoding="utf-8").strip()
 API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
@@ -373,6 +374,22 @@ def execution_reserve(decision_id: str, outcome: ExecutionOutcome, authorization
     if not reserved:
         raise HTTPException(409, "execution_already_reserved_or_consumed")
     record["execution_started_at"] = started_at
+    authority_secret = SIGNING_SECRET or current_secret()
+    if not authority_secret:
+        raise HTTPException(503, "execution_authority_not_configured")
+    remaining_ttl = max(1, int((datetime.fromisoformat(record["expires_at"]) - datetime.now(timezone.utc)).total_seconds()))
+    authority = issue_authority(
+        secret=authority_secret.encode(),
+        decision_id=decision_id,
+        tenant_id=record["tenant_id"],
+        action=record["normalized_action"],
+        policy=record["policy_snapshot"],
+        decision=record["decision"],
+        ttl_seconds=remaining_ttl,
+        now=int(time.time()),
+        nonce=record["nonce"],
+    )
+    record["execution_authority"] = authority.token()
     record["execution"] = {"timestamp": started_at, "status": "RESERVED", "action_hash": record["action_hash"], "nonce": record["nonce"]}
     save(record, "EXECUTION_RESERVED")
     return record
@@ -398,6 +415,8 @@ def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | 
         raise HTTPException(403, "approval_expired")
     if record.get("execution_started_at") is None:
         raise HTTPException(409, "execution_not_reserved")
+    if not record.get("execution_authority"):
+        raise HTTPException(409, "execution_authority_missing")
     consumed_at = now()
     try:
         finalized = finalize_execution(record, outcome.nonce, consumed_at, digest, canonical, now, outcome.outcome)
