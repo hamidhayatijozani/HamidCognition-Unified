@@ -2,26 +2,25 @@
 
 ## Core thesis
 
-> HHJ-CSG tests the thesis that trustworthy AI-agent governance requires every governed action to be bound to verifiable evidence, an authenticated gate decision, and third-party replay.
+> HHJ-CSG نخستین محیط اجرای حاکمیتی (Governance Runtime) است که هر اقدام (Action) انجام‌شده توسط یک عامل هوش مصنوعی را به شواهد قابل‌راستی‌آزمایی (Evidence)، امضای رمزنگاری‌شده (Cryptographic Signature) و قابلیت بازپخش مستقل (Replayability) مقید می‌کند.
 
-## Falsifiable claim
+## Research qualification
 
-The claim is not that evidence, authentication, or replay are individually novel. The claim is that an agent-governance runtime can make these properties enforceable at the action boundary and demonstrate them through reproducible, adversarially testable evidence.
+The statement above is a research claim, not an established fact. The priority claim ("first") remains provisional until a documented prior-art and literature review supports it.
 
-## Novelty claim
+## Falsifiable framing
 
-> HHJ-CSG may be the first governance runtime to combine these requirements as an enforceable, replay-oriented action-boundary protocol.
+The research question is whether an agent-governance runtime can make evidence binding, cryptographic authentication, and independent replay enforceable at the action boundary and demonstrate these properties through reproducible, adversarially testable evidence.
 
-This priority claim is provisional and must not be presented as established fact until a documented prior-art/literature search supports it.
+The thesis must remain open to falsification. A benchmark result that contradicts the claimed properties is evidence against the thesis and must not be concealed or reinterpreted as success.
 
-## Success condition
+## Evaluation boundary
 
-The thesis survives only if the public benchmark demonstrates that:
+The benchmark must distinguish:
 
-1. governed actions are bound to verifiable evidence;
-2. forged decisions are rejected;
-3. replayed nonces or stale decisions are rejected where single-use semantics are required;
-4. evidence tampering is detected;
-5. an independent party can reproduce the decision outcome from the recorded evidence and decision record.
+- evidence integrity from evidence truth;
+- cryptographic authenticity from decision correctness;
+- replayability from governance;
+- governance properties from overall agent trustworthiness.
 
-A benchmark result that contradicts these conditions is evidence against the thesis, not a failure to be hidden.
+Passing the technical properties above does not, by itself, establish that an agent is trustworthy or that a governance policy is correct.
