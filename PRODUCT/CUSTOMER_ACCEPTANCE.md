@@ -12,6 +12,7 @@ This procedure verifies that a customer deployment preserves the security and ex
 
 ### Decision integrity
 - decision integrity verification succeeds;
+- a downstream tool rejects a call without Gate-issued execution authority;
 - action hash matches the execution request;
 - tenant mismatch cannot retrieve or execute another tenant's decision;
 - expired decisions are rejected;
