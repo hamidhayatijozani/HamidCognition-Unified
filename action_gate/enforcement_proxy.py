@@ -63,8 +63,13 @@ def record_execution(decision_id: str, tenant_id: str, actor_id: str | None, ses
     return post_json(GATE_URL + f"/v1/action/{urllib.parse.quote(decision_id, safe='')}/execution", {"tenant_id": tenant_id, "actor_id": actor_id, "session_id": session_id, "action_hash": action_hash_value, "nonce": nonce, "outcome": outcome})
 
 
-def tool_headers(authority, session_id=None):
-    return {"X-HCJ-Execution-Authority": authority, **({"X-HCJ-Session-ID": session_id} if session_id else {})}
+def tool_headers(authority, tenant_id, action_hash_value, session_id=None):
+    return {
+        "X-HCJ-Execution-Authority": authority,
+        "X-HCJ-Action-Hash": action_hash_value,
+        "X-Tenant-ID": tenant_id,
+        **({"X-HCJ-Session-ID": session_id} if session_id else {}),
+    }
 
 
 class HTTPHandler(BaseHTTPRequestHandler):
@@ -83,7 +88,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
                     authority = reserved["execution_authority"]
                 except Exception:
                     self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
-                status, out = post_json(TOOL_URL + self.path, payload, tool_headers(authority, session_id))
+                status, out = post_json(TOOL_URL + self.path, payload, tool_headers(authority, tenant_id, expected_hash, session_id))
                 try:
                     record_execution(decision_id, tenant_id, actor_id, session_id, expected_hash, record["nonce"], {"http_status": status, "tool_response": out})
                 except Exception:
@@ -112,7 +117,7 @@ class MCPHandler(BaseHTTPRequestHandler):
                 authority = reserved["execution_authority"]
             except Exception:
                 self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
-            status, out = post_json(TOOL_URL, message, tool_headers(authority, session_id))
+            status, out = post_json(TOOL_URL, message, tool_headers(authority, tenant_id, result["action_hash"], session_id))
             try:
                 record_execution(result["decision_id"], tenant_id, actor_id, session_id, result["action_hash"], result["nonce"], {"http_status": status, "tool_response": out, "protocol": "MCP", "method": "tools/call", "tool": tool})
             except Exception:
