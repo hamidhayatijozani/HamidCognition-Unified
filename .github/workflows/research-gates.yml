@@ -129,12 +129,15 @@ jobs:
       - name: Install clawrtc
         shell: bash
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install clawrtc==1.8.0
+          python3 -m venv .venv
+          if [ -f .venv/Scripts/python.exe ]; then PYTHON_BIN=.venv/Scripts/python.exe; else PYTHON_BIN=.venv/bin/python; fi
+          "$PYTHON_BIN" -m pip install --upgrade pip
+          "$PYTHON_BIN" -m pip install clawrtc==1.8.0
       - name: Run RustChain anti-emulation check
         shell: bash
         run: |
-          python3 - <<'PY'
+          if [ -f .venv/Scripts/python.exe ]; then PYTHON_BIN=.venv/Scripts/python.exe; else PYTHON_BIN=.venv/bin/python; fi
+          "$PYTHON_BIN" - <<'PY'
           import json
           import platform
           import sys
