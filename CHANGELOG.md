@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.2 — Execution Authority Boundary
+
+- Put the previously dormant security-authority primitive on the real execution path.
+- Issue a Gate-signed execution authority only after atomic reservation and bind it to decision, tenant, action digest, policy digest, nonce and expiry.
+- Make the downstream tool reject calls without valid Gate-issued authority.
+- Remove the separate enforcement-only attestation secret from the production path.
+- Add explicit edge/backend network segmentation in production Compose.
+- Add negative tests for direct tool bypass and tampered execution authority.
+
 ## 1.0.1 — Execution Evidence Integrity
 
 - Atomically finalize execution outcome, one-time consumption, record version, and audit event in one database transaction.
