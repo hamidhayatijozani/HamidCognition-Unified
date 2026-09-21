@@ -1,0 +1,61 @@
+name: RustChain Anti-Emulation Bounty Probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - bounty/rustchain-antemulation-macos
+
+jobs:
+  probe:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-14
+            name: github-hosted-macos-14
+          - runner: windows-2025
+            name: github-hosted-windows-2025
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Probe environment
+        shell: bash
+        run: |
+          python3 --version || python --version
+          uname -a || ver
+          system_profiler SPSoftwareDataType SPHardwareDataType 2>/dev/null || true
+          systeminfo 2>/dev/null | head -40 || true
+
+      - name: Install clawrtc
+        shell: bash
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install clawrtc==1.8.0
+
+      - name: Run anti-emulation check
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import platform
+          import sys
+          from clawrtc.data.fingerprint_checks import check_anti_emulation
+
+          result = check_anti_emulation()
+          payload = {
+              "runner": "${{ matrix.name }}",
+              "python": sys.version,
+              "platform": platform.platform(),
+              "machine": platform.machine(),
+              "result": result,
+          }
+          print(json.dumps(payload, indent=2, default=str))
+          with open("rustchain-antemulation-result.json", "w", encoding="utf-8") as f:
+              json.dump(payload, f, indent=2, default=str)
+          PY
+
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: rustchain-antemulation-${{ matrix.name }}
+          path: rustchain-antemulation-result.json
