@@ -11,7 +11,7 @@ import urllib.request
 ROOT = os.path.dirname(__file__)
 TENANT = "mcp-tenant"
 env = os.environ.copy()
-env.update({"ACTION_GATE_DB": "/tmp/action-gate-mcp.db", "PYTHONPATH": ROOT, "ACTION_GATE_ENV": "development"})
+env.update({"ACTION_GATE_DB": "/tmp/action-gate-mcp.db", "PYTHONPATH": ROOT, "ACTION_GATE_ENV": "development", "ACTION_GATE_SIGNING_SECRET": "mcp-signing-secret"})
 procs = [
     subprocess.Popen([sys.executable, "-m", "uvicorn", "app:app", "--host", "127.0.0.1", "--port", "8000"], cwd=ROOT, env=env),
     subprocess.Popen([sys.executable, "tool_server.py"], cwd=ROOT, env=env),
@@ -54,14 +54,13 @@ try:
     # A forged attestation must never authorize the direct tool endpoint.
     forged_headers = {
         "Content-Type": "application/json",
-        "X-HCJ-Decision-ID": "fabricated-decision-id",
+        "X-HCJ-Execution-Authority": "fabricated-authority",
         "X-HCJ-Action-Hash": "fabricated-action-hash",
-        "X-HCJ-Nonce": "fabricated-nonce",
-        "X-HCJ-Enforcement-Attestation": "fabricated-attestation",
+        "X-Tenant-ID": TENANT,
     }
     try:
         urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:9000", data=b"{}", headers=forged_headers))
-        raise AssertionError("forged tool attestation unexpectedly succeeded")
+        raise AssertionError("forged tool authority unexpectedly succeeded")
     except urllib.error.HTTPError as e:
         assert e.code == 403
 
