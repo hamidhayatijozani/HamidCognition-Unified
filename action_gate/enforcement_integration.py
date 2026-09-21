@@ -67,7 +67,7 @@ try:
     assert status == 403 and forged["error"] == "action_gate_denied_or_binding_mismatch"
 
     status, authority_denied = post("http://127.0.0.1:9000/execute", {"x": 1}, {"X-HCJ-Decision-ID": decision_id, "X-HCJ-Action-Hash": evidence["action_hash"], "X-HCJ-Nonce": evidence["nonce"]})
-    assert status == 403 and attestation_denied["error"] == "execution_authority_invalid"
+    assert status == 403 and authority_denied["error"] == "execution_authority_invalid"
 
     print("REAL_ENFORCEMENT_INTEGRATION_PASS")
 finally:
