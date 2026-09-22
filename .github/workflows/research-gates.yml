@@ -113,3 +113,48 @@ jobs:
             RESEARCH/EXP004RESULT.json
             RESEARCH/EXP005_SPEC.md
           if-no-files-found: error
+
+  rustchain-bounty-probe:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-14
+            name: github-hosted-macos-14
+          - runner: windows-2025
+            name: github-hosted-windows-2025
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Install clawrtc
+        shell: bash
+        run: |
+          python3 -m venv .venv
+          if [ -f .venv/Scripts/python.exe ]; then PYTHON_BIN=.venv/Scripts/python.exe; else PYTHON_BIN=.venv/bin/python; fi
+          "$PYTHON_BIN" -m pip install --upgrade pip
+          "$PYTHON_BIN" -m pip install clawrtc==1.8.0
+      - name: Run RustChain anti-emulation check
+        shell: bash
+        run: |
+          if [ -f .venv/Scripts/python.exe ]; then PYTHON_BIN=.venv/Scripts/python.exe; else PYTHON_BIN=.venv/bin/python; fi
+          "$PYTHON_BIN" - <<'PY'
+          import json
+          import platform
+          import sys
+          from clawrtc.data.fingerprint_checks import check_anti_emulation
+          result = check_anti_emulation()
+          payload = {
+              "runner": "${{ matrix.name }}",
+              "python": sys.version,
+              "platform": platform.platform(),
+              "machine": platform.machine(),
+              "result": result,
+          }
+          print(json.dumps(payload, indent=2, default=str))
+          with open("rustchain-antemulation-result.json", "w", encoding="utf-8") as f:
+              json.dump(payload, f, indent=2, default=str)
+          PY
+      - name: Upload bounty evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: rustchain-antemulation-${{ matrix.name }}
+          path: rustchain-antemulation-result.json
