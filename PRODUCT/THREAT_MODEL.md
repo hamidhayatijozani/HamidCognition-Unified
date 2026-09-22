@@ -7,7 +7,7 @@ Authorization decisions, tenant isolation, actor/session identity, policy snapsh
 ## Threats and controls
 
 ### Decision tampering
-Control: decision signature, action hash, policy hash, nonce, expiry, and verification before execution.
+Control: Gate-issued execution authority binds decision ID, tenant, action digest, policy digest, nonce, decision and expiry; the downstream tool verifies that authority before accepting a call.
 
 ### Cross-tenant or cross-actor substitution
 Control: tenant/actor/session binding and execution-time identity checks.
@@ -19,7 +19,7 @@ Control: one-time nonce consumption and expiry.
 Control: evidence reservation/persistence before protected production execution and fail-closed behavior.
 
 ### Direct bypass
-Control: deployment architecture must place the enforcement adapter on the production path with no alternate direct route.
+Control: production topology separates edge/backend networks, the tool is not host-published, and the tool rejects calls without Gate-issued execution authority. The production E2E suite includes a direct-tool negative control.
 
 ### Policy drift
 Control: policy version, snapshot, and policy hash are bound to the decision.

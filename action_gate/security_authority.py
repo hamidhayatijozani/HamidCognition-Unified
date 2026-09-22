@@ -49,6 +49,15 @@ class Authority:
         raw = canonical_json(asdict(self)).encode()
         return base64.urlsafe_b64encode(raw).decode().rstrip("=")
 
+    @classmethod
+    def from_token(cls, token: str) -> "Authority":
+        try:
+            padded = token + "=" * (-len(token) % 4)
+            data = json.loads(base64.urlsafe_b64decode(padded.encode()).decode())
+            return cls(**data)
+        except Exception as exc:
+            raise AuthorityError("malformed_authority") from exc
+
 
 def issue_authority(*, secret: bytes, decision_id: str, tenant_id: str,
                     action: Mapping[str, Any], policy: Mapping[str, Any],
@@ -69,6 +78,27 @@ def issue_authority(*, secret: bytes, decision_id: str, tenant_id: str,
     }
     signature = hmac.new(secret, canonical_json(payload).encode(), hashlib.sha256).hexdigest()
     return Authority(**payload, signature=signature)
+
+def verify_authority_envelope(*, authority: Authority, secret: bytes,
+                              tenant_id: str, action_digest: str,
+                              now: int | None = None,
+                              used_nonces: set[str] | None = None) -> None:
+    current = int(time.time()) if now is None else int(now)
+    expected = hmac.new(secret, canonical_json(authority.payload()).encode(), hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(expected, authority.signature):
+        raise AuthorityError("invalid_signature")
+    if authority.tenant_id != tenant_id:
+        raise AuthorityError("tenant_mismatch")
+    if current >= authority.expires_at or current < authority.issued_at:
+        raise AuthorityError("expired_or_not_yet_valid")
+    if authority.action_digest != action_digest:
+        raise AuthorityError("action_binding_mismatch")
+    if authority.decision not in {"ALLOW", "SANDBOX"}:
+        raise AuthorityError("decision_not_executable")
+    if used_nonces is not None:
+        if authority.nonce in used_nonces:
+            raise AuthorityError("nonce_reuse")
+        used_nonces.add(authority.nonce)
 
 
 def verify_authority(*, authority: Authority, secret: bytes,

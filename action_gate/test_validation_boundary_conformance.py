@@ -5,6 +5,7 @@ import tempfile
 
 os.environ["ACTION_GATE_DB"] = os.path.join(tempfile.gettempdir(), "hamidcognition-vb-conformance.db")
 os.environ["ACTION_GATE_ENV"] = "development"
+os.environ["ACTION_GATE_SIGNING_SECRET"] = "vb-signing-secret"
 
 from fastapi.testclient import TestClient
 import app as gate

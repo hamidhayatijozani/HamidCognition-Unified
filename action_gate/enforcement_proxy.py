@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import hmac
 import json
 import os
 import urllib.error
@@ -17,7 +16,6 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 GATE_URL = os.getenv("GATE_URL", "http://127.0.0.1:8000")
 TOOL_URL = os.getenv("TOOL_URL", "http://127.0.0.1:9000")
 API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
-ENFORCEMENT_SECRET = os.getenv("ACTION_GATE_ENFORCEMENT_SECRET", "dev-enforcement-secret")
 
 
 def canonical(obj):
@@ -26,10 +24,6 @@ def canonical(obj):
 
 def action_hash(tenant_id, actor_id, session_id, action, target, parameters):
     return hashlib.sha256(canonical({"tenant_id": tenant_id, "actor_id": actor_id, "session_id": session_id, "action": action.lower(), "target": target, "parameters": parameters}).encode()).hexdigest()
-
-
-def attestation(decision_id, action_hash_value, nonce):
-    return hmac.new(ENFORCEMENT_SECRET.encode(), f"{decision_id}:{action_hash_value}:{nonce}".encode(), hashlib.sha256).hexdigest()
 
 
 def auth_headers():
@@ -69,8 +63,13 @@ def record_execution(decision_id: str, tenant_id: str, actor_id: str | None, ses
     return post_json(GATE_URL + f"/v1/action/{urllib.parse.quote(decision_id, safe='')}/execution", {"tenant_id": tenant_id, "actor_id": actor_id, "session_id": session_id, "action_hash": action_hash_value, "nonce": nonce, "outcome": outcome})
 
 
-def tool_headers(decision_id, action_hash_value, nonce, session_id=None):
-    return {"X-HCJ-Decision-ID": decision_id, "X-HCJ-Action-Hash": action_hash_value, "X-HCJ-Nonce": nonce, "X-HCJ-Enforcement-Attestation": attestation(decision_id, action_hash_value, nonce), **({"X-HCJ-Session-ID": session_id} if session_id else {})}
+def tool_headers(authority, tenant_id, action_hash_value, session_id=None):
+    return {
+        "X-HCJ-Execution-Authority": authority,
+        "X-HCJ-Action-Hash": action_hash_value,
+        "X-Tenant-ID": tenant_id,
+        **({"X-HCJ-Session-ID": session_id} if session_id else {}),
+    }
 
 
 class HTTPHandler(BaseHTTPRequestHandler):
@@ -85,10 +84,11 @@ class HTTPHandler(BaseHTTPRequestHandler):
                 if not record:
                     self.send_response(403); self.end_headers(); self.wfile.write(b'{"error":"action_gate_denied_or_binding_mismatch"}'); return
                 try:
-                    reserve_execution(decision_id, tenant_id, actor_id, session_id, expected_hash, record["nonce"])
+                    reserved = reserve_execution(decision_id, tenant_id, actor_id, session_id, expected_hash, record["nonce"])
+                    authority = reserved["execution_authority"]
                 except Exception:
                     self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
-                status, out = post_json(TOOL_URL + self.path, payload, tool_headers(decision_id, expected_hash, record["nonce"]))
+                status, out = post_json(TOOL_URL + self.path, payload, tool_headers(authority, tenant_id, expected_hash, session_id))
                 try:
                     record_execution(decision_id, tenant_id, actor_id, session_id, expected_hash, record["nonce"], {"http_status": status, "tool_response": out})
                 except Exception:
@@ -113,10 +113,11 @@ class MCPHandler(BaseHTTPRequestHandler):
             if result["decision"] != "ALLOW":
                 self.send_response(200); self.end_headers(); self.wfile.write(json.dumps({"jsonrpc": "2.0", "id": message.get("id"), "result": {"blocked_by_action_gate": True, "decision": result}}).encode()); return
             try:
-                reserve_execution(result["decision_id"], tenant_id, actor_id, session_id, result["action_hash"], result["nonce"])
+                reserved = reserve_execution(result["decision_id"], tenant_id, actor_id, session_id, result["action_hash"], result["nonce"])
+                authority = reserved["execution_authority"]
             except Exception:
                 self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
-            status, out = post_json(TOOL_URL, message, tool_headers(result["decision_id"], result["action_hash"], result["nonce"], session_id))
+            status, out = post_json(TOOL_URL, message, tool_headers(authority, tenant_id, result["action_hash"], session_id))
             try:
                 record_execution(result["decision_id"], tenant_id, actor_id, session_id, result["action_hash"], result["nonce"], {"http_status": status, "tool_response": out, "protocol": "MCP", "method": "tools/call", "tool": tool})
             except Exception:

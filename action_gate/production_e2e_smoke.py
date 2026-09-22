@@ -2,6 +2,7 @@ import json
 import socket
 import time
 import urllib.request
+import urllib.error
 
 TOKEN = "ci-action-gate-token"
 TENANT = "compose-tenant"
@@ -28,6 +29,14 @@ for _ in range(30):
         time.sleep(1)
 else:
     raise RuntimeError("enforcement_service_not_ready")
+
+# Negative control: direct tool access without Gate-issued authority must fail closed.
+try:
+    req = urllib.request.Request("http://tool:9000/direct", data=b"{}", headers={"Content-Type": "application/json"})
+    urllib.request.urlopen(req)
+    raise AssertionError("direct_tool_access_bypassed_action_gate")
+except urllib.error.HTTPError as exc:
+    assert exc.code == 403, exc.code
 
 health = get(BASE + "/health")
 assert health["status"] == "ok" and health["storage"]["backend"] == "postgresql", health
