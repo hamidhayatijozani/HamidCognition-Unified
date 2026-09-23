@@ -34,8 +34,14 @@ jobs:
         if: failure()
         working-directory: action_gate
         run: |
-          docker compose -f docker-compose.production.yml ps > logs.txt 2>&1 || true
+          docker compose -f docker-compose.production.yml ps -a > logs.txt 2>&1 || true
           docker compose -f docker-compose.production.yml logs --tail=1000 >> logs.txt 2>&1 || true
+          for id in $(docker compose -f docker-compose.production.yml ps -aq); do
+            echo "===== docker inspect $id =====" >> logs.txt
+            docker inspect "$id" >> logs.txt 2>&1 || true
+            echo "===== docker logs $id =====" >> logs.txt
+            docker logs "$id" >> logs.txt 2>&1 || true
+          done
         continue-on-error: true
       - name: Upload logs
         if: failure()
