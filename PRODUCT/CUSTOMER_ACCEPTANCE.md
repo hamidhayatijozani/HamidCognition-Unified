@@ -1,7 +1,8 @@
 # Action Gate Customer Acceptance Test
 
 ## Purpose
-This procedure verifies that a customer deployment preserves the security and execution boundary demonstrated by v1.0.0.
+
+This procedure verifies that a customer deployment preserves the security and execution boundary demonstrated by Action Gate v1.0.2.
 
 ## Required tests
 
@@ -33,6 +34,7 @@ This procedure verifies that a customer deployment preserves the security and ex
 - replay after restart reproduces the stored decision and hashes.
 
 ## Acceptance result
+
 A deployment is accepted only when all required tests produce recorded evidence.
 
 A passing test suite does not establish that customer policy is correct. Customer policy must be separately reviewed and versioned.
