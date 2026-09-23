@@ -2,7 +2,7 @@
 
 **Originator:** Hamid Hayati Jozani  
 **Canonical record:** HamidCognition-Unified  
-**Current release:** v1.0.0
+**Current release:** v1.0.2
 
 ## Purpose
 
