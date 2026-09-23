@@ -33,6 +33,13 @@ jobs:
       - name: Dump container logs on failure
         if: failure()
         working-directory: action_gate
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          ACTION_GATE_APPROVAL_SECRET: ci-only-approval-secret-not-for-production
+          DOMAIN: localhost
         run: |
           docker compose -f docker-compose.production.yml ps -a > logs.txt 2>&1 || true
           docker compose -f docker-compose.production.yml logs --tail=1000 >> logs.txt 2>&1 || true
