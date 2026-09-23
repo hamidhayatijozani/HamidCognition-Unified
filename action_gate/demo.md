@@ -1,64 +1,60 @@
 # Action Gate 90-Second Demo
 
-This demo runs against the real Action Gate HTTP API. It is intended for screen recording from Termux or any terminal.
+This demo runs against the real Action Gate HTTP API and prints the actual verdict, reason, signature, approval state, evidence-chain hashes, and replay reference.
 
-## What the recording shows
+## Scenarios
 
 1. **ALLOW** — ordinary read action.
-2. **ASK** — external customer email requiring human approval.
-3. **DENY** — destructive action against a production target.
+2. **ASK** — external communication. The API requires human approval. The current `evaluate` response does not contain a separate `approval_request` object, so the demo prints the real approval endpoint and the stored `approval: null` state instead of inventing an object.
+3. **DENY** — destructive action against a production target, with the stored evidence chain.
 
-Each decision prints the risk level, policy result, decision signature, decision ID, and replay endpoint.
-
-The demo does **not** invent NED, HAIS, or DRS values. Those metrics are not part of the current Action Gate API response. The recording therefore shows the actual product contract instead of a prettier fiction, which is an unfortunately useful distinction.
+The demo deliberately does not display NED, HAIS, or DRS values because the current API does not expose those metrics.
 
 ## Run
-
-From the repository root:
 
 ```bash
 cd action_gate
 python demo.py
 ```
 
-Or, if the service is already running elsewhere:
+Or:
 
 ```bash
 ACTION_GATE_URL=http://127.0.0.1:8000 python demo.py
 ```
 
-For an authenticated deployment:
+For the local authenticated production-style service:
 
 ```bash
-ACTION_GATE_URL=https://YOUR-GATE-HOST ACTION_GATE_API_TOKEN=YOUR_TOKEN python demo.py
+ACTION_GATE_URL=http://127.0.0.1:8000 ACTION_GATE_API_TOKEN=ci-action-gate-token python demo.py
 ```
 
-## Recording target
+## Recording
 
-Keep the terminal full-screen and record one continuous run. The script is paced for a short product demo and should fit comfortably inside 90 seconds on a normal local deployment.
+Keep the terminal full-screen and record one continuous run. The script is paced for a short product demo.
 
 Suggested narration:
 
-> An AI agent proposes an action. Action Gate evaluates it against a versioned policy, records a signed decision, and exposes replayable evidence.
+> An AI agent proposes an action. Action Gate evaluates it against a versioned policy, creates a signed decision record, and exposes replayable evidence.
 >
 > A normal read is allowed.
 >
-> An external communication requires human approval.
+> An external communication pauses for human approval.
 >
 > A destructive production action is denied.
 >
-> The important part is that the decision is not just printed. It is bound to the action, policy, nonce, tenant, and signature, and it can be replayed.
+> The important part is that the decision is bound to the action and policy, signed, persisted, and replayable.
 
 ## Video
 
 **Status:** not recorded yet.
 
-Replace this line after recording:
+Replace with:
 
 `VIDEO: <public video URL>`
 
-## Important product-boundary note
+## Product boundary
 
-The current shipped policy classifies `transfer_funds` as `SANDBOX`, not `DENY`. The demo intentionally uses a real `DENY` scenario so the three-state recording is ALLOW / ASK / DENY without falsifying the current implementation.
+The shipped builtin policy classifies `transfer_funds` and `transfer_money` as `SANDBOX`, not `DENY`. The demo therefore uses a real `DENY` case instead of falsifying the financial-transfer behavior.
 
-No decision is claimed to be objectively correct or safe. The gate records, constrains, and enforces a decision under its configured policy and available evidence.
+No decision is presented as objectively safe. The gate enforces the configured policy and records the evidence available at decision time.
