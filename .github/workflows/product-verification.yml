@@ -1,0 +1,64 @@
+name: Product Verification
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install test dependencies when declared
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
+          if [ -f pyproject.toml ]; then python -m pip install -e .; fi
+          if [ -f requirements-dev.txt ]; then python -m pip install -r requirements-dev.txt; fi
+
+      - name: Run repository test suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -d tests ]; then
+            python -m pytest -q
+          else
+            echo 'No tests/ directory found; verification cannot be claimed.'
+            exit 1
+          fi
+
+      - name: Verify product boundary documents exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f PRODUCT/QUICKSTART.md
+          test -f PRODUCT/CUSTOMER_ACCEPTANCE.md
+          test -f PRODUCT/PRODUCT_COMPLETION_CONTROL.md
+          test -f PRODUCT/SECURITY_BOUNDARY.md
+          test -f PRODUCT/OFFER_BOUNDARY.md
+          test -f PROJECT_CATALOG.md
+
+      - name: Record exact revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'commit=%s\n' "${GITHUB_SHA}" | tee verification-revision.txt
+          git status --short
