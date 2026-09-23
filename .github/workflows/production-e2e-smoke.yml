@@ -19,7 +19,16 @@ jobs:
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           ACTION_GATE_APPROVAL_SECRET: ci-only-approval-secret-not-for-production
           DOMAIN: localhost
-        run: docker compose -f docker-compose.production.yml up -d --build
+        run: |
+          cat > .env.ci <<'EOF'
+          POSTGRES_PASSWORD=ci-postgres-password
+          ACTION_GATE_API_TOKEN=ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET=ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET=ci-enforcement-secret
+          ACTION_GATE_APPROVAL_SECRET=ci-only-approval-secret-not-for-production
+          DOMAIN=localhost
+          EOF
+          docker compose --env-file .env.ci -f docker-compose.production.yml up -d --build
       - name: Run production E2E smoke
         working-directory: action_gate
         env:
@@ -29,7 +38,7 @@ jobs:
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           ACTION_GATE_APPROVAL_SECRET: ci-only-approval-secret-not-for-production
           DOMAIN: localhost
-        run: docker compose -f docker-compose.production.yml exec -T action-gate python production_e2e_smoke.py
+        run: docker compose --env-file .env.ci -f docker-compose.production.yml exec -T action-gate python production_e2e_smoke.py
       - name: Dump container logs on failure
         if: failure()
         working-directory: action_gate
@@ -41,9 +50,9 @@ jobs:
           ACTION_GATE_APPROVAL_SECRET: ci-only-approval-secret-not-for-production
           DOMAIN: localhost
         run: |
-          docker compose -f docker-compose.production.yml ps -a > logs.txt 2>&1 || true
-          docker compose -f docker-compose.production.yml logs --tail=1000 >> logs.txt 2>&1 || true
-          for id in $(docker compose -f docker-compose.production.yml ps -aq); do
+          docker compose --env-file .env.ci -f docker-compose.production.yml ps -a > logs.txt 2>&1 || true
+          docker compose --env-file .env.ci -f docker-compose.production.yml logs --tail=1000 >> logs.txt 2>&1 || true
+          for id in $(docker compose --env-file .env.ci -f docker-compose.production.yml ps -aq); do
             echo "===== docker inspect $id =====" >> logs.txt
             docker inspect "$id" >> logs.txt 2>&1 || true
             echo "===== docker logs $id =====" >> logs.txt
@@ -67,4 +76,4 @@ jobs:
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           ACTION_GATE_APPROVAL_SECRET: ci-only-approval-secret-not-for-production
           DOMAIN: localhost
-        run: docker compose -f docker-compose.production.yml down -v
+        run: docker compose --env-file .env.ci -f docker-compose.production.yml down -v
