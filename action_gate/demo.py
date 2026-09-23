@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
-"""Record-ready 90-second Action Gate demo.
-
-Uses the real Action Gate HTTP API. No mocked verdicts or invented metrics.
-"""
+"""Record-ready Action Gate demo using only real API responses."""
 
 from __future__ import annotations
 
 import json
 import os
-import sys
 import time
 import urllib.error
 import urllib.request
@@ -51,10 +47,10 @@ def pause(seconds: float = 0.7) -> None:
 
 def show_result(number: int, total: int, title: str, action_text: str, result: dict) -> None:
     decision = result["decision"]
-    risk = result["risk_assessment"]["level"]
     decision_id = result["decision_id"]
     signature = result.get("decision_signature", "")
     checks = result.get("policy_checks", [])
+    evidence = request("GET", f"/v1/evidence/{decision_id}?tenant_id={TENANT}")
 
     decision_color = {
         "ALLOW": GREEN,
@@ -68,12 +64,26 @@ def show_result(number: int, total: int, title: str, action_text: str, result: d
     print(f'  Agent:  "{action_text}"')
     pause()
     print(color("  ↓ Action Gate", BOLD))
-    print(f"    Risk:       {risk}")
+    print(f"    Risk:       {result['risk_assessment']['level']}")
     for check in checks[:2]:
         print(f"    Policy:     {check.get('policy', 'n/a')} -> {check.get('result', 'n/a')}")
     print(color(f"  ↓ Verdict: {decision}", BOLD + decision_color))
-    print(f"    Reason:     {checks[0].get('reason', 'recorded by policy') if checks else 'recorded'}")
+    print(f"    Reason:     {result.get('reason', checks[0].get('reason', 'n/a') if checks else 'n/a')}")
     print(f"    Signature:  {signature[:12]}…")
+    print(f"    Decision:   {decision_id}")
+
+    if decision == "ASK":
+        print("    approval_request: required (real API does not emit a separate request object)")
+        print(f"      status: pending")
+        print(f"      approve endpoint: /v1/action/{decision_id}/approve")
+        print(f"      current approval: {evidence.get('approval')}")
+    else:
+        print(f"    approval:    {evidence.get('approval')}")
+
+    print("    evidence_chain:")
+    for key in ("schema_version", "action_hash", "policy_hash", "evidence_hash", "audit_event_hash"):
+        if key in evidence:
+            print(f"      {key}: {evidence[key]}")
     print(f"    Replay:     {BASE}/v1/replay/{decision_id}?tenant_id={TENANT}")
     pause()
 
@@ -83,19 +93,17 @@ def main() -> int:
     print(color("║              ACTION GATE — 90s DEMO                 ║", BOLD + CYAN))
     print(color("╚══════════════════════════════════════════════════════╝", BOLD + CYAN))
     print("Real API. Real policy. Real signed decision records.")
-    print(color("No mocked NED/HAIS/DRS scores: the current API does not expose those metrics.", DIM))
+    print(color("No mocked NED/HAIS/DRS scores: those metrics are not exposed by the current API.", DIM))
     print()
 
     try:
         health = request("GET", "/health")
     except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
         print(color(f"Action Gate is not reachable at {BASE}: {exc}", RED))
-        print("Start it first, for example: uvicorn app:app --reload")
         return 1
 
     print(color(f"Gate: {health.get('product')} v{health.get('version')}", BOLD))
     print(f"Policy: {health.get('policy_version')}  |  Environment: {health.get('environment')}")
-    print()
     print(color("Three decisions. One gate.", BOLD))
     pause(1.0)
 
@@ -106,6 +114,8 @@ def main() -> int:
             {
                 "tenant_id": TENANT,
                 "agent_id": AGENT,
+                "actor_id": "demo-actor",
+                "session_id": "demo-session-allow",
                 "action": "read_public_file",
                 "target": "/public/info.txt",
             },
@@ -116,6 +126,8 @@ def main() -> int:
             {
                 "tenant_id": TENANT,
                 "agent_id": AGENT,
+                "actor_id": "demo-actor",
+                "session_id": "demo-session-ask",
                 "action": "send_email",
                 "target": "customer@example.com",
             },
@@ -126,6 +138,8 @@ def main() -> int:
             {
                 "tenant_id": TENANT,
                 "agent_id": AGENT,
+                "actor_id": "demo-actor",
+                "session_id": "demo-session-deny",
                 "action": "delete_file",
                 "target": "/production/data.db",
             },
@@ -135,19 +149,15 @@ def main() -> int:
     for index, (title, action_text, payload) in enumerate(scenarios, start=1):
         try:
             result = request("POST", "/v1/action/evaluate", payload)
-        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
+            show_result(index, len(scenarios), title, action_text, result)
+        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, KeyError) as exc:
             print(color(f"Scenario {index} failed: {exc}", RED))
             return 1
-        show_result(index, len(scenarios), title, action_text, result)
 
     print()
     print(color("DEMO COMPLETE", BOLD + GREEN))
-    print("ALLOW  → ordinary action can proceed.")
-    print("ASK    → human approval is required before execution.")
-    print("DENY   → destructive production action is blocked.")
-    print()
-    print(color("Note: transfer_funds is currently classified as SANDBOX by the shipped policy,", DIM))
-    print(color("not DENY. The demo deliberately does not falsify that behavior.", DIM))
+    print("The recording above is the shipped API behavior, not a fabricated verdict.")
+    print(color("Note: transfer_funds is currently SANDBOX under builtin-v1, so the demo does not pretend it is DENY.", DIM))
     return 0
 
 
