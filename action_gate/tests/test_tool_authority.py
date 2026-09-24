@@ -6,8 +6,9 @@ import pytest
 from security_authority import issue_authority, AuthorityError
 
 
-def test_tool_accepts_only_gate_issued_authority(monkeypatch):
+def test_tool_accepts_only_gate_issued_authority(monkeypatch, tmp_path):
     monkeypatch.setenv("ACTION_GATE_SIGNING_SECRET", "authority-test-secret")
+    monkeypatch.setenv("TOOL_NONCE_DB", str(tmp_path / "tool-authority.db"))
     import tool_server
     importlib.reload(tool_server)
 
@@ -31,8 +32,9 @@ def test_tool_accepts_only_gate_issued_authority(monkeypatch):
         tool_server.verify_execution_authority(None, "tenant-a", authority.action_digest)
 
 
-def test_tool_rejects_tampered_authority(monkeypatch):
+def test_tool_rejects_tampered_authority(monkeypatch, tmp_path):
     monkeypatch.setenv("ACTION_GATE_SIGNING_SECRET", "authority-test-secret")
+    monkeypatch.setenv("TOOL_NONCE_DB", str(tmp_path / "tool-authority.db"))
     import tool_server
     importlib.reload(tool_server)
 
