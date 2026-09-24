@@ -81,6 +81,7 @@ def issue_authority(*, secret: bytes, decision_id: str, tenant_id: str,
 
 def verify_authority_envelope(*, authority: Authority, secret: bytes,
                               tenant_id: str, action_digest: str,
+                              policy_digest: str,
                               now: int | None = None,
                               used_nonces: set[str] | None = None) -> None:
     current = int(time.time()) if now is None else int(now)
@@ -93,6 +94,8 @@ def verify_authority_envelope(*, authority: Authority, secret: bytes,
         raise AuthorityError("expired_or_not_yet_valid")
     if authority.action_digest != action_digest:
         raise AuthorityError("action_binding_mismatch")
+    if authority.policy_digest != policy_digest:
+        raise AuthorityError("policy_binding_mismatch")
     if authority.decision not in {"ALLOW", "SANDBOX"}:
         raise AuthorityError("decision_not_executable")
     if used_nonces is not None:
