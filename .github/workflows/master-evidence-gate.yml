@@ -41,10 +41,11 @@ jobs:
       - name: "05 Default project unit suite"
         if: always()
         run: |
+          set +e
           set -o pipefail
           export PYTHONPATH="$GITHUB_WORKSPACE/action_gate:$GITHUB_WORKSPACE:$PYTHONPATH"
           python -m pytest -q action_gate 2>&1 | tee "$EVIDENCE_DIR/default-tests.log"
-          rc=$?
+          rc=${PIPESTATUS[0]}
           echo "$rc" > "$EVIDENCE_DIR/default-tests.rc"
           exit 0
       - name: "06 STI unit tests"
