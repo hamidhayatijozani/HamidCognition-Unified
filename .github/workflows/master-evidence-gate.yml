@@ -98,7 +98,7 @@ jobs:
           for i in $(seq 1 30); do
             status=$(docker inspect -f '{{.State.Health.Status}}' "$PG_CONTAINER" 2>/dev/null || true)
             echo "$status"
-            [ "$status" = healthy ] && exit 0
+            if [ "$status" = healthy ]; then echo 0 > "$EVIDENCE_DIR/postgres-health.rc"; exit 0; fi
             sleep 2
           done
           echo 1 > "$EVIDENCE_DIR/postgres-health.rc"
@@ -167,6 +167,7 @@ jobs:
                   rows.append({"path":p,"sha256":hashlib.sha256(open(p,"rb").read()).hexdigest(),"bytes":os.path.getsize(p)})
           json.dump({"workflow":"Master Evidence Gate","artifact":"validation-evidence-pack","files":rows},open(root+"/manifest.json","w"),indent=2)
           PY
+          (cd evidence && zip -q -r validation-evidence-pack.zip . -x validation-evidence-pack.zip)
       - name: "18 Upload validation-evidence-pack"
         if: always()
         uses: actions/upload-artifact@v4
@@ -180,7 +181,7 @@ jobs:
         run: |
           set -e
           failures=0
-          for f in default-tests sti-tests sti-benchmark replay-200 replay-integrity postgres-start postgres-seed postgres-restart postgres-verify latency latency-gate; do
+          for f in default-tests sti-tests sti-benchmark replay-200 replay-integrity postgres-start postgres-health postgres-seed postgres-restart postgres-verify latency latency-gate; do
             if [ -f "evidence/$f.rc" ]; then
               rc=$(cat "evidence/$f.rc")
               echo "$f: rc=$rc"
