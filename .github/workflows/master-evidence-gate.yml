@@ -1,0 +1,44 @@
+name: Master Evidence Gate
+
+on:
+  push:
+    branches: [ main, 'integration/**', 'research/**' ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  sti:
+    name: STI synthetic benchmark
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install test dependencies
+        run: python -m pip install --upgrade pip pytest
+      - name: Run STI benchmark tests
+        run: python -m pytest -q action_gate/tests/test_sti_001.py
+      - name: Run STI benchmark
+        run: python RESEARCH/experiments/sti_001.py
+
+  repository-tests:
+    name: Repository tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f action_gate/requirements.txt ]; then python -m pip install -r action_gate/requirements.txt; fi
+          python -m pip install "pytest>=8,<9"
+      - name: Run tests
+        run: |
+          export PYTHONPATH="$GITHUB_WORKSPACE/action_gate:$GITHUB_WORKSPACE:${PYTHONPATH:-}"
+          python -m pytest -q action_gate
