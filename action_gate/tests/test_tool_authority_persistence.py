@@ -35,6 +35,7 @@ def test_tool_nonce_claim_survives_module_reload(tmp_path, monkeypatch):
 
 def test_tool_rejects_sandbox_authority():
     import action_gate.tool_server as tool_server
+    tool_server.SIGNING_SECRET = SECRET
     authority = issue_authority(
         secret=SECRET,
         decision_id="dec-2",
