@@ -9,6 +9,9 @@
 | NR-0003 | Unknown-Space Ledger coupled to falsification workflow | NEW_COMBINATION | UNVERIFIED | REQUIRED |
 | NR-0004 | Experiment Fingerprint linking data, seed, code, environment and output | NEW_COMBINATION | UNVERIFIED | REQUIRED |
 | NR-0005 | Claim Strength Gate coupling epistemic status to evidence lineage | NEW_COMBINATION | UNVERIFIED | REQUIRED |
+| NR-0006 | State Transition Integrity as a cross-line measurement construct | NEW_COMBINATION | UNVERIFIED | REQUIRED |
+| NR-0007 | Separating transition integrity from final-outcome correctness as an experimental factor | NEW_COMBINATION | UNVERIFIED | REQUIRED |
+| NR-0008 | Controlled failure taxonomy spanning epistemic, provenance, semantic and common-mode transition failures | NEW_COMBINATION | UNVERIFIED | REQUIRED |
 
 ## Boundary
 
