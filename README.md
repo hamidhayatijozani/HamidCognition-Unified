@@ -4,7 +4,8 @@
 
 **Originator:** Hamid Hayati Jozani  
 **Status:** Public research, engineering, integration, and provenance record  
-**Canonical release:** v1.0.2
+**Repository governance release:** v2.0.0  
+**Commercial product runtime:** HamidCognition Action Gate v1.0.2
 
 ## What this repository is
 
