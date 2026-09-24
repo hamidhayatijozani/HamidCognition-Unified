@@ -9,7 +9,7 @@ on:
       - "action-gate-v*"
 
 permissions:
-  contents: write
+  contents: read
   actions: read
 
 jobs:
@@ -147,40 +147,41 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: release-candidate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - name: Download release candidate artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: action-gate-release-candidate-${{ needs.release-candidate.outputs.version }}
+          path: release
 
       - name: Publish product release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          TAG="action-gate-v${{ steps.version.outputs.version }}"
+          TAG="action-gate-v${{ needs.release-candidate.outputs.version }}"
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Product release $TAG already exists; nothing to publish."
             exit 0
           fi
+          tar_file="$(find release -maxdepth 1 -name 'action-gate-*.tar' -print -quit)"
+          sha_file="$(find release -maxdepth 1 -name 'action-gate-*.tar.sha256' -print -quit)"
+          manifest_file="$(find release -maxdepth 1 -name 'action-gate-*.manifest.txt' -print -quit)"
+          test -f "$tar_file" && test -f "$sha_file" && test -f "$manifest_file"
           cat > product-release-notes.md <<EOF
-          HamidCognition Action Gate v${{ steps.version.outputs.version }}
+          HamidCognition Action Gate v${{ needs.release-candidate.outputs.version }}
 
-          This is the versioned commercial runtime baseline.
+          Verified source commit: ${{ github.sha }}
+          Release-candidate workflow run: #${{ github.run_id }}
 
-          Verified source commit: $GITHUB_SHA
-          Release-candidate workflow run: #$GITHUB_RUN_ID
-
-          Included artifacts:
-          - action-gate-${{ steps.version.outputs.version }}.tar
-          - action-gate-${{ steps.version.outputs.version }}.tar.sha256
-          - action-gate-${{ steps.version.outputs.version }}.manifest.txt
-
-          The manifest records the prerequisite verification runs and same-SHA evidence.
           Commercial deployment remains subject to the customer acceptance procedure.
           EOF
-          gh release create "$TAG" \
-            --repo "$GITHUB_REPOSITORY" \
-            --target "$GITHUB_SHA" \
-            --title "HamidCognition Action Gate v${{ steps.version.outputs.version }}" \
-            --notes-file product-release-notes.md \
-            "action-gate-${{ steps.version.outputs.version }}.tar" \
-            "action-gate-${{ steps.version.outputs.version }}.tar.sha256" \
-            "action-gate-${{ steps.version.outputs.version }}.manifest.txt"
+          gh release create "$TAG"             --repo "$GITHUB_REPOSITORY"             --target "${{ github.sha }}"             --title "HamidCognition Action Gate v${{ needs.release-candidate.outputs.version }}"             --notes-file product-release-notes.md             "$tar_file" "$sha_file" "$manifest_file"
