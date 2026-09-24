@@ -22,7 +22,7 @@ def test_tool_nonce_claim_survives_module_reload(tmp_path, monkeypatch):
         action={"verb": "write", "resource": "customer/42"},
         policy={"version": "p1"},
         decision="ALLOW",
-        now=1000,
+        now=int(time.time()),
         nonce="nonce-persistent",
         ttl_seconds=300,
     )
