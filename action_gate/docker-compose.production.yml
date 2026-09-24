@@ -56,6 +56,9 @@ services:
       dockerfile: Dockerfile.tool
     environment:
       ACTION_GATE_SIGNING_SECRET: ${ACTION_GATE_SIGNING_SECRET:?set ACTION_GATE_SIGNING_SECRET}
+      TOOL_NONCE_DB: /data/tool_authority.db
+    volumes:
+      - tool_data:/data
     networks:
       - backend
     expose:
