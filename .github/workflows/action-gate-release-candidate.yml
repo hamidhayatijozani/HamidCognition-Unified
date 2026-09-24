@@ -9,7 +9,7 @@ on:
       - "action-gate-v*"
 
 permissions:
-  contents: read
+  contents: write
   actions: read
 
 jobs:
@@ -146,3 +146,41 @@ jobs:
             action-gate-${{ steps.version.outputs.version }}.manifest.txt
           if-no-files-found: error
           retention-days: 30
+
+
+      - name: Publish product release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="action-gate-v${{ steps.version.outputs.version }}"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Product release $TAG already exists; nothing to publish."
+            exit 0
+          fi
+          cat > product-release-notes.md <<EOF
+          HamidCognition Action Gate v${{ steps.version.outputs.version }}
+
+          This is the versioned commercial runtime baseline.
+
+          Verified source commit: $GITHUB_SHA
+          Release-candidate workflow run: #$GITHUB_RUN_ID
+
+          Included artifacts:
+          - action-gate-${{ steps.version.outputs.version }}.tar
+          - action-gate-${{ steps.version.outputs.version }}.tar.sha256
+          - action-gate-${{ steps.version.outputs.version }}.manifest.txt
+
+          The manifest records the prerequisite verification runs and same-SHA evidence.
+          Commercial deployment remains subject to the customer acceptance procedure.
+          EOF
+          gh release create "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "HamidCognition Action Gate v${{ steps.version.outputs.version }}" \
+            --notes-file product-release-notes.md \
+            "action-gate-${{ steps.version.outputs.version }}.tar" \
+            "action-gate-${{ steps.version.outputs.version }}.tar.sha256" \
+            "action-gate-${{ steps.version.outputs.version }}.manifest.txt"
