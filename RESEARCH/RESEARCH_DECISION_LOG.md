@@ -7,6 +7,8 @@
 | RD-0001 | Unified باید lineage را حفظ کند، نه اینکه تاریخچه را در یک implementation حل کند | جلوگیری از حذف variant و failure | PROJECT_CATALOG / MIGRATION | ACTIVE |
 | RD-0002 | ادعاهای علمی بدون evidence کافی به‌عنوان VERIFIED ثبت نشوند | کنترل overclaim | README / Claim Ledger | ACTIVE |
 | RD-0003 | novelty به‌صورت candidate ثبت شود تا prior-art comparison انجام شود | تفکیک ایده از اثبات novelty | Novelty Register | ACTIVE |
+| RD-0004 | State Transition Integrity به‌عنوان hypothesis cross-line ثبت شود، نه canonical theory | شباهت ساختاری میان چند خط پژوهشی بدون اثبات هم‌ارزی مکانیزم | CROSSLINE_SYNTHESIS_2026-09-24 / STI-001 | ACTIVE |
+| RD-0005 | نخستین آزمون STI باید baselineهای ساده را مستقیماً مقایسه کند | جلوگیری از ساخت متریک جدید بدون نشان‌دادن ارزش افزوده | STI-001 | ACTIVE |
 
 ## Decision rule
 
