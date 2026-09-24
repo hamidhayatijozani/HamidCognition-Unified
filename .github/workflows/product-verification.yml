@@ -31,19 +31,23 @@ jobs:
         run: |
           set -euo pipefail
           python -m pip install --upgrade pip
-          python -m pip install pytest
+          if [ -f action_gate/requirements.txt ]; then
+            python -m pip install -r action_gate/requirements.txt
+          fi
           if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
           if [ -f pyproject.toml ]; then python -m pip install -e .; fi
           if [ -f requirements-dev.txt ]; then python -m pip install -r requirements-dev.txt; fi
+          python -m pip install "pytest>=8,<9"
 
       - name: Run repository test suite
         shell: bash
         run: |
           set -euo pipefail
-          if [ -d tests ]; then
-            python -m pytest -q
+          export PYTHONPATH="$GITHUB_WORKSPACE/action_gate:$PYTHONPATH"
+          if [ -d action_gate/tests ] || find action_gate -maxdepth 2 -type f \( -name 'test_*.py' -o -name '*_test.py' \) | grep -q .; then
+            python -m pytest -q action_gate
           else
-            echo 'No tests/ directory found; verification cannot be claimed.'
+            echo 'No Python tests found; verification cannot be claimed.'
             exit 1
           fi
 
