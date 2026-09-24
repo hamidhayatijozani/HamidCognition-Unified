@@ -1,6 +1,6 @@
 # HamidCognition Action Gate Commercial Product Specification
 
-Version: 1.0.0  
+Version: 1.0.2  
 Product: HamidCognition Action Gate  
 Originator: Hamid Hayati Jozani
 
@@ -14,9 +14,9 @@ Current executable decisions: ALLOW, DENY, ASK, SANDBOX. DEFER is not part of th
 
 The product provides a separately deployable control point between an agent and a tool. It adds explicit authorization state, evidence, replay, identity binding, and enforcement rather than reducing governance to an untraceable allow/deny boolean.
 
-## Validated v1.0.0 boundary
+## Validated v1.0.2 boundary
 
-The current release evidence covers:
+The release baseline has automated evidence for:
 
 - production authentication;
 - tenant isolation;
@@ -31,12 +31,8 @@ The current release evidence covers:
 - end-to-end smoke validation;
 - 200-event decision replay;
 - restart/persistence replay;
-- clean-room validation on a release-candidate commit;
+- clean-room validation on the release commit;
 - release-candidate container artifact generation.
-
-Direct main-head verification is tracked separately and must not be inferred from a pull-request run.
-
-Evidence references are recorded in the release and workflow artifacts for the exact release baseline.
 
 These are engineering validation claims for the tested boundary. They do not guarantee that every customer policy, downstream tool, deployment, or business process is safe or correct.
 
@@ -46,7 +42,7 @@ A customer deployment must provide a protected gate endpoint, production authent
 
 ## Commercial boundary
 
-The commercial product must distinguish:
+The commercial product distinguishes:
 
 1. software supplied by HamidCognition;
 2. customer policy and data;
