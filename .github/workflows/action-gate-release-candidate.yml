@@ -3,7 +3,7 @@ name: Action Gate Release Candidate
 on:
   workflow_run:
     workflows:
-      - "Action Gate Product Gates"
+      - "Action Gate Release Readiness Gate"
     types:
       - completed
 
@@ -55,7 +55,7 @@ jobs:
           product=HamidCognition Action Gate
           version=${{ steps.version.outputs.version }}
           commit=$VALIDATED_SHA
-          product_gates_run_id=$VALIDATED_RUN_ID
+          release_readiness_run_id=$VALIDATED_RUN_ID
           image=action-gate:${{ steps.version.outputs.version }}
           archive=action-gate-${{ steps.version.outputs.version }}.tar
           generated_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
