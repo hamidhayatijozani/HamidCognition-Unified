@@ -33,7 +33,8 @@ def verify_execution_authority(token: str | None, tenant_id: str | None, action_
     if not token or not action_hash or not tenant_id:
         raise AuthorityError("direct_tool_access_rejected")
     authority = Authority.from_token(token)
-    secret = SIGNING_SECRET.encode() if isinstance(SIGNING_SECRET, str) else SIGNING_SECRET\n    verify_authority_envelope(authority=authority, secret=secret, tenant_id=tenant_id, action_digest=action_hash, used_nonces=None)
+    secret = SIGNING_SECRET.encode() if isinstance(SIGNING_SECRET, str) else SIGNING_SECRET
+    verify_authority_envelope(authority=authority, secret=secret, tenant_id=tenant_id, action_digest=action_hash, used_nonces=None)
     if authority.decision != "ALLOW":
         raise AuthorityError("decision_not_executable")
     _claim_nonce(authority.nonce, authority.decision_id, authority.expires_at)
