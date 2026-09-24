@@ -90,7 +90,7 @@ P/S/T، LUMEN، market/streaming work و regime detection در سطح انتزا
 
 Ground truth باید قبل از اجرا مشخص شود.
 
-## Falsification requirements
+## Executable research layer\nSTI-001 اکنون یک benchmark مصنوعی اجرایی دارد: `RESEARCH/experiments/sti_001.py`. این artifact سناریوهای failure را با ground truth مستقل می‌سازد و چهار evaluator را مقایسه می‌کند. تست‌های invariant در `action_gate/tests/test_sti_001.py` ثبت شده‌اند. این خروجی فقط discrimination روی سناریوهای مصنوعی است و نباید به‌عنوان اعتبار عمومی شناختی تفسیر شود.\n\n## Falsification requirements
 - baseline improvement باید مستقل از اطلاعات اضافی unfair باشد.
 - shuffled/reordered trajectories باید آزمون شوند.
 - provenance-complete-but-wrong باید وجود داشته باشد.
