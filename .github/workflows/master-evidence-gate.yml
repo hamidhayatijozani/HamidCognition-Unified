@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   validation:
@@ -35,9 +35,7 @@ jobs:
           mkdir -p "$EVIDENCE_DIR"
           git rev-parse HEAD > "$EVIDENCE_DIR/commit.txt"
           date -u +%FT%TZ > "$EVIDENCE_DIR/start_utc.txt"
-          printf 'event=%s\nref=%s\nsha=%s\nworkflow=%s\nrun_id=%s\n' \
-            "$GITHUB_EVENT_NAME" "$GITHUB_REF" "$GITHUB_SHA" "$GITHUB_WORKFLOW" "$GITHUB_RUN_ID" \
-            > "$EVIDENCE_DIR/github-run-context.txt"
+          printf 'event=%s\nref=%s\nsha=%s\nworkflow=%s\nrun_id=%s\n'             "$GITHUB_EVENT_NAME" "$GITHUB_REF" "$GITHUB_SHA" "$GITHUB_WORKFLOW" "$GITHUB_RUN_ID"             > "$EVIDENCE_DIR/github-run-context.txt"
       - name: "05 Default project unit suite"
         if: always()
         run: |
@@ -51,30 +49,34 @@ jobs:
       - name: "06 STI unit tests"
         if: always()
         run: |
+          set +e
           set -o pipefail
           python -m pytest -q action_gate/tests/test_sti_001.py 2>&1 | tee "$EVIDENCE_DIR/sti-tests.log"
-          rc=$?
+          rc=${PIPESTATUS[0]}
           echo "$rc" > "$EVIDENCE_DIR/sti-tests.rc"
           exit 0
       - name: "07 STI synthetic benchmark"
         if: always()
         run: |
+          set +e
           set -o pipefail
           python RESEARCH/experiments/sti_001.py --output "$EVIDENCE_DIR/sti-benchmark.json" 2>&1 | tee "$EVIDENCE_DIR/sti-benchmark.log"
-          rc=$?
+          rc=${PIPESTATUS[0]}
           echo "$rc" > "$EVIDENCE_DIR/sti-benchmark.rc"
           exit 0
       - name: "08 200-event Replay"
         if: always()
         run: |
+          set +e
           set -o pipefail
           python RESEARCH/experiments/replay_200.py 2>&1 | tee "$EVIDENCE_DIR/replay-200.log"
-          rc=$?
+          rc=${PIPESTATUS[0]}
           echo "$rc" > "$EVIDENCE_DIR/replay-200.rc"
           exit 0
       - name: "09 Replay integrity verification"
         if: always()
         run: |
+          set +e
           set -o pipefail
           python - <<'PY' 2>&1 | tee "$EVIDENCE_DIR/replay-integrity.log"
           import json,sys
@@ -83,16 +85,17 @@ jobs:
           print(json.dumps({"events":d["events"],"digest_match":d["source_digest"]==d["replay_digest"],"passed":ok},indent=2))
           sys.exit(0 if ok else 1)
           PY
-          rc=$?
+          rc=${PIPESTATUS[0]}
           echo "$rc" > "$EVIDENCE_DIR/replay-integrity.rc"
           exit 0
       - name: "10 Start PostgreSQL persistence container"
         if: always()
         run: |
+          set +e
           set -o pipefail
           docker rm -f "$PG_CONTAINER" >/dev/null 2>&1 || true
           docker run -d --name "$PG_CONTAINER" -p 54329:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=evidence             --health-cmd='pg_isready -U postgres -d evidence' --health-interval=2s --health-timeout=3s --health-retries=20             postgres:16-alpine | tee "$EVIDENCE_DIR/postgres-container-id.txt"
-          rc=$?
+          rc=${PIPESTATUS[0]}
           echo "$rc" > "$EVIDENCE_DIR/postgres-start.rc"
           exit 0
       - name: "11 PostgreSQL healthcheck"
@@ -110,22 +113,25 @@ jobs:
       - name: "12 PostgreSQL seed and baseline"
         if: always()
         run: |
+          set +e
           set -o pipefail
           python RESEARCH/experiments/postgres_persistence.py 2>&1 | tee "$EVIDENCE_DIR/postgres-seed.log"
-          rc=$?
+          rc=${PIPESTATUS[0]}
           echo "$rc" > "$EVIDENCE_DIR/postgres-seed.rc"
           exit 0
       - name: "13 Real PostgreSQL container restart"
         if: always()
         run: |
+          set +e
           set -o pipefail
           docker restart "$PG_CONTAINER" 2>&1 | tee "$EVIDENCE_DIR/postgres-restart.log"
-          rc=$?
+          rc=${PIPESTATUS[0]}
           echo "$rc" > "$EVIDENCE_DIR/postgres-restart.rc"
           exit 0
       - name: "14 PostgreSQL persistence after restart"
         if: always()
         run: |
+          set +e
           set -o pipefail
           for i in $(seq 1 30); do
             status=$(docker inspect -f '{{.State.Health.Status}}' "$PG_CONTAINER" 2>/dev/null || true)
@@ -133,20 +139,22 @@ jobs:
             sleep 2
           done
           python RESEARCH/experiments/postgres_verify.py 2>&1 | tee "$EVIDENCE_DIR/postgres-verify.log"
-          rc=$?
+          rc=${PIPESTATUS[0]}
           echo "$rc" > "$EVIDENCE_DIR/postgres-verify.rc"
           exit 0
       - name: "15 Latency benchmark"
         if: always()
         run: |
+          set +e
           set -o pipefail
           python RESEARCH/experiments/latency_check.py 2>&1 | tee "$EVIDENCE_DIR/latency.log"
-          rc=$?
+          rc=${PIPESTATUS[0]}
           echo "$rc" > "$EVIDENCE_DIR/latency.rc"
           exit 0
       - name: "16 Latency threshold gate"
         if: always()
         run: |
+          set +e
           set -o pipefail
           python - <<'PY' 2>&1 | tee "$EVIDENCE_DIR/latency-gate.log"
           import json,sys
@@ -154,7 +162,7 @@ jobs:
           print(json.dumps(d,indent=2))
           sys.exit(0 if d["passed"] else 1)
           PY
-          rc=$?
+          rc=${PIPESTATUS[0]}
           echo "$rc" > "$EVIDENCE_DIR/latency-gate.rc"
           exit 0
       - name: "17 Build evidence manifest"
@@ -197,4 +205,3 @@ jobs:
           done
           test "$failures" -eq 0
           test -f evidence/manifest.json
-
