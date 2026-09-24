@@ -146,17 +146,3 @@ jobs:
             action-gate-${{ steps.version.outputs.version }}.manifest.txt
           if-no-files-found: error
           retention-days: 30
-
-  publish:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: release-candidate
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      actions: read
-    steps:
-      - name: Download release candidate artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: action-gate-release-candidate-${{ needs.release-candidate.outputs.version }}
-          path: release
