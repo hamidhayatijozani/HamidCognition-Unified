@@ -1,11 +1,35 @@
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import os
+import sqlite3
+import time
 
 from security_authority import Authority, AuthorityError, verify_authority_envelope
 
 SIGNING_SECRET = os.getenv("ACTION_GATE_SIGNING_SECRET")
-USED_NONCES: set[str] = set()
+TOOL_NONCE_DB = os.getenv("TOOL_NONCE_DB", "/data/tool_authority.db")
+
+
+def _claim_nonce(nonce: str, decision_id: str, expires_at: int) -> None:
+    os.makedirs(os.path.dirname(TOOL_NONCE_DB) or ".", exist_ok=True)
+    con = sqlite3.connect(TOOL_NONCE_DB, timeout=5)
+    try:
+        con.execute("PRAGMA busy_timeout=5000")
+        con.execute(
+            "CREATE TABLE IF NOT EXISTS used_authorities (nonce TEXT PRIMARY KEY, decision_id TEXT NOT NULL, expires_at INTEGER NOT NULL, used_at INTEGER NOT NULL)"
+        )
+        now = int(time.time())
+        con.execute("DELETE FROM used_authorities WHERE expires_at <= ?", (now,))
+        con.execute(
+            "INSERT INTO used_authorities(nonce, decision_id, expires_at, used_at) VALUES (?,?,?,?)",
+            (nonce, decision_id, expires_at, now),
+        )
+        con.commit()
+    except sqlite3.IntegrityError as exc:
+        con.rollback()
+        raise AuthorityError("nonce_reuse") from exc
+    finally:
+        con.close()
 
 
 def verify_execution_authority(token: str | None, tenant_id: str | None, action_hash: str | None) -> None:
@@ -19,8 +43,11 @@ def verify_execution_authority(token: str | None, tenant_id: str | None, action_
         secret=SIGNING_SECRET.encode(),
         tenant_id=tenant_id,
         action_digest=action_hash,
-        used_nonces=USED_NONCES,
+        used_nonces=None,
     )
+    if authority.decision != "ALLOW":
+        raise AuthorityError("decision_not_executable")
+    _claim_nonce(authority.nonce, authority.decision_id, authority.expires_at)
 
 
 class Tool(BaseHTTPRequestHandler):
@@ -37,8 +64,15 @@ class Tool(BaseHTTPRequestHandler):
             self.wfile.write(b'{"error":"execution_authority_invalid"}')
             return
 
-        size = int(self.headers.get("Content-Length", "0"))
-        body = json.loads(self.rfile.read(size) or b"{}")
+        try:
+            size = int(self.headers.get("Content-Length", "0"))
+            body = json.loads(self.rfile.read(size) or b"{}")
+        except (ValueError, json.JSONDecodeError):
+            self.send_response(400)
+            self.end_headers()
+            self.wfile.write(b'{"error":"invalid_json"}')
+            return
+
         self.send_response(200)
         self.end_headers()
         self.wfile.write(json.dumps({"tool_executed": True, "received": body}).encode())
