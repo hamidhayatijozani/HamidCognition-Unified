@@ -35,6 +35,9 @@ jobs:
           mkdir -p "$EVIDENCE_DIR"
           git rev-parse HEAD > "$EVIDENCE_DIR/commit.txt"
           date -u +%FT%TZ > "$EVIDENCE_DIR/start_utc.txt"
+          printf 'event=%s\nref=%s\nsha=%s\nworkflow=%s\nrun_id=%s\n' \
+            "$GITHUB_EVENT_NAME" "$GITHUB_REF" "$GITHUB_SHA" "$GITHUB_WORKFLOW" "$GITHUB_RUN_ID" \
+            > "$EVIDENCE_DIR/github-run-context.txt"
       - name: "05 Default project unit suite"
         if: always()
         run: |
