@@ -1,63 +1,35 @@
-# Action Gate Operations Runbook
+# Action Gate v1.0.2 Operations Runbook
 
-## Health
+## Start
+1. Set DOMAIN and unique production secrets through the deployment environment or secret manager.
+2. Back up the existing evidence database before first upgrade.
+3. Start with docker compose using action_gate/docker-compose.production.yml.
+4. Verify /health reports version 1.0.2 and PostgreSQL storage.
+5. Keep production execution disabled until customer acceptance passes.
 
-Monitor runtime availability and dependency health. A healthy process is not equivalent to a healthy enforcement boundary.
+## Acceptance
+Run PRODUCT/CUSTOMER_ACCEPTANCE.md against the exact deployed commit/image. Record the result, policy hash, image digest, and rollback target.
 
-## Key signals
+## Monitoring
+Monitor health, request latency, HTTP 4xx/5xx rates, denials and approvals, evidence reservation/finalization failures, PostgreSQL health/storage capacity, and certificate renewal.
 
-Track at minimum:
+## Incident response
+If evidence persistence, authorization, or integrity verification fails, treat the execution path as fail-closed. Preserve logs and evidence before changing the deployment. Do not bypass Action Gate to restore functionality.
 
-- request count
-- decisions by ALLOW/DENY/ASK/SANDBOX
-- decision latency
-- execution latency
-- authentication failures
-- actor/session binding mismatches
-- nonce reuse attempts
-- evidence reservation/persistence failures
-- database connection failures
-- replay/validation failures
+## Key rotation
+Add the new key to ACTION_GATE_SIGNING_KEYS, select it with ACTION_GATE_KEY_ID, deploy, then retain the previous key until all decisions signed with it have passed their retention period. Never place keys in source control.
 
-## Incident priority
+## Upgrade
+1. Export/backup evidence.
+2. Record current version and image digest.
+3. Deploy the candidate in a non-production environment.
+4. Run the complete acceptance suite.
+5. Verify replay compatibility.
+6. Roll out reversibly.
+7. Record the new version, commit, image digest, policy fingerprint and acceptance result.
 
-### Evidence failure
+## Rollback
+Stop the candidate, restore the previously recorded image/release baseline, verify database compatibility, then rerun health and relevant acceptance checks. Do not delete evidence to make a rollback appear clean.
 
-If required evidence cannot be reserved or persisted, production execution must remain blocked. Restore the evidence path before reopening production execution.
-
-### Identity mismatch
-
-A binding mismatch is a security event. Investigate actor, session, tenant, nonce, and correlation data. Do not bypass the gate to restore throughput.
-
-### Database failure
-
-Treat inability to persist required audit/evidence state as fail-closed for protected production actions.
-
-### Unexpected decision distribution
-
-A sudden change in DENY/ASK/SANDBOX/ALLOW distribution should be investigated as a policy/configuration or integration change.
-
-## Recovery
-
-1. Preserve incident evidence.
-2. Record version and configuration fingerprint.
-3. Confirm dependency health.
-4. Restore persistence if needed.
-5. Run acceptance/replay checks.
-6. Re-enable production execution only after the boundary is verified.
-7. Record recovery evidence.
-
-## Backup/restore
-
-Backups must include the persistent evidence store and must be periodically restored into an isolated environment. A backup that has never been restored is a hypothesis wearing a file extension.
-
-## Change control
-
-Every production change should identify:
-
-- previous version
-- new version
-- commit/image digest
-- configuration change
-- acceptance evidence
-- rollback target
+## Recovery boundary
+PostgreSQL evidence is part of the security record. Backup and restore procedures must preserve integrity and access controls. HA, external secret managers, SIEM, HSM/KMS and identity federation are deployment-specific and require separate validation.
