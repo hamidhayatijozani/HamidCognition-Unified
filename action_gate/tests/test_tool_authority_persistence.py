@@ -1,4 +1,5 @@
 import importlib
+import time
 
 import pytest
 
@@ -43,7 +44,7 @@ def test_tool_rejects_sandbox_authority():
         action={"verb": "write", "resource": "customer/42"},
         policy={"version": "p1"},
         decision="SANDBOX",
-        now=1000,
+        now=int(time.time()),
         nonce="nonce-sandbox",
     )
     with pytest.raises(AuthorityError, match="decision_not_executable"):
