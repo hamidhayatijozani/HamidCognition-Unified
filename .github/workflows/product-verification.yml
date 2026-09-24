@@ -43,9 +43,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          export PYTHONPATH="$GITHUB_WORKSPACE/action_gate:$PYTHONPATH"
+          export PYTHONPATH="$GITHUB_WORKSPACE/action_gate:${PYTHONPATH:-}"
           if [ -d action_gate/tests ] || find action_gate -maxdepth 2 -type f \( -name 'test_*.py' -o -name '*_test.py' \) | grep -q .; then
-            python -m pytest -q action_gate
+            PYTHONPATH="$GITHUB_WORKSPACE/action_gate:$GITHUB_WORKSPACE:${PYTHONPATH:-}" python -m pytest -q action_gate
           else
             echo 'No Python tests found; verification cannot be claimed.'
             exit 1
