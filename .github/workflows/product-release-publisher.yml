@@ -1,0 +1,54 @@
+name: Product Release Publisher
+
+on:
+  workflow_run:
+    workflows: ["Action Gate Release Candidate"]
+    types: [completed]
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  publish:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release candidate artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --dir release
+          find release -maxdepth 3 -type f -print
+
+      - name: Publish product release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          manifest_file="$(find release -name '*.manifest.txt' -print -quit)"
+          tar_file="$(find release -name 'action-gate-*.tar' -print -quit)"
+          sha_file="$(find release -name 'action-gate-*.tar.sha256' -print -quit)"
+          test -f "$manifest_file" && test -f "$tar_file" && test -f "$sha_file"
+          version="$(awk -F= '$1=="version"{print $2}' "$manifest_file")"
+          test -n "$version"
+          tag="action-gate-v$version"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "$tag already exists; nothing to publish."
+            exit 0
+          fi
+          cat > /tmp/release-notes.md <<EOF
+          HamidCognition Action Gate v$version
+
+          Verified source commit: $HEAD_SHA
+          Release-candidate workflow run: #${{ github.event.workflow_run.id }}
+
+          The release was published by a dedicated write-scoped publisher workflow. The build/evidence workflow does not receive repository write permission.
+          Commercial deployment remains subject to the customer acceptance procedure.
+          EOF
+          gh release create "$tag"             --repo "$GITHUB_REPOSITORY"             --target "$HEAD_SHA"             --title "HamidCognition Action Gate v$version"             --notes-file /tmp/release-notes.md             "$tar_file" "$sha_file" "$manifest_file"
