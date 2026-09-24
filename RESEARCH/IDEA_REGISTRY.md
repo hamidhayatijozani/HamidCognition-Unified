@@ -93,7 +93,7 @@ Status: HYPOTHESIS / CROSS-LINE SYNTHESIS.
 موضوع: سنجش یکپارچگی انتقال از state_t به state_t+1 از نظر traceability، evidence alignment، transition stability، semantic consistency و uncertainty integrity.
 رابطه با خطوط موجود: ClaimLab، Epistemic Liquidity، Epistemic Distance، HHJ-CSG، replay/provenance، P/S/T، LUMEN و regime detection.
 آزمون پایه: مقایسه outcome-only، confidence-only، provenance-only و transition-integrity evaluation روی trajectories با ground truth مستقل.
-مرجع: RESEARCH/STATE_TRANSITION_INTEGRITY.md و RESEARCH/STI_EXPERIMENT_001.md.
+مرجع: RESEARCH/STATE_TRANSITION_INTEGRITY.md و RESEARCH/STI_EXPERIMENT_001.md.\nArtifact اجرایی: RESEARCH/experiments/sti_001.py؛ تست مهندسی: action_gate/tests/test_sti_001.py.
 
 ## Research principles
 1. Running code is evidence of execution, not evidence of correctness.
