@@ -88,6 +88,13 @@ Status: HYPOTHESIS.
 سؤال: آیا معنای یک state یا metric در طول نسخه‌ها بدون تغییر schema تغییر می‌کند؟
 آزمون: semantic snapshots، versioned interpretation، replay across versions و drift alerts.
 
+### HC-015 — State Transition Integrity (STI)
+Status: HYPOTHESIS / CROSS-LINE SYNTHESIS.
+موضوع: سنجش یکپارچگی انتقال از state_t به state_t+1 از نظر traceability، evidence alignment، transition stability، semantic consistency و uncertainty integrity.
+رابطه با خطوط موجود: ClaimLab، Epistemic Liquidity، Epistemic Distance، HHJ-CSG، replay/provenance، P/S/T، LUMEN و regime detection.
+آزمون پایه: مقایسه outcome-only، confidence-only، provenance-only و transition-integrity evaluation روی trajectories با ground truth مستقل.
+مرجع: RESEARCH/STATE_TRANSITION_INTEGRITY.md و RESEARCH/STI_EXPERIMENT_001.md.
+
 ## Research principles
 1. Running code is evidence of execution, not evidence of correctness.
 2. A named model is not necessarily the model actually implemented.
@@ -99,3 +106,5 @@ Status: HYPOTHESIS.
 8. New architecture requires an evidence path back to source, experiment or hypothesis.
 9. Canonical status is earned by conformance and reproducibility, not by naming.
 10. No irreversible deletion of source history during consolidation.
+11. Cross-line conceptual similarity is not evidence that mechanisms are identical.
+12. A unifying abstraction must survive attempts to falsify the abstraction itself.
