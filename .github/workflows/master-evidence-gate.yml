@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   validation:
@@ -196,3 +196,48 @@ jobs:
           done
           test "$failures" -eq 0
           test -f evidence/manifest.json
+
+
+      - name: "20 Create official v2.0.0 release"
+        if: success() && github.ref == 'refs/heads/main' && github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v2.0.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "v2.0.0 already exists; nothing to create."
+            exit 0
+          fi
+          CURRENT_ZIP_HASH="$(sha256sum "$EVIDENCE_DIR/validation-evidence-pack.zip" | awk '{print $1}')"
+          cat > /tmp/release-notes.md <<EOF
+          Certified Governance Release for HamidCognition v2.0.0.
+
+          Validation:
+          - Current workflow run: #$GITHUB_RUN_ID
+          - Current validated commit: $GITHUB_SHA
+          - Evidence ZIP SHA-256 (current run): $CURRENT_ZIP_HASH
+          - Prior evidence Run ID: #36036827697
+          - Prior evidence ZIP SHA-256: b817b3e56e40e97029a596d36b1cd0907a6095cbc5b4cbdb251a557878f700ef
+
+          The validation gate covers the 19 operational steps:
+          01 checkout exact revision
+          02 Python 3.11 setup
+          03 dependency installation
+          04 evidence ledger initialization
+          05 default project unit suite
+          06 STI unit tests
+          07 STI synthetic benchmark
+          08 200-event replay
+          09 replay integrity verification
+          10 PostgreSQL persistence container start
+          11 PostgreSQL healthcheck
+          12 PostgreSQL seed and baseline
+          13 PostgreSQL restart
+          14 PostgreSQL persistence after restart
+          15 latency benchmark
+          16 latency threshold gate
+          17 evidence manifest build
+          18 validation evidence artifact upload
+          19 final 100-percent gate
+          EOF
+          gh release create v2.0.0             --repo "$GITHUB_REPOSITORY"             --target "$GITHUB_SHA"             --title "HamidCognition v2.0.0 - Certified Governance Release"             --notes-file /tmp/release-notes.md
