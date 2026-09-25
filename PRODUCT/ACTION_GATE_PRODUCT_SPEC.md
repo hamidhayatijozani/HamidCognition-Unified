@@ -1,6 +1,6 @@
 # HamidCognition Action Gate Commercial Product Specification
 
-Version: 1.0.4
+Version: 1.0.5
 Product: HamidCognition Action Gate
 Originator: Hamid Hayati Jozani
 
@@ -14,7 +14,7 @@ Current executable decisions: ALLOW, DENY, ASK, SANDBOX. DEFER is not part of th
 
 The product provides a separately deployable control point between an agent and a tool. It adds explicit authorization state, evidence, replay, identity binding, and enforcement rather than reducing governance to an untraceable allow/deny boolean.
 
-## Validated v1.0.4 boundary
+## Validated v1.0.5 boundary
 
 The release baseline has automated evidence for:
 
