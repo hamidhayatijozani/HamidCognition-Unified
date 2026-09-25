@@ -4,7 +4,7 @@ This file is the execution control for turning HamidCognition-Unified into a coh
 
 ## Canonical product
 
-Current product boundary: **HamidCognition Action Gate v1.0.2**.
+Current product boundary: **HamidCognition Action Gate v1.0.4**.
 
 The commercial product is the executable Action Gate boundary. Research lines remain separate evidence-bearing assets until they have their own implementation, tests, reproducibility record, and explicit product boundary.
 
@@ -49,7 +49,6 @@ Do not merge research into the commercial runtime merely because it is interesti
 
 No prize or market claim is considered real until its external rules and the submission evidence are verified.
 
-## Current next engineering target
+## Current product state
 
-Close the remaining executable-verification gap around the v1.0.2 product boundary, then freeze a release candidate. After that, audit the research tree and external opportunity space in parallel rather than interrupting the product release.
-
+Action Gate v1.0.4 is the frozen validated commercial runtime baseline. The next workstream is customer-specific delivery and acceptance, not another release-cycle rewrite of the validated core unless new evidence requires it.
