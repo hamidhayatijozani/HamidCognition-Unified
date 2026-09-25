@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This procedure verifies that a customer deployment preserves the security and execution boundary demonstrated by Action Gate v1.0.4.
+This procedure verifies that a customer deployment preserves the security and execution boundary demonstrated by Action Gate v1.0.5.
 
 ## Required tests
 
