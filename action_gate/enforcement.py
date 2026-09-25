@@ -7,8 +7,8 @@ from typing import Any, Mapping
 
 from fastapi import Header, HTTPException
 
-from security_authority import Authority, AuthorityError, verify_authority
-from storage import consume_authority_nonce
+from .security_authority import Authority, AuthorityError, verify_authority
+from .storage import consume_authority_nonce
 
 AUTHORITY_HEADER = "X-Action-Gate-Authority"
 
