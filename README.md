@@ -1,99 +1,77 @@
-# HamidCognition-Unified
+# HamidCognition Action Gate
 
-🧠 **HamidCognition Unified** is a research and engineering program investigating computational cognitive states, evidence-aware decision systems, execution governance, behavioral state transfer, unknown-space exploration, and experimental forecasting and trading systems.
+**Runtime authorization and execution governance for AI agents.**
 
-**Originator:** Hamid Hayati Jozani  
-**Status:** Public research, engineering, integration, and provenance record  
-**Repository governance release:** v2.0.0  
-**Commercial product runtime:** HamidCognition Action Gate v1.0.2
+HamidCognition Action Gate is a deployable control boundary between an AI agent and protected tools:
 
-## What this repository is
+**Agent → Action Gate → Protected Tool**
 
-HamidCognition-Unified is the canonical integration record for the HamidCognition program. It preserves the relationship between ideas, implementations, hypotheses, experiments, failures, unknowns, contradictions, and evidence.
+It evaluates an action before execution, binds authorization to the relevant tenant/actor/session/action context, records evidence, and allows the protected tool to execute only through the governed path.
 
-The goal is not artificial uniformity. The goal is a reproducible path from an idea to an implementation, experiment, observation, falsification or survival, and evidence-backed status transition.
+## Why it exists
 
-## Unified project structure
+AI agents increasingly have the ability to call APIs, MCP tools, databases, cloud systems and other privileged services. OWASP identifies excessive agency, excessive permissions and excessive autonomy as material risks and recommends complete mediation at downstream systems. NIST is also examining identity and authorization practices for software agents.
 
-The repository consolidates the active HamidCognition lines into one canonical tree:
+Action Gate addresses one narrow question:
 
-- **Action Gate / HHJ-CSG**: execution-governance runtime for evaluating and enforcing agent actions before high-impact tool execution.
-- **P/S/T Cognitive State Engine**: computational models of Pressure, Stability, and Tension/Freedom-related state.
-- **ClaimLab**: evidence-aware separation of observations, inferences, explanations, ontology claims, and overclaiming.
-- **LUMEN / Behavioral State Transfer**: research into structured behavioral continuity beyond narrative reconstruction.
-- **KIRGANDE / Unknown-Space Explorer**: anomaly, contradiction, unexplained-behavior, and candidate-structure discovery.
-- **Farahoosh-Prime**: exploratory generation, mutation, recombination, experiment, falsification, and unexplained-result preservation.
-- **Scale-Breaking research**: falsifiable testing of amplitude-dependent restoring behavior.
-- **Trading / EUR/USD research**: experimental market prediction and simulation with an explicit separation between simulated and live evidence.
+> Can the protected tool independently verify that this exact agent action is authorized, current, correctly bound, and not being replayed?
 
-Historical repositories are integrated by lineage and preserved as historical artifacts. No historical implementation becomes canonical merely because it is newer, larger, or named "complete".
+## Product capabilities
 
-## Current product boundary
+- ALLOW / DENY / ASK / SANDBOX decisions
+- tenant, actor, session and action binding
+- cryptographically bound decision records
+- Gate-issued execution authority
+- single-use nonce and replay protection
+- HTTP and MCP enforcement
+- fail-closed evidence handling
+- persistent PostgreSQL operation
+- audit and replay evidence
+- protected-tool acceptance tests
+- self-hosted, managed and enterprise delivery
 
-**HamidCognition Action Gate v1.0.2** is the current production-oriented software boundary in this repository.
+## Commercial entry point
 
-The validated engineering boundary includes production authentication, tenant isolation, actor/session binding, decision integrity, one-time nonce protection, HTTP and MCP enforcement, fail-closed evidence handling, persistent PostgreSQL operation, replay and persistence replay, production containerization, atomic execution finalization, Gate-issued execution authority at the downstream tool boundary, explicit production network segmentation, and executable validation evidence.
+The fastest path to purchase is a **one-tool pilot**.
 
-These are evidence-backed engineering claims for the tested boundary. They are not universal safety, legal-compliance, downstream-correctness, or business-outcome guarantees.
+Protect one high-impact agent tool or MCP server, run the acceptance suite against the customer's real deployment, and deliver reproducible evidence.
 
-## Research loop
+See `SALES/ONE_PAGER.md`, `SALES/ICP_AND_POSITIONING.md`, `SALES/PILOT_OFFER.md`, `SALES/DEMO_SCRIPT.md`, `SALES/OUTBOUND_EMAILS.md`, and `SALES/OBJECTIONS.md`.
 
-```
-IDEA
-  ↓
-CLAIM / HYPOTHESIS
-  ↓
-OPERATIONALIZATION
-  ↓
-EXPERIMENT
-  ↓
-OBSERVATION
-  ↓
-FALSIFICATION / SURVIVAL
-  ↓
-REPRODUCTION
-  ↓
-STATUS TRANSITION
-  ↓
-CANONICALIZATION or ARCHIVE
-```
+## Product boundary
 
-No stage may assume the result of a later stage.
+The current commercial runtime is **HamidCognition Action Gate v1.0.5**.
 
-## Epistemic status
+Validated engineering claims are limited to the tested boundary. The product does not claim universal AI safety, regulatory certification, downstream correctness, or guaranteed business outcomes.
 
-Where applicable, claims and artifacts are assigned:
+## Delivery models
 
-`VERIFIED` · `IMPLEMENTED` · `HYPOTHESIS` · `UNKNOWN` · `FALSIFIED` · `SUPERSEDED`
+**SELF_HOSTED** — customer operates the deployment.
 
-Code, commits, benchmarks, project names, and model output are not scientific validation by themselves.
+**MANAGED** — HamidCognition operates the service boundary.
+
+**ENTERPRISE** — negotiated integration, security review, support, deployment architecture and SLA.
+
+## Research program
+
+The broader HamidCognition repository preserves research and lineage around ClaimLab, P/S/T cognitive-state experiments, LUMEN / behavioral state transfer, KIRGANDE / unknown-space exploration, Farahoosh-Prime experimentation, scale-breaking research, and trading/forecasting experiments.
+
+Those research lines are not automatically commercial product claims. The Action Gate boundary is the current product surface.
 
 ## Evidence and provenance
 
-Important results should be traceable through:
+Important results are traceable through:
 
-`dataset → preprocessing → parameters → seed → code commit → environment → execution → observation → analysis → claim`
+`dataset → parameters → code commit → environment → execution → observation → analysis → claim`
 
-The repository also maintains evidence-to-claim mapping, contradiction records, unknown-space records, experiment fingerprints, canonicalization gates, provenance records, and migration lineage.
-
-## Documentation
-
-- `PROJECT_CATALOG.md` — unified project and research-line catalog
-- `PRODUCT/` — product specification, deployment, acceptance, release, and commercial boundary
-- `RESEARCH/` — experiments, evidence rules, research governance, and unknown-space exploration
-- `MIGRATION/` — source lineage, integration decisions, conflicts, and migration records
-- `RIGHTS_AND_PROVENANCE.md` — attribution and provenance
-- `SECURITY.md` — security reporting guidance
-- `CITATION.cff` — machine-readable citation metadata
+The repository preserves implementation lineage, evidence records, acceptance procedures and release artifacts.
 
 ## Rights
 
 **Copyright © 2026 Hamid Hayati Jozani. All rights reserved.**
 
-Public visibility does not by itself grant an open-source license or permission to commercialize the material. See `RIGHTS_AND_PROVENANCE.md` for the project's stated provenance and attribution position.
+Public repository visibility does not by itself grant an open-source license or permission to commercialize the material.
 
 ## Citation
 
-For the current integrated project, cite **Hamid Hayati Jozani — HamidCognition-Unified** and include the exact release or commit when reproducibility matters.
-
-For historical artifacts, cite their original repository and exact commit/path in addition to the Unified lineage record.
+For the integrated project, cite **Hamid Hayati Jozani — HamidCognition-Unified** and include the exact release or commit when reproducibility matters.
