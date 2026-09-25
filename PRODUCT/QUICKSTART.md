@@ -1,4 +1,4 @@
-# Action Gate 1.0.2 Quickstart
+# Action Gate 1.0.4 Quickstart
 
 ## Product
 
@@ -15,6 +15,7 @@ The production Compose definition is `action_gate/docker-compose.production.yml`
 5. Start the stack and verify Action Gate health.
 6. Run the complete customer acceptance procedure.
 7. Record version, commit/image digest, policy fingerprint, acceptance evidence, and rollback target.
+8. Verify the tool authority nonce database is on the persistent production volume configured by the Compose file.
 
 ## Acceptance
 
