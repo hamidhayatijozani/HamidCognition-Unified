@@ -23,7 +23,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          pip install pytest fastapi httpx uvicorn pydantic
+          pip install pytest fastapi httpx uvicorn pydantic 'psycopg[binary]'
 
       - name: Run AST Enforcement Coverage Gate
         run: python scripts/check_enforcement_coverage.py
