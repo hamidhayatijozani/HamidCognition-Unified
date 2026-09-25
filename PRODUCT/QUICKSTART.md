@@ -1,4 +1,4 @@
-# Action Gate 1.0.4 Quickstart
+# Action Gate 1.0.5 Quickstart
 
 ## Product
 
