@@ -1,7 +1,7 @@
 # HamidCognition Action Gate Commercial Product Specification
 
-Version: 1.0.2  
-Product: HamidCognition Action Gate  
+Version: 1.0.4
+Product: HamidCognition Action Gate
 Originator: Hamid Hayati Jozani
 
 ## Product definition
@@ -14,7 +14,7 @@ Current executable decisions: ALLOW, DENY, ASK, SANDBOX. DEFER is not part of th
 
 The product provides a separately deployable control point between an agent and a tool. It adds explicit authorization state, evidence, replay, identity binding, and enforcement rather than reducing governance to an untraceable allow/deny boolean.
 
-## Validated v1.0.2 boundary
+## Validated v1.0.4 boundary
 
 The release baseline has automated evidence for:
 
@@ -22,7 +22,7 @@ The release baseline has automated evidence for:
 - tenant isolation;
 - actor/session binding;
 - decision integrity and cryptographic binding;
-- single-use execution nonce protection;
+- single-use execution nonce protection with persistent nonce state;
 - HTTP enforcement;
 - MCP enforcement;
 - fail-closed evidence handling;
@@ -32,13 +32,15 @@ The release baseline has automated evidence for:
 - 200-event decision replay;
 - restart/persistence replay;
 - clean-room validation on the release commit;
-- release-candidate container artifact generation.
+- release-candidate container artifact generation;
+- aggregate same-SHA release-readiness gating;
+- history-wide high-confidence secret regression scanning.
 
 These are engineering validation claims for the tested boundary. They do not guarantee that every customer policy, downstream tool, deployment, or business process is safe or correct.
 
 ## Deployment contract
 
-A customer deployment must provide a protected gate endpoint, production authentication, signing secret/keyring configuration, persistent production storage, an enforcement integration that cannot bypass the gate, customer policy configuration, and appropriate monitoring and backups.
+A customer deployment must provide a protected gate endpoint, production authentication, signing secret/keyring configuration, persistent production storage, an enforcement integration that cannot bypass the gate, customer policy configuration, and appropriate monitoring and backups. The execution-authority nonce database must use the persistent production storage configured by the supplied Compose deployment.
 
 ## Commercial boundary
 
