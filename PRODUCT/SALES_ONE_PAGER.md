@@ -15,7 +15,7 @@ AI agents can move from generating text to taking real actions: invoking tools, 
 - Policy-bound action decisions: **ALLOW / DENY / ASK / SANDBOX**
 - Tenant, actor, session, and action identity binding
 - Cryptographic decision/action binding
-- Single-use execution nonce protection
+- Single-use execution nonce protection with persistent nonce state
 - Evidence reservation and recording
 - Fail-closed behavior when required evidence cannot be reserved or recorded
 - Persistent evidence and replay
@@ -28,7 +28,7 @@ AI agents can move from generating text to taking real actions: invoking tools, 
 
 ## Validated engineering boundary
 
-The current commercial product specification identifies the validated **Action Gate v1.0.2** boundary and lists production authentication, tenant isolation, actor/session binding, decision integrity, nonce protection, HTTP and MCP enforcement, fail-closed evidence handling, PostgreSQL persistence, production Compose startup, end-to-end smoke validation, replay, restart/persistence replay, clean-room validation, and release-candidate artifact generation.
+The current commercial product specification identifies the validated **Action Gate v1.0.4** boundary and lists production authentication, tenant isolation, actor/session binding, decision integrity, persistent nonce protection, HTTP and MCP enforcement, fail-closed evidence handling, PostgreSQL persistence, production Compose startup, end-to-end smoke validation, replay, restart/persistence replay, clean-room validation, security-history scanning, and release-readiness gating.
 
 These are engineering validation claims for the tested boundary. They are not claims of universal AI safety, universal policy correctness, regulatory certification, or safety of downstream tools.
 
