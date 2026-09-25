@@ -32,6 +32,7 @@ def init_db() -> None:
         con.execute("CREATE TABLE IF NOT EXISTS validation_events (event_id TEXT PRIMARY KEY, correlation_id TEXT NOT NULL, tenant_id TEXT, request_id TEXT, idempotency_key TEXT, request_digest TEXT, validation_result TEXT NOT NULL, error_code TEXT, raw_request TEXT NOT NULL, created_at TEXT NOT NULL)")
         con.execute("CREATE TABLE IF NOT EXISTS rate_limit_events (event_id TEXT PRIMARY KEY, rate_key TEXT NOT NULL, created_at REAL NOT NULL)")
         con.execute("CREATE INDEX IF NOT EXISTS idx_rate_limit_events_key_time ON rate_limit_events(rate_key, created_at)")
+        con.execute("CREATE TABLE IF NOT EXISTS authority_nonces (nonce TEXT PRIMARY KEY, decision_id TEXT NOT NULL, consumed_at TEXT NOT NULL)")
         con.commit()
         if backend() == "sqlite":
             con.execute("CREATE TRIGGER IF NOT EXISTS audit_events_no_update BEFORE UPDATE ON audit_events BEGIN SELECT RAISE(ABORT, 'audit_events_are_append_only'); END")
@@ -241,6 +242,33 @@ def finalize_execution(record: dict[str, Any], nonce: str, consumed_at: str, dig
             return None
         con.commit()
         return finalized
+    except Exception:
+        con.rollback()
+        raise
+    finally:
+        con.close()
+
+
+def consume_authority_nonce(nonce: str, decision_id: str, consumed_at: str) -> bool:
+    """Atomically consume an execution-authority nonce exactly once."""
+    con = connect()
+    try:
+        if backend() == "postgresql":
+            row = con.execute(
+                "INSERT INTO authority_nonces (nonce, decision_id, consumed_at) "
+                "VALUES (%s,%s,%s) ON CONFLICT (nonce) DO NOTHING RETURNING nonce",
+                (nonce, decision_id, consumed_at),
+            ).fetchone()
+        else:
+            con.execute("BEGIN IMMEDIATE")
+            con.execute(
+                "INSERT OR IGNORE INTO authority_nonces (nonce, decision_id, consumed_at) VALUES (?,?,?)",
+                (nonce, decision_id, consumed_at),
+            )
+            row = con.execute("SELECT changes()").fetchone()
+            row = (nonce,) if row and row[0] == 1 else None
+        con.commit()
+        return bool(row)
     except Exception:
         con.rollback()
         raise
