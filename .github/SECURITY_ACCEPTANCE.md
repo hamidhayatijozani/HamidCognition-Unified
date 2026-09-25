@@ -1,6 +1,6 @@
 # Security Acceptance Verification
 
-This document makes the protected-tool acceptance boundary explicit in repository history.
+This document explicitly makes the protected-tool acceptance boundary explicit in repository history.
 
 The CI gate covers:
 - direct execution without X-Action-Gate-Authority
