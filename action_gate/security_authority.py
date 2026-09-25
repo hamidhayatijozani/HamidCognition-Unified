@@ -102,8 +102,8 @@ def verify_authority_envelope(*, authority: Authority, secret: bytes,
 
 
 def verify_authority(*, authority: Authority, secret: bytes,
-                     tenant_id: str, action: Mapping[str, Any],
-                     policy: Mapping[str, Any], now: int | None = None,
+                     tenant_id: str, action: Mapping[str, Any] | None = None,
+                     policy: Mapping[str, Any] | None = None, now: int | None = None,
                      used_nonces: set[str] | None = None) -> None:
     current = int(time.time()) if now is None else int(now)
     expected = hmac.new(secret, canonical_json(authority.payload()).encode(), hashlib.sha256).hexdigest()
@@ -113,9 +113,9 @@ def verify_authority(*, authority: Authority, secret: bytes,
         raise AuthorityError("tenant_mismatch")
     if current >= authority.expires_at or current < authority.issued_at:
         raise AuthorityError("expired_or_not_yet_valid")
-    if authority.action_digest != canonical_digest(action):
+    if action is not None and authority.action_digest != canonical_digest(action):
         raise AuthorityError("action_binding_mismatch")
-    if authority.policy_digest != canonical_digest(policy):
+    if policy is not None and authority.policy_digest != canonical_digest(policy):
         raise AuthorityError("policy_binding_mismatch")
     if used_nonces is not None:
         if authority.nonce in used_nonces:
