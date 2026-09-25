@@ -13,7 +13,9 @@ This procedure verifies that a customer deployment preserves the security and ex
 
 ### Decision integrity
 - decision integrity verification succeeds;
+- a protected endpoint rejects direct access without `X-Action-Gate-Authority` before its handler executes;
 - a downstream tool rejects a call without Gate-issued execution authority;
+- replaying the same authority concurrently permits at most one request to cross the enforcement barrier;
 - action hash matches the execution request;
 - tenant mismatch cannot retrieve or execute another tenant's decision;
 - expired decisions are rejected;
@@ -40,3 +42,8 @@ This procedure verifies that a customer deployment preserves the security and ex
 A deployment is accepted only when all required tests produce recorded evidence.
 
 A passing test suite does not establish that customer policy is correct. Customer policy must be separately reviewed and versioned.
+
+
+## Protected-tool bypass suite
+
+The automated acceptance suite includes direct-access, replay, tenant-tampering, action-tampering, and atomic nonce-consumption tests. The production acceptance run must execute these tests against the same storage and deployment topology used by the protected tools.
