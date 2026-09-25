@@ -1,5 +1,6 @@
 import os
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 from fastapi import Depends, FastAPI
@@ -85,3 +86,42 @@ def test_nonce_consumption_is_atomic(monkeypatch, tmp_path):
     storage.init_db()
     assert storage.consume_authority_nonce("nonce-1", "dec-1", "2026-09-25T00:00:00+00:00")
     assert not storage.consume_authority_nonce("nonce-1", "dec-1", "2026-09-25T00:00:01+00:00")
+
+
+def test_expired_authority_is_forbidden(monkeypatch, tmp_path):
+    monkeypatch.setenv("ACTION_GATE_AUTHORITY_SECRET", "test-authority-secret")
+    import action_gate.storage as storage
+    monkeypatch.setattr(storage, "SQLITE_PATH", str(tmp_path / "expiry.db"))
+    storage.init_db()
+    token = mint().token()
+    authority = mint()
+    expired = authority.__class__(
+        decision_id=authority.decision_id,
+        tenant_id=authority.tenant_id,
+        action_digest=authority.action_digest,
+        policy_digest=authority.policy_digest,
+        nonce=authority.nonce,
+        issued_at=int(time.time()) - 10,
+        expires_at=int(time.time()) - 1,
+        decision=authority.decision,
+        signature=authority.signature,
+    ).token()
+    with pytest.raises(Exception) as exc:
+        enforce_execution_authority(expired)
+    assert "expired_or_not_yet_valid" in str(exc.value)
+
+
+def test_concurrent_same_nonce_only_one_succeeds(monkeypatch, tmp_path):
+    monkeypatch.setenv("ACTION_GATE_AUTHORITY_SECRET", "test-authority-secret")
+    import action_gate.storage as storage
+    monkeypatch.setattr(storage, "SQLITE_PATH", str(tmp_path / "race.db"))
+    storage.init_db()
+
+    def consume(_):
+        return storage.consume_authority_nonce(
+            "shared-race-nonce", "dec-race", "2026-09-25T00:00:00+00:00"
+        )
+
+    with ThreadPoolExecutor(max_workers=10) as pool:
+        results = list(pool.map(consume, range(10)))
+    assert sum(results) == 1
