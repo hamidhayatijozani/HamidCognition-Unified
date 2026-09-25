@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This procedure verifies that a customer deployment preserves the security and execution boundary demonstrated by Action Gate v1.0.2.
+This procedure verifies that a customer deployment preserves the security and execution boundary demonstrated by Action Gate v1.0.4.
 
 ## Required tests
 
@@ -17,7 +17,8 @@ This procedure verifies that a customer deployment preserves the security and ex
 - action hash matches the execution request;
 - tenant mismatch cannot retrieve or execute another tenant's decision;
 - expired decisions are rejected;
-- a consumed nonce cannot be reused.
+- a consumed nonce cannot be reused;
+- nonce reuse remains rejected after the tool service is restarted.
 
 ### Policy boundary
 - ALLOW may cross the production execution boundary;
@@ -31,7 +32,8 @@ This procedure verifies that a customer deployment preserves the security and ex
 
 ### Persistence
 - restart does not invalidate valid persisted decisions unexpectedly;
-- replay after restart reproduces the stored decision and hashes.
+- replay after restart reproduces the stored decision and hashes;
+- the execution-authority nonce database is stored on persistent production storage.
 
 ## Acceptance result
 
