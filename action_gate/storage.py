@@ -19,7 +19,10 @@ def backend() -> str:
 def connect():
     if backend() == "postgresql":
         return psycopg.connect(DATABASE_URL)
-    return sqlite3.connect(SQLITE_PATH)
+    con = sqlite3.connect(SQLITE_PATH, timeout=10.0)
+    con.execute("PRAGMA busy_timeout=10000")
+    con.execute("PRAGMA journal_mode=WAL")
+    return con
 
 
 def init_db() -> None:
@@ -269,6 +272,30 @@ def consume_authority_nonce(nonce: str, decision_id: str, consumed_at: str) -> b
             row = (nonce,) if row and row[0] == 1 else None
         con.commit()
         return bool(row)
+    except Exception:
+        con.rollback()
+        raise
+    finally:
+        con.close()
+
+
+def purge_authority_nonces(older_than_seconds: int, now_ts: float | None = None) -> int:
+    """Delete consumed authority nonces older than the retention window."""
+    if older_than_seconds < 0:
+        raise ValueError("older_than_seconds must be non-negative")
+    import datetime as _datetime
+    now = _datetime.datetime.now(_datetime.timezone.utc) if now_ts is None else _datetime.datetime.fromtimestamp(now_ts, _datetime.timezone.utc)
+    cutoff = (now - _datetime.timedelta(seconds=older_than_seconds)).isoformat()
+    con = connect()
+    try:
+        if backend() == "postgresql":
+            cur = con.execute("DELETE FROM authority_nonces WHERE consumed_at < %s", (cutoff,))
+            count = cur.rowcount
+        else:
+            cur = con.execute("DELETE FROM authority_nonces WHERE consumed_at < ?", (cutoff,))
+            count = cur.rowcount
+        con.commit()
+        return count
     except Exception:
         con.rollback()
         raise
