@@ -1,7 +1,7 @@
 # HamidCognition Action Gate — Commercial Handoff
 
-Version: 1.0.0
-Product runtime: Action Gate v1.0.2
+Version: 1.0.4
+Product runtime: Action Gate v1.0.4
 Repository governance release: v2.0.0
 
 ## 1. What is being sold
@@ -18,9 +18,10 @@ The product is not sold as a claim that an AI decision is objectively correct. I
 
 A standard self-hosted delivery consists of:
 
-- Action Gate v1.0.2 source/runtime from the exact agreed commit or release baseline.
+- Action Gate v1.0.4 source/runtime from the exact agreed commit or release baseline.
 - Production Docker Compose deployment.
 - PostgreSQL persistence.
+- Persistent execution-authority nonce storage.
 - TLS edge configuration through Caddy.
 - Environment/configuration template.
 - Integration contract and API contract.
@@ -28,8 +29,6 @@ A standard self-hosted delivery consists of:
 - Operations runbook.
 - Security boundary and threat model.
 - Release/provenance record.
-
-The repository currently contains these components under action_gate/ and PRODUCT/.
 
 ## 3. Commercial modes
 
@@ -68,15 +67,17 @@ The repository's PRODUCT/CUSTOMER_ACCEPTANCE.md defines the detailed procedure.
 
 v2.0.0 is the repository governance release created on 2026-09-24. It records the validated governance workflow and evidence provenance.
 
-The commercial runtime version remains Action Gate v1.0.2. These version numbers must not be conflated.
+The commercial runtime is now Action Gate v1.0.4. These version numbers must not be conflated.
 
-The v2.0.0 governance release records:
+The product release is:
 
-- current workflow run: #36040783746
-- validated commit: 30aed1973a2800a47bc528328c8b2ad4cdd6542e
-- current evidence ZIP SHA-256: b979d5a9f194095f6f403b9c56242895bfb3ee4453630a99801b93b162aef116
-- prior evidence Run ID: #36036827697
-- prior evidence ZIP SHA-256: b817b3e56e40e97029a596d36b1cd0907a6095cbc5b4cbdb251a557878f700ef
+- tag: action-gate-v1.0.4
+- validated commit: 6e51841351141e286f9d8d8894d0719dee8e601f
+- Product Release Publisher run: #36050172910
+- release artifact: action-gate-1.0.4.tar
+- artifact SHA-256: e8d62fec11d502ea029ea0c1b010557a30ed492c9529db298d127bf7bc38bc9d
+
+The release is available through the private repository's GitHub release at the action-gate-v1.0.4 tag.
 
 ## 6. Explicit non-claims
 
@@ -95,7 +96,7 @@ The commercial handoff does not include, unless separately contracted and eviden
 
 ## 7. Legal and licensing boundary
 
-The repository currently states that it is publicly visible but not generally licensed for reproduction, redistribution, modification, or commercialization. Commercial delivery therefore requires a separate written license/permission or another legally valid authorization covering the supplied scope.
+The repository is private and its license does not grant general rights to reproduce, redistribute, modify, publish, or commercialize the software. Commercial delivery therefore requires a separate written license/permission or another legally valid authorization covering the supplied scope.
 
 ## 8. Definition of commercial readiness
 
