@@ -93,23 +93,19 @@ def test_expired_authority_is_forbidden(monkeypatch, tmp_path):
     import action_gate.storage as storage
     monkeypatch.setattr(storage, "SQLITE_PATH", str(tmp_path / "expiry.db"))
     storage.init_db()
-    token = mint().token()
-    authority = mint()
-    expired = authority.__class__(
-        decision_id=authority.decision_id,
-        tenant_id=authority.tenant_id,
-        action_digest=authority.action_digest,
-        policy_digest=authority.policy_digest,
-        nonce=authority.nonce,
-        issued_at=int(time.time()) - 10,
-        expires_at=int(time.time()) - 1,
-        decision=authority.decision,
-        signature=authority.signature,
-    ).token()
+    authority = issue_authority(
+        secret=b"test-authority-secret",
+        decision_id="dec_expired",
+        tenant_id="tenant-a",
+        action={"action": "protected.execute", "target": "prod"},
+        policy={"version": "policy-1"},
+        decision="ALLOW",
+        ttl_seconds=1,
+        now=int(time.time()) - 10,
+    )
     with pytest.raises(Exception) as exc:
-        enforce_execution_authority(expired)
+        enforce_execution_authority(authority.token())
     assert "expired_or_not_yet_valid" in str(exc.value)
-
 
 def test_concurrent_same_nonce_only_one_succeeds(monkeypatch, tmp_path):
     monkeypatch.setenv("ACTION_GATE_AUTHORITY_SECRET", "test-authority-secret")
