@@ -37,8 +37,8 @@ def enforce_execution_authority(
             authority=authority,
             secret=_authority_secret(),
             tenant_id=expected_tenant_id or authority.tenant_id,
-            action=expected_action or {},
-            policy=expected_policy or {},
+            action=expected_action,
+            policy=expected_policy,
         )
     except AuthorityError as exc:
         code = str(exc)
