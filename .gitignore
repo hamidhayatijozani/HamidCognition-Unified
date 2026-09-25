@@ -1,0 +1,32 @@
+# Production secrets and local environment
+.env
+.env.*
+!.env.example
+PRODUCT/.env.production
+PRODUCT/.env.production.local
+
+# Local databases and runtime state
+*.db
+*.sqlite
+*.sqlite3
+tool_authority.db
+/data/
+
+# Local artifacts
+*.tar
+*.tar.gz
+*.zip
+*.sha256
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Node
+node_modules/
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/
