@@ -30,3 +30,18 @@ The protected-tool layer verifies the authority signature, expiry, executable de
 The authority token is integrity-protected, not encrypted. It is a short-lived signed artifact and therefore must be transported over TLS and treated as sensitive.
 
 The protected tool remains responsible for comparing the verified authority context with the exact action it is about to execute. A valid authority for one tenant/action/policy is not authorization for another.
+
+
+### Execution-authority nonce retention
+
+Consumed authority nonces are retained in the configured database and can be purged by trusted operations staff with:
+
+`python scripts/cleanup_authority_nonces.py --older-than-seconds 86400`
+
+The retention interval must be chosen to exceed the maximum replay-relevant evidence window. Purging removes replay-prevention records, so it must not be configured shorter than the operational authority lifetime plus the required audit window.
+
+### Reference protected-tool boundary
+
+`protected_tools/reference_tool.py` is a side-effect-free reference runtime used to prove the boundary and acceptance tests. It requires `Depends(require_execution_authority)` and then binds tenant, action and policy digests before returning an execution result.
+
+The nonce transaction prevents the same authority from being accepted twice by the Gate boundary. It does not by itself provide distributed exactly-once semantics for an arbitrary downstream external system. A real side effect must additionally use an idempotency key or transactional mechanism appropriate to that downstream system.
