@@ -1,24 +1,37 @@
-name: Security Acceptance
+name: Security Acceptance & Enforcement CI
 
 on:
   push:
-    branches: ["main"]
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  enforcement:
+  security-enforcement-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-      - name: Install dependencies
+          python-version: '3.11'
+
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          pip install pytest fastapi httpx
-      - name: Static enforcement coverage
+          pip install pytest fastapi httpx uvicorn pydantic
+
+      - name: Run AST Enforcement Coverage Gate
         run: python scripts/check_enforcement_coverage.py
-      - name: Protected-tool acceptance
-        run: pytest -q tests/test_protected_tool_enforcement.py
+
+      - name: Execute E2E Acceptance Tests
+        env:
+          ACTION_GATE_API_TOKEN: "test_api_token"
+          ACTION_GATE_SIGNING_SECRET: "test_signing_secret"
+          ACTION_GATE_APPROVAL_SECRET: "test_approval_secret"
+          ACTION_GATE_AUTHORITY_SECRET: "test_authority_secret"
+        run: pytest tests/ -v --tb=short
