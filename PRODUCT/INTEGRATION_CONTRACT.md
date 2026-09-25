@@ -56,3 +56,22 @@ nonce=single-use-request-id
 trace_id=trace-demo
 
 This example contains no credentials and is not a production policy.
+
+
+## Protected-tool requirement
+
+Every production execution endpoint must install the Action Gate enforcement dependency before its business handler. The minimum FastAPI integration is:
+
+```python
+from fastapi import Depends
+from action_gate.enforcement import require_execution_authority
+
+@app.post("/protected-tools/execute")
+def execute(auth_context=Depends(require_execution_authority)):
+    # Bind the verified authority context to the exact action before side effect.
+    ...
+```
+
+The enforcement layer rejects missing, malformed, expired, tampered, non-executable, tenant-mismatched, action-mismatched, and policy-mismatched authorities. It atomically consumes the authority nonce, so a second concurrent use fails with nonce_reuse.
+
+The authority secret is an internal Gate-to-Protected-Tool secret. It must never be supplied to the caller or agent. The authority token itself is signed rather than encrypted, so TLS and normal secret-handling controls remain mandatory.
