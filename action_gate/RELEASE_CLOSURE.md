@@ -5,6 +5,8 @@ This file is intentionally non-executable.
 The commercial product boundary remains **HamidCognition Action Gate v1.0.5**.
 Research branches and experimental product lines are not part of this release.
 
+Closure revision: current-main validation trigger.
+
 This marker exists to make the release-validation path explicit on the current main revision and to ensure every release-validation workflow evaluates the same source revision.
 
 Release claims remain limited to:
