@@ -1,0 +1,9002 @@
+[
+  {
+    "id": "RG-0001",
+    "rangeal": "R",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴✨"
+  },
+  {
+    "id": "RG-0002",
+    "rangeal": "R",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴✨"
+  },
+  {
+    "id": "RG-0003",
+    "rangeal": "R",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴✨"
+  },
+  {
+    "id": "RG-0004",
+    "rangeal": "R",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴✨"
+  },
+  {
+    "id": "RG-0005",
+    "rangeal": "R",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴✨"
+  },
+  {
+    "id": "RG-0006",
+    "rangeal": "R",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴✨"
+  },
+  {
+    "id": "RG-0007",
+    "rangeal": "R",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴✨"
+  },
+  {
+    "id": "RG-0008",
+    "rangeal": "R",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴✨"
+  },
+  {
+    "id": "RG-0009",
+    "rangeal": "R",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴✨"
+  },
+  {
+    "id": "RG-0010",
+    "rangeal": "B",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵✨"
+  },
+  {
+    "id": "RG-0011",
+    "rangeal": "B",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵✨"
+  },
+  {
+    "id": "RG-0012",
+    "rangeal": "B",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵✨"
+  },
+  {
+    "id": "RG-0013",
+    "rangeal": "B",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵✨"
+  },
+  {
+    "id": "RG-0014",
+    "rangeal": "B",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵✨"
+  },
+  {
+    "id": "RG-0015",
+    "rangeal": "B",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵✨"
+  },
+  {
+    "id": "RG-0016",
+    "rangeal": "B",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵✨"
+  },
+  {
+    "id": "RG-0017",
+    "rangeal": "B",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵✨"
+  },
+  {
+    "id": "RG-0018",
+    "rangeal": "B",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵✨"
+  },
+  {
+    "id": "RG-0019",
+    "rangeal": "Y",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡✨"
+  },
+  {
+    "id": "RG-0020",
+    "rangeal": "Y",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡✨"
+  },
+  {
+    "id": "RG-0021",
+    "rangeal": "Y",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡✨"
+  },
+  {
+    "id": "RG-0022",
+    "rangeal": "Y",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡✨"
+  },
+  {
+    "id": "RG-0023",
+    "rangeal": "Y",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡✨"
+  },
+  {
+    "id": "RG-0024",
+    "rangeal": "Y",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡✨"
+  },
+  {
+    "id": "RG-0025",
+    "rangeal": "Y",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡✨"
+  },
+  {
+    "id": "RG-0026",
+    "rangeal": "Y",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡✨"
+  },
+  {
+    "id": "RG-0027",
+    "rangeal": "Y",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡✨"
+  },
+  {
+    "id": "RG-0028",
+    "rangeal": "RR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴✨"
+  },
+  {
+    "id": "RG-0029",
+    "rangeal": "RR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴✨"
+  },
+  {
+    "id": "RG-0030",
+    "rangeal": "RR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴✨"
+  },
+  {
+    "id": "RG-0031",
+    "rangeal": "RR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴✨"
+  },
+  {
+    "id": "RG-0032",
+    "rangeal": "RR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴✨"
+  },
+  {
+    "id": "RG-0033",
+    "rangeal": "RR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴✨"
+  },
+  {
+    "id": "RG-0034",
+    "rangeal": "RR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴✨"
+  },
+  {
+    "id": "RG-0035",
+    "rangeal": "RR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴✨"
+  },
+  {
+    "id": "RG-0036",
+    "rangeal": "RR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴✨"
+  },
+  {
+    "id": "RG-0037",
+    "rangeal": "RB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵✨"
+  },
+  {
+    "id": "RG-0038",
+    "rangeal": "RB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵✨"
+  },
+  {
+    "id": "RG-0039",
+    "rangeal": "RB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵✨"
+  },
+  {
+    "id": "RG-0040",
+    "rangeal": "RB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵✨"
+  },
+  {
+    "id": "RG-0041",
+    "rangeal": "RB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵✨"
+  },
+  {
+    "id": "RG-0042",
+    "rangeal": "RB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵✨"
+  },
+  {
+    "id": "RG-0043",
+    "rangeal": "RB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵✨"
+  },
+  {
+    "id": "RG-0044",
+    "rangeal": "RB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵✨"
+  },
+  {
+    "id": "RG-0045",
+    "rangeal": "RB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵✨"
+  },
+  {
+    "id": "RG-0046",
+    "rangeal": "RY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡✨"
+  },
+  {
+    "id": "RG-0047",
+    "rangeal": "RY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡✨"
+  },
+  {
+    "id": "RG-0048",
+    "rangeal": "RY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡✨"
+  },
+  {
+    "id": "RG-0049",
+    "rangeal": "RY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡✨"
+  },
+  {
+    "id": "RG-0050",
+    "rangeal": "RY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡✨"
+  },
+  {
+    "id": "RG-0051",
+    "rangeal": "RY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡✨"
+  },
+  {
+    "id": "RG-0052",
+    "rangeal": "RY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡✨"
+  },
+  {
+    "id": "RG-0053",
+    "rangeal": "RY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡✨"
+  },
+  {
+    "id": "RG-0054",
+    "rangeal": "RY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡✨"
+  },
+  {
+    "id": "RG-0055",
+    "rangeal": "BR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴✨"
+  },
+  {
+    "id": "RG-0056",
+    "rangeal": "BR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴✨"
+  },
+  {
+    "id": "RG-0057",
+    "rangeal": "BR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴✨"
+  },
+  {
+    "id": "RG-0058",
+    "rangeal": "BR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴✨"
+  },
+  {
+    "id": "RG-0059",
+    "rangeal": "BR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴✨"
+  },
+  {
+    "id": "RG-0060",
+    "rangeal": "BR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴✨"
+  },
+  {
+    "id": "RG-0061",
+    "rangeal": "BR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴✨"
+  },
+  {
+    "id": "RG-0062",
+    "rangeal": "BR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴✨"
+  },
+  {
+    "id": "RG-0063",
+    "rangeal": "BR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴✨"
+  },
+  {
+    "id": "RG-0064",
+    "rangeal": "BB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵✨"
+  },
+  {
+    "id": "RG-0065",
+    "rangeal": "BB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵✨"
+  },
+  {
+    "id": "RG-0066",
+    "rangeal": "BB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵✨"
+  },
+  {
+    "id": "RG-0067",
+    "rangeal": "BB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵✨"
+  },
+  {
+    "id": "RG-0068",
+    "rangeal": "BB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵✨"
+  },
+  {
+    "id": "RG-0069",
+    "rangeal": "BB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵✨"
+  },
+  {
+    "id": "RG-0070",
+    "rangeal": "BB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵✨"
+  },
+  {
+    "id": "RG-0071",
+    "rangeal": "BB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵✨"
+  },
+  {
+    "id": "RG-0072",
+    "rangeal": "BB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵✨"
+  },
+  {
+    "id": "RG-0073",
+    "rangeal": "BY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡✨"
+  },
+  {
+    "id": "RG-0074",
+    "rangeal": "BY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡✨"
+  },
+  {
+    "id": "RG-0075",
+    "rangeal": "BY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡✨"
+  },
+  {
+    "id": "RG-0076",
+    "rangeal": "BY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡✨"
+  },
+  {
+    "id": "RG-0077",
+    "rangeal": "BY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡✨"
+  },
+  {
+    "id": "RG-0078",
+    "rangeal": "BY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡✨"
+  },
+  {
+    "id": "RG-0079",
+    "rangeal": "BY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡✨"
+  },
+  {
+    "id": "RG-0080",
+    "rangeal": "BY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡✨"
+  },
+  {
+    "id": "RG-0081",
+    "rangeal": "BY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡✨"
+  },
+  {
+    "id": "RG-0082",
+    "rangeal": "YR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴✨"
+  },
+  {
+    "id": "RG-0083",
+    "rangeal": "YR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴✨"
+  },
+  {
+    "id": "RG-0084",
+    "rangeal": "YR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴✨"
+  },
+  {
+    "id": "RG-0085",
+    "rangeal": "YR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴✨"
+  },
+  {
+    "id": "RG-0086",
+    "rangeal": "YR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴✨"
+  },
+  {
+    "id": "RG-0087",
+    "rangeal": "YR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴✨"
+  },
+  {
+    "id": "RG-0088",
+    "rangeal": "YR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴✨"
+  },
+  {
+    "id": "RG-0089",
+    "rangeal": "YR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴✨"
+  },
+  {
+    "id": "RG-0090",
+    "rangeal": "YR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴✨"
+  },
+  {
+    "id": "RG-0091",
+    "rangeal": "YB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵✨"
+  },
+  {
+    "id": "RG-0092",
+    "rangeal": "YB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵✨"
+  },
+  {
+    "id": "RG-0093",
+    "rangeal": "YB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵✨"
+  },
+  {
+    "id": "RG-0094",
+    "rangeal": "YB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵✨"
+  },
+  {
+    "id": "RG-0095",
+    "rangeal": "YB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵✨"
+  },
+  {
+    "id": "RG-0096",
+    "rangeal": "YB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵✨"
+  },
+  {
+    "id": "RG-0097",
+    "rangeal": "YB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵✨"
+  },
+  {
+    "id": "RG-0098",
+    "rangeal": "YB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵✨"
+  },
+  {
+    "id": "RG-0099",
+    "rangeal": "YB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵✨"
+  },
+  {
+    "id": "RG-0100",
+    "rangeal": "YY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🟡✨"
+  },
+  {
+    "id": "RG-0101",
+    "rangeal": "YY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🟡✨"
+  },
+  {
+    "id": "RG-0102",
+    "rangeal": "YY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🟡✨"
+  },
+  {
+    "id": "RG-0103",
+    "rangeal": "YY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🟡✨"
+  },
+  {
+    "id": "RG-0104",
+    "rangeal": "YY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🟡✨"
+  },
+  {
+    "id": "RG-0105",
+    "rangeal": "YY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🟡✨"
+  },
+  {
+    "id": "RG-0106",
+    "rangeal": "YY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🟡✨"
+  },
+  {
+    "id": "RG-0107",
+    "rangeal": "YY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🟡✨"
+  },
+  {
+    "id": "RG-0108",
+    "rangeal": "YY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🟡✨"
+  },
+  {
+    "id": "RG-0109",
+    "rangeal": "RRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0110",
+    "rangeal": "RRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0111",
+    "rangeal": "RRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0112",
+    "rangeal": "RRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0113",
+    "rangeal": "RRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0114",
+    "rangeal": "RRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0115",
+    "rangeal": "RRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0116",
+    "rangeal": "RRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0117",
+    "rangeal": "RRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0118",
+    "rangeal": "RRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0119",
+    "rangeal": "RRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0120",
+    "rangeal": "RRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0121",
+    "rangeal": "RRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0122",
+    "rangeal": "RRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0123",
+    "rangeal": "RRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0124",
+    "rangeal": "RRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0125",
+    "rangeal": "RRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0126",
+    "rangeal": "RRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0127",
+    "rangeal": "RRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0128",
+    "rangeal": "RRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0129",
+    "rangeal": "RRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0130",
+    "rangeal": "RRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0131",
+    "rangeal": "RRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0132",
+    "rangeal": "RRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0133",
+    "rangeal": "RRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0134",
+    "rangeal": "RRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0135",
+    "rangeal": "RRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0136",
+    "rangeal": "RBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0137",
+    "rangeal": "RBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0138",
+    "rangeal": "RBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0139",
+    "rangeal": "RBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0140",
+    "rangeal": "RBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0141",
+    "rangeal": "RBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0142",
+    "rangeal": "RBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0143",
+    "rangeal": "RBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0144",
+    "rangeal": "RBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0145",
+    "rangeal": "RBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0146",
+    "rangeal": "RBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0147",
+    "rangeal": "RBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0148",
+    "rangeal": "RBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0149",
+    "rangeal": "RBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0150",
+    "rangeal": "RBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0151",
+    "rangeal": "RBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0152",
+    "rangeal": "RBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0153",
+    "rangeal": "RBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0154",
+    "rangeal": "RBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0155",
+    "rangeal": "RBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0156",
+    "rangeal": "RBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0157",
+    "rangeal": "RBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0158",
+    "rangeal": "RBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0159",
+    "rangeal": "RBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0160",
+    "rangeal": "RBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0161",
+    "rangeal": "RBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0162",
+    "rangeal": "RBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0163",
+    "rangeal": "RYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0164",
+    "rangeal": "RYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0165",
+    "rangeal": "RYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0166",
+    "rangeal": "RYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0167",
+    "rangeal": "RYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0168",
+    "rangeal": "RYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0169",
+    "rangeal": "RYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0170",
+    "rangeal": "RYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0171",
+    "rangeal": "RYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0172",
+    "rangeal": "RYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0173",
+    "rangeal": "RYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0174",
+    "rangeal": "RYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0175",
+    "rangeal": "RYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0176",
+    "rangeal": "RYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0177",
+    "rangeal": "RYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0178",
+    "rangeal": "RYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0179",
+    "rangeal": "RYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0180",
+    "rangeal": "RYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0181",
+    "rangeal": "RYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0182",
+    "rangeal": "RYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0183",
+    "rangeal": "RYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0184",
+    "rangeal": "RYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0185",
+    "rangeal": "RYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0186",
+    "rangeal": "RYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0187",
+    "rangeal": "RYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0188",
+    "rangeal": "RYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0189",
+    "rangeal": "RYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0190",
+    "rangeal": "BRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0191",
+    "rangeal": "BRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0192",
+    "rangeal": "BRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0193",
+    "rangeal": "BRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0194",
+    "rangeal": "BRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0195",
+    "rangeal": "BRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0196",
+    "rangeal": "BRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0197",
+    "rangeal": "BRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0198",
+    "rangeal": "BRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0199",
+    "rangeal": "BRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0200",
+    "rangeal": "BRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0201",
+    "rangeal": "BRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0202",
+    "rangeal": "BRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0203",
+    "rangeal": "BRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0204",
+    "rangeal": "BRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0205",
+    "rangeal": "BRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0206",
+    "rangeal": "BRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0207",
+    "rangeal": "BRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0208",
+    "rangeal": "BRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0209",
+    "rangeal": "BRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0210",
+    "rangeal": "BRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0211",
+    "rangeal": "BRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0212",
+    "rangeal": "BRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0213",
+    "rangeal": "BRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0214",
+    "rangeal": "BRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0215",
+    "rangeal": "BRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0216",
+    "rangeal": "BRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0217",
+    "rangeal": "BBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0218",
+    "rangeal": "BBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0219",
+    "rangeal": "BBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0220",
+    "rangeal": "BBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0221",
+    "rangeal": "BBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0222",
+    "rangeal": "BBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0223",
+    "rangeal": "BBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0224",
+    "rangeal": "BBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0225",
+    "rangeal": "BBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0226",
+    "rangeal": "BBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0227",
+    "rangeal": "BBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0228",
+    "rangeal": "BBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0229",
+    "rangeal": "BBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0230",
+    "rangeal": "BBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0231",
+    "rangeal": "BBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0232",
+    "rangeal": "BBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0233",
+    "rangeal": "BBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0234",
+    "rangeal": "BBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0235",
+    "rangeal": "BBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0236",
+    "rangeal": "BBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0237",
+    "rangeal": "BBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0238",
+    "rangeal": "BBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0239",
+    "rangeal": "BBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0240",
+    "rangeal": "BBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0241",
+    "rangeal": "BBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0242",
+    "rangeal": "BBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0243",
+    "rangeal": "BBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0244",
+    "rangeal": "BYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0245",
+    "rangeal": "BYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0246",
+    "rangeal": "BYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0247",
+    "rangeal": "BYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0248",
+    "rangeal": "BYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0249",
+    "rangeal": "BYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0250",
+    "rangeal": "BYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0251",
+    "rangeal": "BYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0252",
+    "rangeal": "BYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0253",
+    "rangeal": "BYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0254",
+    "rangeal": "BYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0255",
+    "rangeal": "BYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0256",
+    "rangeal": "BYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0257",
+    "rangeal": "BYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0258",
+    "rangeal": "BYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0259",
+    "rangeal": "BYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0260",
+    "rangeal": "BYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0261",
+    "rangeal": "BYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0262",
+    "rangeal": "BYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0263",
+    "rangeal": "BYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0264",
+    "rangeal": "BYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0265",
+    "rangeal": "BYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0266",
+    "rangeal": "BYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0267",
+    "rangeal": "BYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0268",
+    "rangeal": "BYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0269",
+    "rangeal": "BYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0270",
+    "rangeal": "BYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0271",
+    "rangeal": "YRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0272",
+    "rangeal": "YRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0273",
+    "rangeal": "YRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0274",
+    "rangeal": "YRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0275",
+    "rangeal": "YRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0276",
+    "rangeal": "YRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0277",
+    "rangeal": "YRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0278",
+    "rangeal": "YRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0279",
+    "rangeal": "YRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0280",
+    "rangeal": "YRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0281",
+    "rangeal": "YRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0282",
+    "rangeal": "YRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0283",
+    "rangeal": "YRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0284",
+    "rangeal": "YRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0285",
+    "rangeal": "YRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0286",
+    "rangeal": "YRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0287",
+    "rangeal": "YRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0288",
+    "rangeal": "YRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0289",
+    "rangeal": "YRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0290",
+    "rangeal": "YRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0291",
+    "rangeal": "YRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0292",
+    "rangeal": "YRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0293",
+    "rangeal": "YRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0294",
+    "rangeal": "YRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0295",
+    "rangeal": "YRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0296",
+    "rangeal": "YRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0297",
+    "rangeal": "YRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0298",
+    "rangeal": "YBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0299",
+    "rangeal": "YBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0300",
+    "rangeal": "YBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0301",
+    "rangeal": "YBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0302",
+    "rangeal": "YBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0303",
+    "rangeal": "YBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0304",
+    "rangeal": "YBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0305",
+    "rangeal": "YBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0306",
+    "rangeal": "YBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0307",
+    "rangeal": "YBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0308",
+    "rangeal": "YBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0309",
+    "rangeal": "YBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0310",
+    "rangeal": "YBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0311",
+    "rangeal": "YBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0312",
+    "rangeal": "YBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0313",
+    "rangeal": "YBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0314",
+    "rangeal": "YBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0315",
+    "rangeal": "YBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0316",
+    "rangeal": "YBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0317",
+    "rangeal": "YBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0318",
+    "rangeal": "YBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0319",
+    "rangeal": "YBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0320",
+    "rangeal": "YBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0321",
+    "rangeal": "YBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0322",
+    "rangeal": "YBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0323",
+    "rangeal": "YBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0324",
+    "rangeal": "YBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0325",
+    "rangeal": "YYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0326",
+    "rangeal": "YYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0327",
+    "rangeal": "YYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0328",
+    "rangeal": "YYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0329",
+    "rangeal": "YYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0330",
+    "rangeal": "YYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0331",
+    "rangeal": "YYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0332",
+    "rangeal": "YYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0333",
+    "rangeal": "YYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0334",
+    "rangeal": "YYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0335",
+    "rangeal": "YYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0336",
+    "rangeal": "YYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0337",
+    "rangeal": "YYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0338",
+    "rangeal": "YYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0339",
+    "rangeal": "YYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0340",
+    "rangeal": "YYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0341",
+    "rangeal": "YYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0342",
+    "rangeal": "YYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0343",
+    "rangeal": "YYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0344",
+    "rangeal": "YYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0345",
+    "rangeal": "YYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0346",
+    "rangeal": "YYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0347",
+    "rangeal": "YYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0348",
+    "rangeal": "YYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0349",
+    "rangeal": "YYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0350",
+    "rangeal": "YYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0351",
+    "rangeal": "YYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0352",
+    "rangeal": "RRRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0353",
+    "rangeal": "RRRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0354",
+    "rangeal": "RRRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0355",
+    "rangeal": "RRRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0356",
+    "rangeal": "RRRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0357",
+    "rangeal": "RRRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0358",
+    "rangeal": "RRRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0359",
+    "rangeal": "RRRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0360",
+    "rangeal": "RRRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0361",
+    "rangeal": "RRRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0362",
+    "rangeal": "RRRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0363",
+    "rangeal": "RRRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0364",
+    "rangeal": "RRRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0365",
+    "rangeal": "RRRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0366",
+    "rangeal": "RRRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0367",
+    "rangeal": "RRRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0368",
+    "rangeal": "RRRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0369",
+    "rangeal": "RRRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0370",
+    "rangeal": "RRRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0371",
+    "rangeal": "RRRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0372",
+    "rangeal": "RRRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0373",
+    "rangeal": "RRRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0374",
+    "rangeal": "RRRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0375",
+    "rangeal": "RRRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0376",
+    "rangeal": "RRRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0377",
+    "rangeal": "RRRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0378",
+    "rangeal": "RRRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0379",
+    "rangeal": "RRBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0380",
+    "rangeal": "RRBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0381",
+    "rangeal": "RRBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0382",
+    "rangeal": "RRBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0383",
+    "rangeal": "RRBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0384",
+    "rangeal": "RRBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0385",
+    "rangeal": "RRBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0386",
+    "rangeal": "RRBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0387",
+    "rangeal": "RRBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0388",
+    "rangeal": "RRBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0389",
+    "rangeal": "RRBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0390",
+    "rangeal": "RRBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0391",
+    "rangeal": "RRBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0392",
+    "rangeal": "RRBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0393",
+    "rangeal": "RRBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0394",
+    "rangeal": "RRBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0395",
+    "rangeal": "RRBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0396",
+    "rangeal": "RRBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0397",
+    "rangeal": "RRBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0398",
+    "rangeal": "RRBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0399",
+    "rangeal": "RRBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0400",
+    "rangeal": "RRBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0401",
+    "rangeal": "RRBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0402",
+    "rangeal": "RRBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0403",
+    "rangeal": "RRBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0404",
+    "rangeal": "RRBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0405",
+    "rangeal": "RRBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0406",
+    "rangeal": "RRYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0407",
+    "rangeal": "RRYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0408",
+    "rangeal": "RRYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0409",
+    "rangeal": "RRYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0410",
+    "rangeal": "RRYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0411",
+    "rangeal": "RRYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0412",
+    "rangeal": "RRYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0413",
+    "rangeal": "RRYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0414",
+    "rangeal": "RRYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0415",
+    "rangeal": "RRYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0416",
+    "rangeal": "RRYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0417",
+    "rangeal": "RRYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0418",
+    "rangeal": "RRYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0419",
+    "rangeal": "RRYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0420",
+    "rangeal": "RRYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0421",
+    "rangeal": "RRYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0422",
+    "rangeal": "RRYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0423",
+    "rangeal": "RRYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0424",
+    "rangeal": "RRYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0425",
+    "rangeal": "RRYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0426",
+    "rangeal": "RRYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0427",
+    "rangeal": "RRYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0428",
+    "rangeal": "RRYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0429",
+    "rangeal": "RRYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0430",
+    "rangeal": "RRYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0431",
+    "rangeal": "RRYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0432",
+    "rangeal": "RRYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0433",
+    "rangeal": "RBRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0434",
+    "rangeal": "RBRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0435",
+    "rangeal": "RBRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0436",
+    "rangeal": "RBRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0437",
+    "rangeal": "RBRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0438",
+    "rangeal": "RBRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0439",
+    "rangeal": "RBRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0440",
+    "rangeal": "RBRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0441",
+    "rangeal": "RBRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0442",
+    "rangeal": "RBRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0443",
+    "rangeal": "RBRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0444",
+    "rangeal": "RBRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0445",
+    "rangeal": "RBRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0446",
+    "rangeal": "RBRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0447",
+    "rangeal": "RBRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0448",
+    "rangeal": "RBRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0449",
+    "rangeal": "RBRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0450",
+    "rangeal": "RBRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0451",
+    "rangeal": "RBRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0452",
+    "rangeal": "RBRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0453",
+    "rangeal": "RBRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0454",
+    "rangeal": "RBRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0455",
+    "rangeal": "RBRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0456",
+    "rangeal": "RBRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0457",
+    "rangeal": "RBRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0458",
+    "rangeal": "RBRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0459",
+    "rangeal": "RBRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0460",
+    "rangeal": "RBBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0461",
+    "rangeal": "RBBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0462",
+    "rangeal": "RBBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0463",
+    "rangeal": "RBBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0464",
+    "rangeal": "RBBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0465",
+    "rangeal": "RBBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0466",
+    "rangeal": "RBBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0467",
+    "rangeal": "RBBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0468",
+    "rangeal": "RBBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0469",
+    "rangeal": "RBBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0470",
+    "rangeal": "RBBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0471",
+    "rangeal": "RBBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0472",
+    "rangeal": "RBBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0473",
+    "rangeal": "RBBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0474",
+    "rangeal": "RBBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0475",
+    "rangeal": "RBBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0476",
+    "rangeal": "RBBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0477",
+    "rangeal": "RBBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0478",
+    "rangeal": "RBBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0479",
+    "rangeal": "RBBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0480",
+    "rangeal": "RBBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0481",
+    "rangeal": "RBBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0482",
+    "rangeal": "RBBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0483",
+    "rangeal": "RBBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0484",
+    "rangeal": "RBBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0485",
+    "rangeal": "RBBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0486",
+    "rangeal": "RBBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0487",
+    "rangeal": "RBYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0488",
+    "rangeal": "RBYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0489",
+    "rangeal": "RBYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0490",
+    "rangeal": "RBYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0491",
+    "rangeal": "RBYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0492",
+    "rangeal": "RBYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0493",
+    "rangeal": "RBYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0494",
+    "rangeal": "RBYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0495",
+    "rangeal": "RBYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0496",
+    "rangeal": "RBYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0497",
+    "rangeal": "RBYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0498",
+    "rangeal": "RBYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0499",
+    "rangeal": "RBYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0500",
+    "rangeal": "RBYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0501",
+    "rangeal": "RBYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0502",
+    "rangeal": "RBYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0503",
+    "rangeal": "RBYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0504",
+    "rangeal": "RBYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0505",
+    "rangeal": "RBYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0506",
+    "rangeal": "RBYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0507",
+    "rangeal": "RBYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0508",
+    "rangeal": "RBYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0509",
+    "rangeal": "RBYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0510",
+    "rangeal": "RBYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0511",
+    "rangeal": "RBYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0512",
+    "rangeal": "RBYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0513",
+    "rangeal": "RBYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0514",
+    "rangeal": "RYRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0515",
+    "rangeal": "RYRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0516",
+    "rangeal": "RYRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0517",
+    "rangeal": "RYRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0518",
+    "rangeal": "RYRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0519",
+    "rangeal": "RYRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0520",
+    "rangeal": "RYRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0521",
+    "rangeal": "RYRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0522",
+    "rangeal": "RYRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0523",
+    "rangeal": "RYRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0524",
+    "rangeal": "RYRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0525",
+    "rangeal": "RYRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0526",
+    "rangeal": "RYRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0527",
+    "rangeal": "RYRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0528",
+    "rangeal": "RYRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0529",
+    "rangeal": "RYRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0530",
+    "rangeal": "RYRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0531",
+    "rangeal": "RYRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0532",
+    "rangeal": "RYRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0533",
+    "rangeal": "RYRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0534",
+    "rangeal": "RYRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0535",
+    "rangeal": "RYRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0536",
+    "rangeal": "RYRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0537",
+    "rangeal": "RYRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0538",
+    "rangeal": "RYRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0539",
+    "rangeal": "RYRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0540",
+    "rangeal": "RYRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0541",
+    "rangeal": "RYBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0542",
+    "rangeal": "RYBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0543",
+    "rangeal": "RYBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0544",
+    "rangeal": "RYBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0545",
+    "rangeal": "RYBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0546",
+    "rangeal": "RYBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0547",
+    "rangeal": "RYBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0548",
+    "rangeal": "RYBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0549",
+    "rangeal": "RYBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0550",
+    "rangeal": "RYBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0551",
+    "rangeal": "RYBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0552",
+    "rangeal": "RYBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0553",
+    "rangeal": "RYBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0554",
+    "rangeal": "RYBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0555",
+    "rangeal": "RYBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0556",
+    "rangeal": "RYBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0557",
+    "rangeal": "RYBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0558",
+    "rangeal": "RYBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0559",
+    "rangeal": "RYBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0560",
+    "rangeal": "RYBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0561",
+    "rangeal": "RYBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0562",
+    "rangeal": "RYBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0563",
+    "rangeal": "RYBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0564",
+    "rangeal": "RYBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0565",
+    "rangeal": "RYBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0566",
+    "rangeal": "RYBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0567",
+    "rangeal": "RYBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0568",
+    "rangeal": "RYYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0569",
+    "rangeal": "RYYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0570",
+    "rangeal": "RYYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0571",
+    "rangeal": "RYYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0572",
+    "rangeal": "RYYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0573",
+    "rangeal": "RYYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0574",
+    "rangeal": "RYYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0575",
+    "rangeal": "RYYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0576",
+    "rangeal": "RYYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0577",
+    "rangeal": "RYYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0578",
+    "rangeal": "RYYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0579",
+    "rangeal": "RYYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0580",
+    "rangeal": "RYYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0581",
+    "rangeal": "RYYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0582",
+    "rangeal": "RYYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0583",
+    "rangeal": "RYYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0584",
+    "rangeal": "RYYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0585",
+    "rangeal": "RYYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0586",
+    "rangeal": "RYYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0587",
+    "rangeal": "RYYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0588",
+    "rangeal": "RYYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0589",
+    "rangeal": "RYYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0590",
+    "rangeal": "RYYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0591",
+    "rangeal": "RYYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0592",
+    "rangeal": "RYYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔴🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0593",
+    "rangeal": "RYYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔴🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0594",
+    "rangeal": "RYYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔴🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0595",
+    "rangeal": "BRRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0596",
+    "rangeal": "BRRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0597",
+    "rangeal": "BRRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0598",
+    "rangeal": "BRRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0599",
+    "rangeal": "BRRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0600",
+    "rangeal": "BRRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0601",
+    "rangeal": "BRRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0602",
+    "rangeal": "BRRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0603",
+    "rangeal": "BRRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0604",
+    "rangeal": "BRRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0605",
+    "rangeal": "BRRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0606",
+    "rangeal": "BRRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0607",
+    "rangeal": "BRRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0608",
+    "rangeal": "BRRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0609",
+    "rangeal": "BRRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0610",
+    "rangeal": "BRRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0611",
+    "rangeal": "BRRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0612",
+    "rangeal": "BRRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0613",
+    "rangeal": "BRRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0614",
+    "rangeal": "BRRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0615",
+    "rangeal": "BRRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0616",
+    "rangeal": "BRRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0617",
+    "rangeal": "BRRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0618",
+    "rangeal": "BRRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0619",
+    "rangeal": "BRRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0620",
+    "rangeal": "BRRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0621",
+    "rangeal": "BRRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0622",
+    "rangeal": "BRBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0623",
+    "rangeal": "BRBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0624",
+    "rangeal": "BRBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0625",
+    "rangeal": "BRBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0626",
+    "rangeal": "BRBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0627",
+    "rangeal": "BRBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0628",
+    "rangeal": "BRBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0629",
+    "rangeal": "BRBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0630",
+    "rangeal": "BRBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0631",
+    "rangeal": "BRBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0632",
+    "rangeal": "BRBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0633",
+    "rangeal": "BRBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0634",
+    "rangeal": "BRBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0635",
+    "rangeal": "BRBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0636",
+    "rangeal": "BRBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0637",
+    "rangeal": "BRBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0638",
+    "rangeal": "BRBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0639",
+    "rangeal": "BRBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0640",
+    "rangeal": "BRBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0641",
+    "rangeal": "BRBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0642",
+    "rangeal": "BRBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0643",
+    "rangeal": "BRBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0644",
+    "rangeal": "BRBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0645",
+    "rangeal": "BRBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0646",
+    "rangeal": "BRBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0647",
+    "rangeal": "BRBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0648",
+    "rangeal": "BRBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0649",
+    "rangeal": "BRYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0650",
+    "rangeal": "BRYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0651",
+    "rangeal": "BRYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0652",
+    "rangeal": "BRYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0653",
+    "rangeal": "BRYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0654",
+    "rangeal": "BRYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0655",
+    "rangeal": "BRYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0656",
+    "rangeal": "BRYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0657",
+    "rangeal": "BRYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0658",
+    "rangeal": "BRYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0659",
+    "rangeal": "BRYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0660",
+    "rangeal": "BRYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0661",
+    "rangeal": "BRYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0662",
+    "rangeal": "BRYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0663",
+    "rangeal": "BRYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0664",
+    "rangeal": "BRYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0665",
+    "rangeal": "BRYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0666",
+    "rangeal": "BRYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0667",
+    "rangeal": "BRYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0668",
+    "rangeal": "BRYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0669",
+    "rangeal": "BRYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0670",
+    "rangeal": "BRYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0671",
+    "rangeal": "BRYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0672",
+    "rangeal": "BRYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0673",
+    "rangeal": "BRYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0674",
+    "rangeal": "BRYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0675",
+    "rangeal": "BRYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0676",
+    "rangeal": "BBRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0677",
+    "rangeal": "BBRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0678",
+    "rangeal": "BBRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0679",
+    "rangeal": "BBRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0680",
+    "rangeal": "BBRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0681",
+    "rangeal": "BBRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0682",
+    "rangeal": "BBRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0683",
+    "rangeal": "BBRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0684",
+    "rangeal": "BBRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0685",
+    "rangeal": "BBRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0686",
+    "rangeal": "BBRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0687",
+    "rangeal": "BBRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0688",
+    "rangeal": "BBRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0689",
+    "rangeal": "BBRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0690",
+    "rangeal": "BBRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0691",
+    "rangeal": "BBRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0692",
+    "rangeal": "BBRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0693",
+    "rangeal": "BBRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0694",
+    "rangeal": "BBRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0695",
+    "rangeal": "BBRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0696",
+    "rangeal": "BBRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0697",
+    "rangeal": "BBRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0698",
+    "rangeal": "BBRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0699",
+    "rangeal": "BBRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0700",
+    "rangeal": "BBRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0701",
+    "rangeal": "BBRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0702",
+    "rangeal": "BBRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0703",
+    "rangeal": "BBBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0704",
+    "rangeal": "BBBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0705",
+    "rangeal": "BBBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0706",
+    "rangeal": "BBBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0707",
+    "rangeal": "BBBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0708",
+    "rangeal": "BBBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0709",
+    "rangeal": "BBBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0710",
+    "rangeal": "BBBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0711",
+    "rangeal": "BBBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0712",
+    "rangeal": "BBBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0713",
+    "rangeal": "BBBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0714",
+    "rangeal": "BBBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0715",
+    "rangeal": "BBBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0716",
+    "rangeal": "BBBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0717",
+    "rangeal": "BBBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0718",
+    "rangeal": "BBBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0719",
+    "rangeal": "BBBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0720",
+    "rangeal": "BBBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0721",
+    "rangeal": "BBBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0722",
+    "rangeal": "BBBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0723",
+    "rangeal": "BBBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0724",
+    "rangeal": "BBBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0725",
+    "rangeal": "BBBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0726",
+    "rangeal": "BBBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0727",
+    "rangeal": "BBBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0728",
+    "rangeal": "BBBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0729",
+    "rangeal": "BBBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0730",
+    "rangeal": "BBYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0731",
+    "rangeal": "BBYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0732",
+    "rangeal": "BBYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0733",
+    "rangeal": "BBYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0734",
+    "rangeal": "BBYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0735",
+    "rangeal": "BBYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0736",
+    "rangeal": "BBYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0737",
+    "rangeal": "BBYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0738",
+    "rangeal": "BBYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0739",
+    "rangeal": "BBYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0740",
+    "rangeal": "BBYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0741",
+    "rangeal": "BBYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0742",
+    "rangeal": "BBYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0743",
+    "rangeal": "BBYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0744",
+    "rangeal": "BBYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0745",
+    "rangeal": "BBYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0746",
+    "rangeal": "BBYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0747",
+    "rangeal": "BBYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0748",
+    "rangeal": "BBYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0749",
+    "rangeal": "BBYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0750",
+    "rangeal": "BBYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0751",
+    "rangeal": "BBYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0752",
+    "rangeal": "BBYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0753",
+    "rangeal": "BBYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0754",
+    "rangeal": "BBYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0755",
+    "rangeal": "BBYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0756",
+    "rangeal": "BBYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0757",
+    "rangeal": "BYRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0758",
+    "rangeal": "BYRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0759",
+    "rangeal": "BYRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0760",
+    "rangeal": "BYRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0761",
+    "rangeal": "BYRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0762",
+    "rangeal": "BYRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0763",
+    "rangeal": "BYRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0764",
+    "rangeal": "BYRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0765",
+    "rangeal": "BYRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔴🔴✨"
+  },
+  {
+    "id": "RG-0766",
+    "rangeal": "BYRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0767",
+    "rangeal": "BYRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0768",
+    "rangeal": "BYRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0769",
+    "rangeal": "BYRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0770",
+    "rangeal": "BYRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0771",
+    "rangeal": "BYRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0772",
+    "rangeal": "BYRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0773",
+    "rangeal": "BYRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0774",
+    "rangeal": "BYRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔴🔵✨"
+  },
+  {
+    "id": "RG-0775",
+    "rangeal": "BYRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0776",
+    "rangeal": "BYRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0777",
+    "rangeal": "BYRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0778",
+    "rangeal": "BYRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0779",
+    "rangeal": "BYRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0780",
+    "rangeal": "BYRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0781",
+    "rangeal": "BYRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0782",
+    "rangeal": "BYRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0783",
+    "rangeal": "BYRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔴🟡✨"
+  },
+  {
+    "id": "RG-0784",
+    "rangeal": "BYBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0785",
+    "rangeal": "BYBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0786",
+    "rangeal": "BYBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0787",
+    "rangeal": "BYBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0788",
+    "rangeal": "BYBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0789",
+    "rangeal": "BYBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0790",
+    "rangeal": "BYBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0791",
+    "rangeal": "BYBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0792",
+    "rangeal": "BYBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔵🔴✨"
+  },
+  {
+    "id": "RG-0793",
+    "rangeal": "BYBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0794",
+    "rangeal": "BYBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0795",
+    "rangeal": "BYBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0796",
+    "rangeal": "BYBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0797",
+    "rangeal": "BYBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0798",
+    "rangeal": "BYBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0799",
+    "rangeal": "BYBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0800",
+    "rangeal": "BYBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0801",
+    "rangeal": "BYBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔵🔵✨"
+  },
+  {
+    "id": "RG-0802",
+    "rangeal": "BYBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0803",
+    "rangeal": "BYBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0804",
+    "rangeal": "BYBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0805",
+    "rangeal": "BYBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0806",
+    "rangeal": "BYBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0807",
+    "rangeal": "BYBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0808",
+    "rangeal": "BYBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0809",
+    "rangeal": "BYBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0810",
+    "rangeal": "BYBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🔵🟡✨"
+  },
+  {
+    "id": "RG-0811",
+    "rangeal": "BYYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0812",
+    "rangeal": "BYYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0813",
+    "rangeal": "BYYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0814",
+    "rangeal": "BYYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0815",
+    "rangeal": "BYYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0816",
+    "rangeal": "BYYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0817",
+    "rangeal": "BYYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0818",
+    "rangeal": "BYYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0819",
+    "rangeal": "BYYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🟡🔴✨"
+  },
+  {
+    "id": "RG-0820",
+    "rangeal": "BYYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0821",
+    "rangeal": "BYYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0822",
+    "rangeal": "BYYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0823",
+    "rangeal": "BYYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0824",
+    "rangeal": "BYYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0825",
+    "rangeal": "BYYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0826",
+    "rangeal": "BYYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0827",
+    "rangeal": "BYYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0828",
+    "rangeal": "BYYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🟡🔵✨"
+  },
+  {
+    "id": "RG-0829",
+    "rangeal": "BYYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0830",
+    "rangeal": "BYYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0831",
+    "rangeal": "BYYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0832",
+    "rangeal": "BYYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0833",
+    "rangeal": "BYYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0834",
+    "rangeal": "BYYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0835",
+    "rangeal": "BYYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🔵🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0836",
+    "rangeal": "BYYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🔵🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0837",
+    "rangeal": "BYYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🔵🟡🟡🟡✨"
+  },
+  {
+    "id": "RG-0838",
+    "rangeal": "YRRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0839",
+    "rangeal": "YRRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0840",
+    "rangeal": "YRRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0841",
+    "rangeal": "YRRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0842",
+    "rangeal": "YRRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0843",
+    "rangeal": "YRRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0844",
+    "rangeal": "YRRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0845",
+    "rangeal": "YRRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0846",
+    "rangeal": "YRRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔴🔴✨"
+  },
+  {
+    "id": "RG-0847",
+    "rangeal": "YRRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0848",
+    "rangeal": "YRRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0849",
+    "rangeal": "YRRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0850",
+    "rangeal": "YRRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0851",
+    "rangeal": "YRRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0852",
+    "rangeal": "YRRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0853",
+    "rangeal": "YRRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0854",
+    "rangeal": "YRRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0855",
+    "rangeal": "YRRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔴🔵✨"
+  },
+  {
+    "id": "RG-0856",
+    "rangeal": "YRRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0857",
+    "rangeal": "YRRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0858",
+    "rangeal": "YRRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0859",
+    "rangeal": "YRRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0860",
+    "rangeal": "YRRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0861",
+    "rangeal": "YRRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0862",
+    "rangeal": "YRRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0863",
+    "rangeal": "YRRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0864",
+    "rangeal": "YRRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔴🟡✨"
+  },
+  {
+    "id": "RG-0865",
+    "rangeal": "YRBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0866",
+    "rangeal": "YRBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0867",
+    "rangeal": "YRBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0868",
+    "rangeal": "YRBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0869",
+    "rangeal": "YRBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0870",
+    "rangeal": "YRBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0871",
+    "rangeal": "YRBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0872",
+    "rangeal": "YRBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0873",
+    "rangeal": "YRBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔵🔴✨"
+  },
+  {
+    "id": "RG-0874",
+    "rangeal": "YRBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0875",
+    "rangeal": "YRBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0876",
+    "rangeal": "YRBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0877",
+    "rangeal": "YRBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0878",
+    "rangeal": "YRBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0879",
+    "rangeal": "YRBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0880",
+    "rangeal": "YRBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0881",
+    "rangeal": "YRBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0882",
+    "rangeal": "YRBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔵🔵✨"
+  },
+  {
+    "id": "RG-0883",
+    "rangeal": "YRBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0884",
+    "rangeal": "YRBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0885",
+    "rangeal": "YRBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0886",
+    "rangeal": "YRBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0887",
+    "rangeal": "YRBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0888",
+    "rangeal": "YRBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0889",
+    "rangeal": "YRBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0890",
+    "rangeal": "YRBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0891",
+    "rangeal": "YRBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🔵🟡✨"
+  },
+  {
+    "id": "RG-0892",
+    "rangeal": "YRYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0893",
+    "rangeal": "YRYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0894",
+    "rangeal": "YRYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0895",
+    "rangeal": "YRYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0896",
+    "rangeal": "YRYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0897",
+    "rangeal": "YRYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0898",
+    "rangeal": "YRYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0899",
+    "rangeal": "YRYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0900",
+    "rangeal": "YRYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🟡🔴✨"
+  },
+  {
+    "id": "RG-0901",
+    "rangeal": "YRYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0902",
+    "rangeal": "YRYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0903",
+    "rangeal": "YRYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0904",
+    "rangeal": "YRYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0905",
+    "rangeal": "YRYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0906",
+    "rangeal": "YRYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0907",
+    "rangeal": "YRYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0908",
+    "rangeal": "YRYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0909",
+    "rangeal": "YRYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🟡🔵✨"
+  },
+  {
+    "id": "RG-0910",
+    "rangeal": "YRYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0911",
+    "rangeal": "YRYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0912",
+    "rangeal": "YRYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0913",
+    "rangeal": "YRYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0914",
+    "rangeal": "YRYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0915",
+    "rangeal": "YRYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0916",
+    "rangeal": "YRYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0917",
+    "rangeal": "YRYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0918",
+    "rangeal": "YRYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔴🟡🟡✨"
+  },
+  {
+    "id": "RG-0919",
+    "rangeal": "YBRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0920",
+    "rangeal": "YBRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0921",
+    "rangeal": "YBRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0922",
+    "rangeal": "YBRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0923",
+    "rangeal": "YBRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0924",
+    "rangeal": "YBRR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0925",
+    "rangeal": "YBRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0926",
+    "rangeal": "YBRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0927",
+    "rangeal": "YBRR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔴🔴✨"
+  },
+  {
+    "id": "RG-0928",
+    "rangeal": "YBRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0929",
+    "rangeal": "YBRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0930",
+    "rangeal": "YBRB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0931",
+    "rangeal": "YBRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0932",
+    "rangeal": "YBRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0933",
+    "rangeal": "YBRB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0934",
+    "rangeal": "YBRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0935",
+    "rangeal": "YBRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0936",
+    "rangeal": "YBRB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔴🔵✨"
+  },
+  {
+    "id": "RG-0937",
+    "rangeal": "YBRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0938",
+    "rangeal": "YBRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0939",
+    "rangeal": "YBRY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0940",
+    "rangeal": "YBRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0941",
+    "rangeal": "YBRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0942",
+    "rangeal": "YBRY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0943",
+    "rangeal": "YBRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0944",
+    "rangeal": "YBRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0945",
+    "rangeal": "YBRY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔴🟡✨"
+  },
+  {
+    "id": "RG-0946",
+    "rangeal": "YBBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0947",
+    "rangeal": "YBBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0948",
+    "rangeal": "YBBR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0949",
+    "rangeal": "YBBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0950",
+    "rangeal": "YBBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0951",
+    "rangeal": "YBBR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0952",
+    "rangeal": "YBBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0953",
+    "rangeal": "YBBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0954",
+    "rangeal": "YBBR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔵🔴✨"
+  },
+  {
+    "id": "RG-0955",
+    "rangeal": "YBBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0956",
+    "rangeal": "YBBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0957",
+    "rangeal": "YBBB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0958",
+    "rangeal": "YBBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0959",
+    "rangeal": "YBBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0960",
+    "rangeal": "YBBB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0961",
+    "rangeal": "YBBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0962",
+    "rangeal": "YBBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0963",
+    "rangeal": "YBBB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔵🔵✨"
+  },
+  {
+    "id": "RG-0964",
+    "rangeal": "YBBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0965",
+    "rangeal": "YBBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0966",
+    "rangeal": "YBBY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0967",
+    "rangeal": "YBBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0968",
+    "rangeal": "YBBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0969",
+    "rangeal": "YBBY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0970",
+    "rangeal": "YBBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0971",
+    "rangeal": "YBBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0972",
+    "rangeal": "YBBY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🔵🟡✨"
+  },
+  {
+    "id": "RG-0973",
+    "rangeal": "YBYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0974",
+    "rangeal": "YBYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0975",
+    "rangeal": "YBYR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0976",
+    "rangeal": "YBYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0977",
+    "rangeal": "YBYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0978",
+    "rangeal": "YBYR",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0979",
+    "rangeal": "YBYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0980",
+    "rangeal": "YBYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0981",
+    "rangeal": "YBYR",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🟡🔴✨"
+  },
+  {
+    "id": "RG-0982",
+    "rangeal": "YBYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0983",
+    "rangeal": "YBYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0984",
+    "rangeal": "YBYB",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0985",
+    "rangeal": "YBYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0986",
+    "rangeal": "YBYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0987",
+    "rangeal": "YBYB",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0988",
+    "rangeal": "YBYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0989",
+    "rangeal": "YBYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0990",
+    "rangeal": "YBYB",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🟡🔵✨"
+  },
+  {
+    "id": "RG-0991",
+    "rangeal": "YBYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0992",
+    "rangeal": "YBYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0993",
+    "rangeal": "YBYY",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0994",
+    "rangeal": "YBYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0995",
+    "rangeal": "YBYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0996",
+    "rangeal": "YBYY",
+    "lumenal": {
+      "intensity": "M",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0997",
+    "rangeal": "YBYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "L"
+    },
+    "symbol": "🟡🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0998",
+    "rangeal": "YBYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "M"
+    },
+    "symbol": "🟡🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-0999",
+    "rangeal": "YBYY",
+    "lumenal": {
+      "intensity": "H",
+      "frequency": "H"
+    },
+    "symbol": "🟡🔵🟡🟡✨"
+  },
+  {
+    "id": "RG-1000",
+    "rangeal": "YYRR",
+    "lumenal": {
+      "intensity": "L",
+      "frequency": "L"
+    },
+    "symbol": "🟡🟡🔴🔴✨"
+  }
+]
