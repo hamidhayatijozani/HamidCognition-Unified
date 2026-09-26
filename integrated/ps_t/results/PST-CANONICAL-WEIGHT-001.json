@@ -1,0 +1,12 @@
+{
+  "experiment_id": "PST-CANONICAL-WEIGHT-001",
+  "status": "GENERATED",
+  "basis": "canonical_engine.py + canonical_weights.json",
+  "source_branch": "fix/pst-canonical-weights",
+  "weight_contract": {"P": 0.05, "S": 0.04, "T": 0.03},
+  "initial_state": {"P": 0.88, "S": 0.78, "T": 0.40},
+  "first_transition": {"P": 0.9055, "S": 0.8062, "T": 0.4494, "energy": 0.8275, "phase": "RUPTURE_IMMINENT"},
+  "last_transition": {"P": 0.95, "S": 0.95, "T": 0.8, "energy": 1.7417, "phase": "RUPTURE_IMMINENT"},
+  "trajectory_sha256": "96c69f12a3352ef96fdc42376b94e2ecce66d884e5920a92a03201d923f1fed7",
+  "note": "Generated independently from the canonical transition equations. This is a reproducible evidence record, not a GitHub Actions attestation."
+}
