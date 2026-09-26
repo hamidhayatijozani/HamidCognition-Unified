@@ -22,7 +22,7 @@ The system evaluates actions before execution, binds authorization to tenant, ac
 
 We are opening a limited number of enterprise proof-of-value engagements focused on a real agent-to-tool execution path.
 
-The proposed pilot is 6–8 weeks and is scoped at $50,000, with the objective of demonstrating the control boundary against customer-selected action scenarios and producing an acceptance/evidence report.
+The proposed pilot is 6–8 weeks and is scoped at 50,000 USDT, with the objective of demonstrating the control boundary against customer-selected action scenarios and producing an acceptance/evidence report.
 
 If the use case is relevant, the next step is a technical evaluation under an appropriate NDA.
 
@@ -45,6 +45,10 @@ The pilot should define in writing:
 9. IP ownership;
 10. permitted use of pilot outputs;
 11. conversion terms if the pilot succeeds.
+
+## Payment
+
+Commercial fees are payable in USDT only. The invoice identifies the exact network, receiving address, amount and payment deadline. A transaction is treated as settled only after transaction-hash verification and the required confirmations.
 
 ## Commercial guardrails
 
