@@ -18,6 +18,7 @@ ENV.update({
     "ACTION_GATE_API_TOKEN": TOKEN,
     "ACTION_GATE_SIGNING_SECRET": "sellable-signing-secret",
     "ACTION_GATE_APPROVAL_SECRET": "sellable-approval-secret",
+    "ACTION_GATE_ENFORCEMENT_SECRET": "sellable-enforcement-secret",
     "ACTION_GATE_REQUIRE_SESSION_BINDING": "1",
     "ACTION_GATE_DB": DB,
     "PYTHONPATH": ROOT,
