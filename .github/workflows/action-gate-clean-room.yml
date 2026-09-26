@@ -39,7 +39,7 @@ jobs:
           echo "expected_sha=$EXPECTED_SHA"
           test -n "$EXPECTED_SHA"
 
-      - name: Checkout clean repository state
+      - name: Checkout exact source revision
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -70,6 +70,7 @@ jobs:
           echo "clean_room_head_sha=$GITHUB_SHA"
 
       - name: Verify canonical product version
+        id: version
         shell: bash
         run: |
           set -euo pipefail
@@ -77,7 +78,6 @@ jobs:
           version="$(tr -d '[:space:]' < action_gate/VERSION)"
           test -n "$version"
           echo "version=$version" >> "$GITHUB_OUTPUT"
-        id: version
 
       - name: Create isolated Python environment
         shell: bash
@@ -95,7 +95,6 @@ jobs:
           elif test -f pyproject.toml || test -f setup.py; then
             python -m pip install -e .
           fi
-          # pytest is a CI test-runner dependency and must not depend on project requirements declaring it.
           python -m pip install 'pytest>=8,<9'
           python -m pip freeze > clean-room-evidence-pip-freeze.txt
 
@@ -145,20 +144,29 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          docker pull python:3.12-slim
           docker build --pull -f action_gate/Dockerfile -t action-gate-clean-room:${{ steps.version.outputs.version }} action_gate
           docker image inspect action-gate-clean-room:${{ steps.version.outputs.version }} --format 'image_id={{.Id}}' | tee clean-room-image.txt
           docker image inspect python:3.12-slim --format '{{json .RepoDigests}}' | tee clean-room-base-image-digests.json
 
-      - name: Emit verification manifest
+      - name: Emit verification manifest and attestation
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p clean-room-evidence
           version="$(tr -d '[:space:]' < action_gate/VERSION)"
+          verified_source_sha="$(git rev-parse HEAD)"
+          test "$verified_source_sha" = "$EXPECTED_SHA"
+          container_image_id="$(sed 's/^image_id=//' clean-room-image.txt)"
+          base_image_digests="$(cat clean-room-base-image-digests.json)"
+          pip_freeze_sha256="$(sha256sum clean-room-evidence-pip-freeze.txt | awk '{print $1}')"
+          timestamp_utc="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           {
             echo "product=Action Gate"
             echo "version=$version"
-            echo "commit=$GITHUB_SHA"
+            echo "commit=$verified_source_sha"
+            echo "github_sha=$GITHUB_SHA"
+            echo "expected_sha=$EXPECTED_SHA"
             echo "run_id=$GITHUB_RUN_ID"
             echo "run_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
             echo "workflow_ref=$GITHUB_WORKFLOW_REF"
@@ -166,24 +174,39 @@ jobs:
             echo "runner_arch=$RUNNER_ARCH"
             echo "python=$(python3 --version)"
             echo "docker=$(docker --version)"
+            echo "pip_freeze_sha256=$pip_freeze_sha256"
+            echo "container_image_id=$container_image_id"
+            echo "base_image_digests=$base_image_digests"
+            echo "timestamp_utc=$timestamp_utc"
             echo "verification=clean-room"
           } > clean-room-evidence/manifest.txt
-          {
-            echo '{'
-            printf '  "product": "Action Gate",\n'
-            printf '  "version": "%s",\n' "$version"
-            printf '  "commit_sha": "%s",\n' "$GITHUB_SHA"
-            printf '  "workflow_run_id": "%s",\n' "$GITHUB_RUN_ID"
-            printf '  "run_url": "%s/%s/actions/runs/%s",\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
-            printf '  "workflow_ref": "%s",\n' "$GITHUB_WORKFLOW_REF"
-            printf '  "runner_os": "%s",\n' "$RUNNER_OS"
-            printf '  "runner_arch": "%s",\n' "$RUNNER_ARCH"
-            printf '  "pip_freeze_sha256": "%s",\n' "$(sha256sum clean-room-evidence-pip-freeze.txt | awk '{print $1}')"
-            printf '  "container_image_id": "%s",\n' "$(sed 's/^image_id=//' clean-room-image.txt)"
-            printf '  "base_image_digests": %s,\n' "$(cat clean-room-base-image-digests.json)"
-            printf '  "timestamp_utc": "%s"\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            echo '}'
-          } > clean-room-evidence/attestation.json
+          export PIP_FREEZE_SHA256="$pip_freeze_sha256"
+          export CONTAINER_IMAGE_ID="$container_image_id"
+          export BASE_IMAGE_DIGESTS="$base_image_digests"
+          export TIMESTAMP_UTC="$timestamp_utc"
+          export VERIFIED_SOURCE_SHA="$verified_source_sha"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          attestation = {
+              "product": "Action Gate",
+              "version": Path("action_gate/VERSION").read_text().strip(),
+              "commit_sha": os.environ["VERIFIED_SOURCE_SHA"],
+              "github_sha": os.environ["GITHUB_SHA"],
+              "expected_sha": os.environ["EXPECTED_SHA"],
+              "workflow_run_id": os.environ["GITHUB_RUN_ID"],
+              "run_url": f'{os.environ["GITHUB_SERVER_URL"]}/{os.environ["GITHUB_REPOSITORY"]}/actions/runs/{os.environ["GITHUB_RUN_ID"]}',
+              "workflow_ref": os.environ["GITHUB_WORKFLOW_REF"],
+              "runner_os": os.environ["RUNNER_OS"],
+              "runner_arch": os.environ["RUNNER_ARCH"],
+              "pip_freeze_sha256": os.environ["PIP_FREEZE_SHA256"],
+              "container_image_id": os.environ["CONTAINER_IMAGE_ID"],
+              "base_image_digests": json.loads(os.environ["BASE_IMAGE_DIGESTS"]),
+              "timestamp_utc": os.environ["TIMESTAMP_UTC"],
+              "verification": "clean-room"
+          }
+          Path("clean-room-evidence/attestation.json").write_text(json.dumps(attestation, indent=2) + "\n")
+          PY
           sha256sum clean-room-evidence/manifest.txt > clean-room-evidence/manifest.sha256
           sha256sum clean-room-evidence/attestation.json > clean-room-evidence/attestation.sha256
           cp clean-room-evidence-pip-freeze.txt clean-room-evidence/pip-freeze.txt
@@ -198,7 +221,7 @@ jobs:
       - name: Upload clean-room evidence
         uses: actions/upload-artifact@v4
         with:
-          name: action-gate-clean-room-evidence-${{ steps.version.outputs.version }}-${{ github.sha }}
+          name: action-gate-clean-room-evidence-${{ steps.version.outputs.version }}-${{ github.event.pull_request.head.sha || github.sha }}
           path: |
             clean-room-evidence.tar.gz
             clean-room-evidence.tar.gz.sha256
