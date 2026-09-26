@@ -178,6 +178,9 @@ jobs:
             printf '  "workflow_ref": "%s",\n' "$GITHUB_WORKFLOW_REF"
             printf '  "runner_os": "%s",\n' "$RUNNER_OS"
             printf '  "runner_arch": "%s",\n' "$RUNNER_ARCH"
+            printf '  "pip_freeze_sha256": "%s",\n' "$(sha256sum clean-room-evidence-pip-freeze.txt | awk '{print $1}')"
+            printf '  "container_image_id": "%s",\n' "$(sed 's/^image_id=//' clean-room-image.txt)"
+            printf '  "base_image_digests": %s,\n' "$(cat clean-room-base-image-digests.json)"
             printf '  "timestamp_utc": "%s"\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
             echo '}'
           } > clean-room-evidence/attestation.json
