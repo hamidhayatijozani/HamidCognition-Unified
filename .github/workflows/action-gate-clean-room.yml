@@ -140,14 +140,24 @@ jobs:
             exit 1
           fi
 
-      - name: Build production container from clean checkout
+      - name: Resolve immutable Python base image
+        id: base
         shell: bash
         run: |
           set -euo pipefail
           docker pull python:3.12-slim
-          docker build --pull -f action_gate/Dockerfile -t action-gate-clean-room:${{ steps.version.outputs.version }} action_gate
-          docker image inspect action-gate-clean-room:${{ steps.version.outputs.version }} --format 'image_id={{.Id}}' | tee clean-room-image.txt
+          digest="$(docker image inspect python:3.12-slim --format '{{index .RepoDigests 0}}')"
+          test -n "$digest"
+          echo "image=$digest" >> "$GITHUB_OUTPUT"
+          echo "$digest" > clean-room-base-image.txt
           docker image inspect python:3.12-slim --format '{{json .RepoDigests}}' | tee clean-room-base-image-digests.json
+
+      - name: Build production container from immutable base
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build --pull=false --build-arg PYTHON_BASE_IMAGE="${{ steps.base.outputs.image }}" -f action_gate/Dockerfile -t action-gate-clean-room:${{ steps.version.outputs.version }} action_gate
+          docker image inspect action-gate-clean-room:${{ steps.version.outputs.version }} --format 'image_id={{.Id}}' | tee clean-room-image.txt
 
       - name: Emit verification manifest and attestation
         shell: bash
