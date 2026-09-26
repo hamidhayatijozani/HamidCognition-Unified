@@ -1,5 +1,6 @@
 import json
 import os
+import socket
 import subprocess
 import sys
 import time
@@ -17,8 +18,24 @@ procs = [
     subprocess.Popen([sys.executable, "tool_server.py"], cwd=ROOT, env=env),
     subprocess.Popen([sys.executable, "enforcement_proxy.py"], cwd=ROOT, env={**env, "MODE": "http", "PORT": "8080"}),
 ]
+
+def wait_for_ports(ports, timeout=15):
+    deadline = time.monotonic() + timeout
+    pending = set(ports)
+    while pending and time.monotonic() < deadline:
+        for port in tuple(pending):
+            try:
+                with socket.create_connection(("127.0.0.1", port), timeout=0.5):
+                    pending.remove(port)
+            except OSError:
+                pass
+        if pending:
+            time.sleep(0.2)
+    if pending:
+        raise RuntimeError(f"services did not become ready: {sorted(pending)}")
+
 try:
-    time.sleep(3)
+    wait_for_ports((8000, 8080, 9000))
 
     def post(url, payload, headers=None):
         req = urllib.request.Request(url, data=json.dumps(payload).encode(), headers={"Content-Type": "application/json", **(headers or {})})
