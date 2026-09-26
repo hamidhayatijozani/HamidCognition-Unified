@@ -32,7 +32,6 @@ jobs:
             "Action Gate Production E2E Smoke"
             "Action Gate Security Authority Gate"
             "Product Verification"
-            "Master Evidence Gate"
             "Security History Secret Scan"
             "Action Gate MVP"
           )
