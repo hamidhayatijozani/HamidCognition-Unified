@@ -1,11 +1,6 @@
 ARG BASE_IMAGE_DIGEST
 FROM python:3.12-slim@${BASE_IMAGE_DIGEST}
-ARG POSTGRESQL_CLIENT_VERSION
 WORKDIR /app
-RUN test -n "$POSTGRESQL_CLIENT_VERSION"
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends postgresql-client="$POSTGRESQL_CLIENT_VERSION" \
-    && rm -rf /var/lib/apt/lists/*
 COPY requirements.txt .
 COPY requirements.lock .
 RUN python -m pip install --no-cache-dir --require-hashes -r requirements.lock
