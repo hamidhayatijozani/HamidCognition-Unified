@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0.0",
+  "registry_purpose": "Authoritative registry for model-weight artifacts admitted to HamidCognition releases.",
+  "integrity_policy": {
+    "required_hash": "sha256",
+    "allowed_weight_formats": ["safetensors", "onnx", "gguf", "pytorch_state_dict", "tensorflow_checkpoint", "other"],
+    "production_admission_requires": ["exact upstream repository identifier", "exact immutable model revision", "exact artifact filename or manifest path", "sha256 of the bytes actually admitted", "format", "runtime compatibility", "license evidence", "verification timestamp", "release binding"]
+  },
+  "models": [],
+  "source_repositories": [
+    {"repository": "hamidhayatijozani/HamidCognition", "role": "historical-model-capable-source", "status": "no_weight_artifact_verified"},
+    {"repository": "hamidhayatijozani/HamidCognitionEngine", "role": "historical-model-capable-source", "status": "no_weight_artifact_verified"},
+    {"repository": "hamidhayatijozani/hamidcognition-complete", "role": "reference-source", "status": "no_weight_artifact_verified"},
+    {"repository": "hamidhayatijozani/hamidcognition-realtime", "role": "runtime-source", "status": "no_weight_artifact_verified"},
+    {"repository": "hamidhayatijozani/hamidcognition-v0-max", "role": "reference-source", "status": "no_weight_artifact_verified"},
+    {"repository": "hamidhayatijozani/epistemic-filter", "role": "epistemic-source", "status": "no_weight_artifact_verified"},
+    {"repository": "hamidhayatijozani/hhj-cognitive-safety-gateway", "role": "gateway-source", "status": "no_weight_artifact_verified"}
+  ]
+}
