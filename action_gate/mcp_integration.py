@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import socket
 import subprocess
 import sys
 import time
@@ -17,8 +18,24 @@ procs = [
     subprocess.Popen([sys.executable, "tool_server.py"], cwd=ROOT, env=env),
     subprocess.Popen([sys.executable, "enforcement_proxy.py"], cwd=ROOT, env={**env, "MODE": "mcp", "PORT": "8081"}),
 ]
+
+def wait_for_ports(ports, timeout=15):
+    deadline = time.monotonic() + timeout
+    pending = set(ports)
+    while pending and time.monotonic() < deadline:
+        for port in tuple(pending):
+            try:
+                with socket.create_connection(("127.0.0.1", port), timeout=0.5):
+                    pending.remove(port)
+            except OSError:
+                pass
+        if pending:
+            time.sleep(0.2)
+    if pending:
+        raise RuntimeError(f"services did not become ready: {sorted(pending)}")
+
 try:
-    time.sleep(2)
+    wait_for_ports((8000, 8081, 9000))
 
     def call(message, tenant=TENANT):
         req = urllib.request.Request(
