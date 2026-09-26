@@ -1,0 +1,19 @@
+name: Financial Runtime Tests
+
+on:
+  push:
+    branches:
+      - main
+      - "feature/**"
+  pull_request:
+
+jobs:
+  financial-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run financial runtime tests
+        run: python -m unittest discover -s tests -p "financial_runtime_test.py" -v
