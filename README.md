@@ -10,9 +10,7 @@ It evaluates an action before execution, binds authorization to the relevant ten
 
 ## Why it exists
 
-AI agents increasingly have the ability to call APIs, MCP tools, databases, cloud systems and other privileged services. OWASP identifies excessive agency, excessive permissions and excessive autonomy as material risks and recommends complete mediation at downstream systems. NIST is also examining identity and authorization practices for software agents.
-
-Action Gate addresses one narrow question:
+AI agents increasingly have the ability to call APIs, MCP tools, databases, cloud systems and other privileged services. Action Gate addresses one narrow engineering question:
 
 > Can the protected tool independently verify that this exact agent action is authorized, current, correctly bound, and not being replayed?
 
@@ -30,19 +28,25 @@ Action Gate addresses one narrow question:
 - protected-tool acceptance tests
 - self-hosted, managed and enterprise delivery
 
+## Commercial release
+
+The customer-facing release is **HamidCognition Action Gate v1.0.5**, published as the immutable GitHub release "action-gate-v1.0.5" at source commit "f3c77cbb314e76911cce37298d58202ffb451d6e".
+
+Commercial delivery is bound to that exact release artifact, checksum, manifest, license scope, and customer acceptance procedure. The mutable main branch is not a customer release.
+
+See PRODUCT/CURRENT_COMMERCIAL_RELEASE.md for the current release-control state.
+
 ## Commercial entry point
 
-The fastest path to purchase is a **one-tool pilot**.
+The practical purchase path is a **one-tool proof-of-value pilot**.
 
-Protect one high-impact agent tool or MCP server, run the acceptance suite against the customer's real deployment, and deliver reproducible evidence.
+Protect one high-impact agent tool or MCP server, run the acceptance suite against the customer's deployment, and deliver reproducible evidence.
 
-See `SALES/ONE_PAGER.md`, `SALES/ICP_AND_POSITIONING.md`, `SALES/PILOT_OFFER.md`, `SALES/DEMO_SCRIPT.md`, `SALES/OUTBOUND_EMAILS.md`, and `SALES/OBJECTIONS.md`.
+See SALES/ONE_PAGER.md, SALES/ICP_AND_POSITIONING.md, SALES/PILOT_OFFER.md, SALES/DEMO_SCRIPT.md, SALES/OUTBOUND_EMAILS.md, and SALES/OBJECTIONS.md.
 
 ## Product boundary
 
-The current commercial runtime is **HamidCognition Action Gate v1.0.5**.
-
-Validated engineering claims are limited to the tested boundary. The product does not claim universal AI safety, regulatory certification, downstream correctness, or guaranteed business outcomes.
+Action Gate is a pre-execution authorization and evidence boundary. It does not claim universal AI safety, universal policy correctness, regulatory certification, downstream correctness, or guaranteed business outcomes.
 
 ## Delivery models
 
@@ -54,15 +58,15 @@ Validated engineering claims are limited to the tested boundary. The product doe
 
 ## Research program
 
-The broader HamidCognition repository preserves research and lineage around ClaimLab, P/S/T cognitive-state experiments, LUMEN / behavioral state transfer, KIRGANDE / unknown-space exploration, Farahoosh-Prime experimentation, scale-breaking research, and trading/forecasting experiments.
+The broader repository preserves research and lineage around ClaimLab, P/S/T cognitive-state experiments, LUMEN / behavioral state transfer, KIRGANDE / unknown-space exploration, Farahoosh-Prime experimentation, scale-breaking research, and trading/forecasting experiments.
 
-Those research lines are not automatically commercial product claims. The Action Gate boundary is the current product surface.
+Those research lines are not automatically commercial product claims. The Action Gate boundary is the product surface.
 
 ## Evidence and provenance
 
 Important results are traceable through:
 
-`dataset → parameters → code commit → environment → execution → observation → analysis → claim`
+dataset → parameters → code commit → environment → execution → observation → analysis → claim
 
 The repository preserves implementation lineage, evidence records, acceptance procedures and release artifacts.
 
