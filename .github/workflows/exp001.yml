@@ -7,10 +7,12 @@ on:
   push:
     paths:
       - 'experiments/EXP-001/**'
+      - 'integrated/ps_t/**'
       - '.github/workflows/exp001.yml'
   pull_request:
     paths:
       - 'experiments/EXP-001/**'
+      - 'integrated/ps_t/**'
       - '.github/workflows/exp001.yml'
 
 jobs:
@@ -29,3 +31,5 @@ jobs:
         run: |
           python replay.py > /tmp/replay.json
           grep '"identical_fingerprints": true' /tmp/replay.json
+      - name: Run canonical weight regression
+        run: python -m pytest -q integrated/ps_t/test_canonical_engine.py
