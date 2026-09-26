@@ -1,0 +1,68 @@
+name: Action Gate Release Source Evidence
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'action_gate/**'
+      - 'PRODUCT/**'
+      - '.github/workflows/**'
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: "Exact main SHA to record"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  release-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      EXPECTED_SHA: ${{ inputs.expected_sha || github.sha }}
+    steps:
+      - name: Checkout exact main revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+
+      - name: Verify release source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$EXPECTED_SHA"
+          test "$GITHUB_EVENT_NAME" = "push" || test "$EXPECTED_SHA" = "$GITHUB_SHA"
+          test "$GITHUB_REF" = "refs/heads/main" || test "$GITHUB_EVENT_NAME" = "workflow_dispatch"
+          echo "release_source_sha=$actual"
+
+      - name: Record runtime identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-source-evidence
+          {
+            echo "product=HamidCognition Action Gate"
+            echo "version=$(tr -d '[:space:]' < action_gate/VERSION)"
+            echo "commit=$(git rev-parse HEAD)"
+            echo "run_id=$GITHUB_RUN_ID"
+            echo "run_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "workflow_ref=$GITHUB_WORKFLOW_REF"
+            echo "event=$GITHUB_EVENT_NAME"
+            echo "runner_os=$RUNNER_OS"
+            echo "runner_arch=$RUNNER_ARCH"
+            echo "python=$(python3 --version)"
+          } > release-source-evidence/manifest.txt
+          sha256sum release-source-evidence/manifest.txt > release-source-evidence/manifest.sha256
+
+      - name: Upload release source evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: action-gate-release-source-${{ github.sha }}
+          path: release-source-evidence/
+          if-no-files-found: error
+          retention-days: 30
