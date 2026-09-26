@@ -2,7 +2,7 @@
 
 ## Release baseline
 
-**HamidCognition Action Gate v1.0.4** is the current engineering and commercial-delivery baseline.
+**HamidCognition Action Gate v1.0.5** is the current published engineering and commercial-delivery baseline.
 
 ## Included
 
@@ -42,7 +42,7 @@ The repository does not assert prices. Pricing is a business decision and must b
 
 ## Acceptance evidence
 
-The v1.0.4 release was validated on the exact release commit by Product Gates, Product Integrity, Production E2E, Product Verification, Security Authority Gate, Master Evidence Gate, Security History Secret Scan, Action Gate MVP, Clean-Room Verification, Release Readiness Gate, and Release Candidate workflows. The final publisher attached the versioned tar, checksum, and manifest to the product release.
+The published v1.0.5 release records verified source commit `f3c77cbb314e76911cce37298d58202ffb451d6e` and release-candidate workflow run `36087744393`. The publisher attached the versioned tar, checksum, and manifest to the release.
 
 ## Not included by default
 
@@ -54,3 +54,7 @@ The v1.0.4 release was validated on the exact release commit by Product Gates, P
 - guaranteed business outcomes.
 
 Those require explicit scope and evidence.
+
+## Live-sale dependency
+
+The product package is prepared for commercial delivery. A live checkout requires a connected payment provider and an activated product/price/payment link. No payment credential or live checkout endpoint is stored in this repository.
