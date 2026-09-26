@@ -6,11 +6,7 @@
 
 HamidCognition Action Gate is a separately deployable control point between an AI agent and protected tools. It evaluates an action before execution, binds the authorization decision to tenant, actor, session, and action identity, records evidence, and permits execution only through the accepted enforcement boundary.
 
-## The problem
-
-AI agents can move from generating text to taking real actions: invoking tools, changing records, calling services, or triggering operational workflows. A conventional allow/deny flag does not by itself provide a durable execution boundary, identity binding, evidence, or replay.
-
-## What Action Gate provides
+## The product
 
 - Policy-bound action decisions: **ALLOW / DENY / ASK / SANDBOX**
 - Tenant, actor, session, and action identity binding
@@ -26,11 +22,21 @@ AI agents can move from generating text to taking real actions: invoking tools, 
 
 **Agent → Action Gate → Policy Decision → Evidence Reservation → Execution Authority → Tool → Outcome → Evidence → Replay**
 
-## Validated engineering boundary
+## Offerable release
 
-The current commercial product specification identifies the validated **Action Gate v1.0.5** boundary and lists production authentication, tenant isolation, actor/session binding, decision integrity, persistent nonce protection, HTTP and MCP enforcement, fail-closed evidence handling, PostgreSQL persistence, production Compose startup, end-to-end smoke validation, replay, restart/persistence replay, clean-room validation, security-history scanning, and release-readiness gating.
+The current customer-deliverable release is **Action Gate v1.0.5**, published at exact source commit:
 
-These are engineering validation claims for the tested boundary. They are not claims of universal AI safety, universal policy correctness, regulatory certification, or safety of downstream tools.
+f3c77cbb314e76911cce37298d58202ffb451d6e
+
+The release contains a versioned container archive, SHA-256 checksum and release manifest. Customer delivery must use this immutable release rather than the mutable main branch.
+
+The current main branch contains later engineering/research changes and is not commercially release-closed until its same-SHA GitHub validation chain is green. This distinction prevents a development head from being represented as a validated customer artifact.
+
+## Validated boundary
+
+The v1.0.5 release evidence covers the documented Action Gate boundary, including production authentication, tenant/actor/session binding, decision integrity, persistent nonce protection, HTTP and MCP enforcement, fail-closed evidence handling, PostgreSQL persistence, production Compose startup, replay/persistence validation, clean-room validation, security-history scanning, and release-readiness gating.
+
+These are engineering validation claims for the stated release and tested boundary. They are not claims of universal AI safety, universal policy correctness, regulatory certification, downstream tool safety, or guaranteed business outcomes.
 
 ## Commercial deployment
 
