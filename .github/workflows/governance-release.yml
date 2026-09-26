@@ -16,11 +16,13 @@ jobs:
     steps:
       - name: Create evidence-bound release
         env:
-          GH_TOKEN: $GITHUB_TOKEN
-          RUN_ID: $GITHUB_RUN_ID
-          HEAD_SHA: $GITHUB_SHA
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         shell: bash
         run: |
           set -euo pipefail
           echo "Evidence-bound release workflow"
-          echo "This workflow must only publish after Master Evidence Gate succeeds."
+          echo "master_evidence_run_id=$RUN_ID"
+          echo "validated_source_sha=$HEAD_SHA"
+          echo "No unsupported certification claim is emitted."
