@@ -28,7 +28,7 @@ AI agents can move from generating text to taking real actions: invoking tools, 
 
 ## Validated engineering boundary
 
-The current commercial product specification identifies the validated **Action Gate v1.0.4** boundary and lists production authentication, tenant isolation, actor/session binding, decision integrity, persistent nonce protection, HTTP and MCP enforcement, fail-closed evidence handling, PostgreSQL persistence, production Compose startup, end-to-end smoke validation, replay, restart/persistence replay, clean-room validation, security-history scanning, and release-readiness gating.
+The current commercial product specification identifies the validated **Action Gate v1.0.5** boundary and lists production authentication, tenant isolation, actor/session binding, decision integrity, persistent nonce protection, HTTP and MCP enforcement, fail-closed evidence handling, PostgreSQL persistence, production Compose startup, end-to-end smoke validation, replay, restart/persistence replay, clean-room validation, security-history scanning, and release-readiness gating.
 
 These are engineering validation claims for the tested boundary. They are not claims of universal AI safety, universal policy correctness, regulatory certification, or safety of downstream tools.
 
@@ -42,7 +42,7 @@ These are engineering validation claims for the tested boundary. They are not cl
 
 ## Pilot offer
 
-**Strategic Proof-of-Value Pilot: $50,000**
+**Strategic Proof-of-Value Pilot: 50,000 USDT**
 
 Recommended scope: one protected agent-to-tool execution path, customer-selected policy scenarios, integration support, acceptance testing, evidence/replay demonstration, and a written pilot outcome report.
 
@@ -52,11 +52,11 @@ Pilot fee is a commercial proposal, not a claim of market-standard pricing.
 
 ## Enterprise conversion
 
-Indicative annual software license target after successful pilot: **$150,000–$300,000/year**, with customer-specific integration, managed operations, support, SLA, and special security requirements priced separately.
+Indicative annual software license target after successful pilot: **150,000–300,000 USDT/year**, with customer-specific integration, managed operations, support, SLA, and special security requirements priced separately.
 
 ## Strategic / OEM licensing
 
-For embedding Action Gate capabilities into another vendor's product or platform, use a negotiated technology/OEM license. Initial commercial discussion target: **$500,000+**, with scope, exclusivity, deployment rights, support, and any royalty/minimum-commitment structure negotiated separately.
+For embedding Action Gate capabilities into another vendor's product or platform, use a negotiated technology/OEM license. Initial commercial discussion target: **500,000+ USDT**, with scope, exclusivity, deployment rights, support, and any royalty/minimum-commitment structure negotiated separately.
 
 ## Who should evaluate it
 
@@ -70,6 +70,10 @@ For embedding Action Gate capabilities into another vendor's product or platform
 ## What the buyer receives
 
 A versioned runtime, deployment materials, integration/API contract, acceptance procedure, operations guidance, security boundary/threat model, and agreed release/provenance evidence, subject to the selected commercial scope and written license.
+
+## Payment
+
+All commercial fees are payable in USDT only. The accepted network and receiving address are stated on the invoice. Settlement is confirmed only from an independently verified transaction hash and the configured confirmation policy.
 
 ## Commercial boundary
 
