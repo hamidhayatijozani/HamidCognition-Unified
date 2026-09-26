@@ -51,6 +51,10 @@ No prize or market claim is considered real until its external rules and the sub
 
 ## Current product state
 
-Action Gate v1.0.5 is the current published commercial runtime. Release tag: `action-gate-v1.0.5`. Verified source commit recorded by the publisher: `f3c77cbb314e76911cce37298d58202ffb451d6e`.
+Action Gate v1.0.5 is the canonical commercial product boundary.
 
-The remaining commercial step is live payment/checkout activation and customer-specific acceptance, not another rewrite of the validated core unless new evidence requires it.
+Historical release evidence for an earlier v1.0.5 publication remains preserved, but it must not be treated as evidence for a later main revision. Current release evidence is valid only when the exact source SHA, workflow run, artifact digest and release record agree.
+
+Commercial payment is USDT only. Payment settlement is deliberately outside the Action Gate authorization path and is governed by PRODUCT/USDT_PAYMENT_POLICY.md.
+
+The product is not considered commercially verified merely because the repository contains release documents. A current saleable release requires same-SHA product/security/clean-room validation and a reproducible release artifact, followed by customer-specific acceptance for production execution.
