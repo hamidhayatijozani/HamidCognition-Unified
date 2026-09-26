@@ -79,6 +79,7 @@ def issue_authority(*, secret: bytes, decision_id: str, tenant_id: str,
     signature = hmac.new(secret, canonical_json(payload).encode(), hashlib.sha256).hexdigest()
     return Authority(**payload, signature=signature)
 
+
 def verify_authority_envelope(*, authority: Authority, secret: bytes,
                               tenant_id: str, action_digest: str,
                               now: int | None = None,
@@ -93,7 +94,7 @@ def verify_authority_envelope(*, authority: Authority, secret: bytes,
         raise AuthorityError("expired_or_not_yet_valid")
     if authority.action_digest != action_digest:
         raise AuthorityError("action_binding_mismatch")
-    if authority.decision not in {"ALLOW", "SANDBOX"}:
+    if authority.decision != "ALLOW":
         raise AuthorityError("decision_not_executable")
     if used_nonces is not None:
         if authority.nonce in used_nonces:
@@ -117,9 +118,9 @@ def verify_authority(*, authority: Authority, secret: bytes,
         raise AuthorityError("action_binding_mismatch")
     if policy is not None and authority.policy_digest != canonical_digest(policy):
         raise AuthorityError("policy_binding_mismatch")
+    if authority.decision != "ALLOW":
+        raise AuthorityError("decision_not_executable")
     if used_nonces is not None:
         if authority.nonce in used_nonces:
             raise AuthorityError("nonce_reuse")
         used_nonces.add(authority.nonce)
-    if authority.decision not in {"ALLOW", "SANDBOX"}:
-        raise AuthorityError("decision_not_executable")
