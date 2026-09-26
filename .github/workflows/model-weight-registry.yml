@@ -1,0 +1,43 @@
+name: Model Weight Registry Verification
+
+on:
+  pull_request:
+    paths:
+      - "MODEL/**"
+      - "scripts/verify_model_weight_registry.py"
+      - ".github/workflows/model-weight-registry.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "MODEL/**"
+      - "scripts/verify_model_weight_registry.py"
+      - ".github/workflows/model-weight-registry.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-model-weight-registry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Verify registry contract
+        run: python3 scripts/verify_model_weight_registry.py
+
+      - name: Reject unregistered model-weight binaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          if find . -type f \( -name '*.safetensors' -o -name '*.gguf' -o -name '*.onnx' -o -name '*.pt' -o -name '*.pth' -o -name '*.ckpt' -o -name '*.h5' \) -not -path './.git/*' | grep -q .; then
+            echo "Model-weight files exist but are not admitted through MODEL/WEIGHT_REGISTRY.json."
+            exit 1
+          fi
+          echo "No unregistered model-weight binaries detected."
