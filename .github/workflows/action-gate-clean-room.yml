@@ -180,7 +180,8 @@ jobs:
             printf '  "workflow_ref": "%s",\n' "$GITHUB_WORKFLOW_REF"
             printf '  "runner_os": "%s",\n' "$RUNNER_OS"
             printf '  "runner_arch": "%s",\n' "$RUNNER_ARCH"
-            printf '  "pip_freeze_sha256": "%s",\n' "$(sha256sum clean-room-evidence-pip-freeze.txt | awk '{print $1}')"
+            printf '  "container_pip_freeze_sha256": "%s",\n' "$(sha256sum clean-room-container-pip-freeze.txt | awk '{print $1}')"
+            printf '  "host_pip_freeze_sha256": "%s",\n' "$(sha256sum clean-room-evidence-pip-freeze.txt | awk '{print $1}')"
             printf '  "requirements_lock_sha256": "%s",\n' "$(sha256sum action_gate/requirements.lock | awk '{print $1}')"
             printf '  "postgresql_client_version": "%s",\n' "$(cat clean-room-postgresql-client-version.txt)"
             printf '  "base_image_digest": "%s",\n' "$(cat clean-room-base-image-digest.txt)"
@@ -192,7 +193,10 @@ jobs:
           } > clean-room-evidence/attestation.json
           sha256sum clean-room-evidence/manifest.txt > clean-room-evidence/manifest.sha256
           sha256sum clean-room-evidence/attestation.json > clean-room-evidence/attestation.sha256
-          cp clean-room-evidence-pip-freeze.txt clean-room-evidence/pip-freeze.txt
+          cp clean-room-container-pip-freeze.txt clean-room-evidence/container-pip-freeze.txt
+          cp clean-room-evidence-pip-freeze.txt clean-room-evidence/host-pip-freeze.txt
+          sha256sum clean-room-evidence/container-pip-freeze.txt > clean-room-evidence/container-pip-freeze.sha256
+          sha256sum clean-room-evidence/host-pip-freeze.txt > clean-room-evidence/host-pip-freeze.sha256
           cp clean-room-image.txt clean-room-evidence/container-image.txt
           cp clean-room-base-image-digests.json clean-room-evidence/base-image-digests.json
           cp action_gate/requirements.lock clean-room-evidence/requirements.lock
@@ -227,6 +231,9 @@ jobs:
           docker build -f action_gate/Dockerfile --build-arg BASE_IMAGE_DIGEST="$base_digest" --build-arg POSTGRESQL_CLIENT_VERSION="$pg_version" -t action-gate-clean-room:${{ steps.version.outputs.version }} action_gate
           docker image inspect action-gate-clean-room:${{ steps.version.outputs.version }} --format 'image_id={{.Id}}' | tee clean-room-image.txt
           docker image inspect python:3.12-slim --format '{{json .RepoDigests}}' | tee clean-room-base-image-digests.json
+          docker run --rm action-gate-clean-room:${{ steps.version.outputs.version }} python -m pip freeze | tee clean-room-container-pip-freeze.txt
+          docker run --rm -v "$GITHUB_WORKSPACE:/src:ro" -w /src action-gate-clean-room:${{ steps.version.outputs.version }} python -m pytest -q
+          docker run --rm action-gate-clean-room:${{ steps.version.outputs.version }} python -m compileall -q /app
 
       - name: Emit verification manifest
         shell: bash
