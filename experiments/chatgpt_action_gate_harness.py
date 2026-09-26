@@ -55,14 +55,17 @@ def get(url: str, headers: dict | None = None):
         return exc.code, body
 
 
-def wait_for(url: str, headers: dict, processes: list[subprocess.Popen], timeout: float = 15) -> None:
+def wait_for(url: str, headers: dict, processes: list[subprocess.Popen], *, require_health: bool = False, timeout: float = 15) -> None:
     deadline = time.time() + timeout
     while time.time() < deadline:
         if any(p.poll() is not None for p in processes):
             raise RuntimeError("one of the Action Gate harness processes exited during startup")
         try:
             status, body = get(url, headers)
-            if status == 200 and body.get("status") in {"ok", "degraded"}:
+            if require_health:
+                if status == 200 and body.get("status") in {"ok", "degraded"}:
+                    return
+            elif 100 <= status < 600:
                 return
         except Exception:
             pass
@@ -128,7 +131,7 @@ def main() -> int:
     tool_headers = {"X-Tenant-ID": "tenant-harness"}
 
     try:
-        wait_for("http://127.0.0.1:8000/health", auth, processes)
+        wait_for("http://127.0.0.1:8000/health", auth, processes, require_health=True)
         wait_for("http://127.0.0.1:8081", {}, processes)
         wait_for("http://127.0.0.1:8082", {}, processes)
 
