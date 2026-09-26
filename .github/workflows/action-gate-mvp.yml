@@ -37,6 +37,8 @@ jobs:
       - run: python enforcement_integration.py
         env:
           ACTION_GATE_API_TOKEN: ci-test-token
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
       - run: python mcp_integration.py
         env:
           ACTION_GATE_API_TOKEN: ci-test-token
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
