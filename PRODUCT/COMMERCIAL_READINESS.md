@@ -42,7 +42,9 @@ The repository does not assert prices. Pricing is a business decision and must b
 
 ## Acceptance evidence
 
-The published v1.0.5 release records verified source commit `f3c77cbb314e76911cce37298d58202ffb451d6e` and release-candidate workflow run `36087744393`. The publisher attached the versioned tar, checksum, and manifest to the release.
+Historical v1.0.5 evidence may be referenced as historical provenance only. It does not automatically validate the current main branch.
+
+A current commercial release must record the exact source commit, successful same-SHA release-readiness run, release-candidate artifact digest and published release record.
 
 ## Not included by default
 
