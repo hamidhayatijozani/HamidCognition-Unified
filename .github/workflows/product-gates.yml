@@ -64,6 +64,7 @@ jobs:
           ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml config
       - name: Start production stack
@@ -75,6 +76,7 @@ jobs:
           ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml up -d --build
       - name: Production PostgreSQL and E2E smoke
@@ -86,6 +88,7 @@ jobs:
           ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml exec -T action-gate python production_e2e_smoke.py
       - name: HHJ-CSG 200-event decision replay acceptance
@@ -97,6 +100,7 @@ jobs:
           ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
           DOMAIN: localhost
           ACTION_GATE_URL: http://action-gate:8000
         run: docker compose -f docker-compose.production.yml exec -T action-gate python csg_acceptance.py
@@ -109,6 +113,7 @@ jobs:
           ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
           DOMAIN: localhost
         run: |
           docker compose -f docker-compose.production.yml restart action-gate
@@ -130,6 +135,7 @@ jobs:
           ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
           DOMAIN: localhost
           ACTION_GATE_URL: http://action-gate:8000
         run: docker compose -f docker-compose.production.yml exec -T action-gate python csg_persistence_replay.py
@@ -143,6 +149,7 @@ jobs:
           ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
           DOMAIN: localhost
         run: |
           docker compose -f docker-compose.production.yml cp action-gate:/tmp/csg-acceptance-result.json ./csg-acceptance-result.json
@@ -198,5 +205,6 @@ jobs:
           ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml down -v
