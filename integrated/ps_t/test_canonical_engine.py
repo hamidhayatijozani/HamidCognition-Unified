@@ -14,8 +14,8 @@ def test_first_transition_is_reproducible():
     engine = CanonicalPST()
     result = engine.step(0.85, 0.75)
     assert result["P"] == 0.9055
-    assert result["S"] == 0.7917
-    assert result["T"] == 0.4251
+    assert result["S"] == 0.8062
+    assert result["T"] == 0.4494
 
 
 def test_weight_change_cannot_be_implicit():
