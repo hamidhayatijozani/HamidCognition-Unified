@@ -1,10 +1,18 @@
-# ChatGPT-style Action Gate experiment
+# External-Agent Action Gate Experiment
 
-This experiment places a controlled agent/tool harness in front of the HamidCognition Action Gate. It demonstrates the intended execution boundary:
+This experiment exercises the HamidCognition Action Gate at a real HTTP and MCP enforcement boundary:
 
-`Agent/ChatGPT-style client -> Action Gate -> Protected Tool -> Evidence`
+`External agent -> enforcement proxy -> Action Gate -> execution authority -> protected tool -> evidence`
 
-It is deliberately honest about the integration boundary. Running the harness does **not** intercept, modify, or control the internal ChatGPT runtime. It provides an executable, reproducible stand-in for a client that submits an action for authorization before a protected tool executes.
+The harness does **not** intercept, modify, or control the internal ChatGPT runtime. The `runtime_interception=false` marker is intentional. It demonstrates the enforceable external-agent boundary without making an unsupported claim about ChatGPT internals.
+
+## What the harness proves
+
+- A destructive MCP action is denied by policy.
+- An allowed MCP action reaches the protected tool.
+- The issued execution authority is single-use: replaying the same authority and action hash at the tool is rejected by the tool nonce guard.
+- An HTTP decision cannot be rebound to a changed target because the action hash no longer matches.
+- The recorded decision can be replayed against its frozen policy and normalized action, with policy and action hashes verified.
 
 Run:
 
@@ -12,6 +20,4 @@ Run:
 python experiments/chatgpt_action_gate_harness.py
 ```
 
-Expected output includes the signed `ALLOW` decision, tenant/action/policy binding, nonce, authority digest, and the explicit `runtime_interception=false` boundary marker.
-
-The next integration step is an actual MCP or HTTP client that submits real tool requests to the running Action Gate. That is the point where the harness can be replaced by a real external agent client without making unsupported claims about ChatGPT internals.
+A successful run emits explicit markers for the MCP boundary, replay attack blocking, binding attack blocking, and evidence replay verification. No signing or API secrets are printed.
