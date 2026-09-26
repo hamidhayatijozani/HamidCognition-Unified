@@ -88,21 +88,137 @@ jobs:
           python -m pip install --upgrade 'pip<26'
           python --version
           python -m pip --version
-          python -m pip install 'pip-tools>=7,<8'
           if test -f action_gate/requirements.txt; then
-            python -m piptools compile --generate-hashes action_gate/requirements.txt --output-file action_gate/requirements.lock
+            pip-compile --generate-hashes action_gate/requirements.txt --output-file action_gate/requirements.lock
             python -m pip install --require-hashes -r action_gate/requirements.lock
           elif test -f requirements.txt; then
-            python -m piptools compile --generate-hashes requirements.txt --output-file requirements.lock
-            python -m pip install --require-hashes -r requirements.lock
+            python -m pip install -r requirements.txt
           elif test -f pyproject.toml || test -f setup.py; then
             python -m pip install -e .
           fi
+          python -m pip install 'pip-tools>=7,<8'
           python -m pip freeze > clean-room-evidence-pip-freeze.txt
-          sha256sum action_gate/requirements.lock | tee clean-room-evidence-requirements-lock.sha256          docker pull python:3.12-slim
+          sha256sum action_gate/requirements.lock > clean-room-evidence-requirements-lock.sha256
+
+      - name: Compile runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          . .clean-room-venv/bin/activate
+          python -m compileall -q action_gate
+
+      - name: Run repository tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          . .clean-room-venv/bin/activate
+          export PYTHONPATH="$GITHUB_WORKSPACE/action_gate"
+          if find . -maxdepth 3 -type f \( -name 'test_*.py' -o -name '*_test.py' \) | grep -q .; then
+            python -m pytest -q
+          else
+            echo "No Python test files discovered in the clean checkout."
+          fi
+
+      - name: Verify product integrity contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(tr -d '[:space:]' < action_gate/VERSION)"
+          required=(
+            PRODUCT/ACTION_GATE_PRODUCT_SPEC.md
+            PRODUCT/COMMERCIAL_READINESS.md
+            PRODUCT/CUSTOMER_ACCEPTANCE.md
+            PRODUCT/RELEASE_NOTES_${version}.md
+            PRODUCT/DEPLOYMENT.md
+            PRODUCT/INTEGRATION_CONTRACT.md
+            PRODUCT/OPERATIONS_RUNBOOK.md
+            PRODUCT/RELEASE_CHECKLIST.md
+            PRODUCT/.env.example
+          )
+          for f in "${required[@]}"; do test -f "$f"; done
+          grep -q '^ACTION_GATE_PRODUCTION_EXECUTION=false$' PRODUCT/.env.example
+          if grep -Eiq '(sk-[A-Za-z0-9_-]{16,}|ghp_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|BEGIN (RSA|OPENSSH|EC|DSA) PRIVATE KEY)' PRODUCT/.env.example; then
+            echo "Obvious secret pattern detected in .env.example"
+            exit 1
+          fi
+
+      - name: Build production container from clean checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker pull python:3.12-slim
           base_digest="$(docker image inspect python:3.12-slim --format '{{index .RepoDigests 0}}' | sed 's/^[^@]*@//')"
           test -n "$base_digest"
-          echo "$base_digest" | grep -Eq '^sha256:[0-9a-f]{64}$'
+          echo "$base_digest" | grep -Eq '^sha256:[0-9a-f]{64}
+
+      - name: Emit verification manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p clean-room-evidence
+          version="$(tr -d '[:space:]' < action_gate/VERSION)"
+          {
+            echo "product=Action Gate"
+            echo "version=$version"
+            echo "commit=$GITHUB_SHA"
+            echo "run_id=$GITHUB_RUN_ID"
+            echo "run_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "workflow_ref=$GITHUB_WORKFLOW_REF"
+            echo "runner_os=$RUNNER_OS"
+            echo "runner_arch=$RUNNER_ARCH"
+            echo "python=$(python3 --version)"
+            echo "docker=$(docker --version)"
+            echo "verification=clean-room"
+          } > clean-room-evidence/manifest.txt
+          {
+            echo '{'
+            printf '  "product": "Action Gate",\n'
+            printf '  "version": "%s",\n' "$version"
+            printf '  "commit_sha": "%s",\n' "$GITHUB_SHA"
+            printf '  "workflow_run_id": "%s",\n' "$GITHUB_RUN_ID"
+            printf '  "run_url": "%s/%s/actions/runs/%s",\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
+            printf '  "workflow_ref": "%s",\n' "$GITHUB_WORKFLOW_REF"
+            printf '  "runner_os": "%s",\n' "$RUNNER_OS"
+            printf '  "runner_arch": "%s",\n' "$RUNNER_ARCH"
+            printf '  "pip_freeze_sha256": "%s",\n' "$(sha256sum clean-room-evidence-pip-freeze.txt | awk '{print $1}')"
+            printf '  "requirements_lock_sha256": "%s",\n' "$(sha256sum action_gate/requirements.lock | awk '{print $1}')"
+            printf '  "postgresql_client_version": "%s",\n' "$(cat clean-room-postgresql-client-version.txt)"
+            printf '  "base_image_digest": "%s",\n' "$(cat clean-room-base-image-digest.txt)"
+            printf '  "model_weight_registry_sha256": "%s",\n' "$(sha256sum MODEL/WEIGHT_REGISTRY.json | awk '{print $1}')"
+            printf '  "container_image_id": "%s",\n' "$(sed 's/^image_id=//' clean-room-image.txt)"
+            printf '  "base_image_digests": %s,\n' "$(cat clean-room-base-image-digests.json)"
+            printf '  "timestamp_utc": "%s"\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo '}'
+          } > clean-room-evidence/attestation.json
+          sha256sum clean-room-evidence/manifest.txt > clean-room-evidence/manifest.sha256
+          sha256sum clean-room-evidence/attestation.json > clean-room-evidence/attestation.sha256
+          cp clean-room-evidence-pip-freeze.txt clean-room-evidence/pip-freeze.txt
+          cp clean-room-image.txt clean-room-evidence/container-image.txt
+          cp clean-room-base-image-digests.json clean-room-evidence/base-image-digests.json
+          cp action_gate/requirements.lock clean-room-evidence/requirements.lock
+          cp clean-room-apt-policy.txt clean-room-evidence/apt-policy.txt
+          cp clean-room-postgresql-client-version.txt clean-room-evidence/postgresql-client-version.txt
+          cp clean-room-base-image-digest.txt clean-room-evidence/base-image-digest.txt
+          sha256sum clean-room-evidence/requirements.lock > clean-room-evidence/requirements.lock.sha256
+          sha256sum clean-room-evidence/apt-policy.txt > clean-room-evidence/apt-policy.sha256
+          sha256sum clean-room-evidence/postgresql-client-version.txt > clean-room-evidence/postgresql-client-version.sha256
+          sha256sum clean-room-evidence/base-image-digest.txt > clean-room-evidence/base-image-digest.sha256
+          sha256sum clean-room-evidence/pip-freeze.txt > clean-room-evidence/pip-freeze.sha256
+          sha256sum clean-room-evidence/container-image.txt > clean-room-evidence/container-image.sha256
+          sha256sum clean-room-evidence/base-image-digests.json > clean-room-evidence/base-image-digests.sha256
+          tar -czf clean-room-evidence.tar.gz clean-room-evidence
+          sha256sum clean-room-evidence.tar.gz | tee clean-room-evidence.tar.gz.sha256
+
+      - name: Upload clean-room evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: action-gate-clean-room-evidence-${{ steps.version.outputs.version }}-${{ github.sha }}
+          path: |
+            clean-room-evidence.tar.gz
+            clean-room-evidence.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 30
+
           echo "$base_digest" | tee clean-room-base-image-digest.txt
           docker run --rm python:3.12-slim bash -lc 'apt-get update >/dev/null && apt-cache policy postgresql-client' | tee clean-room-apt-policy.txt
           pg_version="$(awk '/Candidate:/ {print $2; exit}' clean-room-apt-policy.txt)"
@@ -111,3 +227,59 @@ jobs:
           docker build -f action_gate/Dockerfile --build-arg BASE_IMAGE_DIGEST="$base_digest" --build-arg POSTGRESQL_CLIENT_VERSION="$pg_version" -t action-gate-clean-room:${{ steps.version.outputs.version }} action_gate
           docker image inspect action-gate-clean-room:${{ steps.version.outputs.version }} --format 'image_id={{.Id}}' | tee clean-room-image.txt
           docker image inspect python:3.12-slim --format '{{json .RepoDigests}}' | tee clean-room-base-image-digests.json
+
+      - name: Emit verification manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p clean-room-evidence
+          version="$(tr -d '[:space:]' < action_gate/VERSION)"
+          {
+            echo "product=Action Gate"
+            echo "version=$version"
+            echo "commit=$GITHUB_SHA"
+            echo "run_id=$GITHUB_RUN_ID"
+            echo "run_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "workflow_ref=$GITHUB_WORKFLOW_REF"
+            echo "runner_os=$RUNNER_OS"
+            echo "runner_arch=$RUNNER_ARCH"
+            echo "python=$(python3 --version)"
+            echo "docker=$(docker --version)"
+            echo "verification=clean-room"
+          } > clean-room-evidence/manifest.txt
+          {
+            echo '{'
+            printf '  "product": "Action Gate",\n'
+            printf '  "version": "%s",\n' "$version"
+            printf '  "commit_sha": "%s",\n' "$GITHUB_SHA"
+            printf '  "workflow_run_id": "%s",\n' "$GITHUB_RUN_ID"
+            printf '  "run_url": "%s/%s/actions/runs/%s",\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
+            printf '  "workflow_ref": "%s",\n' "$GITHUB_WORKFLOW_REF"
+            printf '  "runner_os": "%s",\n' "$RUNNER_OS"
+            printf '  "runner_arch": "%s",\n' "$RUNNER_ARCH"
+            printf '  "pip_freeze_sha256": "%s",\n' "$(sha256sum clean-room-evidence-pip-freeze.txt | awk '{print $1}')"
+            printf '  "container_image_id": "%s",\n' "$(sed 's/^image_id=//' clean-room-image.txt)"
+            printf '  "base_image_digests": %s,\n' "$(cat clean-room-base-image-digests.json)"
+            printf '  "timestamp_utc": "%s"\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo '}'
+          } > clean-room-evidence/attestation.json
+          sha256sum clean-room-evidence/manifest.txt > clean-room-evidence/manifest.sha256
+          sha256sum clean-room-evidence/attestation.json > clean-room-evidence/attestation.sha256
+          cp clean-room-evidence-pip-freeze.txt clean-room-evidence/pip-freeze.txt
+          cp clean-room-image.txt clean-room-evidence/container-image.txt
+          cp clean-room-base-image-digests.json clean-room-evidence/base-image-digests.json
+          sha256sum clean-room-evidence/pip-freeze.txt > clean-room-evidence/pip-freeze.sha256
+          sha256sum clean-room-evidence/container-image.txt > clean-room-evidence/container-image.sha256
+          sha256sum clean-room-evidence/base-image-digests.json > clean-room-evidence/base-image-digests.sha256
+          tar -czf clean-room-evidence.tar.gz clean-room-evidence
+          sha256sum clean-room-evidence.tar.gz | tee clean-room-evidence.tar.gz.sha256
+
+      - name: Upload clean-room evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: action-gate-clean-room-evidence-${{ steps.version.outputs.version }}-${{ github.sha }}
+          path: |
+            clean-room-evidence.tar.gz
+            clean-room-evidence.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 30
