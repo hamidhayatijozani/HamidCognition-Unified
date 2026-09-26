@@ -11,6 +11,11 @@ on:
       - 'docker-compose*.yml'
       - '.github/workflows/action-gate-clean-room.yml'
   workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: 'Exact source SHA to verify (defaults to checked-out revision)'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -18,11 +23,42 @@ permissions:
 jobs:
   clean-room:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      EXPECTED_SHA: ${{ inputs.expected_sha || github.event.pull_request.head.sha || github.sha }}
     steps:
+      - name: Runner preflight and source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "runner=$RUNNER_NAME"
+          echo "runner_os=$RUNNER_OS"
+          echo "runner_arch=$RUNNER_ARCH"
+          echo "event=$GITHUB_EVENT_NAME"
+          echo "workflow_sha=$GITHUB_SHA"
+          echo "expected_sha=$EXPECTED_SHA"
+          test -n "$EXPECTED_SHA"
+
       - name: Checkout clean repository state
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Verify exact source revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$EXPECTED_SHA"
+          echo "verified_source_sha=$actual"
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            test "$GITHUB_REF" = "refs/heads/main"
+            test "$actual" = "$GITHUB_SHA"
+            echo "verified_release_main_head=$actual"
+          else
+            echo "verification_mode=candidate"
+          fi
 
       - name: Verify direct main-head execution
         if: github.event_name == 'push'
@@ -49,7 +85,9 @@ jobs:
           set -euo pipefail
           python3 -m venv .clean-room-venv
           . .clean-room-venv/bin/activate
-          python -m pip install --upgrade pip
+          python -m pip install --upgrade 'pip<26'
+          python --version
+          python -m pip --version
           if test -f action_gate/requirements.txt; then
             python -m pip install -r action_gate/requirements.txt
           elif test -f requirements.txt; then
@@ -58,7 +96,8 @@ jobs:
             python -m pip install -e .
           fi
           # pytest is a CI test-runner dependency and must not depend on project requirements declaring it.
-          python -m pip install pytest
+          python -m pip install 'pytest>=8,<9'
+          python -m pip freeze > clean-room-evidence-pip-freeze.txt
 
       - name: Compile runtime
         shell: bash
@@ -107,6 +146,8 @@ jobs:
         run: |
           set -euo pipefail
           docker build --pull -f action_gate/Dockerfile -t action-gate-clean-room:${{ steps.version.outputs.version }} action_gate
+          docker image inspect action-gate-clean-room:${{ steps.version.outputs.version }} --format 'image_id={{.Id}}' | tee clean-room-image.txt
+          docker image inspect python:3.12-slim --format '{{json .RepoDigests}}' | tee clean-room-base-image-digests.json
 
       - name: Emit verification manifest
         shell: bash
@@ -142,6 +183,12 @@ jobs:
           } > clean-room-evidence/attestation.json
           sha256sum clean-room-evidence/manifest.txt > clean-room-evidence/manifest.sha256
           sha256sum clean-room-evidence/attestation.json > clean-room-evidence/attestation.sha256
+          cp clean-room-evidence-pip-freeze.txt clean-room-evidence/pip-freeze.txt
+          cp clean-room-image.txt clean-room-evidence/container-image.txt
+          cp clean-room-base-image-digests.json clean-room-evidence/base-image-digests.json
+          sha256sum clean-room-evidence/pip-freeze.txt > clean-room-evidence/pip-freeze.sha256
+          sha256sum clean-room-evidence/container-image.txt > clean-room-evidence/container-image.sha256
+          sha256sum clean-room-evidence/base-image-digests.json > clean-room-evidence/base-image-digests.sha256
           tar -czf clean-room-evidence.tar.gz clean-room-evidence
           sha256sum clean-room-evidence.tar.gz | tee clean-room-evidence.tar.gz.sha256
 
