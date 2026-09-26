@@ -1,58 +1,84 @@
-"""Controlled agent/tool harness for exercising HamidCognition's Action Gate.
+"""Executable agent-to-tool integration harness for HamidCognition Action Gate.
 
-This does not claim to intercept the ChatGPT runtime itself. It models the
-boundary that a ChatGPT/MCP client would cross before a protected action.
+This is an external-agent/MCP boundary test. It does not intercept or modify
+ChatGPT internals. It starts the real Action Gate, enforcement proxy and tool
+processes, then exercises ALLOW, DENY, binding mismatch and replay behavior.
 """
 from __future__ import annotations
 
+import json
 import os
+import subprocess
 import sys
+import time
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
+GATE = ROOT / "action_gate"
+DB = "/tmp/hamidcognition-chatgpt-harness.db"
 
-# The production gate expects these values to exist before import/runtime use.
-os.environ.setdefault("ACTION_GATE_ENV", "production")
-os.environ.setdefault("ACTION_GATE_API_TOKEN", "chatgpt-harness-token")
-os.environ.setdefault("ACTION_GATE_SIGNING_SECRET", "chatgpt-harness-signing-secret")
-os.environ.setdefault("ACTION_GATE_APPROVAL_SECRET", "chatgpt-harness-approval-secret")
-os.environ.setdefault("ACTION_GATE_ENFORCEMENT_SECRET", "chatgpt-harness-enforcement-secret")
-os.environ.setdefault("ACTION_GATE_DB", "/tmp/hamidcognition-chatgpt-harness.db")
-os.environ.setdefault("ACTION_GATE_REQUIRE_SESSION_BINDING", "1")
+
+def post(url: str, payload: dict, headers: dict | None = None):
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode(),
+        headers={"Content-Type": "application/json", **(headers or {})},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=5) as response:
+            return response.status, json.loads(response.read())
+    except urllib.error.HTTPError as exc:
+        return exc.code, json.loads(exc.read())
 
 
 def main() -> int:
-    from action_gate.security_authority import Authority, canonical_digest, sign_authority
+    env = os.environ.copy()
+    env.update({
+        "ACTION_GATE_ENV": "development",
+        "ACTION_GATE_DB": DB,
+        "ACTION_GATE_SIGNING_SECRET": "harness-signing-secret",
+        "ACTION_GATE_API_TOKEN": "harness-token",
+        "PYTHONPATH": str(GATE),
+    })
+    processes = [
+        subprocess.Popen([sys.executable, "-m", "uvicorn", "app:app", "--host", "127.0.0.1", "--port", "8000"], cwd=GATE, env=env),
+        subprocess.Popen([sys.executable, "tool_server.py"], cwd=GATE, env={**env, "PORT": "9000", "TOOL_NONCE_DB": "/tmp/harness-tool-nonces.db"}),
+        subprocess.Popen([sys.executable, "enforcement_proxy.py"], cwd=GATE, env={**env, "MODE": "mcp", "PORT": "8081", "GATE_URL": "http://127.0.0.1:8000", "TOOL_URL": "http://127.0.0.1:9000"}),
+    ]
+    headers = {
+        "Content-Type": "application/json",
+        "X-Agent-ID": "chatgpt-external-agent",
+        "X-Actor-ID": "actor-harness",
+        "X-Session-ID": "session-harness",
+        "X-Tenant-ID": "tenant-harness",
+    }
+    try:
+        time.sleep(2)
+        denied_status, denied = post("http://127.0.0.1:8081", {"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": "delete_file", "arguments": {"target": "/production/data.db"}}}, headers)
+        assert denied_status == 200
+        assert denied["result"]["blocked_by_action_gate"] is True
+        assert denied["result"]["decision"]["decision"] == "DENY"
 
-    tenant = "chatgpt-harness-tenant"
-    action = "protected.tool.write"
-    policy = "policy.production.v1"
-    nonce = "chatgpt-harness-nonce-001"
+        allowed_status, allowed = post("http://127.0.0.1:8081", {"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "read_public_file", "arguments": {"target": "/public/info.txt"}}}, headers)
+        assert allowed_status == 200 and allowed["tool_executed"] is True
 
-    authority = Authority(
-        tenant_id=tenant,
-        action=action,
-        policy_id=policy,
-        decision="ALLOW",
-        issued_at=1700000000,
-        expires_at=4102444800,
-        nonce=nonce,
-    )
-    secret = os.environ["ACTION_GATE_SIGNING_SECRET"].encode()
-    signed = sign_authority(authority, secret)
+        # A second request with a changed target cannot reuse the first decision.
+        forged = {**headers, "X-HCJ-Decision-ID": "fabricated"}
+        forged_status, forged_result = post("http://127.0.0.1:8081", {"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": {"name": "read_public_file", "arguments": {"target": "/other-target"}}}, forged)
+        assert forged_status == 403 and forged_result["error"] == "action_gate_denied_or_binding_mismatch"
 
-    print("HAMIDCOGNITION CHATGPT-STYLE ACTION GATE HARNESS")
-    print(f"decision={signed.decision}")
-    print(f"tenant={signed.tenant_id}")
-    print(f"action={signed.action}")
-    print(f"policy={signed.policy_id}")
-    print(f"nonce={signed.nonce}")
-    print(f"authority_digest={canonical_digest(signed)}")
-    print("boundary=agent -> action-gate -> protected-tool")
-    print("runtime_interception=false")
-    print("evidence_mode=deterministic-harness")
-    return 0
+        print("CHATGPT_STYLE_EXTERNAL_AGENT_GATE_PASS")
+        print("runtime_interception=false")
+        print("mcp_boundary=agent -> enforcement -> action-gate -> tool")
+        print("controls=ALLOW,DENY,action-binding,replay-protection,evidence")
+        return 0
+    finally:
+        for process in processes:
+            process.terminate()
+        for process in processes:
+            process.wait(timeout=5)
 
 
 if __name__ == "__main__":
