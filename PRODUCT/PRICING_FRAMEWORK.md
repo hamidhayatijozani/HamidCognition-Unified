@@ -48,13 +48,17 @@ Variables:
 
 | Variable | Unit | Value |
 |---|---|---|
-| License/deployment | fixed | [QUOTE] |
-| Production environments | environment | [N] |
-| Integration work | day/project | [QUOTE] |
-| Annual maintenance | year | [QUOTE] |
-| Managed service | month | [QUOTE] |
-| Enterprise support | year | [QUOTE] |
-| Custom security review | project | [QUOTE] |
+| Pilot / proof-of-value | fixed | 50,000 USDT |
+| Production environments | environment | scoped in order form |
+| Integration work | day/project | quoted separately |
+| Annual maintenance | year | 20% of license |
+| Managed service | month | 5,000 USDT starting point |
+| Enterprise support | year | 150,000 USDT starting point |
+| Custom security review | project | quoted separately |
+
+## Payment
+
+All amounts are payable in USDT only. The invoice states the network, receiving address, amount and deadline.
 
 ## Pricing rule
 Do not quote a number as a technical fact. Final pricing belongs in a signed order form and should reflect delivery responsibility, integration effort, support obligations, and contractual risk.

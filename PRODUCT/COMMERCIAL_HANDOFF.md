@@ -1,7 +1,7 @@
 # HamidCognition Action Gate — Commercial Handoff
 
-Version: 1.0.4
-Product runtime: Action Gate v1.0.4
+Version: 1.0.5
+Product runtime: Action Gate v1.0.5
 Repository governance release: v2.0.0
 
 ## 1. What is being sold
@@ -18,7 +18,7 @@ The product is not sold as a claim that an AI decision is objectively correct. I
 
 A standard self-hosted delivery consists of:
 
-- Action Gate v1.0.4 source/runtime from the exact agreed commit or release baseline.
+- Action Gate v1.0.5 source/runtime from the exact agreed commit or release baseline.
 - Production Docker Compose deployment.
 - PostgreSQL persistence.
 - Persistent execution-authority nonce storage.
@@ -65,19 +65,9 @@ The repository's PRODUCT/CUSTOMER_ACCEPTANCE.md defines the detailed procedure.
 
 ## 5. Release identity
 
-v2.0.0 is the repository governance release created on 2026-09-24. It records the validated governance workflow and evidence provenance.
+The commercial runtime baseline is Action Gate v1.0.5. Current release evidence must identify the exact delivered commit, successful same-SHA validation run, artifact digest and release record. Historical v1.0.4 release references are provenance only and must not be substituted for current evidence.
 
-The commercial runtime is now Action Gate v1.0.4. These version numbers must not be conflated.
-
-The product release is:
-
-- tag: action-gate-v1.0.4
-- validated commit: 6e51841351141e286f9d8d8894d0719dee8e601f
-- Product Release Publisher run: #36050172910
-- release artifact: action-gate-1.0.4.tar
-- artifact SHA-256: e8d62fec11d502ea029ea0c1b010557a30ed492c9529db298d127bf7bc38bc9d
-
-The release is available through the private repository's GitHub release at the action-gate-v1.0.4 tag.
+Commercial settlement is USDT only and follows PRODUCT/USDT_PAYMENT_POLICY.md.
 
 ## 6. Explicit non-claims
 
