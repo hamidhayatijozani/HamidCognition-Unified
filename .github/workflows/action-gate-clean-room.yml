@@ -57,7 +57,6 @@ jobs:
           elif test -f pyproject.toml || test -f setup.py; then
             python -m pip install -e .
           fi
-          # pytest is a CI test-runner dependency and must not depend on project requirements declaring it.
           python -m pip install pytest
 
       - name: Compile runtime
@@ -97,10 +96,23 @@ jobs:
           )
           for f in "${required[@]}"; do test -f "$f"; done
           grep -q '^ACTION_GATE_PRODUCTION_EXECUTION=false$' PRODUCT/.env.example
-          if grep -Eiq '(sk-[A-Za-z0-9_-]{16,}|ghp_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|BEGIN (RSA|OPENSSH|EC|DSA) PRIVATE KEY)' PRODUCT/.env.example; then
-            echo "Obvious secret pattern detected in .env.example"
-            exit 1
-          fi
+          python - <<'PY'
+          import re
+          from pathlib import Path
+
+          text = Path("PRODUCT/.env.example").read_text(encoding="utf-8")
+          patterns = (
+              r"sk-[A-Za-z0-9_-]{16,}",
+              r"ghp_[A-Za-z0-9]{20,}",
+              r"AKIA[0-9A-Z]{16}",
+              r"BEGIN (RSA|OPENSSH|EC|DSA) PRIVATE KEY",
+          )
+          matches = [p for p in patterns if re.search(p, text)]
+          if matches:
+              print("Obvious secret pattern detected in .env.example:", ", ".join(matches))
+              raise SystemExit(1)
+          print(".env.example contains no obvious credential/private-key patterns")
+          PY
 
       - name: Build production container from clean checkout
         shell: bash
