@@ -1,14 +1,15 @@
 # Current Commercial Release Status
 
-## Sellable release
+## Offerable release
 
-The current offerable Action Gate artifact is **v1.0.6**, published as GitHub release action-gate-v1.0.6.
+The current offerable Action Gate artifact is **v1.0.7**, published as GitHub release `action-gate-v1.0.7`.
 
 Its immutable commercial release target is:
 
-ee1e121f2af6f6099a77c08cb14854e69e2245b8
+`797b5b7c5d71fd94278b99f6bd2904eb4c340135`
 
-Release candidate workflow: #36284400509
+Release candidate workflow: **36297686201**  
+Product release publisher workflow: **36297713893**
 
 The published release includes:
 - versioned production container archive;
@@ -19,7 +20,7 @@ The published release includes:
 
 ## Release validation
 
-The v1.0.6 source commit passed the same-SHA production validation chain on GitHub Actions, including:
+The v1.0.7 source commit passed the same-SHA production validation chain on GitHub Actions, including:
 - Action Gate Product Gates;
 - Action Gate Product Integrity;
 - Action Gate Clean-Room Verification;
@@ -34,7 +35,7 @@ The v1.0.6 source commit passed the same-SHA production validation chain on GitH
 - Action Gate Release Candidate;
 - Product Release Publisher.
 
-The production product-gate run exercised unit/product tests, validation-boundary conformance, real HTTP enforcement, real MCP enforcement, sellable readiness checks, package/runtime compilation, production Compose startup, PostgreSQL-backed E2E smoke, and 200-event decision replay/persistence validation.
+The current release evidence establishes technical release readiness for the exact source revision. It does not establish customer-specific production acceptance, a completed customer transaction, or market validation.
 
 ## Customer delivery rule
 
