@@ -1,0 +1,41 @@
+name: Semantic Document Synchronization
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  document-sync:
+    name: Evidence-aware documentation consistency
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate synchronization
+        run: python tools/document_sync.py --check
+
+      - name: Generate synchronization state
+        run: python tools/document_sync.py --write-state
+
+      - name: Run synchronization tests
+        run: python -m unittest tests.test_document_sync -v
+
+      - name: Upload synchronization state
+        uses: actions/upload-artifact@v4
+        with:
+          name: document-sync-state
+          path: evidence/document-sync-state.json
