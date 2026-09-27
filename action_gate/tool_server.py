@@ -4,7 +4,10 @@ import os
 import sqlite3
 import time
 
-from security_authority import Authority, AuthorityError, canonical_digest, verify_authority_envelope
+try:
+    from .security_authority import Authority, AuthorityError, canonical_digest, verify_authority_envelope
+except ImportError:  # pragma: no cover - direct script execution
+    from security_authority import Authority, AuthorityError, canonical_digest, verify_authority_envelope
 
 AUTHORITY_SECRET = os.getenv("ACTION_GATE_AUTHORITY_SECRET")
 TOOL_NONCE_DB = os.getenv("TOOL_NONCE_DB", "/data/tool_authority.db")
