@@ -58,27 +58,36 @@ def load_declared_paths() -> list[str]:
 def apply_safe_updates(identity: dict[str, str]) -> list[str]:
     """Update only deterministic release identity in approved AUTO documents."""
     changed: list[str] = []
-    replacements = (
-        (re.compile(r"current customer-facing release is \*\*v\d+\.\d+\.\d+\*\*"),
-         f"current customer-facing release is **v{identity['release_version']}**"),
-        (re.compile(r"published as [^., )]+"),
-         f"published as {identity['release_tag']}"),
-        (re.compile(r"at source commit [0-9a-f]{40}", re.I),
-         f"at source commit {identity['source_commit']}"),
-        (re.compile(r"current validated release is \*\*v\d+\.\d+\.\d+\*\*"),
-         f"current validated release is **v{identity['release_version']}**"),
-    )
     for relative in ("README.md", "PRODUCT/QUICKSTART.md"):
         path = ROOT / relative
         original = path.read_text(encoding="utf-8")
         updated = original
-        for pattern, replacement in replacements:
-            updated = pattern.sub(replacement, updated)
+        if relative == "README.md":
+            updated = re.sub(
+                r"current customer-facing release is \*\*v\d+\.\d+\.\d+\*\*",
+                f"current customer-facing release is **v{identity['release_version']}**",
+                updated,
+            )
+            updated = re.sub(
+                r"published as GitHub release [^ ]+ at source commit [0-9a-f]{40}",
+                f"published as GitHub release {identity['release_tag']} at source commit {identity['source_commit']}",
+                updated,
+            )
+        else:
+            updated = re.sub(
+                r"current validated release is \*\*v\d+\.\d+\.\d+\*\*",
+                f"current validated release is **v{identity['release_version']}**",
+                updated,
+            )
+            updated = re.sub(
+                r"published as [^., )]+",
+                f"published as {identity['release_tag']}",
+                updated,
+            )
         if updated != original:
             path.write_text(updated, encoding="utf-8")
             changed.append(relative)
     return changed
-
 def build_state() -> dict[str, Any]:
     identity = canonical_identity()
     paths = load_declared_paths()
