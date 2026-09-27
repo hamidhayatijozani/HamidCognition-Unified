@@ -18,8 +18,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: .
-      ACTION_GATE_API_TOKEN: ci-action-gate-token
-      ACTION_GATE_SIGNING_SECRET: ci-signing-secret
       ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
     steps:
       - uses: actions/checkout@v4
