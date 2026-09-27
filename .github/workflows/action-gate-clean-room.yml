@@ -25,6 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
+      ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+      ACTION_GATE_SIGNING_SECRET: ci-signing-secret
       EXPECTED_SHA: ${{ inputs.expected_sha || github.event.pull_request.head.sha || github.sha }}
     steps:
       - name: Runner preflight and source identity

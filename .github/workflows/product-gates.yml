@@ -18,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: .
+      ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -30,16 +31,22 @@ jobs:
         working-directory: action_gate
         env:
           ACTION_GATE_ENV: development
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
         run: pytest -q
       - name: Run Action Gate meta-validation boundary
         working-directory: action_gate
         env:
           ACTION_GATE_ENV: development
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
         run: pytest -q test_meta_validation.py
       - name: Run Validation Boundary conformance suite
         working-directory: action_gate
         env:
           ACTION_GATE_ENV: development
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
         run: pytest -q test_validation_boundary_conformance.py --junitxml=validation-boundary-junit.xml
       - name: Run real HTTP enforcement integration
         working-directory: action_gate
@@ -139,6 +146,14 @@ jobs:
           DOMAIN: localhost
           ACTION_GATE_URL: http://action-gate:8000
         run: docker compose -f docker-compose.production.yml exec -T action-gate python csg_persistence_replay.py
+      - name: Collect production startup diagnostics
+        if: always()
+        working-directory: action_gate
+        run: |
+          docker compose -f docker-compose.production.yml ps -a > production-startup-ps.txt 2>&1 || true
+          docker compose -f docker-compose.production.yml logs --no-color --tail=1000 action-gate postgres tool enforcement > production-startup-logs.txt 2>&1 || true
+          docker inspect $(docker compose -f docker-compose.production.yml ps -q action-gate 2>/dev/null || true) > production-action-gate-inspect.json 2>&1 || true
+
       - name: Collect replay evidence from production container
         if: always()
         working-directory: action_gate

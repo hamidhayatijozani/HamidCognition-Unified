@@ -11,7 +11,7 @@ TENANT = "integration-tenant"
 OTHER_TENANT = "other-tenant"
 API_TOKEN = os.environ.get("ACTION_GATE_API_TOKEN", "ci-test-token")
 env = os.environ.copy()
-env.update({"ACTION_GATE_DB": "/tmp/action-gate-integration.db", "PYTHONPATH": ROOT, "ACTION_GATE_ENV": "development", "ACTION_GATE_SIGNING_SECRET": "dev-signing-secret", "ACTION_GATE_API_TOKEN": API_TOKEN})
+env.update({"ACTION_GATE_DB": "/tmp/action-gate-integration.db", "PYTHONPATH": ROOT, "ACTION_GATE_ENV": "development", "ACTION_GATE_SIGNING_SECRET": "dev-signing-secret", "ACTION_GATE_API_TOKEN": API_TOKEN, "ACTION_GATE_AUTHORITY_SECRET": "ci-authority-secret", "TOOL_NONCE_DB": "/tmp/action-gate-tool-authority.db"})
 procs = [
     subprocess.Popen([sys.executable, "-m", "uvicorn", "app:app", "--host", "127.0.0.1", "--port", "8000"], cwd=ROOT, env=env),
     subprocess.Popen([sys.executable, "tool_server.py"], cwd=ROOT, env=env),
