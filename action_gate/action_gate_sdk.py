@@ -43,6 +43,21 @@ class ActionGateClient:
             "context": context or {}, "evidence": evidence or [],
         })
 
+
+    def reserve_execution(self, decision_id: str, *, tenant_id: str, actor_id: str | None, session_id: str | None,
+                          action_hash: str, nonce: str) -> dict[str, Any]:
+        return self._request("POST", f"/v1/action/{decision_id}/execution/reserve", {
+            "tenant_id": tenant_id, "actor_id": actor_id, "session_id": session_id,
+            "action_hash": action_hash, "nonce": nonce,
+        })
+
+    def record_execution(self, decision_id: str, *, tenant_id: str, actor_id: str | None, session_id: str | None,
+                         action_hash: str, nonce: str, outcome: dict[str, Any]) -> dict[str, Any]:
+        return self._request("POST", f"/v1/action/{decision_id}/execution", {
+            "tenant_id": tenant_id, "actor_id": actor_id, "session_id": session_id,
+            "action_hash": action_hash, "nonce": nonce, "outcome": outcome,
+        })
+
     def self_audit(self, *, tenant_id: str, actor_id: str, session_id: str, action: str,
                    target: str | None = None, claim: str | None = None,
                    evidence: list[dict[str, Any]] | None = None,
