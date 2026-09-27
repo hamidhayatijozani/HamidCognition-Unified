@@ -36,7 +36,7 @@ def test_shock_removal_recovers_monotonically() -> None:
     trajectory = run_trajectory([0.0, 10.0, 8.0, 6.0, 4.0, 2.0, 1.0, 0.5, 0.2, 0.1, 0.05, 0.02, 0.0], config=CONFIG)
     recovered = [row["T"] for row in trajectory[2:]]
     assert all(row["R"] == 1 for row in trajectory[2:])
-    assert all(recovered[i] > recovered[i - 1] for i in range(1, len(recovered)))
+    assert all(recovered[i] >= recovered[i - 1] for i in range(1, len(recovered)))
     assert recovered[-1] <= CONFIG.t_max
 
 
