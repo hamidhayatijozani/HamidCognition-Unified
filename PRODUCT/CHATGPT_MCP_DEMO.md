@@ -45,11 +45,13 @@ python action_gate/chatgpt_mcp_server.py
 
 The MCP endpoint is:
 
-```
+```text
 http://127.0.0.1:8787/mcp
 ```
 
-For ChatGPT, the endpoint must be reachable through HTTPS or Secure MCP Tunnel. OpenAI's current ChatGPT integration uses MCP Streamable HTTP and exposes custom MCP apps through Developer Mode.
+In the production container, the server binds to `0.0.0.0:8787`; Caddy exposes it externally at `https://<your-domain>/mcp`.
+
+For ChatGPT, the endpoint must be reachable through HTTPS or Secure MCP Tunnel. ChatGPT connects to remote MCP servers, not directly to a local/private listener. OpenAI's current ChatGPT integration uses MCP Streamable HTTP and exposes custom MCP apps through Developer Mode.
 
 ## ChatGPT test script
 
