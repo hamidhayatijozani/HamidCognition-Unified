@@ -1,12 +1,12 @@
-# HamidCognition Action Gate v1.0.8 Delivery Manifest
+# HamidCognition Action Gate v1.0.10 Delivery Manifest
 
 ## Customer deliverable
 
-The canonical commercial runtime is §action_gate/§ at version **1.0.8**.
+The canonical commercial runtime is `action_gate/` at version **1.0.10**.
 
-The validated release identity is established by the immutable GitHub release §action-gate-v1.0.8§ and its exact source commit.
+The validated release identity is established by the immutable GitHub release `action-gate-v1.0.10` and its exact source commit `77d820e99dc78a6a9e3217d3c1c49d5cdf07813f`.
 
-The release artifact and checksum must be taken from the v1.0.8 release assets and verified before delivery.
+The release artifact and checksum must be taken from the v1.0.10 release assets and verified before delivery.
 
 A delivery must additionally identify:
 - image digest when container images are supplied;
