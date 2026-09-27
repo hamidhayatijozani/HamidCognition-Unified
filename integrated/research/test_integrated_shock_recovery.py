@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 
-from shock_recovery import RecoveryConfig, run_trajectory
+from integrated.research.shock_recovery import RecoveryConfig, run_trajectory
 
 CONFIG = RecoveryConfig()
 
