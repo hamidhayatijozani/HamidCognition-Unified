@@ -3,9 +3,6 @@ name: Action Gate Security Authority Gate
 on:
   push:
     branches: [main, 'feat/security-authority-v1']
-    paths:
-      - 'action_gate/**'
-      - '.github/workflows/security-authority-gate.yml'
   pull_request:
     paths:
       - 'action_gate/**'
