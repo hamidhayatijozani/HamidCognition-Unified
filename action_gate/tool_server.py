@@ -50,7 +50,7 @@ def _claim_nonce(nonce: str, decision_id: str, expires_at: int) -> None:
     finally:
         con.close()
 
-def verify_execution_authority(token: str | None, tenant_id: str | None, payload: dict, action_digest: str | None = None) -> None:
+def verify_execution_authority(token: str | None, tenant_id: str | None, payload: dict, action_digest: str | None = None, policy_digest: str | None = None) -> None:
     if not AUTHORITY_SECRET:
         raise AuthorityError("tool_authority_verification_not_configured")
     if not token or not tenant_id:
@@ -60,9 +60,9 @@ def verify_execution_authority(token: str | None, tenant_id: str | None, payload
     if isinstance(payload.get("action"), dict) and isinstance(payload.get("policy"), dict):
         bound_action_digest = canonical_digest(payload["action"])
         bound_policy_digest = canonical_digest(payload["policy"])
-    elif action_digest:
+    elif action_digest and policy_digest:
         bound_action_digest = action_digest
-        bound_policy_digest = None
+        bound_policy_digest = policy_digest
     else:
         raise AuthorityError("action_and_policy_binding_required")
     verify_authority_envelope(
