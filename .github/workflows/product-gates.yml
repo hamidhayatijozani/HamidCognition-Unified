@@ -2,9 +2,7 @@ name: Action Gate Product Gates
 
 on:
   push:
-    paths:
-      - 'action_gate/**'
-      - '.github/workflows/product-gates.yml'
+    branches: [main]
   pull_request:
     paths:
       - 'action_gate/**'
