@@ -4,7 +4,7 @@ This file is the execution control for turning HamidCognition-Unified into a coh
 
 ## Canonical product
 
-Current product boundary: **HamidCognition Action Gate v1.0.5**.
+Current product boundary: **HamidCognition Action Gate v1.0.7**.
 
 The commercial product is the executable Action Gate boundary. Research lines remain separate evidence-bearing assets until they have their own implementation, tests, reproducibility record, and explicit product boundary.
 
@@ -20,7 +20,8 @@ The commercial product is the executable Action Gate boundary. Research lines re
    - Action Gate starts from the production definition;
    - authentication, tenant/actor/session binding, decision integrity, nonce protection and fail-closed behavior are executable;
    - HTTP and MCP enforcement use the same governed authority;
-   - direct downstream bypass is rejected.
+   - direct downstream bypass is rejected;
+   - policy binding is independently verified at the protected tool boundary.
 
 3. **Evidence integrity**
    - customer acceptance tests are executable;
@@ -51,10 +52,10 @@ No prize or market claim is considered real until its external rules and the sub
 
 ## Current product state
 
-Action Gate v1.0.5 is the canonical commercial product boundary.
+Action Gate v1.0.7 is the canonical commercial product boundary.
 
-Historical release evidence for an earlier v1.0.5 publication remains preserved, but it must not be treated as evidence for a later main revision. Current release evidence is valid only when the exact source SHA, workflow run, artifact digest and release record agree.
+Current release evidence is valid only when the exact source SHA, workflow run, artifact digest and release record agree.
 
 Commercial payment is USDT only. Payment settlement is deliberately outside the Action Gate authorization path and is governed by PRODUCT/USDT_PAYMENT_POLICY.md.
 
-The product is not considered commercially verified merely because the repository contains release documents. A current saleable release requires same-SHA product/security/clean-room validation and a reproducible release artifact, followed by customer-specific acceptance for production execution.
+The product is not considered commercially verified merely because the repository contains release documents. A current offerable release requires same-SHA product/security/clean-room validation and a reproducible release artifact, followed by customer-specific acceptance for production execution.
