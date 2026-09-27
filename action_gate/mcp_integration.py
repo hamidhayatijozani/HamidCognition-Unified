@@ -20,6 +20,21 @@ procs = [
 try:
     time.sleep(2)
 
+    def reserve_execution(decision_id, tenant_id, actor_id, session_id, action_hash_value, nonce):
+        req = urllib.request.Request(
+            "http://127.0.0.1:8000/v1/action/" + decision_id + "/execution/reserve",
+            data=json.dumps({
+                "tenant_id": tenant_id,
+                "actor_id": actor_id,
+                "session_id": session_id,
+                "action_hash": action_hash_value,
+                "nonce": nonce,
+            }).encode(),
+            headers={"Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(req) as r:
+            return json.loads(r.read())
+
     def call(message, tenant=TENANT):
         req = urllib.request.Request(
             "http://127.0.0.1:8081",
