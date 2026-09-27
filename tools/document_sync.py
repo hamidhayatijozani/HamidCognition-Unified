@@ -15,7 +15,7 @@ MAP_PATH = ROOT / "PRODUCT" / "DOCUMENT_DEPENDENCY_MAP.yaml"
 CANONICAL_RELEASE = ROOT / "PRODUCT" / "CURRENT_COMMERCIAL_RELEASE.md"
 STATE_PATH = ROOT / "evidence" / "document-sync-state.json"
 
-VERSION_RE = re.compile(r"\*\*v(\d+\.\d+\.\d+)\*\*")
+VERSION_RE = re.compile(r"\bv(\d+\.\d+\.\d+)\b")
 TAG_RE = re.compile(r"(?:GitHub release\s+|published as\s+(?:the immutable\s+)?(?:GitHub release\s+)?)`?([A-Za-z0-9._-]+)`?", re.I)
 COMMIT_RE = re.compile(r"Verified source commit: [^0-9a-f]*([0-9a-f]{40})", re.I)
 
