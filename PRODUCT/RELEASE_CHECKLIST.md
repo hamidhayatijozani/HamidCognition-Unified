@@ -7,7 +7,8 @@
 - [x] Release checksum asset published.
 - [x] Release manifest asset published.
 - [x] Publisher records verified source commit.
-- [ ] Current-main CI status independently green at the v1.0.10 release source commit.
+- [x] Release-candidate workflow 36303350191 completed successfully for source commit 77d820e99dc78a6a9e3217d3c1c49d5cdf07813f.
+- [ ] Current-main CI status independently green at the latest main commit.
 - [ ] Signing material externally managed. This remains an operational deployment requirement.
 
 ## Security
@@ -39,14 +40,14 @@
 - Release-candidate workflow run: 36303350191
 - Release artifact: action-gate-1.0.10.tar
 - Release artifact digest: sha256:10bb53b69b56ff86146f5c71e3e5d7e34dacb4e12dba2adafc59f9d5276abd91
-- Release checksum asset: action-gate-1.0.5.tar.sha256
+- Release checksum asset: action-gate-1.0.10.tar.sha256
 - Release checksum digest: sha256:1f57c20d6d27608c817fd695f963b33b8bd5c69c3d37a9052a519f2d45fb4dfa
-- Manifest asset: action-gate-1.0.5.manifest.txt
+- Manifest asset: action-gate-1.0.10.manifest.txt
 - Manifest digest: sha256:bcf4aceeee10e18bfbb358d95116d357e0f6fa9bb796527b2d2a930e8427f5e5
 
 ## Known boundary
 
-This evidence establishes the published release artifact and its recorded source provenance. It does not establish customer infrastructure readiness, external signing-key custody, regulatory certification, or live financial-trading performance.
+This evidence establishes the published release artifact and its recorded source provenance. It does not establish customer infrastructure readiness, external signing-key custody, regulatory certification, live financial-trading performance, or completion of a customer transaction.
 
 ## Commercial close condition
 
