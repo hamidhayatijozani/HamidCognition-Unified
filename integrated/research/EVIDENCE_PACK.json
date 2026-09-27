@@ -9,14 +9,17 @@
     "t_min": 0.01
   },
   "engine": "research_recovery_v1.1",
-  "replay_sha256": "4f4e0a6e314d8ef19b2a15ae2345e4beb7f3a9a330f7577189ec91b65a8e33fd",
-  "schema": "PST-SHOCK-RECOVERY-EVIDENCE-v1",
   "execution": {
-    "local_pytest": "1 passed",
-    "evidence_pack_sha256": "12774050e0566be2469e0494eed3c6dae99dc64a782bfc730a63a29d4c547814",
-    "canonical_evidence_sha256": "9b0673805fa6ac9124c4ab43d54a8541a734f335aa12e77ccff079e8cc6cb068",
-    "shock_T": 0.3181818182,
+    "canonical_engine_execution": "not_modified",
+    "executed_at_utc": "2026-09-27T23:15:57.153768+00:00",
+    "execution_scope": "exact GitHub main source files reproduced locally",
+    "local_pytest": "5 passed",
     "persistent_final_T": 0.01,
-    "recovered_final_T": 0.8
-  }
+    "recovered_final_T": 0.8,
+    "shock_T": 0.3181818182,
+    "source_commit": "47e54c3d2523c06a2ba4c6e8e1539a9c6ba404a9",
+    "test_count": 5
+  },
+  "replay_sha256": "4f4e0a6e314d8ef19b2a15ae2345e4beb7f3a9a330f7577189ec91b65a8e33fd",
+  "schema": "PST-SHOCK-RECOVERY-EVIDENCE-v1"
 }
