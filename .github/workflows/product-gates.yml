@@ -30,16 +30,22 @@ jobs:
         working-directory: action_gate
         env:
           ACTION_GATE_ENV: development
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
         run: pytest -q
       - name: Run Action Gate meta-validation boundary
         working-directory: action_gate
         env:
           ACTION_GATE_ENV: development
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
         run: pytest -q test_meta_validation.py
       - name: Run Validation Boundary conformance suite
         working-directory: action_gate
         env:
           ACTION_GATE_ENV: development
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
         run: pytest -q test_validation_boundary_conformance.py --junitxml=validation-boundary-junit.xml
       - name: Run real HTTP enforcement integration
         working-directory: action_gate
