@@ -6,6 +6,7 @@ from openai import OpenAI
 
 
 SERVER_URL = os.environ["MCP_SERVER_URL"]
+MCP_BEARER_TOKEN = os.getenv("MCP_BEARER_TOKEN")
 MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
 
 
@@ -22,6 +23,7 @@ def main() -> None:
                 "type": "mcp",
                 "server_label": "hamidcognition",
                 "server_url": SERVER_URL,
+                **({"headers": {"Authorization": f"Bearer {MCP_BEARER_TOKEN}"}} if MCP_BEARER_TOKEN else {}),
                 "allowed_tools": ["protected_read_public_file", "get_action_gate_evidence"],
                 "require_approval": "never",
             }
