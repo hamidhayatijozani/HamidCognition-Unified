@@ -1,0 +1,30 @@
+{
+  "artifact": "PST-SHOCK-RECOVERY-RESEARCH-1.1",
+  "execution_mode": "local",
+  "runtime": {
+    "python": "3.13.5"
+  },
+  "source_sha256": {
+    "shock_recovery.py": "09a0e1b234722aa1b39684f49198a60b9e67347010b0862e3d17d5fdd338f398",
+    "test_shock_recovery.py": "3388afada784df560f7488b1ecfacfff37ba1328ed885cc1f747ba47f4547c38"
+  },
+  "tests": {
+    "1_no_shock": {"pass": true, "final_T": 0.5},
+    "2_shock_degradation": {"pass": true, "degraded_T": 0.3181818182},
+    "3_persistent_shock_no_recovery": {
+      "pass": true,
+      "min_T_reached": 0.01,
+      "all_recovery_gates_zero": true
+    },
+    "4_shock_removal_recovery": {
+      "pass": true,
+      "initial_shocked_T": 0.01,
+      "final_recovered_T": 0.208
+    },
+    "5_replay_sha256_integrity": {
+      "pass": true,
+      "sha256": "6b22805628aa353f5653ab1d7c559fb3bef707d06424f561f51e0d427e73539f"
+    }
+  },
+  "status": "LOCAL_EXECUTION_VERIFIED_GITHUB_ATTESTATION_PENDING"
+}
