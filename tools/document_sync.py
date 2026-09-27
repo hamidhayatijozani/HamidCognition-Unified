@@ -16,7 +16,7 @@ CANONICAL_RELEASE = ROOT / "PRODUCT" / "CURRENT_COMMERCIAL_RELEASE.md"
 STATE_PATH = ROOT / "evidence" / "document-sync-state.json"
 
 VERSION_RE = re.compile(r"\*\*v(\d+\.\d+\.\d+)\*\*")
-TAG_RE = re.compile(r"GitHub release [^A-Za-z0-9]*([A-Za-z0-9._-]+)")
+TAG_RE = re.compile(r"(?:GitHub release\s+|published as\s+(?:the immutable\s+)?(?:GitHub release\s+)?)`?([A-Za-z0-9._-]+)`?", re.I)
 COMMIT_RE = re.compile(r"Verified source commit: [^0-9a-f]*([0-9a-f]{40})", re.I)
 
 def sha256_text(value: str) -> str:
@@ -69,8 +69,8 @@ def apply_safe_updates(identity: dict[str, str]) -> list[str]:
                 updated,
             )
             updated = re.sub(
-                r"published as GitHub release [^ ]+ at source commit [0-9a-f]{40}",
-                f"published as GitHub release {identity['release_tag']} at source commit {identity['source_commit']}",
+                r"published as (?:the immutable\s+)?GitHub release\s+`?[^` )]+`? at source commit [0-9a-f]{40}",
+                f"published as the immutable GitHub release `{identity['release_tag']}` at source commit {identity['source_commit']}",
                 updated,
             )
         else:
@@ -127,7 +127,13 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--write-state", action="store_true")
     parser.add_argument("--check", action="store_true")
+    parser.add_argument("--apply-safe", action="store_true")
     args = parser.parse_args()
+    identity = canonical_identity()
+    if args.apply_safe:
+        changed = apply_safe_updates(identity)
+        if changed:
+            print(json.dumps({"safe_updates": changed}))
     state = build_state()
     if args.write_state:
         STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
