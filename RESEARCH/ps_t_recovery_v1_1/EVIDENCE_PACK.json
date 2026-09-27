@@ -1,0 +1,34 @@
+{
+  "config": {
+    "recovery_rate": 0.1,
+    "recovery_threshold": 1.0,
+    "shock_rate": 0.2,
+    "t_base": 0.5,
+    "t_max": 0.8,
+    "t_min": 0.01
+  },
+  "experiment_id": "PST-RECOVERY-V1.1-001",
+  "status": "LOCAL_EXECUTED",
+  "tests": {
+    "1_no_shock": {"final_T": 0.5, "pass": true},
+    "2_shock_degradation": {"degraded_T": 0.31818182, "pass": true},
+    "3_persistent_shock_no_recovery": {"all_recovery_gates_zero": true, "min_T_reached": 0.01, "pass": true},
+    "4_shock_removal_recovery": {
+      "pass": true,
+      "recovered_final_T": 0.43336818,
+      "trajectory": [
+        {"D": 10, "R": 0, "T": 0.31818182, "step": 0},
+        {"D": 10, "R": 0, "T": 0.13636364, "step": 1},
+        {"D": 0, "R": 1, "T": 0.22272727, "step": 2},
+        {"D": 0, "R": 1, "T": 0.30045455, "step": 3},
+        {"D": 0, "R": 1, "T": 0.37040909, "step": 4},
+        {"D": 0, "R": 1, "T": 0.43336818, "step": 5}
+      ]
+    },
+    "5_replay_sha256": {
+      "pass": true,
+      "sha256": "99dc3e16b014e9f433c3dbdc60557c21d1633dde3c6879d1dd7e45cedcd0a3eb"
+    }
+  },
+  "trajectory_sha256": "99dc3e16b014e9f433c3dbdc60557c21d1633dde3c6879d1dd7e45cedcd0a3eb"
+}
