@@ -78,7 +78,7 @@ try:
             "target": "/public/policy-check.txt",
             "parameters": {"target": "/public/policy-check.txt"},
         }).encode(),
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": "application/json", "Authorization": f"Bearer {os.environ.get('ACTION_GATE_API_TOKEN', 'ci-test-token')}"},
     )
     with urllib.request.urlopen(gate_req) as r:
         gate = json.loads(r.read())
