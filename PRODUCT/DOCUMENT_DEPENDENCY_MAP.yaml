@@ -1,0 +1,48 @@
+version: 1
+schema: semantic-document-dependency-map
+
+documents:
+  - id: current-commercial-release
+    path: PRODUCT/CURRENT_COMMERCIAL_RELEASE.md
+    mode: BLOCK
+    claims:
+      - id: current-release-identity
+        source_paths:
+          - PRODUCT/CURRENT_COMMERCIAL_RELEASE.md
+          - PRODUCT/QUICKSTART.md
+        evidence_paths:
+          - PRODUCT/CURRENT_COMMERCIAL_RELEASE.md
+        deterministic_fields:
+          - release_version
+          - release_tag
+          - source_commit
+          - artifact_digest
+
+  - id: quickstart-release-identity
+    path: PRODUCT/QUICKSTART.md
+    mode: AUTO
+    claims:
+      - id: quickstart-release-identity
+        source_paths:
+          - PRODUCT/QUICKSTART.md
+          - PRODUCT/CURRENT_COMMERCIAL_RELEASE.md
+        evidence_paths:
+          - PRODUCT/CURRENT_COMMERCIAL_RELEASE.md
+        deterministic_fields:
+          - release_version
+          - release_tag
+
+  - id: readme-product-identity
+    path: README.md
+    mode: AUTO
+    claims:
+      - id: readme-release-identity
+        source_paths:
+          - README.md
+          - PRODUCT/CURRENT_COMMERCIAL_RELEASE.md
+        evidence_paths:
+          - PRODUCT/CURRENT_COMMERCIAL_RELEASE.md
+        deterministic_fields:
+          - release_version
+          - release_tag
+          - source_commit
