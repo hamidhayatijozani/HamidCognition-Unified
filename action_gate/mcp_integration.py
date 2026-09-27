@@ -30,7 +30,7 @@ try:
                 "action_hash": action_hash_value,
                 "nonce": nonce,
             }).encode(),
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "Authorization": f"Bearer {os.environ.get('ACTION_GATE_API_TOKEN', 'ci-test-token')}"},
         )
         with urllib.request.urlopen(req) as r:
             return json.loads(r.read())
