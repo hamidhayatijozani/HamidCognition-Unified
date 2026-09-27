@@ -190,4 +190,4 @@ def get_action_gate_evidence(decision_id: str) -> dict[str, Any]:
 
 
 if __name__ == "__main__":
-    mcp.run(transport="streamable-http")
+    # Containers must bind to all interfaces so the reverse proxy can reach the MCP server.\n    mcp.run(transport="streamable-http", host=os.getenv("MCP_HOST", "0.0.0.0"), port=int(os.getenv("MCP_PORT", "8787")))
