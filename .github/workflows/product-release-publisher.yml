@@ -39,7 +39,12 @@ jobs:
           test -n "$version"
           tag="action-gate-v$version"
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "$tag already exists; nothing to publish."
+            existing_target="$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json targetCommitish --jq '.targetCommitish')"
+            if [ "$existing_target" != "$HEAD_SHA" ]; then
+              echo "$tag already exists but points to $existing_target, expected $HEAD_SHA."
+              exit 1
+            fi
+            echo "$tag already exists and is bound to the validated commit $HEAD_SHA; nothing to publish."
             exit 0
           fi
           cat > /tmp/release-notes.md <<EOF
