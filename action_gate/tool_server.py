@@ -30,23 +30,29 @@ def _claim_nonce(nonce: str, decision_id: str, expires_at: int) -> None:
         con.close()
 
 
-def verify_execution_authority(token: str | None, tenant_id: str | None, payload: dict) -> None:
+def verify_execution_authority(token: str | None, tenant_id: str | None, payload: dict, action_digest: str | None = None) -> None:
     if not AUTHORITY_SECRET:
         raise AuthorityError("tool_authority_verification_not_configured")
     if not token or not tenant_id:
         raise AuthorityError("direct_tool_access_rejected")
-    if not isinstance(payload.get("action"), dict) or not isinstance(payload.get("policy"), dict):
-        raise AuthorityError("action_and_policy_binding_required")
     authority = Authority.from_token(token)
     secret = AUTHORITY_SECRET.encode()
+    if isinstance(payload.get("action"), dict) and isinstance(payload.get("policy"), dict):
+        bound_action_digest = canonical_digest(payload["action"])
+        bound_policy_digest = canonical_digest(payload["policy"])
+    elif action_digest:
+        bound_action_digest = action_digest
+        bound_policy_digest = None
+    else:
+        raise AuthorityError("action_and_policy_binding_required")
     verify_authority_envelope(
         authority=authority,
         secret=secret,
         tenant_id=tenant_id,
-        action_digest=canonical_digest(payload["action"]),
+        action_digest=bound_action_digest,
         used_nonces=None,
     )
-    if authority.policy_digest != canonical_digest(payload["policy"]):
+    if bound_policy_digest is not None and authority.policy_digest != bound_policy_digest:
         raise AuthorityError("policy_binding_mismatch")
     if payload.get("tenant_id") != tenant_id:
         raise AuthorityError("tenant_mismatch")
@@ -70,6 +76,7 @@ class Tool(BaseHTTPRequestHandler):
                 self.headers.get("X-HCJ-Execution-Authority"),
                 self.headers.get("X-Tenant-ID"),
                 body,
+                self.headers.get("X-HCJ-Action-Hash"),
             )
         except AuthorityError:
             self.send_response(403)
