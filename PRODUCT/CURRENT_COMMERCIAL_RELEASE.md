@@ -2,16 +2,11 @@
 
 ## Offerable release
 
-The current offerable Action Gate artifact is **v1.0.7**, published as GitHub release `action-gate-v1.0.7`.
+The current offerable Action Gate artifact is **v1.0.8**, published as GitHub release §action-gate-v1.0.8§.
 
-Its immutable commercial release target is:
+Its source commit is the immutable commit targeted by that release.
 
-`797b5b7c5d71fd94278b99f6bd2904eb4c340135`
-
-Release candidate workflow: **36297686201**  
-Product release publisher workflow: **36297713893**
-
-The published release includes:
+The published release must include:
 - versioned production container archive;
 - SHA-256 checksum;
 - release manifest;
@@ -20,22 +15,9 @@ The published release includes:
 
 ## Release validation
 
-The v1.0.7 source commit passed the same-SHA production validation chain on GitHub Actions, including:
-- Action Gate Product Gates;
-- Action Gate Product Integrity;
-- Action Gate Clean-Room Verification;
-- Action Gate Production E2E Smoke;
-- Action Gate Security Authority Gate;
-- Product Verification;
-- Security History Secret Scan;
-- Action Gate MVP;
-- Master Evidence Gate;
-- Action Gate Release Source Evidence;
-- Action Gate Release Readiness Gate;
-- Action Gate Release Candidate;
-- Product Release Publisher.
+The v1.0.8 source revision must pass the same-SHA production validation chain on GitHub Actions before publication.
 
-The current release evidence establishes technical release readiness for the exact source revision. It does not establish customer-specific production acceptance, a completed customer transaction, or market validation.
+The release evidence establishes technical release readiness for the exact source revision. It does not establish customer-specific production acceptance, a completed customer transaction, or market validation.
 
 ## Customer delivery rule
 
