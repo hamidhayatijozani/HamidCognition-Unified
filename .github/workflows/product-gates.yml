@@ -104,7 +104,16 @@ jobs:
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
           DOMAIN: localhost
-        run: docker compose -f docker-compose.production.yml exec -T chatgpt-mcp python -c "import socket; s=socket.create_connection(('127.0.0.1',8787),5); s.close()"
+        run: |
+          for attempt in $(seq 1 30); do
+            if docker compose -f docker-compose.production.yml exec -T chatgpt-mcp python -c "import socket; s=socket.create_connection(('127.0.0.1',8787),2); s.close()" >/dev/null 2>&1; then
+              echo "ChatGPT MCP listener is reachable on :8787"
+              exit 0
+            fi
+            sleep 1
+          done
+          docker compose -f docker-compose.production.yml logs --no-color chatgpt-mcp
+          exit 1
 
       - name: Production PostgreSQL and E2E smoke
         working-directory: action_gate
