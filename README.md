@@ -62,6 +62,12 @@ The broader repository preserves research and lineage around ClaimLab, P/S/T cog
 
 Those research lines are not automatically commercial product claims. The Action Gate boundary is the product surface.
 
+## Living documentation
+
+The repository includes a Semantic Document Synchronization Layer (SDS). It listens to declared code, release, and evidence signals and keeps deterministic product metadata synchronized. Semantic, commercial, legal, and payment claims are not silently rewritten: they are flagged for revalidation instead.
+
+See PRODUCT/DOCUMENT_SYNCHRONIZATION.md and PRODUCT/DOCUMENT_DEPENDENCY_MAP.yaml.
+
 ## Evidence and provenance
 
 Important results are traceable through:
