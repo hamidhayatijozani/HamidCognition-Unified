@@ -1,4 +1,11 @@
 {$DOMAIN} {
-    reverse_proxy enforcement:8080
+    handle /mcp* {
+        reverse_proxy chatgpt-mcp:8787
+    }
+
+    handle {
+        reverse_proxy enforcement:8080
+    }
+
     encode zstd gzip
 }
