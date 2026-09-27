@@ -49,7 +49,7 @@ The MCP endpoint is:
 http://127.0.0.1:8787/mcp
 ```
 
-For ChatGPT, the endpoint must be reachable through HTTPS or Secure MCP Tunnel. OpenAI's current ChatGPT integration uses MCP Streamable HTTP and exposes custom MCP apps through Developer Mode. citeturn0search1turn0search3
+For ChatGPT, the endpoint must be reachable through HTTPS or Secure MCP Tunnel. OpenAI's current ChatGPT integration uses MCP Streamable HTTP and exposes custom MCP apps through Developer Mode.
 
 ## ChatGPT test script
 
@@ -66,4 +66,4 @@ This gives a buyer a live demonstration of the actual boundary rather than a sli
 
 The MCP facade should remain separate from the protected tool network. The protected tool must not be directly exposed to ChatGPT.
 
-For production, add OAuth or another supported authenticated MCP authorization flow, derive identity from the authenticated principal, and retain the Action Gate as the independent authorization boundary. OpenAI's current guidance recommends stable HTTPS Streamable HTTP endpoints and authenticated authorization for private or write-capable tools. citeturn0search6turn0search7
+For production, add OAuth or another supported authenticated MCP authorization flow, derive identity from the authenticated principal, and retain the Action Gate as the independent authorization boundary. OpenAI's current guidance recommends stable HTTPS Streamable HTTP endpoints and authenticated authorization for private or write-capable tools.
