@@ -2,12 +2,12 @@
 
 ## Engineering
 
-- [x] Canonical product release is 1.0.5.
+- [x] Canonical product release is 1.0.10.
 - [x] Versioned release artifact published.
 - [x] Release checksum asset published.
 - [x] Release manifest asset published.
 - [x] Publisher records verified source commit.
-- [ ] Current-main CI status independently green at the latest main commit. This must be verified from the current workflow runs before treating main as fully release-closed.
+- [ ] Current-main CI status independently green at the v1.0.10 release source commit.
 - [ ] Signing material externally managed. This remains an operational deployment requirement.
 
 ## Security
@@ -33,16 +33,16 @@
 ## Exact published release evidence
 
 - Product: HamidCognition Action Gate
-- Version: 1.0.5
-- Release tag: action-gate-v1.0.5
-- Source commit recorded by publisher: f3c77cbb314e76911cce37298d58202ffb451d6e
-- Release-candidate workflow run: 36087744393
-- Release artifact: action-gate-1.0.5.tar
-- Release artifact digest: sha256:a4612aaeda25ee35fcb92f35a179666e7c578794f448eac5b3e28ce39f5b630d
+- Version: 1.0.10
+- Release tag: action-gate-v1.0.10
+- Source commit recorded by publisher: 77d820e99dc78a6a9e3217d3c1c49d5cdf07813f
+- Release-candidate workflow run: 36303350191
+- Release artifact: action-gate-1.0.10.tar
+- Release artifact digest: sha256:10bb53b69b56ff86146f5c71e3e5d7e34dacb4e12dba2adafc59f9d5276abd91
 - Release checksum asset: action-gate-1.0.5.tar.sha256
-- Release checksum digest: sha256:3b7d58861219a656d892e00c8f64e9ffc101df014d13e466bf1a69e0e98a19aa
+- Release checksum digest: sha256:1f57c20d6d27608c817fd695f963b33b8bd5c69c3d37a9052a519f2d45fb4dfa
 - Manifest asset: action-gate-1.0.5.manifest.txt
-- Manifest digest: sha256:15ee71cf278dd3199e5874c7854bbd1c99a1d3b5e697c2978f73fb6315abaf90
+- Manifest digest: sha256:bcf4aceeee10e18bfbb358d95116d357e0f6fa9bb796527b2d2a930e8427f5e5
 
 ## Known boundary
 
