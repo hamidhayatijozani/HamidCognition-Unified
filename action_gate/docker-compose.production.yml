@@ -101,6 +101,12 @@ services:
       DEMO_ACTOR_ID: ${DEMO_ACTOR_ID:-chatgpt-user}
       DEMO_AGENT_ID: ${DEMO_AGENT_ID:-chatgpt-demo-agent}
       DEMO_SESSION_ID: ${DEMO_SESSION_ID:-chatgpt-demo-session}
+      MCP_BEARER_TOKEN: ${MCP_BEARER_TOKEN:-}
+      MCP_ISSUER_URL: ${MCP_ISSUER_URL:-https://auth.example.com}
+      MCP_RESOURCE_URL: ${MCP_RESOURCE_URL:-https://localhost/mcp}
+      MCP_REQUIRED_SCOPE: ${MCP_REQUIRED_SCOPE:-mcp:execute}
+      MCP_CLIENT_ID: ${MCP_CLIENT_ID:-chatgpt-demo-client}
+      MCP_TOKEN_TTL_SECONDS: ${MCP_TOKEN_TTL_SECONDS:-3600}
     networks:
       - edge
       - backend
