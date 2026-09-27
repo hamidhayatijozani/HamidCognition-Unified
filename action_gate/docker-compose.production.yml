@@ -17,7 +17,9 @@ services:
     restart: unless-stopped
 
   action-gate:
-    build: .
+    build:
+      context: ..
+      dockerfile: action_gate/Dockerfile
     environment:
       ACTION_GATE_ENV: production
       ACTION_GATE_API_TOKEN: ${ACTION_GATE_API_TOKEN:?set ACTION_GATE_API_TOKEN}
