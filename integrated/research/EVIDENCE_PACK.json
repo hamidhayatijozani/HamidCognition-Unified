@@ -1,0 +1,22 @@
+{
+  "canonical_boundary": "frozen",
+  "commercial_boundary": "excluded",
+  "config": {
+    "lambda_recovery": 0.35,
+    "lambda_shock": 0.2,
+    "shock_scale": 1.0,
+    "t_max": 0.8,
+    "t_min": 0.01
+  },
+  "engine": "research_recovery_v1.1",
+  "replay_sha256": "4f4e0a6e314d8ef19b2a15ae2345e4beb7f3a9a330f7577189ec91b65a8e33fd",
+  "schema": "PST-SHOCK-RECOVERY-EVIDENCE-v1",
+  "execution": {
+    "local_pytest": "1 passed",
+    "evidence_pack_sha256": "12774050e0566be2469e0494eed3c6dae99dc64a782bfc730a63a29d4c547814",
+    "canonical_evidence_sha256": "9b0673805fa6ac9124c4ab43d54a8541a734f335aa12e77ccff079e8cc6cb068",
+    "shock_T": 0.3181818182,
+    "persistent_final_T": 0.01,
+    "recovered_final_T": 0.8
+  }
+}
