@@ -17,6 +17,7 @@ jobs:
           ACTION_GATE_API_TOKEN: ci-action-gate-token
           ACTION_GATE_SIGNING_SECRET: ci-signing-secret
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
           ACTION_GATE_APPROVAL_SECRET: ci-only-approval-secret-not-for-production
           DOMAIN: localhost
         run: |
@@ -25,6 +26,7 @@ jobs:
           ACTION_GATE_API_TOKEN=ci-action-gate-token
           ACTION_GATE_SIGNING_SECRET=ci-signing-secret
           ACTION_GATE_ENFORCEMENT_SECRET=ci-enforcement-secret
+          ACTION_GATE_AUTHORITY_SECRET=ci-authority-secret
           ACTION_GATE_APPROVAL_SECRET=ci-only-approval-secret-not-for-production
           DOMAIN=localhost
           EOF
