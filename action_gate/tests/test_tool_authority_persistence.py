@@ -11,6 +11,7 @@ SECRET = b"test-only-action-gate-secret"
 
 def test_tool_nonce_claim_survives_module_reload(tmp_path, monkeypatch):
     db = tmp_path / "tool_authority.db"
+    monkeypatch.setenv("ACTION_GATE_AUTHORITY_SECRET", SECRET.decode())
     monkeypatch.setenv("TOOL_NONCE_DB", str(db))
     import action_gate.tool_server as tool_server
     tool_server.TOOL_NONCE_DB = str(db)
@@ -34,22 +35,28 @@ def test_tool_nonce_claim_survives_module_reload(tmp_path, monkeypatch):
         reloaded._claim_nonce(authority.nonce, authority.decision_id, authority.expires_at)
 
 
-def test_tool_rejects_sandbox_authority():
+def test_tool_rejects_sandbox_authority(tmp_path, monkeypatch):
+    monkeypatch.setenv("ACTION_GATE_AUTHORITY_SECRET", SECRET.decode())
+    monkeypatch.setenv("TOOL_NONCE_DB", str(tmp_path / "sandbox.db"))
     import action_gate.tool_server as tool_server
-    tool_server.SIGNING_SECRET = SECRET
+    tool_server = importlib.reload(tool_server)
+
+    action = {"verb": "write", "resource": "customer/42"}
+    policy = {"version": "p1"}
     authority = issue_authority(
         secret=SECRET,
         decision_id="dec-2",
         tenant_id="tenant-a",
-        action={"verb": "write", "resource": "customer/42"},
-        policy={"version": "p1"},
+        action=action,
+        policy=policy,
         decision="SANDBOX",
         now=int(time.time()),
         nonce="nonce-sandbox",
     )
+    payload = {"tenant_id": "tenant-a", "action": action, "policy": policy}
     with pytest.raises(tool_server.AuthorityError, match="decision_not_executable"):
         tool_server.verify_execution_authority(
             authority.token(),
             "tenant-a",
-            authority.action_digest,
+            payload,
         )
