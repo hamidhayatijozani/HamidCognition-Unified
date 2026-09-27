@@ -52,13 +52,12 @@ try:
     assert evidence["tool_executed"] is True
 
     # The direct tool endpoint must independently enforce the policy binding carried by the authority.
-    # Reuse the reserved authority from a fresh allowed decision, but deliberately alter only the policy digest.
+    # Obtain a fresh ALLOW authority, then alter only the policy digest at the tool boundary.
     gate_req = urllib.request.Request(
         "http://127.0.0.1:8000/v1/action/evaluate",
         data=json.dumps({
             "agent_id": "mcp-demo",
             "actor_id": "actor-mcp",
-            "session_id": None,
             "tenant_id": TENANT,
             "action": "read_public_file",
             "target": "/public/policy-check.txt",
@@ -68,7 +67,21 @@ try:
     )
     with urllib.request.urlopen(gate_req) as r:
         gate = json.loads(r.read())
-    reserved = reserve_execution(gate["decision_id"], TENANT, "actor-mcp", None, gate["action_hash"], gate["nonce"]) if False else None
+    reserved = reserve_execution(gate["decision_id"], TENANT, "actor-mcp", None, gate["action_hash"], gate["nonce"])
+    wrong_policy_headers = {
+        "Content-Type": "application/json",
+        "X-HCJ-Execution-Authority": reserved["execution_authority"],
+        "X-HCJ-Action-Hash": gate["action_hash"],
+        "X-HCJ-Policy-Hash": "0" * 64,
+        "X-Tenant-ID": TENANT,
+    }
+    try:
+        urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:9000", data=b"{}", headers=wrong_policy_headers))
+        raise AssertionError("mismatched policy binding unexpectedly succeeded")
+    except urllib.error.HTTPError as e:
+        body = json.loads(e.read())
+        assert e.code == 403
+        assert body["diagnostic"] == "policy_binding_mismatch"
 
     # MCP must reject unsupported methods before any tool execution path is reached.
     status, unsupported = call({"jsonrpc": "2.0", "id": 3, "method": "resources/read", "params": {"uri": "file:///public/info.txt"}})
