@@ -139,9 +139,8 @@ jobs:
       - name: Verify authenticated MCP boundary
         working-directory: action_gate
         env:
-          MCP_TEST_URL: http://127.0.0.1:8787
           MCP_BEARER_TOKEN: ci-mcp-bearer-token
-        run: python test_mcp_auth.py
+        run: docker compose -f docker-compose.production.yml exec -T chatgpt-mcp python test_mcp_auth.py
       - name: Production PostgreSQL and E2E smoke
         working-directory: action_gate
         env:
