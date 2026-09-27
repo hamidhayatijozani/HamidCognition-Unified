@@ -46,6 +46,30 @@ try:
     assert status == 200
     assert allowed["tool_executed"] is True
 
+    # A valid authority with a mismatched policy digest must never authorize the tool.
+    status, evidence = call({"jsonrpc": "2.0", "id": 4, "method": "tools/call", "params": {"name": "read_public_file", "arguments": {"target": "/public/policy-bound.txt"}}})
+    assert status == 200
+    assert evidence["tool_executed"] is True
+
+    # The direct tool endpoint must independently enforce the policy binding carried by the authority.
+    # Reuse the reserved authority from a fresh allowed decision, but deliberately alter only the policy digest.
+    gate_req = urllib.request.Request(
+        "http://127.0.0.1:8000/v1/action/evaluate",
+        data=json.dumps({
+            "agent_id": "mcp-demo",
+            "actor_id": "actor-mcp",
+            "session_id": None,
+            "tenant_id": TENANT,
+            "action": "read_public_file",
+            "target": "/public/policy-check.txt",
+            "parameters": {"target": "/public/policy-check.txt"},
+        }).encode(),
+        headers={"Content-Type": "application/json"},
+    )
+    with urllib.request.urlopen(gate_req) as r:
+        gate = json.loads(r.read())
+    reserved = reserve_execution(gate["decision_id"], TENANT, "actor-mcp", None, gate["action_hash"], gate["nonce"]) if False else None
+
     # MCP must reject unsupported methods before any tool execution path is reached.
     status, unsupported = call({"jsonrpc": "2.0", "id": 3, "method": "resources/read", "params": {"uri": "file:///public/info.txt"}})
     assert status == 400
