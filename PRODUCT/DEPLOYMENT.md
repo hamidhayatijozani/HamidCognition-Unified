@@ -1,10 +1,8 @@
 # Action Gate Deployment Contract
 
-Version: 1.0.4 baseline
+Version: 1.0.10
 
-The current deployment contract targets Action Gate 1.0.4. Historical 0.4.x and earlier product records remain historical evidence and are not relabeled as 1.0.4 execution evidence.
-
-This document defines the minimum deployment boundary for a customer installation. It is an operational contract, not a compliance certification.
+This document defines the minimum deployment boundary for a customer installation of Action Gate v1.0.10. It is an operational contract, not a compliance certification.
 
 ## Required components
 
