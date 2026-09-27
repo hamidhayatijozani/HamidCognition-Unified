@@ -5,9 +5,7 @@ permissions:
 
 on:
   push:
-    paths:
-      - 'action_gate/**'
-      - '.github/workflows/action-gate-mvp.yml'
+    branches: [main]
   pull_request:
     paths:
       - 'action_gate/**'
