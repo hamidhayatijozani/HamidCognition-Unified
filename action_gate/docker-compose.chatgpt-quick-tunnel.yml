@@ -1,0 +1,25 @@
+# Demo-only Cloudflare Quick Tunnel for ChatGPT MCP
+#
+# Run together with docker-compose.production.yml:
+#   docker compose -f docker-compose.production.yml -f docker-compose.chatgpt-quick-tunnel.yml up -d --build
+#
+# Then inspect:
+#   docker compose -f docker-compose.production.yml -f docker-compose.chatgpt-quick-tunnel.yml logs -f chatgpt-quick-tunnel
+#
+# The log contains a temporary https://*.trycloudflare.com URL.
+# This is for short-lived testing only. Use a managed HTTPS endpoint or
+# Secure MCP Tunnel for production/private deployments.
+services:
+  chatgpt-quick-tunnel:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --url http://chatgpt-mcp:8787
+    networks:
+      - edge
+    depends_on:
+      chatgpt-mcp:
+        condition: service_started
+    restart: "no"
+
+networks:
+  edge:
+    driver: bridge
