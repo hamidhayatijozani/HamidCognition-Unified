@@ -54,7 +54,7 @@ def verify_execution_authority(token: str | None, tenant_id: str | None, payload
     )
     if bound_policy_digest is not None and authority.policy_digest != bound_policy_digest:
         raise AuthorityError("policy_binding_mismatch")
-    if payload.get("tenant_id") != tenant_id:
+    if "tenant_id" in payload and payload.get("tenant_id") != tenant_id:
         raise AuthorityError("tenant_mismatch")
     _claim_nonce(authority.nonce, authority.decision_id, authority.expires_at)
 
