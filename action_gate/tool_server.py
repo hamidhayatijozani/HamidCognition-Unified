@@ -115,8 +115,9 @@ class Tool(BaseHTTPRequestHandler):
         token = self.headers.get("X-HCJ-Execution-Authority")
         tenant_id = self.headers.get("X-Tenant-ID")
         action_digest = self.headers.get("X-HCJ-Action-Hash")
+        policy_digest = self.headers.get("X-HCJ-Policy-Hash")
         try:
-            verify_execution_authority(token, tenant_id, body, action_digest)
+            verify_execution_authority(token, tenant_id, body, action_digest, policy_digest)
         except AuthorityError as exc:
             authority_nonce = None
             try:
