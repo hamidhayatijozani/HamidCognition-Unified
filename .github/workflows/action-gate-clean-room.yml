@@ -158,7 +158,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          docker build --pull=false --build-arg PYTHON_BASE_IMAGE="${{ steps.base.outputs.image }}" -f action_gate/Dockerfile -t action-gate-clean-room:${{ steps.version.outputs.version }} action_gate
+          docker build --pull=false --build-arg PYTHON_BASE_IMAGE="${{ steps.base.outputs.image }}" -f action_gate/Dockerfile -t action-gate-clean-room:${{ steps.version.outputs.version }} .
           docker image inspect action-gate-clean-room:${{ steps.version.outputs.version }} --format 'image_id={{.Id}}' | tee clean-room-image.txt
 
       - name: Emit verification manifest and attestation
