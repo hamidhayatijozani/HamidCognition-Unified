@@ -1,8 +1,10 @@
-# Action Gate 1.0.6 Quickstart
+# Action Gate 1.0.7 Quickstart
 
 ## Product
 
 Action Gate is a deployable policy-enforcement boundary between an agent and protected tools. It evaluates an action, binds the decision to tenant/actor/session/action identity, records evidence, and authorizes execution only through the governed path.
+
+The current validated release is **v1.0.7**, published as `action-gate-v1.0.7`.
 
 ## Production deployment
 
@@ -20,6 +22,8 @@ The production Compose definition is `action_gate/docker-compose.production.yml`
 ## Acceptance
 
 A running container is not an accepted security boundary. Acceptance requires evidence for identity binding, decision integrity, nonce single-use, expiry, tenant isolation, ALLOW/DENY/ASK/SANDBOX enforcement, evidence fail-closed behavior, persistence/replay, and absence of a direct downstream bypass.
+
+For the fast first pass, run `PRODUCT/customer_acceptance_smoke.py` against the acceptance deployment. It is non-destructive and uses the inert `example.read_only_check` action. The complete acceptance procedure remains mandatory for production delivery.
 
 ## Delivery modes
 
