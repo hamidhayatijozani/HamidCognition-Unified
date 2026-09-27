@@ -44,7 +44,7 @@ Authenticated mode accepts a Bearer token at the MCP HTTP boundary. The current 
 
 For a customer deployment, replace that verifier with an OAuth/OIDC JWT verifier or token introspection service. The MCP principal should then determine the tenant, actor, agent and session context passed into Action Gate. Do not accept those identities from tool arguments.
 
-This follows the MCP authorization model: the MCP server is the resource server, verifies the bearer token, and obtains the authenticated principal from the validated token. citeturn3search3turn3search10
+This follows the MCP authorization model: the MCP server is the resource server, verifies the bearer token, and obtains the authenticated principal from the validated token.
 
 ## Local run
 
@@ -110,7 +110,7 @@ For a customer or persistent demo:
 8. Use a distinct tenant and principal for every customer.
 9. Rotate temporary demo credentials after every public demonstration.
 
-ChatGPT connects to remote MCP servers rather than directly to a local/private listener. OpenAI's current documentation says custom MCP apps are configured with a remote endpoint and can use an authentication mechanism; private/on-premises servers can use Secure MCP Tunnel. Full MCP/write support is currently rolling out for Business, Enterprise and Edu, while Pro supports custom MCP connections with read/fetch permissions. citeturn0search0turn0search7
+ChatGPT connects to remote MCP servers rather than directly to a local/private listener. OpenAI's current documentation says custom MCP apps are configured with a remote endpoint and can use an authentication mechanism; private/on-premises servers can use Secure MCP Tunnel. Full MCP/write support is currently rolling out for Business, Enterprise and Edu, while Pro supports custom MCP connections with read/fetch permissions.
 
 ## ChatGPT test sequence
 
@@ -147,7 +147,7 @@ export MCP_BEARER_TOKEN='...'
 python action_gate/openai_remote_mcp_demo.py
 ```
 
-The current OpenAI API reference supports a remote MCP `server_url`, an allowed-tool filter, optional approval settings, and HTTP headers for authentication. It also supports an OAuth authorization token when the application performs the OAuth flow. citeturn1search0
+The current OpenAI API reference supports a remote MCP `server_url`, an allowed-tool filter, optional approval settings, and HTTP headers for authentication. It also supports an OAuth authorization token when the application performs the OAuth flow.
 
 For a first proof, keep the allowed tools constrained to the two demo tools. Do not use `require_approval="never"` for destructive customer tools. The sample uses that setting only to make the non-destructive proof deterministic.
 
