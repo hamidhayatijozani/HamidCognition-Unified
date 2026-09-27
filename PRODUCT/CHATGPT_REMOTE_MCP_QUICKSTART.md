@@ -24,7 +24,7 @@ Then read the temporary public URL:
 docker compose -f docker-compose.production.yml -f docker-compose.chatgpt-quick-tunnel.yml logs chatgpt-quick-tunnel
 ```
 
-Cloudflare Quick Tunnels generate a temporary `trycloudflare.com` URL and are intended for testing/development, not production. citeturn5search1
+Cloudflare Quick Tunnels generate a temporary `trycloudflare.com` URL and are intended for testing/development, not production.
 
 The MCP endpoint is:
 
@@ -48,11 +48,11 @@ export MCP_SERVER_URL='https://<temporary-host>.trycloudflare.com/mcp'
 python action_gate/openai_remote_mcp_demo.py
 ```
 
-The Responses API supports remote MCP tools with a `server_url`, tool filtering, and an explicit approval policy. citeturn4search0turn4search4
+The Responses API supports remote MCP tools with a `server_url`, tool filtering, and an explicit approval policy.
 
 ## 3. Test inside ChatGPT
 
-For a custom ChatGPT MCP app, use the same `/mcp` endpoint in Developer Mode. OpenAI's current documentation says ChatGPT connects to remote MCP servers, and custom apps with full MCP/write support are currently available on Business and Enterprise/Edu; Pro can connect MCPs with read/fetch permissions. The setup is on ChatGPT web, not mobile. citeturn3search0
+For a custom ChatGPT MCP app, use the same `/mcp` endpoint in Developer Mode. OpenAI's current documentation says ChatGPT connects to remote MCP servers, and custom apps with full MCP/write support are currently available on Business and Enterprise/Edu; Pro can connect MCPs with read/fetch permissions. The setup is on ChatGPT web, not mobile.
 
 For a private/local server, OpenAI recommends Secure MCP Tunnel rather than exposing the origin directly. citeturn3search0
 
