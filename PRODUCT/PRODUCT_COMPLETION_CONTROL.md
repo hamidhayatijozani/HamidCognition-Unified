@@ -4,7 +4,7 @@ This file is the execution control for turning HamidCognition-Unified into a coh
 
 ## Canonical product
 
-Current product boundary: **HamidCognition Action Gate v1.0.8**.
+Current product boundary: **HamidCognition Action Gate v1.0.10**.
 
 The commercial product is the executable Action Gate boundary. Research lines remain separate evidence-bearing assets until they have their own implementation, tests, reproducibility record, and explicit product boundary.
 
@@ -52,7 +52,7 @@ No prize or market claim is considered real until its external rules and the sub
 
 ## Current product state
 
-Action Gate v1.0.8 is the canonical commercial product boundary.
+Action Gate v1.0.10 is the canonical commercial product boundary.
 
 Current release evidence is valid only when the exact source SHA, workflow run, artifact digest and release record agree.
 
