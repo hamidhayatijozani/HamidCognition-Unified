@@ -139,7 +139,16 @@ jobs:
       - name: Verify authenticated MCP boundary
         working-directory: action_gate
         env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
+          ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
           MCP_BEARER_TOKEN: ci-mcp-bearer-token
+          MCP_RESOURCE_URL: http://127.0.0.1:8787/mcp
+          DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml exec -T chatgpt-mcp python test_mcp_auth.py
       - name: Production PostgreSQL and E2E smoke
         working-directory: action_gate
