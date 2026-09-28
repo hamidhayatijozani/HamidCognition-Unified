@@ -1,10 +1,11 @@
 # Current Commercial Release Status
 
-## Offerable release
+## Published release
 
-The current offerable Action Gate artifact is **v1.0.10**, published as GitHub release `action-gate-v1.0.10`.
+The current published Action Gate customer-delivery release is **v1.1.0**, published as GitHub release `action-gate-v1.1.0`.
 
-Verified source commit: `77d820e99dc78a6a9e3217d3c1c49d5cdf07813f`.
+Verified source commit:
+`43e558deacbe3df06554f79178b922b27ac94b1a`
 
 The published release includes:
 - versioned production container archive;
@@ -15,12 +16,24 @@ The published release includes:
 
 ## Release validation
 
-The v1.0.10 source revision passed the same-SHA product, security, Clean-Room, production E2E, release-readiness, and release-publication chain on GitHub Actions before publication.
+The v1.1.0 source revision was published through the dedicated release workflow after the release-candidate evidence chain completed.
 
-Release-candidate workflow run: `36303350191`.
+Release-candidate workflow run:
+`36309864630`
 
-The v1.0.10 release artifact digest is:
-`sha256:10bb53b69b56ff86146f5c71e3e5d7e34dacb4e12dba2adafc59f9d5276abd91`.
+The primary release artifact is:
+`action-gate-1.1.0.tar`
+
+Artifact SHA-256:
+`sha256:8c6381a3c7693fa182a21cf8f298e1d77adbdeb6161291094731faf451257a92`
+
+## Release versus main
+
+The release tag is the customer-delivery reference point. The mutable `main` branch is not automatically equivalent to the published release.
+
+At the time this document was synchronized, `main` was ahead of the v1.1.0 source commit and contained subsequent changes, including MCP E2E and production-gate work. Those changes are not retroactively part of v1.1.0.
+
+Any post-v1.1.0 change intended for customer delivery must pass a new release-control cycle and receive a new release identity.
 
 ## Customer delivery rule
 
