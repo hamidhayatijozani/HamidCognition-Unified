@@ -77,6 +77,7 @@ jobs:
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
           DOMAIN: localhost
+          MCP_BEARER_TOKEN: ci-mcp-bearer-token
         run: docker compose -f docker-compose.production.yml -f docker-compose.chatgpt-quick-tunnel.yml config
 
       - name: Verify ChatGPT MCP surface imports
@@ -87,7 +88,7 @@ jobs:
         run: python -c "import chatgpt_mcp_server; assert chatgpt_mcp_server.mcp.name == 'HamidCognition Action Gate Demo'"
       - name: Compile runtime
         working-directory: action_gate
-        run: python -m py_compile app.py storage.py self_audit.py test_meta_validation.py rate_limit.py canonicalization.py keyring.py policy_store.py action_gate_sdk.py csg_contract.py csg_ingress.py csg_routes.py decision_authority.py csg_validation_handler.py agentrq_simulator.py csg_acceptance.py csg_persistence_replay.py enforcement_integration.py mcp_integration.py test_validation_boundary_conformance.py production_e2e_smoke.py sellable_gate.py security_authority.py
+        run: python -m py_compile app.py storage.py self_audit.py test_meta_validation.py rate_limit.py canonicalization.py keyring.py policy_store.py action_gate_sdk.py csg_contract.py csg_ingress.py csg_routes.py decision_authority.py csg_validation_handler.py agentrq_simulator.py csg_acceptance.py csg_persistence_replay.py enforcement_integration.py mcp_integration.py test_mcp_auth.py test_mcp_e2e.py test_validation_boundary_conformance.py production_e2e_smoke.py sellable_gate.py security_authority.py
       - name: Validate production Compose
         working-directory: action_gate
         env:
@@ -150,6 +151,21 @@ jobs:
           MCP_RESOURCE_URL: http://127.0.0.1:8787/mcp
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml exec -T chatgpt-mcp python test_mcp_auth.py
+      - name: Verify MCP ALLOW DENY EVIDENCE end-to-end
+        working-directory: action_gate
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
+          ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          MCP_BEARER_TOKEN: ci-mcp-bearer-token
+          MCP_RESOURCE_URL: http://127.0.0.1:8787/mcp
+          DOMAIN: localhost
+        run: docker compose -f docker-compose.production.yml exec -T chatgpt-mcp python test_mcp_e2e.py
+
       - name: Production PostgreSQL and E2E smoke
         working-directory: action_gate
         env:
