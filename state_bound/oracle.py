@@ -22,35 +22,19 @@ class StateOracle:
             self._world=WorldState(self._version,dict(trajectory),dict(metadata or self._world.metadata))
             return OracleSnapshot(self._world.version,self._world)
     def update_context(self,context:dict)->OracleSnapshot:
-        """Refresh context without changing trajectory version to isolate context-only drift."""
         with self._lock:
-            metadata=dict(self._world.metadata)
-            metadata["context"]=dict(context)
+            metadata=dict(self._world.metadata); metadata["context"]=dict(context)
             self._world=WorldState(self._world.version,dict(self._world.trajectory),metadata)
             return OracleSnapshot(self._world.version,self._world)
     def update_state(self,state:dict)->OracleSnapshot:
-        """Refresh live execution state without changing trajectory version."""
         with self._lock:
-            metadata=dict(self._world.metadata)
-            metadata["state"]=dict(state)
+            metadata=dict(self._world.metadata); metadata["state"]=dict(state)
             self._world=WorldState(self._world.version,dict(self._world.trajectory),metadata)
             return OracleSnapshot(self._world.version,self._world)
-    def update_evidence(self, evidence: dict) -> OracleSnapshot:
-        """Refresh evidence without changing trajectory version."""
-        with self._lock:
-            metadata = dict(self._world.metadata)
-            metadata["evidence"] = dict(evidence)
-            self._world = WorldState(
-                self._world.version,
-                dict(self._world.trajectory),
-                metadata,
-            )
-            return OracleSnapshot(self._world.version, self._world)
-
     def execute_if_valid(self,*,authority,action:dict,subject:str,now_ns:int,verify:Callable,execute:Callable):
         """Atomically verify latest committed oracle state and run the prototype callback."""
         with self._lock:
-            snapshot=OracleSnapshot(self._world.version,self._world)
-            result=verify(authority,current_world=snapshot.world,current_action=action,subject=subject,now_ns=now_ns)
-            if result.executable: execute(action,snapshot.world)
+            world=self._world
+            result=verify(authority,current_world=world,current_action=action,subject=subject,now_ns=now_ns)
+            if result.executable: execute(action,world)
             return result
