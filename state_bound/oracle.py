@@ -10,7 +10,7 @@ class OracleSnapshot:
     world:WorldState
 
 class StateOracle:
-    """Append-only in-memory oracle for TA-001."""
+    """Trajectory oracle with independently refreshable context for drift experiments."""
     def __init__(self,initial_trajectory:dict,metadata:dict|None=None):
         self._lock=RLock(); self._version=1
         self._world=WorldState(self._version,dict(initial_trajectory),dict(metadata or {}))
@@ -20,6 +20,13 @@ class StateOracle:
         with self._lock:
             self._version+=1
             self._world=WorldState(self._version,dict(trajectory),dict(metadata or self._world.metadata))
+            return OracleSnapshot(self._world.version,self._world)
+    def update_context(self,context:dict)->OracleSnapshot:
+        """Refresh context without changing trajectory version to isolate context-only drift."""
+        with self._lock:
+            metadata=dict(self._world.metadata)
+            metadata["context"]=dict(context)
+            self._world=WorldState(self._world.version,dict(self._world.trajectory),metadata)
             return OracleSnapshot(self._world.version,self._world)
     def execute_if_valid(self,*,authority,action:dict,subject:str,now_ns:int,verify:Callable,execute:Callable):
         """Atomically verify latest committed oracle state and run the prototype callback."""
