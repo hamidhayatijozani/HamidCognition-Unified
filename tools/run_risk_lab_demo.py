@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Reproducible Agent Action Risk Lab demo against the repository's real HTTP tool."""
 from __future__ import annotations
-import json, os, subprocess, sys, threading, time, urllib.error, urllib.request
+import json, os, socket, subprocess, sys, threading, time, urllib.error, urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -33,6 +33,15 @@ def request(url, payload, headers=None):
         except json.JSONDecodeError: body=raw
         return e.code, body
 
+def _port_ready(port: int) -> bool:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.settimeout(0.5)
+        try:
+            sock.connect(("127.0.0.1", port))
+            return True
+        except OSError:
+            return False
+
 def run():
     baseline = ThreadingHTTPServer(("127.0.0.1", 9100), BaselineHandler)
     threading.Thread(target=baseline.serve_forever, daemon=True).start()
@@ -40,7 +49,18 @@ def run():
     env.update({"ACTION_GATE_API_TOKEN":TOKEN,"ACTION_GATE_ENV":"development","ACTION_GATE_AUTHORITY_SECRET":"ci-authority-secret","ACTION_GATE_SIGNING_SECRET":"mcp-signing-secret","ACTION_GATE_DEBUG_AUTHORITY":"1","TOOL_NONCE_DB":"/tmp/risk-lab-tool-authority.db"})
     stack=subprocess.Popen([sys.executable,str(ROOT/"action_gate"/"mcp_integration.py")],cwd=str(ROOT/"action_gate"),env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
     try:
-        time.sleep(2)
+        deadline = time.time() + 30
+        while time.time() < deadline:
+            if all(_port_ready(port) for port in (8000, 9000, 8081)):
+                break
+            if stack.poll() is not None:
+                output = stack.stdout.read() if stack.stdout else ""
+                raise RuntimeError(f"mcp_integration.py exited early with code {stack.returncode}: {output[-4000:]}")
+            time.sleep(0.5)
+        else:
+            output = stack.stdout.read() if stack.stdout else ""
+            raise RuntimeError(f"Risk Lab stack did not become ready within 30s: {output[-4000:]}")
+
         payload={"target":TARGET,"purpose":"risk-lab-demo"}
         b_status,b_body=request("http://127.0.0.1:9100/tool",payload)
 
