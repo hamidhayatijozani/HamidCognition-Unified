@@ -22,6 +22,8 @@ class WorldState:
         return self._trajectory_digest
     def context_digest(self)->str:
         return digest(self.metadata.get("context",{}))
+    def state_digest(self)->str:
+        return digest(self.metadata.get("state",{}))
 
 @dataclass(frozen=True)
 class Decision:
@@ -31,6 +33,7 @@ class Decision:
     trajectory_digest:str
     reason:str=""
     context_digest:str=""
+    state_digest:str=""
 
 @dataclass(frozen=True)
 class ExecutionAuthority:
