@@ -1,6 +1,8 @@
-# HamidCognition Action Gate v1.1.0
+# HamidCognition Action Gate v1.1.0 Development Milestone
 
-## Release basis
+> This document records the v1.1.0 development milestone and its feature-level validation. It is **not** the published commercial release record. The last validated published commercial release remains v1.0.10 until the v1.1.0 same-SHA release rule is satisfied.
+
+## Development basis
 
 - Version: **1.1.0**
 - Purpose: introduce the first enterprise architecture slice without replacing the proven HTTP/MCP enforcement path.
