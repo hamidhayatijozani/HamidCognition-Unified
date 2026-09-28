@@ -1,54 +1,41 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
-import hmac
-from .authority import Authority, AuthorityError, _sign
-from .epistemic import EpistemicState
-from .state import InvariantReport, WorldState, digest
+from .models import ExecutionAuthority, WorldState, digest
+
+INVARIANTS = ("action", "context", "state", "evidence", "trajectory", "environment", "policy")
 
 @dataclass(frozen=True)
 class VerificationResult:
     status: str
-    reason: str
-    invariants: InvariantReport
-    authority_issued: bool = False
-    verification_started_at: int = 0
+    reasons: tuple[str, ...]
+    latency_us: float = 0.0
 
     @property
-    def executable(self):
+    def executable(self) -> bool:
         return self.status == "VALID"
 
-def verify_authority(authority: Authority, *, current_world: WorldState, current_action, tenant_subject, secret, now=1000, consumed_nonces=None):
-    verification_started_at = now
-    if not current_world.freshness_valid(now):
-        report = InvariantReport(False, False, False, False, False, False, False)
-        return VerificationResult("HOLD", "current_world_stale", report, False, verification_started_at)
-    if not hmac.compare_digest(_sign(authority.payload(), secret), authority.signature):
-        raise AuthorityError("invalid_signature")
-    fp = current_world.fingerprint()
-    invariants = InvariantReport(
-        action=digest(current_action) == authority.action_hash,
-        context=fp["context"] == authority.context_hash,
-        state=fp["state"] == authority.state_hash,
-        evidence=fp["evidence"] == authority.evidence_hash,
-        trajectory=fp["trajectory"] == authority.trajectory_hash,
-        policy=fp["policy"] == authority.policy_hash,
-        environment=fp["environment"] == authority.environment_hash,
-    )
-    if authority.subject != tenant_subject:
-        return VerificationResult("INVALID", "subject_mismatch", invariants, False, verification_started_at)
-    if authority.epistemic_state != EpistemicState.KNOWN.value:
-        return VerificationResult("HOLD", "epistemic_state_not_known", invariants, False, verification_started_at)
-    if now < authority.issued_at or now >= authority.expires_at:
-        return VerificationResult("INVALID", "authority_expired_or_not_yet_valid", invariants, False, verification_started_at)
-    if not invariants.valid:
-        return VerificationResult("INVALID", "world_state_invariant_failed", invariants, False, verification_started_at)
+def verify_authority(authority: ExecutionAuthority, *, action: dict, current_world: WorldState, consumed_nonces: set[str] | None = None) -> VerificationResult:
+    import time
+    start = time.perf_counter_ns()
+    reasons = []
+    if not authority.executable:
+        reasons.append("decision_or_epistemic_state_not_executable")
+    if digest(action) != digest(authority.action):
+        reasons.append("action_invariant_failed")
+    current = current_world.fingerprint()
+    for key in INVARIANTS[1:]:
+        if current[key] != authority.authorized_world[key]:
+            reasons.append(f"{key}_invariant_failed")
     if consumed_nonces is not None and authority.nonce in consumed_nonces:
-        return VerificationResult("INVALID", "replay_rejected", invariants, False, verification_started_at)
-    return VerificationResult("VALID", "all_invariants_hold", invariants, True, verification_started_at)
+        reasons.append("replay_detected")
+    latency_us = (time.perf_counter_ns() - start) / 1000
+    if reasons:
+        return VerificationResult("INVALID", tuple(reasons), latency_us)
+    return VerificationResult("VALID", (), latency_us)
 
-def execute_once(authority, *, current_world, current_action, tenant_subject, secret, consumed_nonces, now=1000):
-    result = verify_authority(authority, current_world=current_world, current_action=current_action, tenant_subject=tenant_subject, secret=secret, now=now, consumed_nonces=consumed_nonces)
-    # Research boundary: verification and the caller's real side effect are not atomic.
-    # A production adapter must use a transaction/CAS boundary or explicitly accept this residual TOCTOU.
+def execute_once(authority: ExecutionAuthority, *, action: dict, current_world: WorldState, consumed_nonces: set[str]) -> VerificationResult:
+    result = verify_authority(authority, action=action, current_world=current_world, consumed_nonces=consumed_nonces)
     if result.executable:
         consumed_nonces.add(authority.nonce)
     return result
