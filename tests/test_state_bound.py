@@ -24,7 +24,7 @@ def test_ta001_uses_latest_committed_snapshot():
 def test_ta001_expired_authority_is_rejected():
     oracle,action,a=fixture()
     r=oracle.execute_if_valid(authority=a,action=action,subject="A",now_ns=10000,verify=verify_authority,execute=lambda _a,_w:None)
-    assert r.status=="HOLD"; assert "authority_not_expired" in r.reason
+    assert r.status=="INVALID"; assert "authority_expired" in r.reason
 
 def test_replay_equivalence_is_explicit_and_excludes_context():
     action={"type":"transfer","amount":1000,"recipient":"B"}
