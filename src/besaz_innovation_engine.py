@@ -134,7 +134,7 @@ def generate_candidates(
             [a],
             "Run the same fixture with the target assumption inverted and compare outcomes.",
             ["difference is measurable", "both outcomes remain auditable"],
-            ["invalid inversion", "misleading edge case"]))
+            ["invalid inversion", "misleading edge case"])
 
     if len(ids) >= 3:
         a, b, c = ids[:3]
