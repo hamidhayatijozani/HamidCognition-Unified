@@ -1,1 +1,22 @@
-{"version":"1.0.0","root":"ROOT","components":[{"component_id":"GOVERNANCE","parent_id":"ROOT","purpose":"Maintain safety, evidence, and authority boundaries","maturity":"SPECIFIED"},{"component_id":"COGNITION","parent_id":"ROOT","purpose":"Maintain self, creator-context, market, and reasoning models","maturity":"PROTOTYPE"},{"component_id":"EXECUTION","parent_id":"ROOT","purpose":"Coordinate prompts, modules, tools, and workflows","maturity":"PROTOTYPE"},{"component_id":"FEEDBACK","parent_id":"ROOT","purpose":"Verify actions and feed results into state and learning","maturity":"SPECIFIED"}]}
+{
+  "version": "1.1.0",
+  "project": "BESAZ",
+  "root": "ROOT",
+  "components": [
+    {"component_id":"GOVERNANCE","parent_id":"ROOT","purpose":"Maintain safety, evidence, and authority boundaries","maturity":"SPECIFIED"},
+    {"component_id":"COGNITION","parent_id":"ROOT","purpose":"Maintain self, creator-context, market, and reasoning models","maturity":"PROTOTYPE"},
+    {"component_id":"EXECUTION","parent_id":"ROOT","purpose":"Coordinate prompts, modules, tools, and workflows","maturity":"PROTOTYPE"},
+    {"component_id":"FEEDBACK","parent_id":"ROOT","purpose":"Verify actions and feed results into state and learning","maturity":"SPECIFIED"},
+    {"component_id":"SELF-MODEL","parent_id":"COGNITION","purpose":"Track implemented capabilities and evidence","maturity":"PROTOTYPE"},
+    {"component_id":"CREATOR-CONTEXT","parent_id":"COGNITION","purpose":"Track explicit project goals and decisions","maturity":"PROTOTYPE"},
+    {"component_id":"MARKET-INTELLIGENCE","parent_id":"COGNITION","purpose":"Maintain dated market evidence","maturity":"PROTOTYPE"},
+    {"component_id":"REASONING","parent_id":"COGNITION","purpose":"Transform evidence into bounded inference","maturity":"PROTOTYPE"},
+    {"component_id":"PROMPTS","parent_id":"EXECUTION","purpose":"Run prompt assets under contracts","maturity":"PROTOTYPE"},
+    {"component_id":"MODULES","parent_id":"EXECUTION","purpose":"Run deterministic modules","maturity":"PROTOTYPE"},
+    {"component_id":"TOOLS","parent_id":"EXECUTION","purpose":"Invoke bounded external capabilities","maturity":"SPECIFIED"},
+    {"component_id":"WORKFLOWS","parent_id":"EXECUTION","purpose":"Coordinate gated operations","maturity":"PROTOTYPE"},
+    {"component_id":"VERIFICATION","parent_id":"FEEDBACK","purpose":"Check claims and actions against evidence","maturity":"VERIFIED"},
+    {"component_id":"MEMORY","parent_id":"FEEDBACK","purpose":"Persist verified state and provenance","maturity":"PROTOTYPE"},
+    {"component_id":"LEARNING","parent_id":"FEEDBACK","purpose":"Convert verified outcomes into model updates","maturity":"PROTOTYPE"}
+  ]
+}
