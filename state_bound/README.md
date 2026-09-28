@@ -1,30 +1,43 @@
 # State-Bound Execution Governance Prototype
 
-Research-only prototype for testing one hypothesis:
+Research-only experiment. It does not alter the production Action Gate release.
 
-> When authorization is separated from execution in time, action-level
-> authorization can be insufficient if the world relevant to the decision
-> has changed.
+## TA-001 only
 
-The prototype keeps four objects separate:
+The first experiment deliberately tests one stable case before adversarial drift:
 
-Decision -> Authority -> Execution -> Outcome
+Decision -> Authority -> Execution verification
 
-An authority is valid only while the bound invariants remain true:
+Baseline:
+Action -> ALLOW
 
-- action
-- context
-- state
-- evidence
-- trajectory
-- environment
-- policy
+Experimental:
+Action + authorized world snapshot -> VALID
 
-This is not a novelty claim and is not part of the immutable Action Gate
-v1.0.10 release. It is an experimental layer for adversarial evaluation.
+The authorized world is represented by the WorldState object and its six fingerprints:
+context, state, evidence, trajectory, environment, policy.
 
-UNKNOWN, CONFLICTED, STALE and UNVERIFIED epistemic states cannot issue
-execution authority.
+## Current-world boundary
 
-The first benchmark compares a baseline action-only check with this
-state-bound verifier under controlled drift scenarios.
+TA-001 uses a deterministic in-memory WorldState. This is a test fixture, not a production freshness guarantee.
+
+## Verification / execution boundary
+
+The prototype measures verification only. It does not claim that a later external side effect is atomic with verification. A production adapter will require a transaction/CAS boundary or will document the residual TOCTOU risk.
+
+## Replay equivalence
+
+For TA-001, replay equivalence means:
+baseline == ALLOW AND experimental == VALID
+
+It is deliberately narrow and applies only to the unchanged stable fixture.
+
+## Measurement
+
+TA-001 records median and p95 verifier latency.
+
+Run:
+python -m pytest -q state_bound/test_state_bound.py
+python -m state_bound.benchmark
+
+No novelty claim is made. The next scenario is permitted only after TA-001 passes.
