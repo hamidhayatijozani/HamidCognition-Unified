@@ -6,6 +6,7 @@ on:
       - "state_bound/**"
       - "tests/test_state_bound.py"
       - "tests/test_ta001_benchmark.py"
+      - "tests/test_trajectory_reality.py"
       - ".github/workflows/state-bound-ta001.yml"
   push:
     paths:
@@ -26,7 +27,7 @@ jobs:
       - name: Install pytest
         run: python -m pip install --upgrade pip pytest
       - name: Run TA-001 tests and meta-test
-        run: python -m pytest -q tests/test_state_bound.py tests/test_ta001_benchmark.py
+        run: python -m pytest -q tests/test_state_bound.py tests/test_ta001_benchmark.py tests/test_trajectory_reality.py
       - name: Run TA-001 benchmark
         run: python -m state_bound.benchmark | tee /tmp/ta001.json
       - name: Publish benchmark summary
