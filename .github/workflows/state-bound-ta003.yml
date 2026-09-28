@@ -8,6 +8,10 @@ on:
       - ".github/workflows/state-bound-ta003.yml"
   workflow_dispatch:
 
+concurrency:
+  group: state-bound-ta003
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
