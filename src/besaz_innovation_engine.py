@@ -127,7 +127,7 @@ def generate_candidates(
             [a],
             "Attach one measurable verification probe and run it against a controlled fixture.",
             ["probe produces a traceable result", "failure is explicitly recorded"],
-            ["overfitting to fixture", "measurement bias"]))
+            ["overfitting to fixture", "measurement bias"])
 
         add(InnovationKind.REVERSE, f"Reverse assumption around {a}",
             f"Testing the opposite of the current assumption for {a} may reveal a hidden boundary condition.",
