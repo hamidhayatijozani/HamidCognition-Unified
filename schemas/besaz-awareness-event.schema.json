@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/hamidhayatijozani/HamidCognition-Unified/schemas/besaz-awareness-event.schema.json",
+  "title": "BESAZ Awareness Event",
+  "type": "object",
+  "required": ["project", "component_id", "event", "decision"],
+  "properties": {
+    "project": {"const": "BESAZ"},
+    "component_id": {"type": "string", "minLength": 1},
+    "event": {"type": "string", "minLength": 1},
+    "decision": {"enum": ["ALLOW", "PROPOSE", "ESCALATE", "DENY"]},
+    "action": {"type": "string"},
+    "evidence_ref": {"type": "string"},
+    "approval_ref": {"type": "string"},
+    "reason": {"type": "string"}
+  },
+  "additionalProperties": false
+}
