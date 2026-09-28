@@ -11,9 +11,11 @@ class VerificationResult:
     def executable(self)->bool: return self.status=="VALID"
 
 def verify_authority(authority:ExecutionAuthority,*,current_world:WorldState,current_action:dict,subject:str,now_ns:int)->VerificationResult:
+    decision=authority.decision
     invariants={
         "action_consistent":current_action==authority.action,
-        "trajectory_consistent":current_world.version==authority.decision.world_version and current_world.trajectory_digest()==authority.decision.trajectory_digest,
+        "trajectory_consistent":current_world.version==decision.world_version and current_world.trajectory_digest()==decision.trajectory_digest,
+        "context_consistent":not decision.context_digest or current_world.context_digest()==decision.context_digest,
         "authority_not_expired":authority.issued_at_ns<=now_ns<authority.expires_at_ns,
     }
     if authority.subject!=subject: return VerificationResult("INVALID","subject_mismatch",invariants)
@@ -21,4 +23,4 @@ def verify_authority(authority:ExecutionAuthority,*,current_world:WorldState,cur
     if not all(invariants.values()):
         failed=",".join(k for k,v in invariants.items() if not v)
         return VerificationResult("INVALID",f"invariant_failed:{failed}",invariants)
-    return VerificationResult("VALID","all_ta001_invariants_hold",invariants)
+    return VerificationResult("VALID","all_bound_invariants_hold",invariants)
