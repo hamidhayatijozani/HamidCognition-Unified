@@ -4,11 +4,6 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - 'action_gate/**'
-      - 'tools/run_risk_lab_demo.py'
-      - '.github/workflows/product-gates.yml'
-      - 'tools/run_risk_lab_demo.py'
   pull_request:
     paths:
       - 'action_gate/**'
