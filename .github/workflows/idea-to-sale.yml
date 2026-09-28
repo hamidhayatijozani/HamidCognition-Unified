@@ -1,0 +1,26 @@
+name: Idea-to-Sale OS
+
+on:
+  push:
+    paths:
+      - "src/idea_to_sale.py"
+      - "tests/test_idea_to_sale.py"
+      - "schemas/idea-to-sale.plan.schema.json"
+      - "docs/IDEA_TO_SALE_OS.md"
+  pull_request:
+    paths:
+      - "src/idea_to_sale.py"
+      - "tests/test_idea_to_sale.py"
+      - "schemas/idea-to-sale.plan.schema.json"
+      - "docs/IDEA_TO_SALE_OS.md"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip pytest
+      - run: python -m pytest -q tests/test_idea_to_sale.py
