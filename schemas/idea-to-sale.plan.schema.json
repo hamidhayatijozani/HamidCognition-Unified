@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/hamidhayatijozani/HamidCognition-Unified/blob/main/schemas/idea-to-sale.plan.schema.json",
+  "title": "Idea-to-Sale Commercial Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "idea",
+    "customer_problem",
+    "target_buyer",
+    "product_boundary",
+    "evidence",
+    "sales_assets",
+    "validation_verified",
+    "pricing_defined",
+    "payment_path_configured"
+  ],
+  "properties": {
+    "idea": {
+      "type": "string",
+      "minLength": 1
+    },
+    "customer_problem": {
+      "type": "string"
+    },
+    "target_buyer": {
+      "type": "string"
+    },
+    "product_boundary": {
+      "type": "string"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sales_assets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "validation_verified": {
+      "type": "boolean"
+    },
+    "pricing_defined": {
+      "type": "boolean"
+    },
+    "payment_path_configured": {
+      "type": "boolean"
+    }
+  }
+}
