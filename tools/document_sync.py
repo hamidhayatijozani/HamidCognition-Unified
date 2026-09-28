@@ -30,6 +30,13 @@ def published_release_text(text: str) -> str:
     marker = "## Last validated published release"
     if marker in text:
         return text.split(marker, 1)[1]
+
+    # README and Quickstart use prose rather than the canonical section heading.
+    prose = "last validated published commercial release"
+    lower = text.lower()
+    if prose in lower:
+        return text[lower.index(prose):]
+
     return text
 
 def parse_release_identity(text: str) -> dict[str, str]:
