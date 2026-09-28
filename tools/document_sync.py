@@ -25,22 +25,43 @@ def sha256_text(value: str) -> str:
 def git_value(args: list[str]) -> str:
     return subprocess.check_output(["git", *args], cwd=ROOT, text=True).strip()
 
-def canonical_identity() -> dict[str, str]:
-    text = CANONICAL_RELEASE.read_text(encoding="utf-8")
-    version = VERSION_RE.search(text)
-    tag = TAG_RE.search(text)
-    commit = COMMIT_RE.search(text)
+def published_release_text(text: str) -> str:
+    """Select the last validated published-release section, not the dev line."""
+    marker = "## Last validated published release"
+    if marker in text:
+        return text.split(marker, 1)[1]
+    marker_lower = "last validated published commercial release"
+    lower = text.lower()
+    if marker_lower in lower:
+        return text[lower.index(marker_lower):]
+    return text
+
+def parse_release_identity(text: str) -> dict[str, str]:
+    source = published_release_text(text)
+    version = VERSION_RE.search(source)
+    tag = TAG_RE.search(source)
+    commit = COMMIT_RE.search(source)
     if not (version and tag and commit):
         raise ValueError("Canonical commercial release identity is incomplete")
-    return {"release_version": version.group(1), "release_tag": tag.group(1),
-            "source_commit": commit.group(1), "canonical_sha256": sha256_text(text)}
+    return {
+        "release_version": version.group(1),
+        "release_tag": tag.group(1),
+        "source_commit": commit.group(1),
+    }
+
+def canonical_identity() -> dict[str, str]:
+    text = CANONICAL_RELEASE.read_text(encoding="utf-8")
+    identity = parse_release_identity(text)
+    identity["canonical_sha256"] = sha256_text(text)
+    return identity
 
 def documented_identity(path: Path) -> dict[str, str]:
     text = path.read_text(encoding="utf-8")
+    source = published_release_text(text)
     result: dict[str, str] = {}
     for key, pattern in (("release_version", VERSION_RE), ("release_tag", TAG_RE),
                          ("source_commit", COMMIT_RE)):
-        match = pattern.search(text)
+        match = pattern.search(source)
         if match:
             result[key] = match.group(1)
     return result
