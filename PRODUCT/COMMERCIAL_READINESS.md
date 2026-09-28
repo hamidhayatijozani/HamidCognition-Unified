@@ -1,23 +1,38 @@
 # Action Gate Commercial Readiness
 
-## Release baseline
+## Canonical product
 
-**HamidCognition Action Gate v1.0.5** is the current published engineering and commercial-delivery baseline.
+**HamidCognition Action Gate v1.0.10** is the current customer-facing product boundary.
+
+The repository distinguishes the published commercial release from mutable `main`. A customer quote must identify the exact release tag, source commit, artifact and checksum being offered.
 
 ## Included
 
 - Action Gate runtime
 - HTTP enforcement integration
-- MCP enforcement integration
+- authenticated MCP enforcement integration
 - decision evidence and replay
-- actor/session binding
+- tenant / actor / session binding
 - production authentication
 - fail-closed execution boundary
 - persistent PostgreSQL storage
 - persistent execution-authority nonce state
 - production Compose deployment
-- validation evidence and clean-room verification
-- versioned release artifact
+- validation evidence
+- Clean-Room verification for the published release
+- versioned release artifact and checksum
+
+## Current published release
+
+- Product: HamidCognition Action Gate
+- Version: 1.0.10
+- Release tag: `action-gate-v1.0.10`
+- Source commit: `77d820e99dc78a6a9e3217d3c1c49d5cdf07813f`
+- Release-candidate workflow run: `36303350191`
+- Artifact: `action-gate-1.0.10.tar`
+- Artifact digest: `sha256:10bb53b69b56ff86146f5c71e3e5d7e34dacb4e12dba2adafc59f9d5276abd91`
+
+Historical v1.0.5 material remains provenance only and must not be presented as the current commercial baseline.
 
 ## Customer delivery package
 
@@ -27,36 +42,77 @@
 4. integration/API contract;
 5. security boundary;
 6. operations runbook;
-7. customer acceptance procedure;
+7. customer acceptance matrix and procedure;
 8. versioned release notes;
 9. provenance and license terms;
 10. delivery manifest.
 
 ## Commercial modes
 
-SELF_HOSTED means the customer operates the runtime.
-MANAGED means HamidCognition operates the service boundary.
-ENTERPRISE means self-hosted or managed deployment plus negotiated support, security review, integration, and SLA terms.
+**SELF_HOSTED** means the customer operates the runtime.
 
-The repository does not assert prices. Pricing is a business decision and must be governed by a separate commercial schedule.
+**MANAGED** means HamidCognition operates the service boundary.
 
-## Acceptance evidence
+**ENTERPRISE** means self-hosted or managed deployment plus negotiated integration, security review, support and SLA terms.
 
-Historical v1.0.5 evidence may be referenced as historical provenance only. It does not automatically validate the current main branch.
+The repository does not represent Managed or Enterprise operations as already delivered to a paying customer.
 
-A current commercial release must record the exact source commit, successful same-SHA release-readiness run, release-candidate artifact digest and published release record.
+## Pilot entry point
+
+The first commercial transaction is a narrow one-tool pilot. The pilot protects one customer-selected high-impact HTTP or MCP tool and measures the actual execution boundary.
+
+Pilot acceptance is based on executable behavior:
+
+- unauthorized direct downstream access is rejected;
+- authority is bound to the intended tenant, actor, session, action and policy;
+- expired authority is rejected;
+- replay is rejected;
+- tampering is rejected;
+- persistence survives restart;
+- evidence can be reproduced from the customer's deployment.
+
+The pilot does not certify the customer's whole AI system, legal compliance, downstream correctness or business outcomes.
+
+## Live-sale dependency
+
+Technical release readiness is not revenue.
+
+A completed sale requires all of the following outside the code-runtime boundary:
+
+1. named buyer and technical owner;
+2. written scope and acceptance criteria;
+3. price and license/usage terms;
+4. invoice or payment request;
+5. verified payment settlement;
+6. customer acceptance evidence;
+7. entitlement/delivery record.
+
+Commercial settlement is currently specified as USDT-only in the repository payment policy. No private wallet key belongs in the repository.
+
+## Commercial truth rule
+
+Do not call the product "sold", "customer validated", "revenue-generating", "production proven with customers", or "compliant" unless the corresponding external evidence exists.
+
+GitHub evidence proves engineering and release provenance. Customer evidence proves customer acceptance. A transaction record proves revenue. They are separate evidence classes.
+
+## Launch assets
+
+- `SALES/ONE_PAGER.md`
+- `SALES/PILOT_OFFER.md`
+- `SALES/DEMO_SCRIPT.md`
+- `SALES/ICP_AND_POSITIONING.md`
+- `SALES/OUTBOUND_EMAILS.md`
+- `SALES/OBJECTIONS.md`
+- `SALES/PRICING_AND_SCOPE.md`
+- `SALES/COMMERCIAL_LAUNCH_PLAN.md`
 
 ## Not included by default
 
 - customer-specific legal compliance certification;
-- universal safety guarantees;
+- universal AI-safety guarantees;
 - downstream tool correctness;
 - customer-specific policy design;
 - 24/7 support;
 - guaranteed business outcomes.
 
 Those require explicit scope and evidence.
-
-## Live-sale dependency
-
-The product package is prepared for commercial delivery. A live checkout requires a connected payment provider and an activated product/price/payment link. No payment credential or live checkout endpoint is stored in this repository.
