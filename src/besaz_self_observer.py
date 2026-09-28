@@ -17,7 +17,7 @@ def observe() -> dict:
             "component_id": c.component_id,
             "parent_id": c.parent_id,
             "maturity": c.maturity.value,
-            "status": state["status"],
+            "status": state["state"]["status"],
             "evidence_refs": state["evidence_refs"],
             "capabilities": list(c.capabilities),
             "limits": list(c.limits),
