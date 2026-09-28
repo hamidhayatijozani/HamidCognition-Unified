@@ -28,4 +28,22 @@ def run_ta001(iterations:int=ITERATIONS)->dict:
     ra={"action":action,"world_version":1,"epistemic_state":"KNOWN"}; rb={"action":dict(action),"world_version":2,"epistemic_state":"STALE"}
     return {"scenario":"TA-001 Stable Trajectory","iterations":iterations,"baseline":{"decision":"ALLOW","median_us":bm},"experimental":{"decision":"VALID","median_us":em,"p95_us":statistics.quantiles(eu,n=20)[18]},"latency_overhead_ratio":em/bm if bm else None,"execution_count":executions,"execution_equivalence":executions==iterations,"replay_equivalence":equivalent_request(ra,rb),"replay_equivalence_definition":"same business-critical action; world_version/epistemic_state may differ","current_world_source":"StateOracle.latest()","oracle_version":oracle.latest().version,"verify_execute_atomic_for_oracle_state":True,"external_side_effect_atomicity":False,"scope":"TA-001 only"}
 
-if __name__=="__main__": print(json.dumps(run_ta001(),indent=2))
+def assert_ta001_contract(result:dict)->None:
+    """Meta-test: the benchmark must fail unless it actually exercised TA-001."""
+    assert result["scenario"] == "TA-001 Stable Trajectory"
+    assert result["iterations"] >= 1000
+    assert result["execution_count"] == result["iterations"]
+    assert result["execution_equivalence"] is True
+    assert result["experimental"]["decision"] == "VALID"
+    assert result["replay_equivalence"] is True
+    assert result["verify_execute_atomic_for_oracle_state"] is True
+    # Deliberately remain explicit about the prototype boundary.
+    assert result["external_side_effect_atomicity"] is False
+    assert result["current_world_source"] == "StateOracle.latest()"
+    assert result["oracle_version"] == 1
+    assert result["experimental"]["p95_us"] >= result["experimental"]["median_us"]
+
+if __name__=="__main__":
+    result=run_ta001()
+    assert_ta001_contract(result)
+    print(json.dumps(result,indent=2))
