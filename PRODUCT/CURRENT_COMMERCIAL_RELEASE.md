@@ -1,8 +1,14 @@
 # Current Commercial Release Status
 
-## Offerable release
+## Current development line
 
-The current offerable Action Gate artifact is **v1.0.10**, published as GitHub release `action-gate-v1.0.10`.
+The current Action Gate product version on `main` is **v1.1.0**, sourced from `action_gate/VERSION`.
+
+This is the current development/release-candidate line. It is **not yet an independently validated published commercial release** merely because the version file says 1.1.0.
+
+## Last validated published release
+
+The last independently validated and published Action Gate release is **v1.0.10**, published as GitHub release `action-gate-v1.0.10`.
 
 Verified source commit: `77d820e99dc78a6a9e3217d3c1c49d5cdf07813f`.
 
@@ -13,14 +19,23 @@ The published release includes:
 - source commit binding;
 - release-candidate evidence.
 
-## Release validation
-
-The v1.0.10 source revision passed the same-SHA product, security, Clean-Room, production E2E, release-readiness, and release-publication chain on GitHub Actions before publication.
-
 Release-candidate workflow run: `36303350191`.
 
 The v1.0.10 release artifact digest is:
 `sha256:10bb53b69b56ff86146f5c71e3e5d7e34dacb4e12dba2adafc59f9d5276abd91`.
+
+## v1.1.0 release rule
+
+v1.1.0 becomes an offerable published release only after all of the following refer to the same source SHA:
+1. product gates pass;
+2. security validation passes;
+3. Clean-Room verification passes;
+4. production E2E validation passes;
+5. release-readiness validation passes;
+6. reproducible release artifact is produced and hashed;
+7. release record/tag is published against that exact source revision.
+
+Until then, customer-facing material must describe v1.1.0 as the current development/release-candidate line and v1.0.10 as the last validated published release.
 
 ## Customer delivery rule
 
