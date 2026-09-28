@@ -240,7 +240,8 @@ def run_sandbox(candidate: InnovationCandidate, fixture: dict[str, Any]) -> Expe
 
     baseline_score = float(baseline.get("score", 0.0))
     variant_score = float(variant.get("score", 0.0))
-    delta = variant_score - baseline_score
+    # Normalize IEEE-754 representation noise in the externally visible metric.
+    delta = round(variant_score - baseline_score, 10)
     result = "PASS" if delta > 0 else "FAIL" if delta < 0 else "INCONCLUSIVE"
     repeatable = bool(fixture.get("repeatable", False))
 
