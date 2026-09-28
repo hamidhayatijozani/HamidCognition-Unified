@@ -1,8 +1,14 @@
 name: Action Gate Product Gates
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
+    paths:
+      - 'action_gate/**'
+      - 'tools/run_risk_lab_demo.py'
+      - '.github/workflows/product-gates.yml'
+      - 'tools/run_risk_lab_demo.py'
   pull_request:
     paths:
       - 'action_gate/**'
@@ -56,6 +62,19 @@ jobs:
       - name: Run real MCP enforcement integration
         working-directory: action_gate
         run: python mcp_integration.py
+      - name: Run Agent Action Risk Lab Before/After evidence
+        run: |
+          python tools/run_risk_lab_demo.py | tee risk-lab-result.json
+      - name: Upload Agent Action Risk Lab evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-action-risk-lab-${{ github.run_id }}
+          path: |
+            artifacts/risk-lab-demo.json
+            artifacts/risk-lab-demo.md
+            risk-lab-result.json
+          if-no-files-found: error
       - name: Run sellable product readiness gate
         working-directory: action_gate
         run: python sellable_gate.py
