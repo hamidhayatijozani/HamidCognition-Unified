@@ -17,6 +17,7 @@ jobs:
     env:
       PYTHONPATH: .
       ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+      MCP_BEARER_TOKEN: ci-mcp-bearer-token
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
