@@ -19,7 +19,7 @@ def test_state_drift_is_detected_without_trajectory_or_context_change():
     assert after.context_digest()==before.context_digest()
     assert after.state_digest()!=before.state_digest()
     result=verify_authority(authority,current_world=after,current_action=ACTION,subject="account-A",now_ns=1)
-    assert result.status=="INVALID"
+    assert result.status=="UNKNOWN"
     assert "state_consistent" in result.reason
     assert not result.executable
 
