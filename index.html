@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Action Gate | Pre-execution authorization for AI agents</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:900px;margin:0 auto;padding:64px 24px;background:#0b0b0d;color:#f5f5f5;line-height:1.65}
+h1{font-size:clamp(2.5rem,7vw,5rem);margin:0 0 8px}.lead{font-size:1.35rem;color:#b8b8c0}
+.card{padding:24px;margin:28px 0;border:1px solid #2b2b32;border-radius:14px;background:#121216}
+a{color:#fff}.cta{display:inline-block;padding:12px 18px;margin:6px 8px 6px 0;border:1px solid #555;border-radius:8px;text-decoration:none}
+small{color:#92929c}
+</style>
+</head>
+<body>
+<h1>Action Gate</h1>
+<p class="lead">A pre-execution authorization and evidence boundary for AI-agent tool calls.</p>
+<div class="card">
+<strong>Agent → Action Gate → Protected Tool</strong>
+<p>Before a privileged action reaches an HTTP or MCP tool, Action Gate evaluates the request, binds authorization to its execution context, issues execution authority, and enforces the governed path.</p>
+</div>
+<div class="card">
+<h2>Product</h2>
+<p>ALLOW / DENY / ASK / SANDBOX · tenant/actor/session/action binding · cryptographic authority · single-use nonce and replay protection · HTTP/MCP enforcement · fail-closed evidence handling · PostgreSQL persistence · audit/replay evidence.</p>
+</div>
+<div class="card">
+<h2>Current commercial release</h2>
+<p><strong>HamidCognition Action Gate v1.0.10</strong><br>
+Release: <a href="https://github.com/hamidhayatijozani/HamidCognition-Unified/releases/tag/action-gate-v1.0.10">action-gate-v1.0.10</a><br>
+Source commit: <code>77d820e99dc78a6a9e3217d3c1c49d5cdf07813f</code></p>
+<a class="cta" href="https://github.com/hamidhayatijozani/HamidCognition-Unified">Repository</a>
+<a class="cta" href="https://github.com/hamidhayatijozani/HamidCognition-Unified/blob/main/PRODUCT/CURRENT_COMMERCIAL_RELEASE.md">Commercial release record</a>
+</div>
+<div class="card">
+<h2>Proof of value</h2>
+<p>Protect one high-impact agent tool or MCP server, run the acceptance suite against the customer's deployment, and deliver reproducible evidence.</p>
+</div>
+<p><small>Copyright © 2026 Hamid Hayati Jozani. All rights reserved. Public repository visibility does not grant an open-source license.</small></p>
+</body>
+</html>

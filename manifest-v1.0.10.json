@@ -1,0 +1,15 @@
+{
+  "product": "HamidCognition Action Gate",
+  "version": "1.0.10",
+  "release_tag": "action-gate-v1.0.10",
+  "source_commit": "77d820e99dc78a6a9e3217d3c1c49d5cdf07813f",
+  "release_candidate_run_id": 36303350191,
+  "artifact": "action-gate-1.0.10.tar",
+  "artifact_sha256": "10bb53b69b56ff86146f5c71e3e5d7e34dacb4e12dba2adafc59f9d5276abd91",
+  "checksum_artifact": "action-gate-1.0.10.tar.sha256",
+  "license_scope": "proprietary",
+  "delivery_models": ["SELF_HOSTED", "MANAGED", "ENTERPRISE"],
+  "acceptance_required": true,
+  "repository": "https://github.com/hamidhayatijozani/HamidCognition-Unified",
+  "release": "https://github.com/hamidhayatijozani/HamidCognition-Unified/releases/tag/action-gate-v1.0.10"
+}
