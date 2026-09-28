@@ -83,7 +83,18 @@ jobs:
         env:
           MCP_E2E_URL: ${{ steps.tunnel.outputs.url }}
           MCP_E2E_BEARER_TOKEN: ${{ env.MCP_BEARER_TOKEN }}
-        run: python3 scripts/mcp_e2e_smoke.py
+        run: |
+          python3 scripts/mcp_e2e_smoke.py | tee mcp-e2e-result.json
+
+      - name: Upload E2E evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcp-ephemeral-e2e-evidence
+          path: |
+            mcp-e2e-result.json
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Collect service diagnostics
         if: always()
