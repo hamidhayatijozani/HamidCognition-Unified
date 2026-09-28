@@ -1,4 +1,8 @@
-# HamidCognition Action Gate
+# BESAZ
+
+**BESAZ is the canonical project name.** The repository preserves historical product and lineage names such as HamidCognition Action Gate where they identify specific artifacts or prior implementations.
+
+The current architecture is being unified under BESAZ as the project-level coordination system.
 
 **Runtime authorization and execution governance for AI agents.**
 
