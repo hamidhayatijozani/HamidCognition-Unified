@@ -28,7 +28,7 @@ If the use case is relevant, the next step is a technical evaluation under an ap
 
 ## NDA boundary
 
-Before sharing source code, internal implementation details, private repository access, signing material, unpublished evidence, or customer-specific deployment credentials, execute a mutually acceptable NDA and written evaluation scope.
+Before sharing source code, internal implementation details, restricted access credentials, signing material, unpublished evidence, or customer-specific deployment credentials, execute a mutually acceptable NDA and written evaluation scope.
 
 ## Pilot boundary
 
@@ -83,3 +83,11 @@ Tier C: high-consequence enterprises deploying agents against operational system
 Use: **pre-execution governance and authorization layer for AI agents**.
 
 Avoid: “AI safety solution,” “universal guardrail,” “guaranteed safe agent,” or “replacement for all security controls.”
+
+## Intellectual property notice
+
+**Copyright © 2026 Hamid Hayati Jozani. All rights reserved.**
+
+The repository is public for transparency and provenance. Public visibility does not grant an open-source license or permission to reproduce, modify, redistribute, commercialize, or create derivative works from proprietary project material.
+
+Third-party components remain subject to their respective licenses.
