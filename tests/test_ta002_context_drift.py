@@ -18,7 +18,7 @@ def test_context_drift_is_detected_without_trajectory_change():
     assert after.trajectory_digest()==before.trajectory_digest()
     assert after.context_digest()!=before.context_digest()
     result=verify_authority(authority,current_world=after,current_action=ACTION,subject="account-A",now_ns=1)
-    assert result.status=="INVALID"
+    assert result.status=="HOLD"
     assert "context_consistent" in result.reason
     assert not result.executable
 
