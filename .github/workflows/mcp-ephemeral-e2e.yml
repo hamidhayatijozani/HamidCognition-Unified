@@ -1,0 +1,71 @@
+name: MCP Ephemeral HTTPS E2E
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "action_gate/chatgpt_mcp_server.py"
+      - "action_gate/docker-compose.production.yml"
+      - "action_gate/docker-compose.chatgpt-quick-tunnel.yml"
+      - "scripts/mcp_e2e_smoke.py"
+      - ".github/workflows/mcp-ephemeral-e2e.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  ephemeral-mcp-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      POSTGRES_PASSWORD: e2e-postgres-password
+      ACTION_GATE_API_TOKEN: e2e-action-gate-token
+      ACTION_GATE_SIGNING_SECRET: e2e-signing-secret
+      ACTION_GATE_AUTHORITY_SECRET: e2e-authority-secret
+      MCP_BEARER_TOKEN: e2e-mcp-bearer-token
+      MCP_ISSUER_URL: https://e2e.invalid
+      MCP_RESOURCE_URL: https://e2e.invalid/mcp
+      MCP_REQUIRED_SCOPE: mcp:execute
+      MCP_CLIENT_ID: hamidcognition-e2e
+      DOMAIN: localhost
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and start production stack with ephemeral tunnel
+        run: |
+          docker compose             -f action_gate/docker-compose.production.yml             -f action_gate/docker-compose.chatgpt-quick-tunnel.yml             up -d --build
+
+      - name: Wait for MCP and discover public HTTPS endpoint
+        id: tunnel
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in {1..60}; do
+            url="$(docker compose               -f action_gate/docker-compose.production.yml               -f action_gate/docker-compose.chatgpt-quick-tunnel.yml               logs chatgpt-quick-tunnel 2>&1               | grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com'               | head -n1 || true)"
+            if [ -n "$url" ]; then
+              echo "url=$url/mcp" >> "$GITHUB_OUTPUT"
+              echo "Discovered MCP endpoint: $url/mcp"
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose             -f action_gate/docker-compose.production.yml             -f action_gate/docker-compose.chatgpt-quick-tunnel.yml             logs --no-color chatgpt-quick-tunnel
+          exit 1
+
+      - name: Run external HTTPS MCP E2E
+        env:
+          MCP_E2E_URL: ${{ steps.tunnel.outputs.url }}
+          MCP_E2E_BEARER_TOKEN: ${{ env.MCP_BEARER_TOKEN }}
+        run: python3 scripts/mcp_e2e_smoke.py
+
+      - name: Collect service diagnostics
+        if: always()
+        run: |
+          docker compose             -f action_gate/docker-compose.production.yml             -f action_gate/docker-compose.chatgpt-quick-tunnel.yml             ps
+          docker compose             -f action_gate/docker-compose.production.yml             -f action_gate/docker-compose.chatgpt-quick-tunnel.yml             logs --no-color --tail=200 chatgpt-mcp action-gate tool chatgpt-quick-tunnel || true
+
+      - name: Tear down
+        if: always()
+        run: |
+          docker compose             -f action_gate/docker-compose.production.yml             -f action_gate/docker-compose.chatgpt-quick-tunnel.yml             down -v
