@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — Deterministic BESAZ Sandbox Metrics
+
+- Normalize the externally visible BESAZ sandbox `delta` metric with `round(delta, 10)` so replay, serialization and exact comparisons are stable across IEEE-754 representation noise.
+- Treat the 10-decimal normalization as the metric's deterministic output contract; do not generalize this precision policy to unrelated metrics without defining their required scale.
+
+
 ## 1.0.2 — Execution Authority Boundary
 
 - Put the previously dormant security-authority primitive on the real execution path.
