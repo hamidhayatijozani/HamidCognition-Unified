@@ -23,14 +23,18 @@ def baseline_action_authorization(action, authorized_action):
 def build_stable_fixture():
     action={"action":"transfer","amount":1000,"recipient":"account-B"}
     world=WorldState(
-        context={"account":"account-A"}, state={"balance":10000},
+        context={"account":"account-A"},
+        state={"balance":10000},
         evidence=[{"id":"balance-check","valid":True}],
         trajectory={"steps":["intent","authorize"]},
         environment={"region":"EU","service":"payments-v1"},
         policy={"version":"p1","transfer_limit":2000},
+        source="stable-test-fixture",
+        observed_at_ns=1_000_000,
+        freshness_bound_ns=0,
     )
-    decision=Decision("ALLOW","KNOWN",world,reason="TA-001 stable fixture")
-    authority=issue_authority(action=action,world=world,decision=decision,nonce="ta001-nonce")
+    decision=Decision("ALLOW","KNOWN",reason="TA-001 stable fixture")
+    authority=issue_authority(action=action,world=world,decision=decision,nonce="ta001-nonce",subject="account-A")
     assert authority is not None
     return action,world,authority
 
@@ -38,7 +42,7 @@ def run_ta001(iterations=1000):
     action,world,authority=build_stable_fixture()
     samples=[]; results=[]
     for _ in range(iterations):
-        result=verify_authority(authority,action=action,current_world=world,consumed_nonces=set())
+        result=verify_authority(authority,action=action,current_world=world,consumed_nonces=set(),now_ns=1_000_000)
         samples.append(result.latency_us)
         results.append(result)
     samples.sort()
