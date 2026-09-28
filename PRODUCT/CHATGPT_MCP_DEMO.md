@@ -98,12 +98,14 @@ Do not put customer data, credentials, destructive tools, or production systems 
 
 ## Stable deployment
 
+The production Compose file now fails closed if `MCP_BEARER_TOKEN` is absent. An unauthenticated public MCP endpoint is not an acceptable default.
+
 For a customer or persistent demo:
 
 1. Run the production Compose stack on a reachable host.
 2. Give the host a stable DNS name.
 3. Let Caddy terminate HTTPS.
-4. Set `MCP_BEARER_TOKEN` only for bootstrap/integration testing, or connect the MCP resource server to a real OAuth/OIDC verifier.
+4. Set a high-entropy `MCP_BEARER_TOKEN` for the bootstrap/demo deployment, or replace the static verifier with a real OAuth/OIDC verifier before customer production use.
 5. Set `MCP_RESOURCE_URL=https://<domain>/mcp`.
 6. Keep the protected tool on the private backend network. Never publish port 9000.
 7. Keep Action Gate's signing, authority and database secrets outside source control.
@@ -111,6 +113,10 @@ For a customer or persistent demo:
 9. Rotate temporary demo credentials after every public demonstration.
 
 ChatGPT connects to remote MCP servers rather than directly to a local/private listener. OpenAI's current documentation says custom MCP apps are configured with a remote endpoint and can use an authentication mechanism; private/on-premises servers can use Secure MCP Tunnel. Full MCP/write support is currently rolling out for Business, Enterprise and Edu, while Pro supports custom MCP connections with read/fetch permissions.
+
+## Automated proof
+
+CI now exercises the real production Compose MCP container through the HTTP MCP surface. The end-to-end harness proves three separate claims: `ALLOW` executes the protected read and returns evidence/replay; `DENY` does not execute the protected delete; and the evidence tool can retrieve the recorded decision. The harness runs after the authenticated MCP boundary check, so a green result represents an authenticated MCP-to-Action-Gate-to-tool path, not merely an import or socket check.
 
 ## ChatGPT test sequence
 
@@ -153,7 +159,7 @@ For a first proof, keep the allowed tools constrained to the two demo tools. Do 
 
 ## What this proves
 
-The current demo can establish the following narrow claim:
+The current demo and CI can establish the following narrow claim:
 
 > A remote MCP tool invocation can be routed through HamidCognition Action Gate, authorized against the exact action context, executed only after authority is issued, and returned with evidence and replay.
 
