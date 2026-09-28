@@ -20,6 +20,8 @@ class WorldState:
         object.__setattr__(self,"_trajectory_digest",digest(self.trajectory))
     def trajectory_digest(self)->str:
         return self._trajectory_digest
+    def context_digest(self)->str:
+        return digest(self.metadata.get("context",{}))
 
 @dataclass(frozen=True)
 class Decision:
@@ -28,6 +30,7 @@ class Decision:
     world_version:int
     trajectory_digest:str
     reason:str=""
+    context_digest:str=""
 
 @dataclass(frozen=True)
 class ExecutionAuthority:
