@@ -24,7 +24,7 @@ if not URL:
 counter = 0
 
 
-def rpc(method: str, params: dict | None = None):
+def rpc(method: str, params: dict | None = None, *, token: str | None = TOKEN, protocol_version: str | None = None):
     global counter
     counter += 1
     body = {
@@ -37,8 +37,10 @@ def rpc(method: str, params: dict | None = None):
         "Content-Type": "application/json",
         "Accept": "application/json, text/event-stream",
     }
-    if TOKEN:
-        headers["Authorization"] = f"Bearer {TOKEN}"
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    if protocol_version:
+        headers["MCP-Protocol-Version"] = protocol_version
 
     req = urllib.request.Request(
         URL, data=json.dumps(body).encode(), headers=headers, method="POST"
@@ -93,13 +95,26 @@ init = json_payload(raw)
 if "result" not in init:
     raise SystemExit(f"initialize returned no result: {init}")
 
-status, _, raw = rpc("notifications/initialized")
+negotiated_protocol = init["result"].get("protocolVersion", "2025-06-18")
+
+status, _, raw = rpc("notifications/initialized", protocol_version=negotiated_protocol)
 if status not in (200, 202):
     raise SystemExit(f"initialized notification failed: HTTP {status}")
 
-status, _, raw = rpc("tools/list")
+status, _, raw = rpc("tools/list", protocol_version=negotiated_protocol)
 tools_result = result_from_tool(raw)
 tool_names = {tool.get("name") for tool in tools_result.get("tools", [])}
+if not TOKEN:
+    raise SystemExit("MCP_E2E_BEARER_TOKEN is required for the authenticated E2E")
+
+try:
+    rpc("tools/list", token=None, protocol_version=negotiated_protocol)
+except RuntimeError as exc:
+    if "HTTP 401" not in str(exc):
+        raise SystemExit(f"unauthenticated request did not fail with HTTP 401: {exc}")
+else:
+    raise SystemExit("unauthenticated request unexpectedly succeeded")
+
 required = {
     "protected_read_public_file",
     "protected_production_delete",
@@ -115,6 +130,7 @@ status, _, raw = rpc(
         "name": "protected_read_public_file",
         "arguments": {"target": "/public/e2e-smoke"},
     },
+    protocol_version=negotiated_protocol,
 )
 allow = structured(result_from_tool(raw))
 if allow.get("decision") != "ALLOW" or not allow.get("executed"):
@@ -129,6 +145,7 @@ status, _, raw = rpc(
         "name": "protected_production_delete",
         "arguments": {"target": "/production/e2e-smoke"},
     },
+    protocol_version=negotiated_protocol,
 )
 deny = structured(result_from_tool(raw))
 if deny.get("decision") != "DENY" or deny.get("executed"):
@@ -140,6 +157,7 @@ status, _, raw = rpc(
         "name": "get_action_gate_evidence",
         "arguments": {"decision_id": decision_id},
     },
+    protocol_version=negotiated_protocol,
 )
 evidence = structured(result_from_tool(raw))
 if "evidence" not in evidence or "replay" not in evidence:
