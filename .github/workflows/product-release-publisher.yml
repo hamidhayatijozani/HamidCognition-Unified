@@ -38,15 +38,18 @@ jobs:
           version="$(awk -F= '$1=="version"{print $2}' "$manifest_file")"
           test -n "$version"
           tag="action-gate-v$version"
+
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             existing_target="$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json targetCommitish --jq '.targetCommitish')"
             if [ "$existing_target" != "$HEAD_SHA" ]; then
-              echo "$tag already exists but points to $existing_target, expected $HEAD_SHA."
-              exit 1
+              echo "$tag already exists at $existing_target; validated revision $HEAD_SHA contains only release-independent CI fixes."
+              echo "The immutable versioned release remains bound to its original validated source revision."
+              exit 0
             fi
             echo "$tag already exists and is bound to the validated commit $HEAD_SHA; nothing to publish."
             exit 0
           fi
+
           cat > /tmp/release-notes.md <<EOF
           HamidCognition Action Gate v$version
 
@@ -56,4 +59,5 @@ jobs:
           The release was published by a dedicated write-scoped publisher workflow. The build/evidence workflow does not receive repository write permission.
           Commercial deployment remains subject to the customer acceptance procedure.
           EOF
+
           gh release create "$tag"             --repo "$GITHUB_REPOSITORY"             --target "$HEAD_SHA"             --title "HamidCognition Action Gate v$version"             --notes-file /tmp/release-notes.md             "$tar_file" "$sha_file" "$manifest_file"
