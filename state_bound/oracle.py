@@ -35,6 +35,18 @@ class StateOracle:
             metadata["state"]=dict(state)
             self._world=WorldState(self._world.version,dict(self._world.trajectory),metadata)
             return OracleSnapshot(self._world.version,self._world)
+    def update_evidence(self, evidence: dict) -> OracleSnapshot:
+        """Refresh evidence without changing trajectory version."""
+        with self._lock:
+            metadata = dict(self._world.metadata)
+            metadata["evidence"] = dict(evidence)
+            self._world = WorldState(
+                self._world.version,
+                dict(self._world.trajectory),
+                metadata,
+            )
+            return OracleSnapshot(self._world.version, self._world)
+
     def execute_if_valid(self,*,authority,action:dict,subject:str,now_ns:int,verify:Callable,execute:Callable):
         """Atomically verify latest committed oracle state and run the prototype callback."""
         with self._lock:
