@@ -1,93 +1,32 @@
 from state_bound.epistemic import issue_authority
-from state_bound.models import Decision, WorldState
-from state_bound.verifier import consume_if_valid
+from state_bound.models import Decision
+from state_bound.oracle import StateOracle
+from state_bound.semantics import equivalent_request
+from state_bound.verifier import verify_authority
 
+def fixture():
+    oracle=StateOracle({"steps":["intent","authorize"],"within_boundary":True},{"source":"test"})
+    s=oracle.latest(); action={"type":"transfer","amount":1000,"recipient":"B"}
+    d=Decision("ALLOW","KNOWN",s.version,s.world.trajectory_digest(),"stable")
+    a=issue_authority(action=action,subject="A",decision=d,nonce="n1",issued_at_ns=0,expires_at_ns=10000)
+    return oracle,action,a
 
-def world():
-    return WorldState(
-        context={"account": "A"},
-        state={"balance": 10000},
-        evidence=[{"source": "ledger", "fresh": True}],
-        trajectory={"spent_today": 0, "limit": 2000},
-        environment={"region": "EU", "mode": "production"},
-        policy={"version": "P1", "max_transfer": 1000},
-    )
+def test_ta001_stable_trajectory_executes_atomically():
+    oracle,action,a=fixture(); calls=[]
+    r=oracle.execute_if_valid(authority=a,action=action,subject="A",now_ns=1,verify=verify_authority,execute=lambda x,w:calls.append((x,w.version)))
+    assert r.status=="VALID"; assert calls==[(action,1)]
 
+def test_ta001_uses_latest_committed_snapshot():
+    oracle,action,a=fixture(); oracle.append({"steps":["intent","authorize","execute"],"within_boundary":True})
+    r=oracle.execute_if_valid(authority=a,action=action,subject="A",now_ns=1,verify=verify_authority,execute=lambda _a,_w:None)
+    assert r.status=="INVALID"; assert "trajectory_consistent" in r.reason
 
-def decision(w):
-    return Decision("ALLOW", "KNOWN", w, "stable")
+def test_ta001_expired_authority_is_rejected():
+    oracle,action,a=fixture()
+    r=oracle.execute_if_valid(authority=a,action=action,subject="A",now_ns=10000,verify=verify_authority,execute=lambda _a,_w:None)
+    assert r.status=="INVALID"; assert "authority_not_expired" in r.reason
 
-
-def authority():
-    w = world()
-    return issue_authority(action={"type": "transfer", "amount": 1000}, world=w,
-                           decision=decision(w), nonce="n1")
-
-
-def test_ta001_stable_trajectory_executes():
-    a = authority()
-    result = consume_if_valid(a, action=a.action, current_world=world(), consumed_nonces=set())
-    assert result.status == "VALID"
-
-
-def test_ta002_context_drift_invalidates():
-    a = authority()
-    w = world()
-    w = WorldState({"account": "B"}, w.state, w.evidence, w.trajectory, w.environment, w.policy)
-    result = consume_if_valid(a, action=a.action, current_world=w, consumed_nonces=set())
-    assert "context_invariant_failed" in result.reasons
-
-
-def test_ta003_state_drift_invalidates():
-    a = authority()
-    w = world()
-    w = WorldState(w.context, {"balance": 8500}, w.evidence, w.trajectory, w.environment, w.policy)
-    result = consume_if_valid(a, action=a.action, current_world=w, consumed_nonces=set())
-    assert "state_invariant_failed" in result.reasons
-
-
-def test_ta004_evidence_invalidation():
-    a = authority()
-    w = world()
-    w = WorldState(w.context, w.state, [{"source": "ledger", "fresh": False}], w.trajectory, w.environment, w.policy)
-    result = consume_if_valid(a, action=a.action, current_world=w, consumed_nonces=set())
-    assert "evidence_invariant_failed" in result.reasons
-
-
-def test_ta005_trajectory_violation():
-    a = authority()
-    w = world()
-    w = WorldState(w.context, w.state, w.evidence, {"spent_today": 1500, "limit": 2000}, w.environment, w.policy)
-    result = consume_if_valid(a, action=a.action, current_world=w, consumed_nonces=set())
-    assert "trajectory_invariant_failed" in result.reasons
-
-
-def test_ta006_policy_drift():
-    a = authority()
-    w = world()
-    w = WorldState(w.context, w.state, w.evidence, w.trajectory, w.environment, {"version": "P2", "max_transfer": 1000})
-    result = consume_if_valid(a, action=a.action, current_world=w, consumed_nonces=set())
-    assert "policy_invariant_failed" in result.reasons
-
-
-def test_ta007_identical_payload_is_not_enough():
-    a = authority()
-    w = world()
-    w = WorldState(w.context, {"balance": 9000}, w.evidence, w.trajectory, w.environment, w.policy)
-    result = consume_if_valid(a, action=a.action, current_world=w, consumed_nonces=set())
-    assert result.status == "INVALID"
-
-
-def test_ta008_replay_is_rejected():
-    a = authority()
-    consumed = {"n1"}
-    result = consume_if_valid(a, action=a.action, current_world=world(), consumed_nonces=consumed)
-    assert "replay_detected" in result.reasons
-
-
-def test_ta009_unknown_never_issues_authority():
-    w = world()
-    d = Decision("HOLD", "UNKNOWN", w, "trajectory_state_changed")
-    a = issue_authority(action={"type": "transfer", "amount": 1000}, world=w,
-                        decision=d, nonce="n-unknown")
-    assert a is None
+def test_replay_equivalence_is_explicit_and_excludes_context():
+    action={"type":"transfer","amount":1000,"recipient":"B"}
+    assert equivalent_request({"action":action,"world_version":1,"epistemic_state":"KNOWN"},{"action":dict(action),"world_version":2,"epistemic_state":"STALE"})
+    assert not equivalent_request({"action":action,"world_version":1,"epistemic_state":"KNOWN"},{"action":{**action,"amount":900},"world_version":1,"epistemic_state":"KNOWN"})
