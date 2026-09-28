@@ -5,7 +5,7 @@ WORKDIR /app
 COPY action_gate/requirements-mcp.txt .
 RUN pip install --no-cache-dir -r requirements-mcp.txt
 
-COPY action_gate/action_gate_sdk.py action_gate/chatgpt_mcp_server.py action_gate/test_mcp_auth.py ./
+COPY action_gate/action_gate_sdk.py action_gate/chatgpt_mcp_server.py action_gate/test_mcp_auth.py action_gate/test_mcp_e2e.py ./
 
 USER 10001
 EXPOSE 8787
