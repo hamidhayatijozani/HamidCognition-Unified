@@ -1,10 +1,12 @@
-# Action Gate 1.0.10 Quickstart
+# Action Gate 1.1.0 Quickstart
 
 ## Product
 
 Action Gate is a deployable policy-enforcement boundary between an agent and protected tools. It evaluates an action, binds the decision to tenant/actor/session/action identity, records evidence, and authorizes execution only through the governed path.
 
-The current validated release is **v1.0.10**, published as `action-gate-v1.0.10`.
+The current development product version is **v1.1.0**, sourced from `action_gate/VERSION`.
+
+The last validated published commercial release is **v1.0.10**. Do not treat the mutable main branch or the v1.1.0 development line as a published commercial release until release-candidate validation and publication are complete.
 
 ## Production deployment
 
