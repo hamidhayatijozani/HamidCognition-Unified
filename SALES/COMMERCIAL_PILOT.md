@@ -42,7 +42,17 @@ Any performance claim must identify its dataset, baseline, evaluation method, an
 
 ## Security
 
-The private repository is the development source. Secrets, credentials, private datasets, and identity-linked cognitive records remain outside public distribution.
+The GitHub repository is public, but the proprietary product and research material remain protected by the repository's proprietary rights notice and applicable law. Secrets, credentials, private datasets, and identity-linked cognitive records remain outside public distribution.
+
+Public repository visibility does not grant a license to reproduce, modify, redistribute, commercialize, or create derivative works from proprietary project material.
+
+## Intellectual property
+
+**Copyright © 2026 Hamid Hayati Jozani. All rights reserved.**
+
+The repository is a technical provenance record. A pilot, repository access, or evaluation does not transfer ownership or grant intellectual-property rights unless expressly stated in a separate written agreement.
+
+Third-party components remain subject to their respective licenses.
 
 ## Contact
 
