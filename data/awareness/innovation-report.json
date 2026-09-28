@@ -1,0 +1,119 @@
+{
+  "project": "BESAZ",
+  "mode": "INNOVATION_SANDBOX",
+  "authority": "NONE",
+  "generated_at": "2026-09-28",
+  "execution_status": "SEEDED_FROM_CANONICAL_ARCHITECTURE",
+  "architecture_components": [
+    "GOVERNANCE",
+    "COGNITION",
+    "EXECUTION",
+    "FEEDBACK",
+    "SELF-MODEL",
+    "CREATOR-CONTEXT",
+    "MARKET-INTELLIGENCE",
+    "REASONING",
+    "PROMPTS",
+    "MODULES",
+    "TOOLS",
+    "WORKFLOWS",
+    "VERIFICATION",
+    "MEMORY",
+    "LEARNING"
+  ],
+  "candidates": [
+    {
+      "kind": "COMBINE",
+      "title": "Cross-link GOVERNANCE + COGNITION",
+      "hypothesis": "ترکیب مشاهده‌های حاکمیت و شناخت می‌تواند شکاف‌هایی را آشکار کند که هرکدام به‌تنهایی نمی‌بینند.",
+      "experiment": "اجرای دو مسیر روی یک سناریوی مصنوعی مشترک و مقایسه پوشش شواهد.",
+      "status": "PROPOSED"
+    },
+    {
+      "kind": "EXTEND",
+      "title": "Extend evidence path for GOVERNANCE",
+      "hypothesis": "افزودن یک probe قابل‌اندازه‌گیری می‌تواند یک فرض معماری را به شواهد تبدیل کند.",
+      "experiment": "افزودن verification probe روی fixture کنترل‌شده.",
+      "status": "PROPOSED"
+    },
+    {
+      "kind": "REVERSE",
+      "title": "Reverse assumption around GOVERNANCE",
+      "hypothesis": "معکوس‌کردن یک فرض می‌تواند مرز پنهان سیستم را آشکار کند.",
+      "experiment": "اجرای همان fixture با فرض معکوس و مقایسه نتیجه.",
+      "status": "PROPOSED"
+    },
+    {
+      "kind": "REORDER",
+      "title": "Reorder GOVERNANCE -> COGNITION -> EXECUTION",
+      "hypothesis": "تغییر ترتیب ممکن است نقطه تشخیص زودتری ایجاد کند یا هزینه را کم کند.",
+      "experiment": "مقایسه دو pipeline مصنوعی با ترتیب متفاوت.",
+      "status": "PROPOSED"
+    },
+    {
+      "kind": "REMOVE",
+      "title": "Ablation of COGNITION",
+      "hypothesis": "حذف موقت یک جزء در Sandbox نشان می‌دهد آیا واقعاً ارزش منحصر‌به‌فرد دارد.",
+      "experiment": "مقایسه baseline و ablation بدون تغییر Production.",
+      "status": "PROPOSED"
+    },
+    {
+      "kind": "TRANSFER",
+      "title": "Transfer verification pattern across layers",
+      "hypothesis": "یک الگوی موفق verification ممکن است در لایه دیگری نیز قابل استفاده باشد.",
+      "experiment": "انتقال الگو به یک fixture مستقل و اندازه‌گیری تغییر پوشش شواهد.",
+      "status": "PROPOSED"
+    },
+    {
+      "kind": "EMERGENT",
+      "title": "Generate a cross-layer probe",
+      "hypothesis": "رابطه میان observableهای دو لایه ممکن است سیگنال جدیدی ایجاد کند، بدون ادعای علیت.",
+      "experiment": "آزمون correlation روی دو fixture مستقل.",
+      "status": "PROPOSED"
+    },
+    {
+      "kind": "CONTRADICTION",
+      "title": "Turn failure into a boundary test",
+      "hypothesis": "شکست آزمایش می‌تواند یک محدودیت معماری مفید را آشکار کند.",
+      "experiment": "تغییر فقط یک متغیر و تکرار آزمایش.",
+      "status": "PROPOSED"
+    }
+  ],
+  "sandbox_smoke_tests": [
+    {
+      "case": "improvement",
+      "baseline_score": 0.5,
+      "variant_score": 0.75,
+      "delta": 0.25,
+      "outcome": "PASS",
+      "repeatable": true,
+      "next_action": "retain_candidate"
+    },
+    {
+      "case": "regression",
+      "baseline_score": 0.8,
+      "variant_score": 0.7,
+      "delta": -0.1,
+      "outcome": "FAIL",
+      "repeatable": true,
+      "next_action": "revise_or_reject"
+    },
+    {
+      "case": "no_change",
+      "baseline_score": 0.7,
+      "variant_score": 0.7,
+      "delta": 0,
+      "outcome": "INCONCLUSIVE",
+      "repeatable": false,
+      "next_action": "revise_or_reject"
+    }
+  ],
+  "hard_boundary": [
+    "sandbox only",
+    "no production mutation",
+    "no self-granted authority",
+    "no invented evidence",
+    "failure must remain visible",
+    "promotion requires explicit verification and approval"
+  ]
+}
