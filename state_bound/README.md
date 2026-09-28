@@ -1,43 +1,17 @@
-# State-Bound Execution Governance Prototype
+# state_bound: TA-001 prototype
 
-Research-only experiment. It does not alter the production Action Gate release.
+Research-only. Not part of immutable Action Gate v1.0.10.
 
-## TA-001 only
+TA-001 tests one narrow hypothesis: on a stable committed trajectory, state-bound execution authority can be verified and executed through one oracle boundary without changing the allowed outcome.
 
-The first experiment deliberately tests one stable case before adversarial drift:
+The in-memory StateOracle is append-only. latest() returns the latest committed snapshot and append() creates a new monotonically increasing version.
 
-Decision -> Authority -> Execution verification
+TA-001 activates only three invariants: action consistency, trajectory consistency, and authority expiry. Action comparison is structural equality and trajectory digest is computed once when a WorldState snapshot is committed, so the verifier does not re-hash the snapshot on every execution.
 
-Baseline:
-Action -> ALLOW
+execute_if_valid() holds the oracle lock across snapshot read, verification and the prototype execution callback. This closes the verify/execute TOCTOU for state owned by this oracle only. External side effects remain outside the guarantee.
 
-Experimental:
-Action + authorized world snapshot -> VALID
+equivalent_request() is explicit: two requests are equivalent when their business-critical action objects are equal; world version and epistemic state may differ.
 
-The authorized world is represented by the WorldState object and its six fingerprints:
-context, state, evidence, trajectory, environment, policy.
+Benchmark scope: 10,000 executions, baseline action-only authorization versus experimental oracle/verifier execution. The first benchmark run showed excessive overhead, so the verifier was reduced to O(1) snapshot checks before further scenarios are allowed.
 
-## Current-world boundary
-
-TA-001 uses a deterministic in-memory WorldState. This is a test fixture, not a production freshness guarantee.
-
-## Verification / execution boundary
-
-The prototype measures verification only. It does not claim that a later external side effect is atomic with verification. A production adapter will require a transaction/CAS boundary or will document the residual TOCTOU risk.
-
-## Replay equivalence
-
-For TA-001, replay equivalence means:
-baseline == ALLOW AND experimental == VALID
-
-It is deliberately narrow and applies only to the unchanged stable fixture.
-
-## Measurement
-
-TA-001 records median and p95 verifier latency.
-
-Run:
-python -m pytest -q state_bound/test_state_bound.py
-python -m state_bound.benchmark
-
-No novelty claim is made. The next scenario is permitted only after TA-001 passes.
+TA-002 through TA-005 are intentionally not implemented in this prototype.
