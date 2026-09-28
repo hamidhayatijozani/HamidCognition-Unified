@@ -1,0 +1,26 @@
+name: State-Bound TA-001
+
+on:
+  push:
+    paths:
+      - "state_bound/**"
+      - ".github/workflows/state-bound-ta001.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ta001:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test runner
+        run: python -m pip install --upgrade pytest
+      - name: Run TA-001
+        run: python -m pytest -q state_bound/test_state_bound.py
+      - name: Run benchmark
+        run: python -m state_bound.benchmark
