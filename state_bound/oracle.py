@@ -10,7 +10,7 @@ class OracleSnapshot:
     world:WorldState
 
 class StateOracle:
-    """Trajectory oracle with independently refreshable context for drift experiments."""
+    """Trajectory oracle with independently refreshable context and state for drift experiments."""
     def __init__(self,initial_trajectory:dict,metadata:dict|None=None):
         self._lock=RLock(); self._version=1
         self._world=WorldState(self._version,dict(initial_trajectory),dict(metadata or {}))
@@ -26,6 +26,13 @@ class StateOracle:
         with self._lock:
             metadata=dict(self._world.metadata)
             metadata["context"]=dict(context)
+            self._world=WorldState(self._world.version,dict(self._world.trajectory),metadata)
+            return OracleSnapshot(self._world.version,self._world)
+    def update_state(self,state:dict)->OracleSnapshot:
+        """Refresh live execution state without changing trajectory version."""
+        with self._lock:
+            metadata=dict(self._world.metadata)
+            metadata["state"]=dict(state)
             self._world=WorldState(self._world.version,dict(self._world.trajectory),metadata)
             return OracleSnapshot(self._world.version,self._world)
     def execute_if_valid(self,*,authority,action:dict,subject:str,now_ns:int,verify:Callable,execute:Callable):
