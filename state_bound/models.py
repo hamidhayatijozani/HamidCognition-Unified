@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Literal
 import hashlib, json
 
@@ -15,7 +15,11 @@ class WorldState:
     version:int
     trajectory:dict[str,Any]
     metadata:dict[str,Any]
-    def trajectory_digest(self)->str: return digest(self.trajectory)
+    _trajectory_digest:str=field(init=False,repr=False)
+    def __post_init__(self):
+        object.__setattr__(self,"_trajectory_digest",digest(self.trajectory))
+    def trajectory_digest(self)->str:
+        return self._trajectory_digest
 
 @dataclass(frozen=True)
 class Decision:
