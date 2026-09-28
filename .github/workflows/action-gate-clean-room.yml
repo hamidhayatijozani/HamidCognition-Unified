@@ -112,11 +112,11 @@ jobs:
         run: |
           set -euo pipefail
           . .clean-room-venv/bin/activate
-          export PYTHONPATH="$GITHUB_WORKSPACE/action_gate"
-          if find . -maxdepth 3 -type f \( -name 'test_*.py' -o -name '*_test.py' \) | grep -q .; then
-            python -m pytest -q
+          export PYTHONPATH="$GITHUB_WORKSPACE/action_gate:$GITHUB_WORKSPACE"
+          if find action_gate tests -maxdepth 3 -type f \( -name 'test_*.py' -o -name '*_test.py' \) | grep -q .; then
+            python -m pytest -q action_gate tests
           else
-            echo "No Python test files discovered in the clean checkout."
+            echo "No Action Gate product test files discovered in the clean checkout."
           fi
 
       - name: Verify product integrity contract
