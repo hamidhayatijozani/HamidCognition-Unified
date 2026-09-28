@@ -16,6 +16,7 @@ def verify_authority(authority:ExecutionAuthority,*,current_world:WorldState,cur
         "action_consistent":current_action==authority.action,
         "trajectory_consistent":current_world.version==decision.world_version and current_world.trajectory_digest()==decision.trajectory_digest,
         "context_consistent":not decision.context_digest or current_world.context_digest()==decision.context_digest,
+        "state_consistent":not decision.state_digest or current_world.state_digest()==decision.state_digest,
         "authority_not_expired":authority.issued_at_ns<=now_ns<authority.expires_at_ns,
     }
     if authority.subject!=subject: return VerificationResult("INVALID","subject_mismatch",invariants)
