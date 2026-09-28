@@ -1,7 +1,7 @@
 import hashlib
 import json
 
-from shock_recovery import RecoveryConfig, RecoveryEngine
+from RESEARCH.SHOCK_RECOVERY.shock_recovery import RecoveryConfig, RecoveryEngine
 
 
 def run(ds):
