@@ -8,6 +8,18 @@ from .verifier import verify_authority
 
 ITERATIONS = 10_000
 
+def build_fixture():
+    oracle = StateOracle({"steps": ["intent", "authorize"], "within_boundary": True},
+                         {"source": "ta001-in-memory-oracle"})
+    snapshot = oracle.latest()
+    action = {"type": "transfer", "amount": 1000, "recipient": "account-B"}
+    decision = Decision("ALLOW", "KNOWN", snapshot.version,
+                        snapshot.world.trajectory_digest(), "stable_trajectory")
+    authority = issue_authority(action=action, subject="account-A", decision=decision,
+                                nonce="ta001", issued_at_ns=0, expires_at_ns=10**18)
+    assert authority is not None
+    return oracle, action, authority
+
 def baseline_action_authorization(action: dict, requested_action: dict) -> str:
     return "ALLOW" if action == requested_action else "DENY"
 
@@ -67,6 +79,19 @@ def run_ta001(iterations: int = ITERATIONS) -> dict:
         "external_side_effect_atomicity": False,
         "scope": "TA-001 only",
     }
+
+def assert_ta001_contract(result: dict) -> None:
+    assert result["scenario"] == "TA-001 Stable Trajectory"
+    assert result["iterations"] >= 1000
+    assert result["execution_count"] == result["iterations"]
+    assert result["false_allow"] == 0
+    assert result["false_deny"] == 0
+    assert result["replay_equivalence"] == 1
+    assert result["verify_execute_atomic_for_oracle_state"] is True
+    assert result["external_side_effect_atomicity"] is False
+    assert result["current_world_source"] == "StateOracle.latest()"
+    assert result["oracle_version"] == 1
+    assert result["experimental"]["p95_us"] >= result["experimental"]["median_us"]
 
 if __name__ == "__main__":
     print(json.dumps(run_ta001(), indent=2))
