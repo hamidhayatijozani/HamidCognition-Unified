@@ -1,0 +1,29 @@
+name: State-Bound TA-002 Context Drift
+
+on:
+  push:
+    paths:
+      - "state_bound/**"
+      - "tests/test_ta002_context_drift.py"
+      - ".github/workflows/state-bound-ta002.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ta002:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pytest
+        run: python -m pip install --upgrade pip pytest
+      - name: Run TA-001 regression and TA-002 tests
+        run: python -m pytest -q tests/test_state_bound.py tests/test_ta002_context_drift.py
+      - name: Run TA-002 benchmark
+        run: python -m state_bound.ta002 | tee /tmp/ta002.json
+      - name: Publish benchmark summary
+        run: cat /tmp/ta002.json >> "$GITHUB_STEP_SUMMARY"
