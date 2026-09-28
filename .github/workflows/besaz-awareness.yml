@@ -1,0 +1,19 @@
+name: BESAZ Awareness Integration
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test-awareness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test runner
+        run: python -m pip install --upgrade pip pytest
+      - name: Run awareness tests
+        run: python -m pytest -q tests/test_awareness_layer.py tests/test_awareness_supervisor.py tests/test_besaz_integration.py
