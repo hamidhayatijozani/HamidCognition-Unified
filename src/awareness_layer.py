@@ -70,7 +70,18 @@ class AwarenessComponent:
 def hierarchy_valid(contracts:Iterable[AwarenessContract])->bool:
     items=list(contracts); ids={c.component_id for c in items}
     if len(ids)!=len(items): return False
-    return all(c.component_id!=c.parent_id and (c.parent_id=="ROOT" or c.parent_id in ids) for c in items)
+    if not all(c.component_id!=c.parent_id and (c.parent_id=="ROOT" or c.parent_id in ids) for c in items):
+        return False
+    parents={c.component_id:c.parent_id for c in items}
+    for start in ids:
+        seen=set()
+        current=start
+        while current!="ROOT":
+            if current in seen: return False
+            seen.add(current)
+            current=parents.get(current)
+            if current is None: return False
+    return True
 
 def canonical_hash(value:Any)->str:
     return sha256(json.dumps(value,sort_keys=True,separators=(",",":"),ensure_ascii=False).encode()).hexdigest()
