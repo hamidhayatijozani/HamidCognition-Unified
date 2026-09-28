@@ -20,10 +20,25 @@ jobs:
       - name: Require all release validation workflows on the same SHA
         env:
           GH_TOKEN: ${{ github.token }}
-          TARGET_SHA: ${{ github.event.workflow_run.head_sha }}
+          TRIGGERING_RUN_ID: ${{ github.event.workflow_run.id }}
         shell: bash
         run: |
           set -euo pipefail
+
+          # Resolve the triggering Product Gates run directly from the GitHub API.
+          # This makes the release gate use the authoritative run SHA.
+          TARGET_SHA="$(curl -fsSL \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runs/$TRIGGERING_RUN_ID" \
+            | jq -r '.head_sha')"
+
+          if [ -z "$TARGET_SHA" ] || [ "$TARGET_SHA" = "null" ]; then
+            echo "Unable to resolve triggering workflow run SHA"
+            exit 1
+          fi
+
+          echo "Release readiness target SHA: $TARGET_SHA"
 
           required_workflows=(
             "Action Gate Product Gates"
