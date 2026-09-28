@@ -1,25 +1,19 @@
 {
+  "schema": "PST-SHOCK-RECOVERY-EVIDENCE-v1",
+  "engine": "research_recovery_v1.1",
   "canonical_boundary": "frozen",
   "commercial_boundary": "excluded",
-  "config": {
-    "lambda_recovery": 0.35,
-    "lambda_shock": 0.2,
-    "shock_scale": 1.0,
-    "t_max": 0.8,
-    "t_min": 0.01
-  },
-  "engine": "research_recovery_v1.1",
   "execution": {
-    "canonical_engine_execution": "not_modified",
-    "executed_at_utc": "2026-09-27T23:15:57.153768+00:00",
-    "execution_scope": "exact GitHub main source files reproduced locally",
+    "source_commit": "18d60ddc6854470b5ea2f0045ce8a4a77548aa1b",
+    "execution_scope": "exact source contents fetched from GitHub main and reproduced locally",
+    "executed_at_utc": "2026-09-28T10:52:58.129642+00:00",
     "local_pytest": "5 passed",
+    "test_count": 5,
+    "canonical_engine_execution": "not_modified",
+    "shock_T": 0.3181818182,
     "persistent_final_T": 0.01,
     "recovered_final_T": 0.8,
-    "shock_T": 0.3181818182,
-    "source_commit": "47e54c3d2523c06a2ba4c6e8e1539a9c6ba404a9",
-    "test_count": 5
+    "github_actions_attestation": "not_available_runner_admission_failure"
   },
-  "replay_sha256": "4f4e0a6e314d8ef19b2a15ae2345e4beb7f3a9a330f7577189ec91b65a8e33fd",
-  "schema": "PST-SHOCK-RECOVERY-EVIDENCE-v1"
+  "replay_sha256": "4f4e0a6e314d8ef19b2a15ae2345e4beb7f3a9a330f7577189ec91b65a8e33fd"
 }
