@@ -1,17 +1,6 @@
-from __future__ import annotations
-from .models import Decision, ExecutionAuthority, WorldState
+from .models import Decision,ExecutionAuthority
 
-def issue_authority(*, action: dict, world: WorldState, decision: Decision, nonce: str, subject: str = "test-subject", issued_at_ns: int = 1_000_000, ttl_ns: int = 1_000_000) -> ExecutionAuthority | None:
-    if decision.epistemic_state != "KNOWN" or decision.decision != "ALLOW":
-        return None
-    if ttl_ns <= 0:
-        raise ValueError("ttl_ns_must_be_positive")
-    return ExecutionAuthority(
-        action=action,
-        subject=subject,
-        decision=decision,
-        authorized_world=world.fingerprint(),
-        nonce=nonce,
-        issued_at_ns=issued_at_ns,
-        expires_at_ns=issued_at_ns + ttl_ns,
-    )
+def issue_authority(*,action:dict,subject:str,decision:Decision,nonce:str,issued_at_ns:int,expires_at_ns:int)->ExecutionAuthority|None:
+    if decision.decision!="ALLOW" or decision.epistemic_state!="KNOWN": return None
+    if expires_at_ns<=issued_at_ns: raise ValueError("expiry_must_follow_issue_time")
+    return ExecutionAuthority(action,subject,decision,issued_at_ns,expires_at_ns,nonce)
