@@ -38,6 +38,7 @@ jobs:
           if [ -f pyproject.toml ]; then python -m pip install -e .; fi
           if [ -f requirements-dev.txt ]; then python -m pip install -r requirements-dev.txt; fi
           python -m pip install "pytest>=8,<9"
+          python -m pip install -r dashboard/requirements.txt
 
       - name: Run repository test suite
         shell: bash
@@ -45,7 +46,7 @@ jobs:
           set -euo pipefail
           export PYTHONPATH="$GITHUB_WORKSPACE/action_gate:${PYTHONPATH:-}"
           if [ -d action_gate/tests ] || find action_gate -maxdepth 2 -type f \( -name 'test_*.py' -o -name '*_test.py' \) | grep -q .; then
-            PYTHONPATH="$GITHUB_WORKSPACE/action_gate:$GITHUB_WORKSPACE:${PYTHONPATH:-}" python -m pytest -q action_gate
+            PYTHONPATH="$GITHUB_WORKSPACE/action_gate:$GITHUB_WORKSPACE:$GITHUB_WORKSPACE/dashboard:${PYTHONPATH:-}" python -m pytest -q action_gate dashboard/test_app.py
           else
             echo 'No Python tests found; verification cannot be claimed.'
             exit 1
