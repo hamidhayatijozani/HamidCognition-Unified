@@ -2,110 +2,129 @@
   "project": "BESAZ",
   "mode": "INNOVATION_SANDBOX",
   "authority": "NONE",
-  "generated_at": "2026-09-28",
-  "execution_status": "SEEDED_FROM_CANONICAL_ARCHITECTURE",
-  "architecture_components": [
-    "GOVERNANCE",
-    "COGNITION",
-    "EXECUTION",
-    "FEEDBACK",
-    "SELF-MODEL",
-    "CREATOR-CONTEXT",
-    "MARKET-INTELLIGENCE",
-    "REASONING",
-    "PROMPTS",
-    "MODULES",
-    "TOOLS",
-    "WORKFLOWS",
-    "VERIFICATION",
-    "MEMORY",
-    "LEARNING"
-  ],
+  "generated_at": 1790722614,
+  "candidate_count": 6,
   "candidates": [
     {
+      "candidate_id": "IN-399e1e5a981d18c9",
       "kind": "COMBINE",
       "title": "Cross-link GOVERNANCE + COGNITION",
-      "hypothesis": "ترکیب مشاهده‌های حاکمیت و شناخت می‌تواند شکاف‌هایی را آشکار کند که هرکدام به‌تنهایی نمی‌بینند.",
-      "experiment": "اجرای دو مسیر روی یک سناریوی مصنوعی مشترک و مقایسه پوشش شواهد.",
+      "hypothesis": "Combining observations from GOVERNANCE and COGNITION may expose a capability neither reveals alone.",
+      "source_components": [
+        "GOVERNANCE",
+        "COGNITION"
+      ],
+      "experiment": "Run both observation paths on the same synthetic scenario and compare signal coverage.",
+      "success_criteria": [
+        "combined coverage increases",
+        "no new unsupported claim is introduced"
+      ],
+      "risks": [
+        "false correlation",
+        "duplicated evidence"
+      ],
       "status": "PROPOSED"
     },
     {
+      "candidate_id": "IN-31d46dc43716040b",
       "kind": "EXTEND",
       "title": "Extend evidence path for GOVERNANCE",
-      "hypothesis": "افزودن یک probe قابل‌اندازه‌گیری می‌تواند یک فرض معماری را به شواهد تبدیل کند.",
-      "experiment": "افزودن verification probe روی fixture کنترل‌شده.",
+      "hypothesis": "Adding a verification step to GOVERNANCE may convert an architectural assumption into evidence.",
+      "source_components": [
+        "GOVERNANCE"
+      ],
+      "experiment": "Attach one measurable verification probe and run it against a controlled fixture.",
+      "success_criteria": [
+        "probe produces a traceable result",
+        "failure is explicitly recorded"
+      ],
+      "risks": [
+        "overfitting to fixture",
+        "measurement bias"
+      ],
       "status": "PROPOSED"
     },
     {
+      "candidate_id": "IN-219ff885226b2cd0",
       "kind": "REVERSE",
       "title": "Reverse assumption around GOVERNANCE",
-      "hypothesis": "معکوس‌کردن یک فرض می‌تواند مرز پنهان سیستم را آشکار کند.",
-      "experiment": "اجرای همان fixture با فرض معکوس و مقایسه نتیجه.",
+      "hypothesis": "Testing the opposite of the current assumption for GOVERNANCE may reveal a hidden boundary condition.",
+      "source_components": [
+        "GOVERNANCE"
+      ],
+      "experiment": "Run the same fixture with the target assumption inverted and compare outcomes.",
+      "success_criteria": [
+        "difference is measurable",
+        "both outcomes remain auditable"
+      ],
+      "risks": [
+        "invalid inversion",
+        "misleading edge case"
+      ],
       "status": "PROPOSED"
     },
     {
+      "candidate_id": "IN-36251eb716b6b462",
       "kind": "REORDER",
       "title": "Reorder GOVERNANCE -> COGNITION -> EXECUTION",
-      "hypothesis": "تغییر ترتیب ممکن است نقطه تشخیص زودتری ایجاد کند یا هزینه را کم کند.",
-      "experiment": "مقایسه دو pipeline مصنوعی با ترتیب متفاوت.",
+      "hypothesis": "Changing component order may reduce unnecessary work or expose an earlier detection point.",
+      "source_components": [
+        "GOVERNANCE",
+        "COGNITION",
+        "EXECUTION"
+      ],
+      "experiment": "Execute two equivalent synthetic pipelines with the order swapped; compare latency and evidence.",
+      "success_criteria": [
+        "functional result remains equivalent",
+        "measured cost changes or remains stable"
+      ],
+      "risks": [
+        "hidden dependency",
+        "non-equivalent pipelines"
+      ],
       "status": "PROPOSED"
     },
     {
+      "candidate_id": "IN-03330d7fdddb0c63",
       "kind": "REMOVE",
       "title": "Ablation of COGNITION",
-      "hypothesis": "حذف موقت یک جزء در Sandbox نشان می‌دهد آیا واقعاً ارزش منحصر‌به‌فرد دارد.",
-      "experiment": "مقایسه baseline و ablation بدون تغییر Production.",
+      "hypothesis": "Temporarily remove COGNITION in a sandbox to determine whether it contributes unique value.",
+      "source_components": [
+        "GOVERNANCE",
+        "COGNITION",
+        "EXECUTION"
+      ],
+      "experiment": "Run baseline and ablated synthetic pipelines; compare correctness and evidence coverage.",
+      "success_criteria": [
+        "loss of capability is measurable",
+        "no production state is touched"
+      ],
+      "risks": [
+        "false negative from weak fixture"
+      ],
       "status": "PROPOSED"
     },
     {
-      "kind": "TRANSFER",
-      "title": "Transfer verification pattern across layers",
-      "hypothesis": "یک الگوی موفق verification ممکن است در لایه دیگری نیز قابل استفاده باشد.",
-      "experiment": "انتقال الگو به یک fixture مستقل و اندازه‌گیری تغییر پوشش شواهد.",
-      "status": "PROPOSED"
-    },
-    {
+      "candidate_id": "IN-2c101cf6abfc33de",
       "kind": "EMERGENT",
       "title": "Generate a cross-layer probe",
-      "hypothesis": "رابطه میان observableهای دو لایه ممکن است سیگنال جدیدی ایجاد کند، بدون ادعای علیت.",
-      "experiment": "آزمون correlation روی دو fixture مستقل.",
+      "hypothesis": "A signal observed in one layer may become informative when tested against another layer's evidence.",
+      "source_components": [
+        "GOVERNANCE",
+        "COGNITION",
+        "EXECUTION",
+        "FEEDBACK"
+      ],
+      "experiment": "Select one observable from two layers, correlate them only inside a synthetic fixture, and test whether the relation survives a changed fixture.",
+      "success_criteria": [
+        "relation is reproducible or explicitly rejected",
+        "no causal claim is inferred from correlation"
+      ],
+      "risks": [
+        "spurious correlation",
+        "scope leakage"
+      ],
       "status": "PROPOSED"
-    },
-    {
-      "kind": "CONTRADICTION",
-      "title": "Turn failure into a boundary test",
-      "hypothesis": "شکست آزمایش می‌تواند یک محدودیت معماری مفید را آشکار کند.",
-      "experiment": "تغییر فقط یک متغیر و تکرار آزمایش.",
-      "status": "PROPOSED"
-    }
-  ],
-  "sandbox_smoke_tests": [
-    {
-      "case": "improvement",
-      "baseline_score": 0.5,
-      "variant_score": 0.75,
-      "delta": 0.25,
-      "outcome": "PASS",
-      "repeatable": true,
-      "next_action": "retain_candidate"
-    },
-    {
-      "case": "regression",
-      "baseline_score": 0.8,
-      "variant_score": 0.7,
-      "delta": -0.1,
-      "outcome": "FAIL",
-      "repeatable": true,
-      "next_action": "revise_or_reject"
-    },
-    {
-      "case": "no_change",
-      "baseline_score": 0.7,
-      "variant_score": 0.7,
-      "delta": 0,
-      "outcome": "INCONCLUSIVE",
-      "repeatable": false,
-      "next_action": "revise_or_reject"
     }
   ],
   "hard_boundary": [
