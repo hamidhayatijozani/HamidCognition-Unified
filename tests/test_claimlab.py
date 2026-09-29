@@ -110,3 +110,45 @@ def test_signal_snapshot_survives_claim_fingerprint_serialization():
     result=ClaimLab().assess(claim,[evidence])
     assert result.fingerprint
     assert evidence.to_dict()["signals"] == snapshot.to_dict()
+
+
+def test_real_http_server_round_trip_persists_exact_signal_snapshot(tmp_path):
+    import json
+    import threading
+    from http.client import HTTPConnection
+    from research.claimlab.app_demo import Handler, SignalEvidenceStore
+    from http.server import ThreadingHTTPServer
+
+    db=tmp_path / "evidence.sqlite3"
+    Handler.store=SignalEvidenceStore(db)
+    server=ThreadingHTTPServer(("127.0.0.1",0),Handler)
+    thread=threading.Thread(target=server.serve_forever,daemon=True)
+    thread.start()
+    try:
+        snapshot={"P":0.72,"S":0.61,"T":0.38,"energy":0.83,"creativity":0.37,"loop":False,"jump":True,"escape":False,"signal":1}
+        request={"id":"evidence-001","relation":"SUPPORT","source":"EURUSD","statement":"signal snapshot","signals":snapshot}
+        conn=HTTPConnection("127.0.0.1",server.server_port,timeout=3)
+        conn.request("POST","/evidence",body=json.dumps(request),headers={"Content-Type":"application/json"})
+        response=conn.getresponse()
+        assert response.status==201
+        created=json.loads(response.read())
+        assert isinstance(created["signals"],dict)
+        assert created["signals"] == snapshot
+
+        conn.request("GET","/evidence/evidence-001")
+        response=conn.getresponse()
+        assert response.status==200
+        replayed=json.loads(response.read())
+        assert replayed["signals"] == snapshot
+        assert replayed["signals"] != {}
+        assert "P/S/T" not in replayed.get("statement","")
+        assert replayed["signals"]["P"] == 0.72
+        assert replayed["signals"]["S"] == 0.61
+        assert replayed["signals"]["T"] == 0.38
+        assert replayed["signals"]["energy"] == 0.83
+        assert replayed["signals"]["loop"] is False
+        assert replayed["signals"]["jump"] is True
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
