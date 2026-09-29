@@ -46,3 +46,9 @@ def test_stale_support_reduces_quality_without_increasing_support():
     assert result.support==1.0
     assert result.evidence_quality==0.5
     assert result.verdict==Verdict.WEAK
+
+
+def test_unknown_produces_evidence_collection_action():
+    result=ClaimLab().assess(Claim("An unobserved regime predicts positive returns",ClaimType.INFERENCE,{"symbol":"EURUSD"}),[])
+    assert result.verdict==Verdict.UNKNOWN
+    assert "collect_minimum_independent_evidence_for_claim_scope" in result.next_tests
