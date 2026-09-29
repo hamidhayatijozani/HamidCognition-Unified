@@ -16,6 +16,28 @@ services:
       retries: 10
     restart: unless-stopped
 
+  dashboard:
+    build:
+      context: ..
+      dockerfile: dashboard/Dockerfile
+    environment:
+      ACTION_GATE_URL: http://action-gate:8000
+      ACTION_GATE_API_TOKEN: $ACTION_GATE_API_TOKEN
+    networks:
+      - edge
+      - backend
+    expose:
+      - "8081"
+    depends_on:
+      action-gate:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8081/').read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+
   action-gate:
     build:
       context: ..
