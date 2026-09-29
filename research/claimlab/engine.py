@@ -28,18 +28,20 @@ def _canonical(value:Any)->bytes: return json.dumps(value,sort_keys=True,separat
 class ClaimLab:
     """Deterministic claim-integrity engine for research, not a truth oracle."""
     def assess(self,claim:Claim,evidence:list[Evidence])->ClaimAssessment:
-        support=sum(max(0,e.strength) for e in evidence if e.relation==EvidenceRelation.SUPPORT and e.fresh)
+        support_evidence=[e for e in evidence if e.relation==EvidenceRelation.SUPPORT and e.fresh]
+        support=sum(max(0,e.strength) for e in support_evidence)
         contradiction=sum(max(0,e.strength) for e in evidence if e.relation==EvidenceRelation.CONTRADICT and e.fresh)
         unresolved=sum(max(0,e.strength) for e in evidence if e.relation in {EvidenceRelation.MISSING,EvidenceRelation.STALE,EvidenceRelation.CONFLICTED})
         usable=[e for e in evidence if e.relation!=EvidenceRelation.MISSING]
-        independent=sum(1 for e in usable if e.independent)
+        independent_support_sources={e.source for e in support_evidence if e.independent and e.source}
+        independent_support_count=len(independent_support_sources)
         coverage=min(1.0,len(usable)/max(1,len(evidence))) if evidence else 0.0
         flags=self._overclaim_flags(claim,support,contradiction,evidence)
         total=support+contradiction+unresolved
         if not evidence or total==0: verdict=Verdict.UNKNOWN
         elif flags: verdict=Verdict.OVERCLAIM
         elif contradiction>support: verdict=Verdict.INVALID
-        elif support>0 and contradiction==0 and unresolved==0 and independent>=2: verdict=Verdict.VALID
+        elif support>0 and contradiction==0 and unresolved==0 and independent_support_count>=2: verdict=Verdict.VALID
         else: verdict=Verdict.WEAK
         tests=self._next_tests(claim,evidence,flags)
         fingerprint=hashlib.sha256(_canonical({"claim":asdict(claim),"evidence":[asdict(e) for e in evidence]})).hexdigest()
