@@ -21,6 +21,11 @@ jobs:
     environment: production
     timeout-minutes: 30
     steps:
+      - name: Checkout deployment script
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
       - name: Install SSH client
         run: sudo apt-get update && sudo apt-get install -y openssh-client
 
