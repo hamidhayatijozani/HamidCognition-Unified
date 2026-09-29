@@ -1,14 +1,14 @@
 {$DOMAIN} {
+    handle /mcp* {
+        reverse_proxy chatgpt-mcp:8787
+    }
+
     handle /api* {
         reverse_proxy dashboard:8081
     }
 
     handle / {
         reverse_proxy dashboard:8081
-    }
-
-    handle /mcp* {
-        reverse_proxy chatgpt-mcp:8787
     }
 
     handle {
