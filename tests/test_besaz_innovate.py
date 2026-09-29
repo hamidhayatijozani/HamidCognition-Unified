@@ -14,4 +14,4 @@ def test_besaz_innovate_uses_contract_without_runtime_evidence(monkeypatch, tmp_
     assert report["mode"] == "INNOVATION_SANDBOX"
     assert report["authority"] == "NONE"
     assert report["candidate_count"] > 0
-    assert all("evidence_refs" in candidate or True for candidate in report["candidates"])
+    assert all(candidate["source_components"] for candidate in report["candidates"])
