@@ -82,6 +82,8 @@ class Handler(BaseHTTPRequestHandler):
                 fresh=bool(request.get("fresh", True)),
                 independent=bool(request.get("independent", True)),
                 signals=signals,
+                evidence_type=request.get("type", "signal_snapshot"),
+                timestamp=request.get("timestamp", ""),
             )
             self._json(201, self.store.put(evidence))
         except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
