@@ -79,3 +79,85 @@ def test_stale_or_conflicted_evidence_is_unresolved_not_unknown():
     assert result.verdict==Verdict.WEAK
     assert result.epistemic_state==EpistemicState.UNRESOLVED
     assert result.unresolved==1.0
+
+def test_signal_snapshot_is_structured_on_evidence():
+    from research.claimlab.engine import SignalSnapshot
+    snapshot=SignalSnapshot(0.72,0.61,0.38,0.83,0.37,False,True,False,1)
+    evidence=ev("sig-1",EvidenceRelation.SUPPORT,"PST signal snapshot",source="signal-feed")
+    evidence=Evidence(evidence.evidence_id,evidence.relation,evidence.source,evidence.statement,signals=snapshot,evidence_type="signal_snapshot",timestamp="2026-09-29T19:31:00+03:30")
+    payload=evidence.to_dict()
+    assert isinstance(payload["signals"],dict)
+    assert payload["signals"] != {}
+    for key in ("P","S","T","energy","creativity","loop","jump","escape","signal"):
+        assert key in payload["signals"]
+    assert payload["signals"]["P"] == 0.72
+    assert payload["signals"]["jump"] is True
+    assert payload["evidence_type"] == "signal_snapshot"
+    assert payload["timestamp"] == "2026-09-29T19:31:00+03:30"
+
+
+def test_signal_snapshot_rejects_out_of_range_continuous_values():
+    from research.claimlab.engine import SignalSnapshot
+    import pytest
+    with pytest.raises(ValueError):
+        SignalSnapshot(1.01,0.5,0.5,0.5,0.5,False,False,False,0)
+
+
+def test_signal_snapshot_survives_claim_fingerprint_serialization():
+    from research.claimlab.engine import SignalSnapshot
+    snapshot=SignalSnapshot(0.9055,0.8062,0.4494,0.8275,0.4494,False,True,False,1)
+    evidence=Evidence("sig-1",EvidenceRelation.SUPPORT,"feed","snapshot",signals=snapshot)
+    claim=Claim("PST signal snapshot was observed",ClaimType.OBSERVATION)
+    result=ClaimLab().assess(claim,[evidence])
+    assert result.fingerprint
+    assert evidence.to_dict()["signals"] == snapshot.to_dict()
+
+
+def test_real_http_server_round_trip_persists_exact_signal_snapshot(tmp_path):
+    import json
+    import threading
+    from http.client import HTTPConnection
+    from research.claimlab.app_demo import Handler, SignalEvidenceStore
+    from http.server import ThreadingHTTPServer
+
+    db=tmp_path / "evidence.sqlite3"
+    Handler.store=SignalEvidenceStore(db)
+    server=ThreadingHTTPServer(("127.0.0.1",0),Handler)
+    thread=threading.Thread(target=server.serve_forever,daemon=True)
+    thread.start()
+    try:
+        snapshot={"P":0.72,"S":0.61,"T":0.38,"energy":0.83,"creativity":0.37,"loop":False,"jump":True,"escape":False,"signal":1}
+        request={"id":"evidence-001","type":"signal_snapshot","timestamp":"2026-09-29T19:31:00+03:30","relation":"SUPPORT","source":"EURUSD","statement":"signal snapshot","signals":snapshot}
+        conn=HTTPConnection("127.0.0.1",server.server_port,timeout=3)
+        conn.request("POST","/evidence",body=json.dumps(request),headers={"Content-Type":"application/json"})
+        response=conn.getresponse()
+        assert response.status==201
+        created=json.loads(response.read())
+        assert isinstance(created["signals"],dict)
+        assert created["signals"] == snapshot
+        conn.request("GET","/evidence/evidence-001")
+        response=conn.getresponse()
+        assert response.status==200
+        replayed=json.loads(response.read())
+        assert replayed["signals"] == snapshot
+        assert replayed["signals"] != {}
+        assert replayed["evidence_type"] == "signal_snapshot"
+        assert replayed["timestamp"] == "2026-09-29T19:31:00+03:30"
+        assert "P/S/T" not in replayed.get("statement","")
+        assert replayed["signals"]["P"] == 0.72
+        assert replayed["signals"]["S"] == 0.61
+        assert replayed["signals"]["T"] == 0.38
+        assert replayed["signals"]["energy"] == 0.83
+        assert replayed["signals"]["loop"] is False
+        assert replayed["signals"]["jump"] is True
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+
+def test_signal_snapshot_type_requires_structured_payload():
+    from research.claimlab.engine import Evidence
+    import pytest
+    with pytest.raises(ValueError):
+        Evidence("bad",EvidenceRelation.SUPPORT,"feed","missing signals",evidence_type="signal_snapshot")
