@@ -79,3 +79,34 @@ def test_stale_or_conflicted_evidence_is_unresolved_not_unknown():
     assert result.verdict==Verdict.WEAK
     assert result.epistemic_state==EpistemicState.UNRESOLVED
     assert result.unresolved==1.0
+
+
+def test_signal_snapshot_is_structured_on_evidence():
+    from research.claimlab.engine import SignalSnapshot
+    snapshot=SignalSnapshot(0.72,0.61,0.38,0.83,0.37,False,True,False,1)
+    evidence=ev("sig-1",EvidenceRelation.SUPPORT,"PST signal snapshot",source="signal-feed")
+    evidence=Evidence(evidence.evidence_id,evidence.relation,evidence.source,evidence.statement,signals=snapshot)
+    payload=evidence.to_dict()
+    assert isinstance(payload["signals"],dict)
+    assert payload["signals"] != {}
+    for key in ("P","S","T","energy","creativity","loop","jump","escape","signal"):
+        assert key in payload["signals"]
+    assert payload["signals"]["P"] == 0.72
+    assert payload["signals"]["jump"] is True
+
+
+def test_signal_snapshot_rejects_out_of_range_continuous_values():
+    from research.claimlab.engine import SignalSnapshot
+    import pytest
+    with pytest.raises(ValueError):
+        SignalSnapshot(1.01,0.5,0.5,0.5,0.5,False,False,False,0)
+
+
+def test_signal_snapshot_survives_claim_fingerprint_serialization():
+    from research.claimlab.engine import SignalSnapshot
+    snapshot=SignalSnapshot(0.9055,0.8062,0.4494,0.8275,0.4494,False,True,False,1)
+    evidence=Evidence("sig-1",EvidenceRelation.SUPPORT,"feed","snapshot",signals=snapshot)
+    claim=Claim("PST signal snapshot was observed",ClaimType.OBSERVATION)
+    result=ClaimLab().assess(claim,[evidence])
+    assert result.fingerprint
+    assert evidence.to_dict()["signals"] == snapshot.to_dict()
