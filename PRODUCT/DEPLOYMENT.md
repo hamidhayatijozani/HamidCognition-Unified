@@ -1,47 +1,48 @@
-# Action Gate Deployment Contract
+# Production Deployment
 
-Version: 1.0.10
+## Architecture
 
-This document defines the minimum deployment boundary for a customer installation of Action Gate v1.0.10. It is an operational contract, not a compliance certification.
+Internet → Caddy/HTTPS → Customer Console + MCP → Action Gate → protected tool → PostgreSQL.
 
-## Required components
+The production Compose stack is `action_gate/docker-compose.production.yml`.
 
-- Action Gate runtime.
-- Persistent storage for decision/evidence records.
-- Production authentication.
-- Signing secret or keyring managed outside source control.
-- A non-bypassable integration point between protected actions and Action Gate.
-- Customer policy configuration.
-- Monitoring for health, latency, denials, evidence failures, and storage failures.
-- Backup and restore procedures for persistent evidence.
+## Deployment contract
+
+The deployment host must already provide:
+- Linux with Docker Engine;
+- Docker Compose v2;
+- public DNS pointing the selected domain to the host;
+- inbound TCP 80/443;
+- outbound access to GitHub and Docker registries;
+- an SSH account used by the GitHub Actions deployment environment.
+
+The deployment workflow is `.github/workflows/deploy-production.yml`.
+
+Required GitHub Actions production secrets:
+- `DEPLOY_HOST`
+- `DEPLOY_USER`
+- `DEPLOY_SSH_KEY`
+
+No application secret is stored in GitHub. The remote deployment script creates the initial production secrets on the host with `openssl` and keeps them in `action_gate/.env.production` with mode 600. Existing production secrets are preserved on later deployments.
+
+Run: GitHub → Actions → Deploy HamidCognition Production → Run workflow, supplying the already configured HTTPS domain.
+
+## What the workflow verifies
+
+1. The host receives the deployment script over SSH.
+2. The host checks Docker and Compose.
+3. The host checks out the current `main` revision.
+4. Production Compose is rendered before startup.
+5. Dashboard, Action Gate, PostgreSQL, MCP, enforcement and Caddy are built/started.
+6. Caddy obtains/renews HTTPS certificates for the supplied domain.
+7. The public dashboard and `/health` endpoint are checked from the GitHub runner.
 
 ## Security boundary
 
-Production execution must never call the downstream tool directly when that tool is governed by Action Gate. The integration path is:
+The workflow never accepts an application API token, signing secret, database password or MCP token as a GitHub workflow input. Those are generated on the deployment host if the production environment has not been initialized.
 
-request -> authenticated gate -> policy decision -> evidence reservation/recording -> execution authorization -> downstream action.
+Do not expose PostgreSQL or internal Action Gate ports publicly. Only 80/443 should be reachable from the internet.
 
-A failure while reserving or recording required evidence is fail-closed.
+## Current truth
 
-## Secrets
-
-Never commit production secrets, signing keys, database passwords, bearer tokens, or customer credentials. Inject them through the deployment environment or an external secret manager.
-
-## Storage
-
-PostgreSQL is the production persistence target for this deployment contract. The exact release evidence must be retained with the candidate being deployed. SQLite is used for persistent execution-authority nonce state in the tool boundary and must remain on the configured persistent production volume. It must not silently replace PostgreSQL as the production evidence store.
-
-## Upgrade rule
-
-Before upgrading a production installation:
-
-1. Export/backup evidence.
-2. Record current version and image digest.
-3. Run customer acceptance against the candidate.
-4. Verify replay compatibility.
-5. Roll out reversibly.
-6. Record version, commit, image digest, and acceptance result.
-
-## Explicit non-claims
-
-Deployment does not by itself prove that a customer's policy is correct, a downstream tool is safe, or an external regulatory obligation is satisfied.
+Creating this workflow does not mean a public deployment already exists. A real deployment requires an actual host, DNS and the three SSH secrets above. Until the workflow succeeds against that infrastructure, the product is not described as publicly deployed.
