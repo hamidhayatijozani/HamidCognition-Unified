@@ -23,7 +23,7 @@ jobs:
       - name: Test innovation engine
         run: pytest -q tests/test_besaz_innovation_engine.py
       - name: Generate innovation report
-        run: python scripts/besaz_innovate.py
+        run: PYTHONPATH=. python scripts/besaz_innovate.py
       - name: Record report
         run: |
           git config user.name "github-actions[bot]"
