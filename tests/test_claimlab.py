@@ -85,7 +85,7 @@ def test_signal_snapshot_is_structured_on_evidence():
     from research.claimlab.engine import SignalSnapshot
     snapshot=SignalSnapshot(0.72,0.61,0.38,0.83,0.37,False,True,False,1)
     evidence=ev("sig-1",EvidenceRelation.SUPPORT,"PST signal snapshot",source="signal-feed")
-    evidence=Evidence(evidence.evidence_id,evidence.relation,evidence.source,evidence.statement,signals=snapshot)
+    evidence=Evidence(evidence.evidence_id,evidence.relation,evidence.source,evidence.statement,signals=snapshot,evidence_type="signal_snapshot",timestamp="2026-09-29T19:31:00+03:30")
     payload=evidence.to_dict()
     assert isinstance(payload["signals"],dict)
     assert payload["signals"] != {}
@@ -93,6 +93,8 @@ def test_signal_snapshot_is_structured_on_evidence():
         assert key in payload["signals"]
     assert payload["signals"]["P"] == 0.72
     assert payload["signals"]["jump"] is True
+    assert payload["evidence_type"] == "signal_snapshot"
+    assert payload["timestamp"] == "2026-09-29T19:31:00+03:30"
 
 
 def test_signal_snapshot_rejects_out_of_range_continuous_values():
@@ -126,7 +128,7 @@ def test_real_http_server_round_trip_persists_exact_signal_snapshot(tmp_path):
     thread.start()
     try:
         snapshot={"P":0.72,"S":0.61,"T":0.38,"energy":0.83,"creativity":0.37,"loop":False,"jump":True,"escape":False,"signal":1}
-        request={"id":"evidence-001","relation":"SUPPORT","source":"EURUSD","statement":"signal snapshot","signals":snapshot}
+        request={"id":"evidence-001","type":"signal_snapshot","timestamp":"2026-09-29T19:31:00+03:30","relation":"SUPPORT","source":"EURUSD","statement":"signal snapshot","signals":snapshot}
         conn=HTTPConnection("127.0.0.1",server.server_port,timeout=3)
         conn.request("POST","/evidence",body=json.dumps(request),headers={"Content-Type":"application/json"})
         response=conn.getresponse()
@@ -141,6 +143,8 @@ def test_real_http_server_round_trip_persists_exact_signal_snapshot(tmp_path):
         replayed=json.loads(response.read())
         assert replayed["signals"] == snapshot
         assert replayed["signals"] != {}
+        assert replayed["evidence_type"] == "signal_snapshot"
+        assert replayed["timestamp"] == "2026-09-29T19:31:00+03:30"
         assert "P/S/T" not in replayed.get("statement","")
         assert replayed["signals"]["P"] == 0.72
         assert replayed["signals"]["S"] == 0.61
@@ -152,3 +156,10 @@ def test_real_http_server_round_trip_persists_exact_signal_snapshot(tmp_path):
         server.shutdown()
         server.server_close()
         thread.join(timeout=2)
+
+
+def test_signal_snapshot_type_requires_structured_payload():
+    from research.claimlab.engine import Evidence
+    import pytest
+    with pytest.raises(ValueError):
+        Evidence("bad",EvidenceRelation.SUPPORT,"feed","missing signals",evidence_type="signal_snapshot")
