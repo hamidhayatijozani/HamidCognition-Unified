@@ -1,0 +1,26 @@
+name: ClaimLab Structured Evidence
+
+on:
+  push:
+    branches:
+      - feat/claimlab-structured-signal-evidence
+  pull_request:
+    paths:
+      - "research/claimlab/**"
+      - "tests/test_claimlab.py"
+      - ".github/workflows/claimlab-structured-evidence.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  claimlab-structured-evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run ClaimLab structured evidence tests
+        run: pytest -q tests/test_claimlab.py
