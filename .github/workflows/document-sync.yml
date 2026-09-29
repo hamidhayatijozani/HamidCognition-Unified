@@ -8,10 +8,10 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  document-sync:
+  validate:
     name: Evidence-aware documentation consistency
     runs-on: ubuntu-latest
     steps:
@@ -25,18 +25,45 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Apply safe deterministic updates on main
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: python tools/document_sync.py --apply-safe
-
       - name: Validate synchronization
         run: python tools/document_sync.py --check
 
       - name: Generate synchronization state
         run: python tools/document_sync.py --write-state
 
+      - name: Run synchronization tests
+        run: python -m unittest tests.test_document_sync -v
+
+      - name: Upload synchronization state
+        uses: actions/upload-artifact@v4
+        with:
+          name: document-sync-state
+          path: evidence/document-sync-state.json
+
+  apply-on-main:
+    name: Apply deterministic documentation synchronization
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Apply safe deterministic updates on main
+        run: python tools/document_sync.py --apply-safe
+
+      - name: Validate synchronization after safe updates
+        run: python tools/document_sync.py --check
+
       - name: Commit safe documentation synchronization
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -47,12 +74,3 @@ jobs:
             git commit -m "chore(document-sync): synchronize release identity"
             git push
           fi
-
-      - name: Run synchronization tests
-        run: python -m unittest tests.test_document_sync -v
-
-      - name: Upload synchronization state
-        uses: actions/upload-artifact@v4
-        with:
-          name: document-sync-state
-          path: evidence/document-sync-state.json
