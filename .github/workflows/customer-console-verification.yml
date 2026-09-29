@@ -1,0 +1,48 @@
+name: Customer Console Verification
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "dashboard/**"
+      - "action_gate/Caddyfile"
+      - "action_gate/docker-compose.production.yml"
+      - ".github/workflows/customer-console-verification.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "dashboard/**"
+      - "action_gate/Caddyfile"
+      - "action_gate/docker-compose.production.yml"
+      - ".github/workflows/customer-console-verification.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate dashboard tests
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r dashboard/requirements.txt pytest
+          PYTHONPATH=. python -m pytest -q dashboard/test_app.py dashboard/test_customer_surface.py
+
+      - name: Validate production Compose
+        working-directory: action_gate
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-api-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          MCP_BEARER_TOKEN: ci-mcp-token
+          DOMAIN: localhost
+        run: docker compose -f docker-compose.production.yml config --quiet
+
+      - name: Build customer console image
+        run: docker build -f dashboard/Dockerfile -t hamidcognition-dashboard:ci .
