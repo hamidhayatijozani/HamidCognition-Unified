@@ -1,0 +1,59 @@
+name: Deploy HamidCognition Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: "Public HTTPS domain already pointed at the deployment host"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hamidcognition-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 30
+    steps:
+      - name: Install SSH client
+        run: sudo apt-get update && sudo apt-get install -y openssh-client
+
+      - name: Prepare SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          set -euo pipefail
+          test -n "$DEPLOY_HOST"
+          test -n "$DEPLOY_USER"
+          test -n "$DEPLOY_SSH_KEY"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+
+      - name: Deploy exact main revision
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DOMAIN: ${{ inputs.domain }}
+        run: |
+          set -euo pipefail
+          scp -q scripts/deploy-production.sh "$DEPLOY_USER@$DEPLOY_HOST:/tmp/hamidcognition-deploy.sh"
+          ssh "$DEPLOY_USER@$DEPLOY_HOST"             "chmod 700 /tmp/hamidcognition-deploy.sh && DOMAIN='$DOMAIN' REPO='https://github.com/hamidhayatijozani/HamidCognition-Unified.git' /tmp/hamidcognition-deploy.sh"
+          rm -f /tmp/hamidcognition-deploy.sh
+
+      - name: Verify public endpoints
+        env:
+          DOMAIN: ${{ inputs.domain }}
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --retry 10 --retry-delay 3 "https://$DOMAIN/"
+          curl --fail --silent --show-error --retry 10 --retry-delay 3 "https://$DOMAIN/health"
