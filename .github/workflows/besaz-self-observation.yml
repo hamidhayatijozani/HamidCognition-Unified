@@ -23,7 +23,7 @@ jobs:
       - name: Verify awareness architecture
         run: python -m pytest -q tests/test_awareness_layer.py tests/test_awareness_supervisor.py tests/test_besaz_integration.py tests/test_besaz_self_observer.py
       - name: Run BESAZ against its own architecture
-        run: python scripts/besaz_self_observe.py
+        run: PYTHONPATH=. python scripts/besaz_self_observe.py
       - name: Record self-observation
         run: |
           git config user.name "BESAZ Self Observer"
