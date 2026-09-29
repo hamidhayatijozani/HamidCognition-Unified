@@ -41,3 +41,4 @@ def test_two_independent_support_sources_can_be_valid():
               ev("s2",EvidenceRelation.SUPPORT,"association replicated",source="feed-B")]
     result=ClaimLab().assess(c,evidence)
     assert result.verdict==Verdict.VALID
+\n\ndef test_unknown_produces_evidence_collection_action():\n    result=ClaimLab().assess(Claim("An unobserved regime predicts positive returns",ClaimType.INFERENCE,{"symbol":"EURUSD"}),[])\n    assert result.verdict==Verdict.UNKNOWN\n    assert "collect_minimum_independent_evidence_for_claim_scope" in result.next_tests\n
