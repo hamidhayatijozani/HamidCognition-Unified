@@ -2,9 +2,9 @@
 
 ## Canonical product
 
-**HamidCognition Action Gate v1.0.10** is the current customer-facing product boundary.
+**HamidCognition Action Gate v1.0.10** is the current customer-facing validated product boundary.
 
-The repository distinguishes the published commercial release from mutable `main`. A customer quote must identify the exact release tag, source commit, artifact and checksum being offered.
+A customer quote must identify the exact release tag, source commit, artifact and checksum being offered.
 
 ## Included
 
@@ -19,7 +19,7 @@ The repository distinguishes the published commercial release from mutable `main
 - persistent execution-authority nonce state
 - production Compose deployment
 - validation evidence
-- Clean-Room verification for the published release
+- Clean-Room verification
 - versioned release artifact and checksum
 
 ## Current published release
@@ -31,8 +31,6 @@ The repository distinguishes the published commercial release from mutable `main
 - Release-candidate workflow run: `36303350191`
 - Artifact: `action-gate-1.0.10.tar`
 - Artifact digest: `sha256:10bb53b69b56ff86146f5c71e3e5d7e34dacb4e12dba2adafc59f9d5276abd91`
-
-Historical v1.0.5 material remains provenance only and must not be presented as the current commercial baseline.
 
 ## Customer delivery package
 
@@ -61,23 +59,21 @@ The repository does not represent Managed or Enterprise operations as already de
 
 The first commercial transaction is a narrow one-tool pilot. The pilot protects one customer-selected high-impact HTTP or MCP tool and measures the actual execution boundary.
 
-Pilot acceptance is based on executable behavior:
+Acceptance is based on executable behavior:
 
 - unauthorized direct downstream access is rejected;
-- authority is bound to the intended tenant, actor, session, action and policy;
+- authority is bound to intended tenant, actor, session, action and policy;
 - expired authority is rejected;
 - replay is rejected;
 - tampering is rejected;
 - persistence survives restart;
 - evidence can be reproduced from the customer's deployment.
 
-The pilot does not certify the customer's whole AI system, legal compliance, downstream correctness or business outcomes.
-
 ## Live-sale dependency
 
 Technical release readiness is not revenue.
 
-A completed sale requires all of the following outside the code-runtime boundary:
+A completed sale requires:
 
 1. named buyer and technical owner;
 2. written scope and acceptance criteria;
@@ -87,13 +83,19 @@ A completed sale requires all of the following outside the code-runtime boundary
 6. customer acceptance evidence;
 7. entitlement/delivery record.
 
-Commercial settlement is currently specified as USDT-only in the repository payment policy. No private wallet key belongs in the repository.
+### Current settlement route
+
+The operator's only supplied settlement account is:
+
+- Provider: TopChange
+- Wallet: کیف پول دلار
+- Wallet ID: `USD2134914`
+
+This is not a blockchain address. Until a real on-chain address and network are supplied, the sale flow must use provider/manual settlement verification rather than pretending that blockchain transaction-hash verification exists.
 
 ## Commercial truth rule
 
-Do not call the product "sold", "customer validated", "revenue-generating", "production proven with customers", or "compliant" unless the corresponding external evidence exists.
-
-GitHub evidence proves engineering and release provenance. Customer evidence proves customer acceptance. A transaction record proves revenue. They are separate evidence classes.
+Do not call the product sold, customer validated, revenue-generating, production proven with customers, or compliant unless the corresponding external evidence exists.
 
 ## Launch assets
 
@@ -105,14 +107,3 @@ GitHub evidence proves engineering and release provenance. Customer evidence pro
 - `SALES/OBJECTIONS.md`
 - `SALES/PRICING_AND_SCOPE.md`
 - `SALES/COMMERCIAL_LAUNCH_PLAN.md`
-
-## Not included by default
-
-- customer-specific legal compliance certification;
-- universal AI-safety guarantees;
-- downstream tool correctness;
-- customer-specific policy design;
-- 24/7 support;
-- guaranteed business outcomes.
-
-Those require explicit scope and evidence.
