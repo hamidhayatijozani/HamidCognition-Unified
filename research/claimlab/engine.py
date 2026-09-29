@@ -55,7 +55,9 @@ class ClaimLab:
         return flags
     def _next_tests(self,claim,evidence,flags):
         tests=[]
-        if flags: tests.append("restate_claim_at_the_strength_supported_by_observation")
+        if not evidence:
+            tests.append("collect_minimum_independent_evidence_for_claim_scope")
+        elif flags: tests.append("restate_claim_at_the_strength_supported_by_observation")
         if any(e.relation==EvidenceRelation.CONTRADICT for e in evidence): tests.append("run_counterclaim_against_same_scope")
         if claim.scope: tests.append("run_out_of_sample_or_unseen_scope_test")
         if not any(e.independent for e in evidence): tests.append("add_independent_evidence_source")
