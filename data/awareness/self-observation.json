@@ -1,0 +1,574 @@
+{
+  "authority": "NONE",
+  "bindings": [
+    {
+      "component_id": "GOVERNANCE",
+      "evidence_required": true,
+      "role": "authority, safety and freeze policy",
+      "subsystem": "Action Gate + Z-FREEZE-LOCK"
+    },
+    {
+      "component_id": "COGNITION",
+      "evidence_required": true,
+      "role": "coordinate knowledge models",
+      "subsystem": "Strategic Intelligence OS"
+    },
+    {
+      "component_id": "SELF-MODEL",
+      "evidence_required": true,
+      "role": "capability ledger and maturity evidence",
+      "subsystem": "Strategic Intelligence Self Model"
+    },
+    {
+      "component_id": "CREATOR-CONTEXT",
+      "evidence_required": true,
+      "role": "explicit goals, constraints and decisions",
+      "subsystem": "Strategic Intelligence Creator Model"
+    },
+    {
+      "component_id": "MARKET-INTELLIGENCE",
+      "evidence_required": true,
+      "role": "dated sources, signals and counter-evidence",
+      "subsystem": "Market Intelligence"
+    },
+    {
+      "component_id": "REASONING",
+      "evidence_required": true,
+      "role": "separate facts, assumptions and inference",
+      "subsystem": "Evidence-bound reasoning"
+    },
+    {
+      "component_id": "EXECUTION",
+      "evidence_required": true,
+      "role": "bounded execution of product and commercial workflows",
+      "subsystem": "Idea-to-Sale OS"
+    },
+    {
+      "component_id": "PROMPTS",
+      "evidence_required": true,
+      "role": "run contracted prompt operations",
+      "subsystem": "Prompt assets"
+    },
+    {
+      "component_id": "MODULES",
+      "evidence_required": true,
+      "role": "run deterministic modules",
+      "subsystem": "Application modules"
+    },
+    {
+      "component_id": "TOOLS",
+      "evidence_required": true,
+      "role": "invoke only authorized interfaces",
+      "subsystem": "External adapters"
+    },
+    {
+      "component_id": "WORKFLOWS",
+      "evidence_required": true,
+      "role": "advance only across explicit gates",
+      "subsystem": "Workflow orchestration"
+    },
+    {
+      "component_id": "FEEDBACK",
+      "evidence_required": true,
+      "role": "verify and record outcomes",
+      "subsystem": "Evidence Pipeline"
+    },
+    {
+      "component_id": "VERIFICATION",
+      "evidence_required": true,
+      "role": "bind claims to tests and artifacts",
+      "subsystem": "Release verification"
+    },
+    {
+      "component_id": "MEMORY",
+      "evidence_required": true,
+      "role": "persist verified state",
+      "subsystem": "Provenance records"
+    },
+    {
+      "component_id": "LEARNING",
+      "evidence_required": true,
+      "role": "propose updates only from verified outcomes",
+      "subsystem": "Learning loop"
+    }
+  ],
+  "components": [
+    {
+      "capabilities": [
+        "audit",
+        "escalate"
+      ],
+      "component_id": "GOVERNANCE",
+      "evidence_refs": [],
+      "limits": [
+        "cannot self-grant authority"
+      ],
+      "maturity": "SPECIFIED",
+      "parent_id": "ROOT",
+      "status": "READY"
+    },
+    {
+      "capabilities": [
+        "research",
+        "update_model"
+      ],
+      "component_id": "COGNITION",
+      "evidence_refs": [],
+      "limits": [
+        "cannot invent evidence"
+      ],
+      "maturity": "PROTOTYPE",
+      "parent_id": "ROOT",
+      "status": "READY"
+    },
+    {
+      "capabilities": [
+        "run_prompt",
+        "run_module",
+        "invoke_tool"
+      ],
+      "component_id": "EXECUTION",
+      "evidence_refs": [],
+      "limits": [
+        "cannot bypass authority"
+      ],
+      "maturity": "PROTOTYPE",
+      "parent_id": "ROOT",
+      "status": "READY"
+    },
+    {
+      "capabilities": [
+        "verify",
+        "record"
+      ],
+      "component_id": "FEEDBACK",
+      "evidence_refs": [],
+      "limits": [
+        "cannot declare unsupported success"
+      ],
+      "maturity": "SPECIFIED",
+      "parent_id": "ROOT",
+      "status": "READY"
+    },
+    {
+      "capabilities": [
+        "r",
+        "e",
+        "f",
+        "r",
+        "e",
+        "s",
+        "h",
+        "_",
+        "c",
+        "a",
+        "p",
+        "a",
+        "b",
+        "i",
+        "l",
+        "i",
+        "t",
+        "y"
+      ],
+      "component_id": "SELF-MODEL",
+      "evidence_refs": [],
+      "limits": [
+        "cannot upgrade maturity without evidence"
+      ],
+      "maturity": "PROTOTYPE",
+      "parent_id": "COGNITION",
+      "status": "READY"
+    },
+    {
+      "capabilities": [
+        "r",
+        "e",
+        "c",
+        "o",
+        "r",
+        "d",
+        "_",
+        "c",
+        "o",
+        "n",
+        "t",
+        "e",
+        "x",
+        "t"
+      ],
+      "component_id": "CREATOR-CONTEXT",
+      "evidence_refs": [],
+      "limits": [
+        "no sensitive inference"
+      ],
+      "maturity": "PROTOTYPE",
+      "parent_id": "COGNITION",
+      "status": "READY"
+    },
+    {
+      "capabilities": [
+        "research_market",
+        "record_signal"
+      ],
+      "component_id": "MARKET-INTELLIGENCE",
+      "evidence_refs": [],
+      "limits": [
+        "no invented demand"
+      ],
+      "maturity": "PROTOTYPE",
+      "parent_id": "COGNITION",
+      "status": "READY"
+    },
+    {
+      "capabilities": [
+        "r",
+        "e",
+        "c",
+        "o",
+        "m",
+        "p",
+        "u",
+        "t",
+        "e"
+      ],
+      "component_id": "REASONING",
+      "evidence_refs": [],
+      "limits": [
+        "must separate fact from inference"
+      ],
+      "maturity": "PROTOTYPE",
+      "parent_id": "COGNITION",
+      "status": "READY"
+    },
+    {
+      "capabilities": [
+        "r",
+        "u",
+        "n",
+        "_",
+        "p",
+        "r",
+        "o",
+        "m",
+        "p",
+        "t"
+      ],
+      "component_id": "PROMPTS",
+      "evidence_refs": [],
+      "limits": [
+        "no hidden privilege escalation"
+      ],
+      "maturity": "PROTOTYPE",
+      "parent_id": "EXECUTION",
+      "status": "READY"
+    },
+    {
+      "capabilities": [
+        "r",
+        "u",
+        "n",
+        "_",
+        "m",
+        "o",
+        "d",
+        "u",
+        "l",
+        "e"
+      ],
+      "component_id": "MODULES",
+      "evidence_refs": [],
+      "limits": [
+        "no self-modification of authority"
+      ],
+      "maturity": "PROTOTYPE",
+      "parent_id": "EXECUTION",
+      "status": "READY"
+    },
+    {
+      "capabilities": [
+        "i",
+        "n",
+        "v",
+        "o",
+        "k",
+        "e",
+        "_",
+        "t",
+        "o",
+        "o",
+        "l"
+      ],
+      "component_id": "TOOLS",
+      "evidence_refs": [],
+      "limits": [
+        "no credential disclosure"
+      ],
+      "maturity": "SPECIFIED",
+      "parent_id": "EXECUTION",
+      "status": "READY"
+    },
+    {
+      "capabilities": [
+        "a",
+        "d",
+        "v",
+        "a",
+        "n",
+        "c",
+        "e",
+        "_",
+        "w",
+        "o",
+        "r",
+        "k",
+        "f",
+        "l",
+        "o",
+        "w"
+      ],
+      "component_id": "WORKFLOWS",
+      "evidence_refs": [],
+      "limits": [
+        "cannot skip approval gates"
+      ],
+      "maturity": "PROTOTYPE",
+      "parent_id": "EXECUTION",
+      "status": "READY"
+    },
+    {
+      "capabilities": [
+        "v",
+        "e",
+        "r",
+        "i",
+        "f",
+        "y"
+      ],
+      "component_id": "VERIFICATION",
+      "evidence_refs": [],
+      "limits": [
+        "cannot manufacture proof"
+      ],
+      "maturity": "VERIFIED",
+      "parent_id": "FEEDBACK",
+      "status": "READY"
+    },
+    {
+      "capabilities": [
+        "r",
+        "e",
+        "c",
+        "o",
+        "r",
+        "d"
+      ],
+      "component_id": "MEMORY",
+      "evidence_refs": [],
+      "limits": [
+        "cannot overwrite provenance silently"
+      ],
+      "maturity": "PROTOTYPE",
+      "parent_id": "FEEDBACK",
+      "status": "READY"
+    },
+    {
+      "capabilities": [
+        "u",
+        "p",
+        "d",
+        "a",
+        "t",
+        "e"
+      ],
+      "component_id": "LEARNING",
+      "evidence_refs": [],
+      "limits": [
+        "no learning from unverified claims"
+      ],
+      "maturity": "PROTOTYPE",
+      "parent_id": "FEEDBACK",
+      "status": "READY"
+    }
+  ],
+  "hard_boundary": "self-observation cannot execute, self-upgrade, self-grant authority, or rewrite contracts",
+  "mode": "SELF_OBSERVE_ONLY",
+  "observation_time": "2026-09-29T23:56:19.228578+00:00",
+  "project": "BESAZ",
+  "proposals": [
+    {
+      "component_id": "GOVERNANCE",
+      "next_action": "attach evidence or implement the next bounded capability",
+      "reason": "maturity=SPECIFIED",
+      "type": "VERIFY_OR_IMPLEMENT"
+    },
+    {
+      "component_id": "GOVERNANCE",
+      "next_action": "run a bounded verification task and record its evidence",
+      "reason": "no evidence reference recorded in current runtime state",
+      "type": "EVIDENCE_GAP"
+    },
+    {
+      "component_id": "COGNITION",
+      "next_action": "attach evidence or implement the next bounded capability",
+      "reason": "maturity=PROTOTYPE",
+      "type": "VERIFY_OR_IMPLEMENT"
+    },
+    {
+      "component_id": "COGNITION",
+      "next_action": "run a bounded verification task and record its evidence",
+      "reason": "no evidence reference recorded in current runtime state",
+      "type": "EVIDENCE_GAP"
+    },
+    {
+      "component_id": "EXECUTION",
+      "next_action": "attach evidence or implement the next bounded capability",
+      "reason": "maturity=PROTOTYPE",
+      "type": "VERIFY_OR_IMPLEMENT"
+    },
+    {
+      "component_id": "EXECUTION",
+      "next_action": "run a bounded verification task and record its evidence",
+      "reason": "no evidence reference recorded in current runtime state",
+      "type": "EVIDENCE_GAP"
+    },
+    {
+      "component_id": "FEEDBACK",
+      "next_action": "attach evidence or implement the next bounded capability",
+      "reason": "maturity=SPECIFIED",
+      "type": "VERIFY_OR_IMPLEMENT"
+    },
+    {
+      "component_id": "FEEDBACK",
+      "next_action": "run a bounded verification task and record its evidence",
+      "reason": "no evidence reference recorded in current runtime state",
+      "type": "EVIDENCE_GAP"
+    },
+    {
+      "component_id": "SELF-MODEL",
+      "next_action": "attach evidence or implement the next bounded capability",
+      "reason": "maturity=PROTOTYPE",
+      "type": "VERIFY_OR_IMPLEMENT"
+    },
+    {
+      "component_id": "SELF-MODEL",
+      "next_action": "run a bounded verification task and record its evidence",
+      "reason": "no evidence reference recorded in current runtime state",
+      "type": "EVIDENCE_GAP"
+    },
+    {
+      "component_id": "CREATOR-CONTEXT",
+      "next_action": "attach evidence or implement the next bounded capability",
+      "reason": "maturity=PROTOTYPE",
+      "type": "VERIFY_OR_IMPLEMENT"
+    },
+    {
+      "component_id": "CREATOR-CONTEXT",
+      "next_action": "run a bounded verification task and record its evidence",
+      "reason": "no evidence reference recorded in current runtime state",
+      "type": "EVIDENCE_GAP"
+    },
+    {
+      "component_id": "MARKET-INTELLIGENCE",
+      "next_action": "attach evidence or implement the next bounded capability",
+      "reason": "maturity=PROTOTYPE",
+      "type": "VERIFY_OR_IMPLEMENT"
+    },
+    {
+      "component_id": "MARKET-INTELLIGENCE",
+      "next_action": "run a bounded verification task and record its evidence",
+      "reason": "no evidence reference recorded in current runtime state",
+      "type": "EVIDENCE_GAP"
+    },
+    {
+      "component_id": "REASONING",
+      "next_action": "attach evidence or implement the next bounded capability",
+      "reason": "maturity=PROTOTYPE",
+      "type": "VERIFY_OR_IMPLEMENT"
+    },
+    {
+      "component_id": "REASONING",
+      "next_action": "run a bounded verification task and record its evidence",
+      "reason": "no evidence reference recorded in current runtime state",
+      "type": "EVIDENCE_GAP"
+    },
+    {
+      "component_id": "PROMPTS",
+      "next_action": "attach evidence or implement the next bounded capability",
+      "reason": "maturity=PROTOTYPE",
+      "type": "VERIFY_OR_IMPLEMENT"
+    },
+    {
+      "component_id": "PROMPTS",
+      "next_action": "run a bounded verification task and record its evidence",
+      "reason": "no evidence reference recorded in current runtime state",
+      "type": "EVIDENCE_GAP"
+    },
+    {
+      "component_id": "MODULES",
+      "next_action": "attach evidence or implement the next bounded capability",
+      "reason": "maturity=PROTOTYPE",
+      "type": "VERIFY_OR_IMPLEMENT"
+    },
+    {
+      "component_id": "MODULES",
+      "next_action": "run a bounded verification task and record its evidence",
+      "reason": "no evidence reference recorded in current runtime state",
+      "type": "EVIDENCE_GAP"
+    },
+    {
+      "component_id": "TOOLS",
+      "next_action": "attach evidence or implement the next bounded capability",
+      "reason": "maturity=SPECIFIED",
+      "type": "VERIFY_OR_IMPLEMENT"
+    },
+    {
+      "component_id": "TOOLS",
+      "next_action": "run a bounded verification task and record its evidence",
+      "reason": "no evidence reference recorded in current runtime state",
+      "type": "EVIDENCE_GAP"
+    },
+    {
+      "component_id": "WORKFLOWS",
+      "next_action": "attach evidence or implement the next bounded capability",
+      "reason": "maturity=PROTOTYPE",
+      "type": "VERIFY_OR_IMPLEMENT"
+    },
+    {
+      "component_id": "WORKFLOWS",
+      "next_action": "run a bounded verification task and record its evidence",
+      "reason": "no evidence reference recorded in current runtime state",
+      "type": "EVIDENCE_GAP"
+    },
+    {
+      "component_id": "VERIFICATION",
+      "next_action": "run a bounded verification task and record its evidence",
+      "reason": "no evidence reference recorded in current runtime state",
+      "type": "EVIDENCE_GAP"
+    },
+    {
+      "component_id": "MEMORY",
+      "next_action": "attach evidence or implement the next bounded capability",
+      "reason": "maturity=PROTOTYPE",
+      "type": "VERIFY_OR_IMPLEMENT"
+    },
+    {
+      "component_id": "MEMORY",
+      "next_action": "run a bounded verification task and record its evidence",
+      "reason": "no evidence reference recorded in current runtime state",
+      "type": "EVIDENCE_GAP"
+    },
+    {
+      "component_id": "LEARNING",
+      "next_action": "attach evidence or implement the next bounded capability",
+      "reason": "maturity=PROTOTYPE",
+      "type": "VERIFY_OR_IMPLEMENT"
+    },
+    {
+      "component_id": "LEARNING",
+      "next_action": "run a bounded verification task and record its evidence",
+      "reason": "no evidence reference recorded in current runtime state",
+      "type": "EVIDENCE_GAP"
+    }
+  ]
+}
