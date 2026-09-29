@@ -1,53 +1,65 @@
-# USDT Payment Policy
+# Payment & Settlement Policy
 
 ## Scope
 
-HamidCognition commercial payments are settled in USDT only.
+HamidCognition separates commercial settlement from the runtime security boundary. Action Gate never needs custody of funds and never receives wallet private keys.
 
-The payment system is intentionally separated from the runtime security boundary. Action Gate never needs custody of funds and never receives wallet private keys.
+## Current operator settlement account
 
-## Required configuration
+The operator currently has one verified TopChange settlement identifier:
 
-The commercial operator configures the receiving wallet outside source control:
+- Provider: TopChange
+- Wallet name: کیف پول دلار
+- Wallet ID: `USD2134914`
+- Identifier type: TopChange wallet/account identifier
+
+This identifier is **not a blockchain address**. The product must not present it as a USDT on-chain receiving address.
+
+## Current payment mode
+
+Until a real blockchain receiving address and network are configured, payment verification is **manual/provider-based**.
+
+The system may issue an invoice and record:
+
+- invoice ID;
+- quoted amount and currency;
+- provider: TopChange;
+- settlement account identifier;
+- payment/reference information supplied by the provider;
+- timestamp;
+- product version;
+- entitlement identifier;
+- verification status;
+- operator verification evidence.
+
+The system must not mark a payment CONFIRMED merely from a customer screenshot, copied identifier, or chat message.
+
+## Optional on-chain USDT mode
+
+If a real USDT receiving address is configured later, the following fields become required:
 
 - `USDT_PAYMENT_ADDRESS`
 - `USDT_NETWORK`
 - `USDT_CONFIRMATIONS_REQUIRED`
 
-The actual wallet address and private keys must never be committed to Git.
+For on-chain settlement, the transaction hash is the settlement reference and confirmation evidence must be recorded.
 
 ## Invoice lifecycle
 
 `ISSUED -> AWAITING_PAYMENT -> PAYMENT_DETECTED -> CONFIRMED -> ENTITLED`
 
-Any conflicting, underpaid, wrong-network or otherwise unverifiable transaction remains `EXCEPTION` until manually reconciled.
-
-## Minimum payment evidence
-
-Each paid invoice records:
-
-- invoice ID;
-- quoted amount in USDT;
-- network;
-- receiving address fingerprint;
-- transaction hash;
-- block/transaction reference;
-- confirmation count;
-- timestamp;
-- product version;
-- entitlement identifier.
-
-The transaction hash is the settlement reference. A screenshot, copied address, or chat message is not settlement proof.
+Any conflicting, underpaid, wrong-network, provider-unverified, or otherwise unverifiable transaction remains `EXCEPTION` until manually reconciled.
 
 ## Safety rules
 
 - Never request or store a wallet seed phrase or private key.
-- Never silently substitute a different USDT network.
-- Display the network and receiving address together before payment.
-- Treat a payment sent on the wrong network as an exception, not as automatically settled.
-- Do not release commercial credentials or artifacts until the invoice reaches `CONFIRMED`.
+- Never invent or infer a blockchain address from a TopChange Wallet ID.
+- Never silently substitute a different network.
+- Do not release commercial credentials or artifacts until settlement reaches `CONFIRMED`.
 - Keep payment verification outside the Action Gate authorization path.
 
-## Current deployment contract
+## Current truth
 
-The repository provides the payment contract and operational boundary. A live receiving address is deployment configuration and must be supplied through the commercial operator's secret/configuration system, not Git.
+The repository contains the payment contract and the operator's TopChange Wallet ID metadata. It does **not** claim that the operator currently has a blockchain USDT receiving address.
+
+A live on-chain address, if later supplied, remains deployment configuration and must not be committed to Git.
