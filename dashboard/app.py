@@ -61,6 +61,10 @@ def gate_headers() -> dict[str, str]:
 def index() -> str:
     return INDEX
 
+@app.get("/health")
+async def public_health() -> dict[str, Any]:
+    return await health()
+
 @app.get("/api/health")
 async def health() -> dict[str, Any]:
     async with httpx.AsyncClient(timeout=5) as client:
