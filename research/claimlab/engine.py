@@ -65,6 +65,12 @@ class Evidence:
     fresh:bool=True
     independent:bool=True
     signals:SignalSnapshot|None=None
+    evidence_type:str="generic"
+    timestamp:str=""
+
+    def __post_init__(self):
+        if self.evidence_type == "signal_snapshot" and self.signals is None:
+            raise ValueError("signal_snapshot evidence requires structured signals")
 
     def to_dict(self) -> dict[str, Any]:
         payload=asdict(self)
