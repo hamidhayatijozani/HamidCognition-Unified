@@ -28,6 +28,34 @@ class EpistemicState(str, Enum):
 
 
 @dataclass(frozen=True)
+class SignalSnapshot:
+    """Structured, replayable state captured with a signal evidence entry."""
+    P: float
+    S: float
+    T: float
+    energy: float
+    creativity: float
+    loop: bool
+    jump: bool
+    escape: bool
+    signal: int
+
+    def __post_init__(self):
+        for name in ("P", "S", "T", "energy", "creativity"):
+            value = float(getattr(self, name))
+            if not 0.0 <= value <= 1.0:
+                raise ValueError(f"{name} must be between 0 and 1")
+            object.__setattr__(self, name, value)
+        object.__setattr__(self, "loop", bool(self.loop))
+        object.__setattr__(self, "jump", bool(self.jump))
+        object.__setattr__(self, "escape", bool(self.escape))
+        object.__setattr__(self, "signal", int(self.signal))
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class Evidence:
     evidence_id:str
     relation:EvidenceRelation
@@ -36,6 +64,12 @@ class Evidence:
     strength:float=1.0
     fresh:bool=True
     independent:bool=True
+    signals:SignalSnapshot|None=None
+
+    def to_dict(self) -> dict[str, Any]:
+        payload=asdict(self)
+        payload["relation"]=self.relation.value
+        return payload
 
 
 @dataclass(frozen=True)
