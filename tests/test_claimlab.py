@@ -52,3 +52,30 @@ def test_unknown_produces_evidence_collection_action():
     result=ClaimLab().assess(Claim("An unobserved regime predicts positive returns",ClaimType.INFERENCE,{"symbol":"EURUSD"}),[])
     assert result.verdict==Verdict.UNKNOWN
     assert "collect_minimum_independent_evidence_for_claim_scope" in result.next_tests
+
+from research.claimlab.engine import EpistemicState
+
+
+def test_unknown_exposes_explicit_epistemic_state_and_reason():
+    result=ClaimLab().assess(Claim("An unobserved regime predicts positive returns",ClaimType.INFERENCE,{"symbol":"EURUSD"}),[])
+    assert result.verdict==Verdict.UNKNOWN
+    assert result.epistemic_state==EpistemicState.UNOBSERVED
+    assert result.unknown_reason=="no_usable_evidence_for_claim_scope"
+
+
+def test_evidence_quality_components_are_auditable():
+    c=Claim("The transition predicts positive returns",ClaimType.INFERENCE)
+    result=ClaimLab().assess(c,[ev("s1",EvidenceRelation.SUPPORT,"support A",source="feed-A"),ev("s2",EvidenceRelation.SUPPORT,"support B",source="feed-B")])
+    assert result.evidence_quality==1.0
+    assert result.evidence_quality_components["scored_evidence"]==2
+    assert result.evidence_quality_components["freshness"]==1.0
+    assert result.evidence_quality_components["independent_sources"]==2
+    assert result.evidence_quality_components["independent_source_factor"]==1.0
+
+
+def test_stale_or_conflicted_evidence_is_unresolved_not_unknown():
+    c=Claim("The transition predicts positive returns",ClaimType.INFERENCE)
+    result=ClaimLab().assess(c,[ev("s1",EvidenceRelation.SUPPORT,"fresh support",source="feed-A"),ev("x1",EvidenceRelation.CONFLICTED,"conflict",source="feed-B")])
+    assert result.verdict==Verdict.WEAK
+    assert result.epistemic_state==EpistemicState.UNRESOLVED
+    assert result.unresolved==1.0
