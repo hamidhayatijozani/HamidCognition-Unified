@@ -47,3 +47,20 @@ def test_sandbox_requires_controlled_fixture():
     result = run_sandbox(candidate, {"baseline": {"score": 1}})
     assert result.outcome == "INCONCLUSIVE"
     assert result.next_action == "repair_fixture"
+
+
+
+def test_besaz_innovate_script_generates_report_without_contract_evidence_refs(monkeypatch, tmp_path):
+    import json
+    import scripts.besaz_innovate as module
+
+    output = tmp_path / "innovation-report.json"
+    monkeypatch.setattr(module, "OUT", output)
+    module.main()
+
+    report = json.loads(output.read_text(encoding="utf-8"))
+    assert report["project"] == "BESAZ"
+    assert report["mode"] == "INNOVATION_SANDBOX"
+    assert report["authority"] == "NONE"
+    assert report["candidate_count"] > 0
+    assert all(candidate["source_components"] for candidate in report["candidates"])
