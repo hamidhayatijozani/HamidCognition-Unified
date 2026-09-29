@@ -1,3 +1,4 @@
 """ClaimLab: evidence-first claim integrity research engine."""
-from .engine import ClaimLab, Claim, Evidence, Verdict, EpistemicState
-__all__ = ["ClaimLab", "Claim", "Evidence", "Verdict", "EpistemicState"]
+from .engine import ClaimLab, Claim, Evidence, Verdict, EpistemicState, SignalSnapshot
+
+__all__ = ["ClaimLab", "Claim", "Evidence", "Verdict", "EpistemicState", "SignalSnapshot"]
