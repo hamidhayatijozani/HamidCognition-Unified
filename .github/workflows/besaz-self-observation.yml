@@ -28,7 +28,7 @@ jobs:
         run: |
           git config user.name "BESAZ Self Observer"
           git config user.email "actions@users.noreply.github.com"
-          git add data/awareness/self-observation.json
+          git add -f data/awareness/self-observation.json
           git diff --cached --quiet && exit 0
           git commit -m "BESAZ: record self-observation"
           git push
