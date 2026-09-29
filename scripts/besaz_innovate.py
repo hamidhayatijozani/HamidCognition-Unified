@@ -14,7 +14,11 @@ def main() -> None:
         {
             "component_id": c.component_id,
             "maturity": c.maturity.value,
-            "evidence_refs": list(c.evidence_refs),
+            # AwarenessContract is the static architecture contract and does
+            # not carry evidence_refs itself; evidence only accumulates at
+            # runtime on AwarenessState (see src/awareness_layer.py). A
+            # canonical contract therefore reports no evidence here.
+            "evidence_refs": [],
             "capabilities": list(c.capabilities),
         }
         for c in contracts
