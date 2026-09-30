@@ -60,7 +60,7 @@ No prize or market claim is considered real until its external rules and the sub
 
 **Last validated published commercial release: Action Gate v1.0.10.**
 
-Current release evidence is valid only when the exact source SHA, workflow run, artifact digest and release record agree.
+Current release evidence is valid only when the same source SHA is used by the product evidence, workflow run, artifact digest and release record.
 
 Commercial payment is USDT only. Payment settlement is deliberately outside the Action Gate authorization path and is governed by PRODUCT/USDT_PAYMENT_POLICY.md.
 
