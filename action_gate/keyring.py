@@ -18,7 +18,7 @@ def _configured_keys() -> dict[str, str]:
         except (json.JSONDecodeError, TypeError, ValueError) as exc:
             raise RuntimeError("invalid_action_gate_signing_keys") from exc
 
-    secret = os.getenv("ACTION_GATE_AUTHORITY_SECRET") or os.getenv("ACTION_GATE_SIGNING_SECRET")
+    secret = os.getenv("ACTION_GATE_SIGNING_SECRET") or os.getenv("ACTION_GATE_AUTHORITY_SECRET")
     if secret:
         return {os.getenv("ACTION_GATE_KEY_ID", "hhj-action-gate-1"): secret}
     return {}
