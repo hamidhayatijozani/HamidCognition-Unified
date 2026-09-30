@@ -29,6 +29,7 @@ OANDA documents separate Practice and production REST base URLs and recommends t
 
 Use deployment-only secrets:
 
+- ACTION_GATE_TENANT_ID
 - OANDA_API_TOKEN
 - OANDA_ACCOUNT_ID
 - OANDA_ENVIRONMENT=practice
