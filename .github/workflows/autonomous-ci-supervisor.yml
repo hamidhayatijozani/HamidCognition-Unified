@@ -16,6 +16,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Static product drift gate
+        run: python3 scripts/product_drift_gate.py
+
       - name: Autonomous control loop
         env:
           GH_TOKEN: ${{ github.token }}
@@ -33,6 +36,9 @@ jobs:
 
           echo "=== Autonomous CI Supervisor ==="
           echo "Repository: $REPO"
+
+          python3 scripts/autonomous_project_control.py
+          python3 scripts/evidence_truth_gate.py
 
           for cycle in 1 2 3 4 5; do
             echo
