@@ -43,7 +43,12 @@ def wait_for_endpoint(url: str) -> None:
             with urllib.request.urlopen(req, timeout=10) as response:
                 print(f"Endpoint reachable (HTTP {response.status})")
                 return
-        except Exception as exc:
+        except urllib.error.HTTPError as exc:
+            # Any HTTP response proves DNS/TCP/TLS reached the MCP server.
+            # Authentication, method, or protocol failures are validated below.
+            print(f"Endpoint reachable (HTTP {exc.code})")
+            return
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
             print(f"[{attempt}/{MAX_REACHABLE_RETRIES}] HTTP not ready: {exc} — waiting {REACHABLE_DELAY}s", file=sys.stderr)
             time.sleep(REACHABLE_DELAY)
     raise SystemExit(f"NETWORK ERROR: endpoint {url} never became reachable after {MAX_REACHABLE_RETRIES} attempts")
