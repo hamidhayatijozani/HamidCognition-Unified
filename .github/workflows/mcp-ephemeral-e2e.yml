@@ -75,13 +75,32 @@ jobs:
             )"
             if [ -n "$url" ]; then
               endpoint="$url/mcp"
+              host="$(printf '%s' "$url" | sed -E 's#https://([^/]+).*#\1#')"
               echo "Discovered MCP endpoint: $endpoint"
-              {
-                echo "MCP_E2E_URL=$endpoint"
-                echo "MCP_E2E_BEARER_TOKEN=$MCP_BEARER_TOKEN"
-              } >> "$GITHUB_ENV"
-              echo "url=$endpoint" >> "$GITHUB_OUTPUT"
-              exit 0
+              echo "Waiting for public DNS/HTTPS propagation for $host..."
+              for j in {1..30}; do
+                if getent hosts "$host" >/dev/null 2>&1; then
+                  http_code="$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 5 --max-time 10 "$endpoint" || true)"
+                  case "$http_code" in
+                    2??|3??|4??)
+                      echo "Public MCP endpoint is reachable (HTTP $http_code)."
+                      {
+                        echo "MCP_E2E_URL=$endpoint"
+                        echo "MCP_E2E_BEARER_TOKEN=$MCP_BEARER_TOKEN"
+                      } >> "$GITHUB_ENV"
+                      echo "url=$endpoint" >> "$GITHUB_OUTPUT"
+                      exit 0
+                      ;;
+                  esac
+                fi
+                sleep 2
+              done
+              echo "Tunnel URL was discovered but never became DNS/HTTPS reachable: $endpoint"
+              docker compose \
+                -f action_gate/docker-compose.production.yml \
+                -f action_gate/docker-compose.chatgpt-quick-tunnel.yml \
+                logs --no-color chatgpt-quick-tunnel
+              exit 1
             fi
             sleep 2
           done
