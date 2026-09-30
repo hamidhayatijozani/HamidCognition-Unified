@@ -35,8 +35,10 @@ def wait_for_endpoint(url: str) -> None:
         try:
             socket.getaddrinfo(host, port, socket.AF_UNSPEC, socket.SOCK_STREAM)
         except socket.gaierror as exc:
-            print(f"[{attempt}/{MAX_REACHABLE_RETRIES}] DNS not ready for {host}: {exc} — waiting {REACHABLE_DELAY}s", file=sys.stderr)
-            time.sleep(REACHABLE_DELAY)
+            print(f"[{attempt}/{MAX_REACHABLE_RETRIES}] DNS not ready for {host}: {exc}", file=sys.stderr)
+            if attempt < MAX_REACHABLE_RETRIES:
+                print(f"waiting {REACHABLE_DELAY}s", file=sys.stderr)
+                time.sleep(REACHABLE_DELAY)
             continue
         try:
             req = urllib.request.Request(url, method="GET")
@@ -49,8 +51,10 @@ def wait_for_endpoint(url: str) -> None:
             print(f"Endpoint reachable (HTTP {exc.code})")
             return
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
-            print(f"[{attempt}/{MAX_REACHABLE_RETRIES}] HTTP not ready: {exc} — waiting {REACHABLE_DELAY}s", file=sys.stderr)
-            time.sleep(REACHABLE_DELAY)
+            print(f"[{attempt}/{MAX_REACHABLE_RETRIES}] HTTP not ready: {exc}", file=sys.stderr)
+            if attempt < MAX_REACHABLE_RETRIES:
+                print(f"waiting {REACHABLE_DELAY}s", file=sys.stderr)
+                time.sleep(REACHABLE_DELAY)
     raise SystemExit(f"NETWORK ERROR: endpoint {url} never became reachable after {MAX_REACHABLE_RETRIES} attempts")
 
 URL = os.environ.get("MCP_E2E_URL")
