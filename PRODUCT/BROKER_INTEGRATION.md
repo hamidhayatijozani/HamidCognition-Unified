@@ -13,7 +13,9 @@ The adapter is deliberately fail-closed.
 - OANDA Practice and Live API environments.
 - Account and pricing endpoints.
 - Market orders with optional stop-loss and take-profit.
-- Gate authorization is mandatory before dispatch.
+- Gate-issued execution authority is mandatory before dispatch.
+- The broker verifies authority signature, tenant binding, action binding, policy binding, expiry, decision and single-use nonce before dispatch.
+- A boolean `gate_authorized` flag is not accepted by the broker execution API.
 - Deterministic instrument and unit limits.
 - Operation ID is carried into OANDA client extensions.
 - A transport failure after dispatch is reported as UNKNOWN and is never automatically retried.
