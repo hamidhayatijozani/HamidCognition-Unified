@@ -8,6 +8,7 @@ import httpx
 from .models import BrokerEnvironment, BrokerExecutionState, BrokerResult, MarketOrder
 from .risk import BrokerPolicy
 from action_gate.enforcement import enforce_execution_authority
+from action_gate.security_authority import Authority
 
 
 class HttpTransport(Protocol):
@@ -181,9 +182,20 @@ class OandaBroker:
             )
             response.raise_for_status()
         except Exception as exc:
+            reconciliation_reference = None
+            try:
+                authority = Authority.from_token(authority_token)
+                reconciliation_reference = {
+                    "decision_id": authority.decision_id,
+                    "tenant_id": authority.tenant_id,
+                    "nonce": authority.nonce,
+                }
+            except Exception:
+                pass
             return BrokerResult(
                 BrokerExecutionState.UNKNOWN, None, None, None, {},
                 f"broker_transport_uncertain:{type(exc).__name__}",
+                reconciliation_reference,
             )
 
         body = response.json()
