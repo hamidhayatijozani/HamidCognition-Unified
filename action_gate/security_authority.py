@@ -1,15 +1,11 @@
-"""Security/authority primitives for Action Gate MVP.
-
-The module is intentionally dependency-free. It binds an authority token to
-one canonical decision scope and rejects expiry, nonce reuse, tenant mismatch,
-and action/resource mismatch before execution.
-"""
+"""Security/authority primitives for Action Gate execution boundaries."""
 from __future__ import annotations
 
 import base64
 import hashlib
 import hmac
 import json
+import os
 import secrets
 import time
 from dataclasses import dataclass, asdict
@@ -38,6 +34,7 @@ class Authority:
     issued_at: int
     expires_at: int
     decision: str
+    key_id: str
     signature: str
 
     def payload(self) -> dict[str, Any]:
@@ -54,6 +51,8 @@ class Authority:
         try:
             padded = token + "=" * (-len(token) % 4)
             data = json.loads(base64.urlsafe_b64decode(padded.encode()).decode())
+            # Backward compatibility for pre-key-id development tokens.
+            data.setdefault("key_id", os.getenv("ACTION_GATE_KEY_ID", "hhj-action-gate-1"))
             return cls(**data)
         except Exception as exc:
             raise AuthorityError("malformed_authority") from exc
@@ -62,7 +61,8 @@ class Authority:
 def issue_authority(*, secret: bytes, decision_id: str, tenant_id: str,
                     action: Mapping[str, Any], policy: Mapping[str, Any],
                     decision: str, ttl_seconds: int = 300,
-                    now: int | None = None, nonce: str | None = None) -> Authority:
+                    now: int | None = None, nonce: str | None = None,
+                    key_id: str | None = None) -> Authority:
     issued = int(time.time()) if now is None else int(now)
     if ttl_seconds <= 0:
         raise AuthorityError("ttl_seconds must be positive")
@@ -75,31 +75,10 @@ def issue_authority(*, secret: bytes, decision_id: str, tenant_id: str,
         "issued_at": issued,
         "expires_at": issued + ttl_seconds,
         "decision": decision,
+        "key_id": key_id or os.getenv("ACTION_GATE_KEY_ID", "hhj-action-gate-1"),
     }
     signature = hmac.new(secret, canonical_json(payload).encode(), hashlib.sha256).hexdigest()
     return Authority(**payload, signature=signature)
-
-
-def verify_authority_envelope(*, authority: Authority, secret: bytes,
-                              tenant_id: str, action_digest: str,
-                              now: int | None = None,
-                              used_nonces: set[str] | None = None) -> None:
-    current = int(time.time()) if now is None else int(now)
-    expected = hmac.new(secret, canonical_json(authority.payload()).encode(), hashlib.sha256).hexdigest()
-    if not hmac.compare_digest(expected, authority.signature):
-        raise AuthorityError("invalid_signature")
-    if authority.tenant_id != tenant_id:
-        raise AuthorityError("tenant_mismatch")
-    if current >= authority.expires_at or current < authority.issued_at:
-        raise AuthorityError("expired_or_not_yet_valid")
-    if authority.action_digest != action_digest:
-        raise AuthorityError("action_binding_mismatch")
-    if authority.decision != "ALLOW":
-        raise AuthorityError("decision_not_executable")
-    if used_nonces is not None:
-        if authority.nonce in used_nonces:
-            raise AuthorityError("nonce_reuse")
-        used_nonces.add(authority.nonce)
 
 
 def verify_authority(*, authority: Authority, secret: bytes,
