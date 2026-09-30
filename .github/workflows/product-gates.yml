@@ -53,6 +53,9 @@ jobs:
         run: pytest -q test_validation_boundary_conformance.py --junitxml=validation-boundary-junit.xml
       - name: Run real HTTP enforcement integration
         working-directory: action_gate
+        env:
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
         run: python enforcement_integration.py
       - name: Run real MCP enforcement integration
         working-directory: action_gate
@@ -130,6 +133,28 @@ jobs:
           MCP_RESOURCE_URL: http://127.0.0.1:8787/mcp
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml up -d --build
+      - name: Verify production stack health before replay
+        working-directory: action_gate
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 60); do
+            docker compose -f docker-compose.production.yml ps -a
+            container_id="$(docker compose -f docker-compose.production.yml ps -q action-gate)"
+            postgres_id="$(docker compose -f docker-compose.production.yml ps -q postgres)"
+            if [ -n "$container_id" ] && [ -n "$postgres_id" ]; then
+              gate_health="$(docker inspect -f '{{.State.Health.Status}}' "$container_id" 2>/dev/null || true)"
+              pg_health="$(docker inspect -f '{{.State.Health.Status}}' "$postgres_id" 2>/dev/null || true)"
+              echo "action-gate health: ${gate_health:-unknown}; postgres health: ${pg_health:-unknown}"
+              if [ "$gate_health" = "healthy" ] && [ "$pg_health" = "healthy" ]; then
+                exit 0
+              fi
+            fi
+            sleep 2
+          done
+          echo "Production stack did not reach healthy state"
+          docker compose -f docker-compose.production.yml ps -a || true
+          docker compose -f docker-compose.production.yml logs --no-color --tail=500 action-gate postgres || true
+          exit 1
       - name: Verify ChatGPT MCP container reachability
         working-directory: action_gate
         env:
