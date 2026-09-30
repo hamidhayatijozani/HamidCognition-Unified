@@ -200,6 +200,9 @@ class OandaBrokerTests(unittest.TestCase):
 
         self.assertEqual(result.state, BrokerExecutionState.UNKNOWN)
         self.assertTrue(result.requires_reconciliation)
+        self.assertEqual(result.reconciliation_reference["decision_id"], "dec_OP-1")
+        self.assertEqual(result.reconciliation_reference["tenant_id"], self.TENANT)
+        self.assertEqual(result.reconciliation_reference["nonce"], Authority.from_token(token).nonce)
         self.assertEqual(len(transport.posts), 1)
 
     def test_risk_limit_blocks_before_authority_or_network(self):
