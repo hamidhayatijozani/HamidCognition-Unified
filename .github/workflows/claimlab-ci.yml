@@ -103,7 +103,7 @@ jobs:
           request = urllib.request.Request(
               "http://127.0.0.1:8790/evidence",
               data=body,
-              headers={"Content-Type": "application/json"},
+              headers={"Content-Type": "application/json", "X-ClaimLab-API-Key": "ci-claimlab-key"},
               method="POST",
           )
           with urllib.request.urlopen(request, timeout=5) as r:
