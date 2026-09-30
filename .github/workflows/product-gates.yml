@@ -137,6 +137,7 @@ jobs:
         working-directory: action_gate
         env:
           ACTION_GATE_API_TOKEN: health-check-placeholder
+          ACTION_GATE_SIGNING_SECRET: health-signing-placeholder
         run: |
           set -euo pipefail
           for attempt in $(seq 1 60); do
