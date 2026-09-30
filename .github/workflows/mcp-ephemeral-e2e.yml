@@ -74,7 +74,7 @@ jobs:
                 -f action_gate/docker-compose.production.yml \
                 -f action_gate/docker-compose.chatgpt-quick-tunnel.yml \
                 logs chatgpt-quick-tunnel 2>&1 \
-                | grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' \
+                | grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' | grep -v '^https://api\.trycloudflare\.com$' \
                 | head -n1 || true
             )"
             if [ -n "$url" ]; then
@@ -138,7 +138,7 @@ jobs:
                 -f action_gate/docker-compose.production.yml \
                 -f action_gate/docker-compose.chatgpt-quick-tunnel.yml \
                 logs chatgpt-quick-tunnel 2>&1 \
-                | grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' \
+                | grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' | grep -v '^https://api\.trycloudflare\.com$' \
                 | tail -n1 || true
             )"
             if [ -z "$url" ]; then
