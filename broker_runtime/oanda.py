@@ -7,6 +7,7 @@ import httpx
 
 from .models import BrokerEnvironment, BrokerExecutionState, BrokerResult, MarketOrder
 from .risk import BrokerPolicy
+from action_gate.enforcement import enforce_execution_authority
 
 
 class HttpTransport(Protocol):
@@ -29,6 +30,7 @@ class OandaBroker:
         live_trading_enabled: bool | None = None,
         live_confirmation: str | None = None,
         policy: BrokerPolicy | None = None,
+        tenant_id: str | None = None,
         transport: HttpTransport | None = None,
     ) -> None:
         self.token = token or os.getenv("OANDA_API_TOKEN", "")
@@ -43,6 +45,7 @@ class OandaBroker:
         )
         self.live_confirmation = live_confirmation or os.getenv("LIVE_TRADING_CONFIRMATION", "")
         self.policy = policy or BrokerPolicy()
+        self.tenant_id = tenant_id or os.getenv("ACTION_GATE_TENANT_ID", "")
         self.transport = transport or httpx.Client(timeout=10.0)
 
     @property
@@ -81,18 +84,49 @@ class OandaBroker:
         response.raise_for_status()
         return response.json()
 
+    def _authorization_action(self, order: MarketOrder) -> dict[str, Any]:
+        return {
+            "action": "broker.market_order",
+            "operation_id": order.operation_id,
+            "instrument": order.instrument,
+            "units": str(order.units),
+            "stop_loss": str(order.stop_loss) if order.stop_loss is not None else None,
+            "take_profit": str(order.take_profit) if order.take_profit is not None else None,
+            "environment": self.environment.value,
+            "account_id": self.account_id,
+        }
+
     def submit_market_order(
         self,
         order: MarketOrder,
         *,
-        gate_authorized: bool,
+        authority_token: str | None = None,
     ) -> BrokerResult:
         self.policy.validate(order)
 
-        if not gate_authorized:
+        if not authority_token:
             return BrokerResult(
                 BrokerExecutionState.BLOCKED, None, None, None, {},
                 "action_gate_authorization_required",
+            )
+        if not self.tenant_id:
+            return BrokerResult(
+                BrokerExecutionState.BLOCKED, None, None, None, {},
+                "action_gate_tenant_not_configured",
+            )
+
+        try:
+            enforce_execution_authority(
+                authority_token,
+                expected_tenant_id=self.tenant_id,
+                expected_action=self._authorization_action(order),
+                expected_policy=self.policy.as_authorization_policy(),
+            )
+        except Exception as exc:
+            reason = getattr(exc, "detail", None) or str(exc)
+            return BrokerResult(
+                BrokerExecutionState.BLOCKED, None, None, None, {},
+                f"action_gate_authorization_rejected:{reason}",
             )
 
         if self.environment is BrokerEnvironment.LIVE:
