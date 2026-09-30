@@ -76,7 +76,7 @@ jobs:
           unauthorized = urllib.request.Request(
               "http://127.0.0.1:8790/evidence",
               data=json.dumps({"id": "unauthorized"}).encode(),
-              headers={"Content-Type": "application/json", "X-ClaimLab-API-Key": "ci-claimlab-key"},
+              headers={"Content-Type": "application/json"},
               method="POST",
           )
           try:
