@@ -1,15 +1,24 @@
 from __future__ import annotations
 
+import hmac
 import os
 from typing import Any
 
 import psycopg
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException
 from psycopg.types.json import Jsonb
 
 from .engine import Evidence, EvidenceRelation, SignalSnapshot
 
 app = FastAPI(title="ClaimLab Evidence API", version="1.0.0")
+
+
+def require_api_key(x_claimlab_api_key: str | None) -> None:
+    expected = os.getenv("CLAIMLAB_API_KEY", "").strip()
+    if not expected:
+        raise RuntimeError("CLAIMLAB_API_KEY is required for evidence writes")
+    if not x_claimlab_api_key or not hmac.compare_digest(x_claimlab_api_key, expected):
+        raise HTTPException(status_code=401, detail="invalid_api_key")
 
 
 def database_url() -> str:
@@ -78,7 +87,8 @@ def health() -> dict[str, str]:
 
 
 @app.post("/evidence", status_code=201)
-def create_evidence(request: dict[str, Any]) -> dict[str, Any]:
+def create_evidence(request: dict[str, Any], x_claimlab_api_key: str | None = Header(default=None)) -> dict[str, Any]:
+    require_api_key(x_claimlab_api_key)
     try:
         snapshot = SignalSnapshot(**request["signals"])
         evidence = Evidence(
