@@ -9,6 +9,7 @@ v1.0.2 is an execution-boundary hardening release produced from a reverse audit 
 - Gate-issued execution authority is now created only after atomic execution reservation.
 - Authority is bound to decision ID, tenant, action digest, policy digest, nonce, decision and expiry.
 - The downstream tool verifies the Gate-issued authority before accepting a call.
+- The OANDA broker adapter now verifies the same Gate-issued authority at the external trading side-effect boundary.
 - The legacy enforcement-only attestation path is removed from production execution.
 - Production Compose explicitly separates the public edge network from the internal backend network.
 - Runtime and tool images include the authority verification code they actually execute.
