@@ -382,7 +382,7 @@ def execution_reserve(decision_id: str, outcome: ExecutionOutcome, authorization
     if not reserved:
         raise HTTPException(409, "execution_already_reserved_or_consumed")
     record["execution_started_at"] = started_at
-    authority_secret = current_secret()
+    authority_secret = os.getenv("ACTION_GATE_AUTHORITY_SECRET") or current_secret()
     if not authority_secret:
         raise HTTPException(503, "execution_authority_not_configured")
     remaining_ttl = max(1, int((datetime.fromisoformat(record["expires_at"]) - datetime.now(timezone.utc)).total_seconds()))
