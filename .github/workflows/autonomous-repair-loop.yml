@@ -1,0 +1,42 @@
+name: Autonomous Repair Loop
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/15 * * * *"
+permissions:
+  actions: write
+  contents: write
+concurrency:
+  group: autonomous-repair-main
+  cancel-in-progress: false
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Install runtime dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install httpx fastapi 'psycopg[binary]'
+      - name: Observe and classify
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/autonomous_repair_planner.py
+      - name: Execute bounded recovery
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/autonomous_repair.py
+      - name: Run deterministic product checks
+        run: |
+          python3 scripts/product_drift_gate.py
+          python3 -m unittest discover -s tests -p "test_oanda_broker.py" -v
+      - name: Upload autonomous evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autonomous-repair-evidence-${{ github.run_id }}
+          path: artifacts/autonomous
+          if-no-files-found: warn
