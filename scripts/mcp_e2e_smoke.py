@@ -11,15 +11,49 @@ from __future__ import annotations
 
 import json
 import os
+import socket
 import sys
+import time
 import urllib.request
 import urllib.error
+from urllib.parse import urlparse
 
+
+
+MAX_REACHABLE_RETRIES = 15
+REACHABLE_DELAY = 5
+
+
+def wait_for_endpoint(url: str) -> None:
+    """Wait until the MCP endpoint is DNS-resolvable and HTTP-reachable."""
+    parsed = urlparse(url)
+    host = parsed.hostname
+    port = parsed.port or 443
+    if not host:
+        raise SystemExit(f"NETWORK ERROR: invalid MCP endpoint URL: {url}")
+    for attempt in range(1, MAX_REACHABLE_RETRIES + 1):
+        try:
+            socket.getaddrinfo(host, port, socket.AF_UNSPEC, socket.SOCK_STREAM)
+        except socket.gaierror as exc:
+            print(f"[{attempt}/{MAX_REACHABLE_RETRIES}] DNS not ready for {host}: {exc} — waiting {REACHABLE_DELAY}s", file=sys.stderr)
+            time.sleep(REACHABLE_DELAY)
+            continue
+        try:
+            req = urllib.request.Request(url, method="GET")
+            with urllib.request.urlopen(req, timeout=10) as response:
+                print(f"Endpoint reachable (HTTP {response.status})")
+                return
+        except Exception as exc:
+            print(f"[{attempt}/{MAX_REACHABLE_RETRIES}] HTTP not ready: {exc} — waiting {REACHABLE_DELAY}s", file=sys.stderr)
+            time.sleep(REACHABLE_DELAY)
+    raise SystemExit(f"NETWORK ERROR: endpoint {url} never became reachable after {MAX_REACHABLE_RETRIES} attempts")
 
 URL = os.environ.get("MCP_E2E_URL")
 TOKEN = os.environ.get("MCP_E2E_BEARER_TOKEN")
 if not URL:
     raise SystemExit("MCP_E2E_URL is required")
+
+wait_for_endpoint(URL)
 
 counter = 0
 
