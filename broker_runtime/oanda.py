@@ -114,6 +114,26 @@ class OandaBroker:
                 BrokerExecutionState.BLOCKED, None, None, None, {},
                 "action_gate_tenant_not_configured",
             )
+        if not self.token:
+            return BrokerResult(
+                BrokerExecutionState.BLOCKED, None, None, None, {},
+                "oanda_api_token_not_configured",
+            )
+        if not self.account_id:
+            return BrokerResult(
+                BrokerExecutionState.BLOCKED, None, None, None, {},
+                "oanda_account_id_not_configured",
+            )
+
+        # Deterministic execution preconditions must be checked before nonce
+        # consumption. Otherwise a disabled LIVE environment or missing broker
+        # credential burns a valid authority without any external side effect.
+        if self.environment is BrokerEnvironment.LIVE:
+            if not self.live_trading_enabled or self.live_confirmation != "LIVE":
+                return BrokerResult(
+                    BrokerExecutionState.BLOCKED, None, None, None, {},
+                    "live_trading_disabled",
+                )
 
         try:
             enforce_execution_authority(
@@ -129,14 +149,6 @@ class OandaBroker:
                 f"action_gate_authorization_rejected:{reason}",
             )
 
-        if self.environment is BrokerEnvironment.LIVE:
-            if not self.live_trading_enabled or self.live_confirmation != "LIVE":
-                return BrokerResult(
-                    BrokerExecutionState.BLOCKED, None, None, None, {},
-                    "live_trading_disabled",
-                )
-
-        self._require_account()
         payload: dict[str, Any] = {
             "order": {
                 "type": "MARKET",
