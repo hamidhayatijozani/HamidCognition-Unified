@@ -9,14 +9,15 @@ from fastapi import Header, HTTPException
 
 from .security_authority import Authority, AuthorityError, verify_authority
 from .storage import consume_authority_nonce
+from .keyring import secret_for_key_id
 
 AUTHORITY_HEADER = "X-Action-Gate-Authority"
 
 
-def _authority_secret() -> bytes:
-    secret = os.getenv("ACTION_GATE_AUTHORITY_SECRET")
+def _authority_secret(key_id: str) -> bytes:
+    secret = secret_for_key_id(key_id)
     if not secret:
-        raise HTTPException(503, "misconfigured_enforcement_secret")
+        raise HTTPException(503, f"unknown_or_revoked_authority_key:{key_id}")
     return secret.encode()
 
 
@@ -35,7 +36,7 @@ def enforce_execution_authority(
         authority = Authority.from_token(raw_authority)
         verify_authority(
             authority=authority,
-            secret=_authority_secret(),
+            secret=_authority_secret(authority.key_id),
             tenant_id=expected_tenant_id or authority.tenant_id,
             action=expected_action,
             policy=expected_policy,
