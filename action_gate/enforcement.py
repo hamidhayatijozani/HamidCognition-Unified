@@ -19,7 +19,9 @@ def _authority_secret(key_id: str) -> bytes:
     # authority verification to the decision-signing secret when both exist.
     secret = os.getenv("ACTION_GATE_AUTHORITY_SECRET")
     if not secret:
-        raise HTTPException(503, f"execution_authority_not_configured:{key_id}")
+        secret = secret_for_key_id(key_id)
+    if not secret:
+        raise HTTPException(503, f"unknown_or_revoked_authority_key:{key_id}")
     return secret.encode()
 
 
