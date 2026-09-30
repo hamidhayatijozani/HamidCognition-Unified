@@ -81,6 +81,24 @@ def issue_authority(*, secret: bytes, decision_id: str, tenant_id: str,
     return Authority(**payload, signature=signature)
 
 
+def verify_authority_envelope(*, authority: Authority, secret: bytes,
+                              tenant_id: str, action_digest: str,
+                              now: int | None = None,
+                              used_nonces: set[str] | None = None) -> None:
+    """Compatibility verifier for tool-server envelopes with explicit action digest."""
+    verify_authority(
+        authority=authority,
+        secret=secret,
+        tenant_id=tenant_id,
+        action=None,
+        policy=None,
+        now=now,
+        used_nonces=used_nonces,
+    )
+    if authority.action_digest != action_digest:
+        raise AuthorityError("action_binding_mismatch")
+
+
 def verify_authority(*, authority: Authority, secret: bytes,
                      tenant_id: str, action: Mapping[str, Any] | None = None,
                      policy: Mapping[str, Any] | None = None, now: int | None = None,
