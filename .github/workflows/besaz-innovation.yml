@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: besaz-innovation-main
+  group: main-writers-serialized
   cancel-in-progress: false
 
 jobs:
