@@ -34,6 +34,7 @@ jobs:
           --health-retries 20
     env:
       DATABASE_URL: postgresql://claimlab:claimlab@127.0.0.1:5432/claimlab
+      CLAIMLAB_API_KEY: ci-claimlab-key
       PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
@@ -53,6 +54,7 @@ jobs:
           import threading
           import time
           import urllib.request
+          import urllib.error
           import uvicorn
           from research.claimlab.http_app import app
 
@@ -70,6 +72,19 @@ jobs:
                   time.sleep(0.2)
           else:
               raise SystemExit("ClaimLab HTTP server did not become healthy")
+
+          unauthorized = urllib.request.Request(
+              "http://127.0.0.1:8790/evidence",
+              data=json.dumps({"id": "unauthorized"}).encode(),
+              headers={"Content-Type": "application/json", "X-ClaimLab-API-Key": "ci-claimlab-key"},
+              method="POST",
+          )
+          try:
+              urllib.request.urlopen(unauthorized, timeout=5)
+          except urllib.error.HTTPError as exc:
+              assert exc.code == 401
+          else:
+              raise AssertionError("unauthenticated evidence write was accepted")
 
           payload = {
               "id": "ci-signal-001",
