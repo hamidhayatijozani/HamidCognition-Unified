@@ -17,6 +17,13 @@ class BrokerPolicy:
         self.allowed_instruments = allowed_instruments
         self.max_units = max_units
 
+    def as_authorization_policy(self) -> dict[str, object]:
+        """Canonical policy material bound into Gate-issued broker authority."""
+        return {
+            "allowed_instruments": sorted(self.allowed_instruments),
+            "max_units": str(self.max_units),
+        }
+
     def validate(self, order: MarketOrder) -> None:
         if order.instrument not in self.allowed_instruments:
             raise ValueError("instrument_not_allowed")
