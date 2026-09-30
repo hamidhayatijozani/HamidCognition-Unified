@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from decimal import Decimal
 
-from action_gate.security_authority import issue_authority
+from action_gate.security_authority import Authority, issue_authority
 from broker_runtime.models import BrokerEnvironment, BrokerExecutionState, MarketOrder
 from broker_runtime.oanda import OandaBroker
 from broker_runtime.risk import BrokerPolicy
