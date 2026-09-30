@@ -135,6 +135,15 @@ jobs:
               sleep 5
               continue
             fi
+            http_code="$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 5 --max-time 10 "$MCP_E2E_URL" || true)"
+            case "$http_code" in
+              2??|3??|4??) ;;
+              *)
+                echo "MCP endpoint is not currently reachable (HTTP $http_code): $MCP_E2E_URL"
+                sleep 5
+                continue
+                ;;
+            esac
             if python3 scripts/mcp_e2e_smoke.py 2>&1 | tee mcp-e2e-result.json; then
               exit 0
             fi
