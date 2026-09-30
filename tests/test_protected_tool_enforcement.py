@@ -140,6 +140,58 @@ def test_concurrent_same_nonce_only_one_succeeds(monkeypatch, tmp_path):
     assert sum(results) == 1
 
 
+def test_key_rotation_accepts_old_key_during_grace_then_rejects(monkeypatch, tmp_path):
+    import json
+    import action_gate.storage as storage
+
+    monkeypatch.delenv("ACTION_GATE_AUTHORITY_SECRET", raising=False)
+    monkeypatch.setenv(
+        "ACTION_GATE_SIGNING_KEYS",
+        json.dumps({"k1": "old-secret", "k2": "new-secret"}),
+    )
+    monkeypatch.setenv("ACTION_GATE_KEY_ID", "k1")
+    monkeypatch.setattr(storage, "SQLITE_PATH", str(tmp_path / "rotation.db"))
+    storage.init_db()
+
+    token = issue_authority(
+        secret=b"old-secret",
+        key_id="k1",
+        decision_id="rotation-1",
+        tenant_id="tenant-a",
+        action=ACTION,
+        policy=POLICY,
+        decision="ALLOW",
+        nonce="rotation-nonce-1",
+    ).token()
+
+    assert enforce_execution_authority(
+        token,
+        expected_tenant_id="tenant-a",
+        expected_action=ACTION,
+        expected_policy=POLICY,
+    )["tenant_id"] == "tenant-a"
+
+    monkeypatch.setenv("ACTION_GATE_SIGNING_KEYS", json.dumps({"k2": "new-secret"}))
+    token2 = issue_authority(
+        secret=b"old-secret",
+        key_id="k1",
+        decision_id="rotation-2",
+        tenant_id="tenant-a",
+        action=ACTION,
+        policy=POLICY,
+        decision="ALLOW",
+        nonce="rotation-nonce-2",
+    ).token()
+
+    with pytest.raises(Exception, match="unknown_or_revoked_authority_key:k1"):
+        enforce_execution_authority(
+            token2,
+            expected_tenant_id="tenant-a",
+            expected_action=ACTION,
+            expected_policy=POLICY,
+        )
+
+
 def test_low_level_binding_checks_remain_fail_closed(monkeypatch, tmp_path):
     monkeypatch.setenv("ACTION_GATE_AUTHORITY_SECRET", SECRET.decode())
     import action_gate.storage as storage
