@@ -136,8 +136,29 @@ jobs:
       - name: Verify production stack health before replay
         working-directory: action_gate
         env:
+          POSTGRES_DB: action_gate
+          POSTGRES_USER: action_gate
+          POSTGRES_PASSWORD: health-postgres-placeholder
           ACTION_GATE_API_TOKEN: health-check-placeholder
           ACTION_GATE_SIGNING_SECRET: health-signing-placeholder
+          ACTION_GATE_KEY_ID: hhj-action-gate-1
+          ACTION_GATE_SIGNING_KEYS: "{}"
+          ACTION_GATE_RATE_LIMIT_PER_MINUTE: "120"
+          ACTION_GATE_DECISION_TTL_SECONDS: "300"
+          ACTION_GATE_APPROVAL_TTL_SECONDS: "300"
+          ACTION_GATE_POLICY_JSON: "{}"
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          DEMO_TENANT_ID: integration-tenant
+          DEMO_ACTOR_ID: actor-1
+          DEMO_AGENT_ID: demo
+          DEMO_SESSION_ID: health-session
+          MCP_BEARER_TOKEN: ci-mcp-bearer-token
+          MCP_ISSUER_URL: http://127.0.0.1:8000
+          MCP_RESOURCE_URL: http://127.0.0.1:8787/mcp
+          MCP_REQUIRED_SCOPE: ""
+          MCP_CLIENT_ID: health-check
+          MCP_TOKEN_TTL_SECONDS: "300"
+          DOMAIN: localhost
         run: |
           set -euo pipefail
           for attempt in $(seq 1 60); do
