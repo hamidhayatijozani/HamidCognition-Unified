@@ -74,8 +74,13 @@ jobs:
                 | head -n1 || true
             )"
             if [ -n "$url" ]; then
-              echo "url=$url/mcp" >> "$GITHUB_OUTPUT"
-              echo "Discovered MCP endpoint: $url/mcp"
+              endpoint="$url/mcp"
+              echo "Discovered MCP endpoint: $endpoint"
+              {
+                echo "MCP_E2E_URL=$endpoint"
+                echo "MCP_E2E_BEARER_TOKEN=$MCP_BEARER_TOKEN"
+              } >> "$GITHUB_ENV"
+              echo "url=$endpoint" >> "$GITHUB_OUTPUT"
               exit 0
             fi
             sleep 2
@@ -86,10 +91,19 @@ jobs:
             logs --no-color chatgpt-quick-tunnel
           exit 1
 
+      - name: Verify E2E environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${MCP_E2E_URL:-}" || { echo "MCP_E2E_URL is empty"; exit 1; }
+          test -n "${MCP_E2E_BEARER_TOKEN:-}" || { echo "MCP_E2E_BEARER_TOKEN is empty"; exit 1; }
+          case "$MCP_E2E_URL" in
+            https://*.trycloudflare.com/mcp) ;;
+            *) echo "Unexpected MCP_E2E_URL: $MCP_E2E_URL"; exit 1 ;;
+          esac
+          echo "MCP E2E environment is ready."
+
       - name: Run external HTTPS MCP E2E
-        env:
-          MCP_E2E_URL: ${{ steps.tunnel.outputs.url }}
-          MCP_E2E_BEARER_TOKEN: ${{ env.MCP_BEARER_TOKEN }}
         run: |
           python3 scripts/mcp_e2e_smoke.py | tee mcp-e2e-result.json
 
