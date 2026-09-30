@@ -115,6 +115,14 @@ except RuntimeError as exc:
 else:
     raise SystemExit("unauthenticated request unexpectedly succeeded")
 
+try:
+    rpc("tools/list", token="definitely-invalid-mcp-token", protocol_version=negotiated_protocol)
+except RuntimeError as exc:
+    if "HTTP 401" not in str(exc):
+        raise SystemExit(f"invalid bearer token did not fail with HTTP 401: {exc}")
+else:
+    raise SystemExit("invalid bearer token unexpectedly succeeded")
+
 required = {
     "protected_read_public_file",
     "protected_production_delete",
@@ -160,6 +168,8 @@ status, _, raw = rpc(
     protocol_version=negotiated_protocol,
 )
 evidence = structured(result_from_tool(raw))
+if evidence.get("decision_id") != decision_id:
+    raise SystemExit(f"EVIDENCE decision binding failed: {evidence}")
 if "evidence" not in evidence or "replay" not in evidence:
     raise SystemExit(f"EVIDENCE/REPLAY path failed: {evidence}")
 
