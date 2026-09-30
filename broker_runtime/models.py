@@ -43,3 +43,8 @@ class BrokerResult:
     request_id: str | None
     raw: dict
     reason: str | None = None
+
+    @property
+    def requires_reconciliation(self) -> bool:
+        """UNKNOWN means the remote side effect may have happened."""
+        return self.state is BrokerExecutionState.UNKNOWN
