@@ -104,7 +104,7 @@ def apply_safe_updates(identity: dict[str, str]) -> list[str]:
                 updated,
             )
             updated = re.sub(
-                r"published as [^., )]+",
+                r"published as (?:the immutable\s+)?(?:GitHub release\s+)?`?[^`., )]+`?(?=\.|,|\s+immutable\s+GitHub release)",
                 f"published as {identity['release_tag']}",
                 updated,
             )
