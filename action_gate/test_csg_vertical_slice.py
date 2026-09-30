@@ -5,9 +5,11 @@ import hmac
 import os
 from datetime import datetime, timezone
 
-os.environ.setdefault("ACTION_GATE_API_TOKEN", "ci-csg-token")
-os.environ.setdefault("ACTION_GATE_SIGNING_SECRET", "ci-csg-secret")
-os.environ.setdefault("ACTION_GATE_ENV", "test")
+os.environ["ACTION_GATE_API_TOKEN"] = "ci-csg-token"
+os.environ["ACTION_GATE_SIGNING_SECRET"] = "ci-csg-secret"
+os.environ["ACTION_GATE_ENV"] = "test"
+os.environ.pop("ACTION_GATE_SIGNING_KEYS", None)
+os.environ.pop("ACTION_GATE_AUTHORITY_SECRET", None)
 
 from fastapi.testclient import TestClient
 
