@@ -39,11 +39,15 @@ jobs:
             -f action_gate/docker-compose.chatgpt-quick-tunnel.yml \
             up -d --build
 
-      - name: Wait for Action Gate and MCP readiness
+      - name: Wait for PostgreSQL, Action Gate and MCP readiness
         run: |
           set -euo pipefail
           for i in {1..60}; do
             if docker compose \
+              -f action_gate/docker-compose.production.yml \
+              -f action_gate/docker-compose.chatgpt-quick-tunnel.yml \
+              exec -T postgres pg_isready -U action_gate -d action_gate >/dev/null 2>&1 && \
+              docker compose \
               -f action_gate/docker-compose.production.yml \
               -f action_gate/docker-compose.chatgpt-quick-tunnel.yml \
               exec -T action-gate python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health').read()" >/dev/null 2>&1; then
@@ -127,30 +131,43 @@ jobs:
         run: |
           set -o pipefail
           : > mcp-e2e-result.json
-          for attempt in {1..5}; do
-            echo "MCP E2E attempt $attempt/5"
-            host="$(printf '%s' "$MCP_E2E_URL" | sed -E 's#https://([^/]+).*#\1#')"
+          for attempt in {1..8}; do
+            echo "MCP E2E attempt $attempt/8"
+            url="$(
+              docker compose \
+                -f action_gate/docker-compose.production.yml \
+                -f action_gate/docker-compose.chatgpt-quick-tunnel.yml \
+                logs chatgpt-quick-tunnel 2>&1 \
+                | grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' \
+                | tail -n1 || true
+            )"
+            if [ -z "$url" ]; then
+              echo "No current Quick Tunnel URL found."
+              sleep 5
+              continue
+            fi
+            endpoint="$url/mcp"
+            host="$(printf '%s' "$url" | sed -E 's#https://([^/]+).*#\1#')"
+            echo "Current tunnel endpoint: $endpoint"
             if ! getent hosts "$host" >/dev/null 2>&1; then
               echo "Tunnel hostname is not currently resolvable: $host"
               sleep 5
               continue
             fi
-            http_code="$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 5 --max-time 10 "$MCP_E2E_URL" || true)"
+            http_code="$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 5 --max-time 10 "$endpoint" || true)"
             case "$http_code" in
               2??|3??|4??) ;;
-              *)
-                echo "MCP endpoint is not currently reachable (HTTP $http_code): $MCP_E2E_URL"
-                sleep 5
-                continue
-                ;;
+              *) echo "MCP endpoint is not currently reachable (HTTP $http_code): $endpoint"; sleep 5; continue ;;
             esac
+            export MCP_E2E_URL="$endpoint"
+            export MCP_E2E_BEARER_TOKEN="$MCP_BEARER_TOKEN"
             if python3 scripts/mcp_e2e_smoke.py 2>&1 | tee mcp-e2e-result.json; then
               exit 0
             fi
-            echo "MCP E2E attempt $attempt failed; retrying after tunnel stabilization..."
+            echo "MCP E2E attempt $attempt failed; re-reading tunnel URL before retry..."
             sleep 5
           done
-          echo "MCP E2E failed after 5 attempts."
+          echo "MCP E2E failed after 8 attempts."
           exit 1
 
       - name: Upload E2E evidence
