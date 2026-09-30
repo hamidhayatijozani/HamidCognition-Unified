@@ -135,6 +135,8 @@ jobs:
         run: docker compose -f docker-compose.production.yml up -d --build
       - name: Verify production stack health before replay
         working-directory: action_gate
+        env:
+          ACTION_GATE_API_TOKEN: health-check-placeholder
         run: |
           set -euo pipefail
           for attempt in $(seq 1 60); do
