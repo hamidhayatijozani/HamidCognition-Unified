@@ -36,6 +36,7 @@ def init_db() -> None:
         con.execute("CREATE TABLE IF NOT EXISTS rate_limit_events (event_id TEXT PRIMARY KEY, rate_key TEXT NOT NULL, created_at REAL NOT NULL)")
         con.execute("CREATE INDEX IF NOT EXISTS idx_rate_limit_events_key_time ON rate_limit_events(rate_key, created_at)")
         con.execute("CREATE TABLE IF NOT EXISTS authority_nonces (nonce TEXT PRIMARY KEY, decision_id TEXT NOT NULL, consumed_at TEXT NOT NULL)")
+        con.execute("CREATE TABLE IF NOT EXISTS execution_reconciliations (reconciliation_id TEXT PRIMARY KEY, decision_id TEXT NOT NULL UNIQUE, tenant_id TEXT NOT NULL, nonce TEXT NOT NULL, resolution TEXT NOT NULL, outcome TEXT NOT NULL, created_at TEXT NOT NULL, resolved_at TEXT NOT NULL)")
         con.commit()
         if backend() == "sqlite":
             con.execute("CREATE TRIGGER IF NOT EXISTS audit_events_no_update BEFORE UPDATE ON audit_events BEGIN SELECT RAISE(ABORT, 'audit_events_are_append_only'); END")
@@ -244,6 +245,77 @@ def finalize_execution(record: dict[str, Any], nonce: str, consumed_at: str, dig
             con.rollback()
             return None
         con.commit()
+        return finalized
+    except Exception:
+        con.rollback()
+        raise
+    finally:
+        con.close()
+
+
+def reconcile_execution(record: dict[str, Any], nonce: str, resolved_at: str, resolution: str, outcome: dict[str, Any], digest_fn, canonical_fn, now_fn) -> dict[str, Any] | None:
+    """Persist a final reconciliation for an UNKNOWN execution exactly once."""
+    if resolution not in {"CONFIRMED_FILLED", "CONFIRMED_NOT_EXECUTED"}:
+        raise ValueError("invalid_reconciliation_resolution")
+    con = connect()
+    try:
+        decision_id = record["decision_id"]
+        if backend() == "postgresql":
+            con.execute("SELECT pg_advisory_xact_lock(%s)", (2147483000,))
+            con.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", (decision_id,))
+            row = con.execute("SELECT record FROM records WHERE decision_id=%s", (decision_id,)).fetchone()
+        else:
+            con.execute("BEGIN IMMEDIATE")
+            row = con.execute("SELECT record FROM records WHERE decision_id=?", (decision_id,)).fetchone()
+        if not row:
+            con.rollback()
+            return None
+        current = json.loads(row[0])
+        if current.get("nonce") != nonce or current.get("consumed_at") is not None or current.get("execution_started_at") is None:
+            con.rollback()
+            return None
+        if current.get("reconciliation") is not None or current.get("execution", {}).get("status") == "RECONCILED":
+            con.rollback()
+            return None
+        finalized = dict(record)
+        finalized["execution"] = {"timestamp": resolved_at, "status": "RECONCILED", "action_hash": current["action_hash"], "nonce": nonce}
+        finalized["reconciliation"] = {"status": resolution, "requires_reconciliation": False, "resolved_at": resolved_at}
+        finalized["outcome"] = outcome
+        finalized["consumed_at"] = resolved_at
+        current_version = con.execute(
+            "SELECT COALESCE(MAX(version), 0) FROM record_versions WHERE decision_id=" + ("%s" if backend() == "postgresql" else "?"),
+            (decision_id,),
+        ).fetchone()[0]
+        previous = con.execute("SELECT event_hash FROM audit_events ORDER BY created_at DESC, event_id DESC LIMIT 1").fetchone()
+        version = current_version + 1
+        previous_hash = previous[0] if previous else "GENESIS"
+        event = {"decision": finalized["decision"], "tenant_id": finalized["tenant_id"], "action_hash": finalized["action_hash"], "version": version, "resolution": resolution}
+        event_hash = digest_fn({"decision_id": decision_id, "event_type": "EXECUTION_RECONCILED", "event": event, "previous_hash": previous_hash})
+        finalized["audit_event_hash"] = event_hash
+        finalized["evidence_hash"] = digest_fn(finalized)
+        event_id = f"evt_{uuid.uuid4().hex}"
+        version_id = f"ver_{uuid.uuid4().hex}"
+        reconciliation_id = f"recon_{uuid.uuid4().hex}"
+        timestamp = now_fn()
+        event_json = canonical_fn(event)
+        record_json = canonical_fn(finalized)
+        outcome_json = canonical_fn(outcome)
+        if backend() == "postgresql":
+            con.execute("INSERT INTO execution_reconciliations VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (reconciliation_id, decision_id, finalized["tenant_id"], nonce, resolution, outcome_json, timestamp, resolved_at))
+            con.execute("INSERT INTO audit_events VALUES (%s,%s,%s,%s,%s,%s,%s)", (event_id, decision_id, "EXECUTION_RECONCILED", event_json, previous_hash, event_hash, timestamp))
+            con.execute("INSERT INTO record_versions VALUES (%s,%s,%s,%s,%s,%s)", (version_id, decision_id, version, "EXECUTION_RECONCILED", record_json, timestamp))
+            updated = con.execute("UPDATE records SET trace_id=%s, record=%s WHERE decision_id=%s AND (record::jsonb->>'nonce')=%s AND (record::jsonb->>'consumed_at') IS NULL AND (record::jsonb->>'execution_started_at') IS NOT NULL AND (record::jsonb->'reconciliation') IS NULL RETURNING decision_id", (finalized["trace_id"], record_json, decision_id, nonce)).fetchone()
+        else:
+            con.execute("INSERT INTO execution_reconciliations VALUES (?,?,?,?,?,?,?,?)", (reconciliation_id, decision_id, finalized["tenant_id"], nonce, resolution, outcome_json, timestamp, resolved_at))
+            con.execute("INSERT INTO audit_events VALUES (?,?,?,?,?,?,?)", (event_id, decision_id, "EXECUTION_RECONCILED", event_json, previous_hash, event_hash, timestamp))
+            con.execute("INSERT INTO record_versions VALUES (?,?,?,?,?,?)", (version_id, decision_id, version, "EXECUTION_RECONCILED", record_json, timestamp))
+            updated = con.execute("UPDATE records SET trace_id=?, record=? WHERE decision_id=? AND json_extract(record, '$.nonce')=? AND json_extract(record, '$.consumed_at') IS NULL AND json_extract(record, '$.execution_started_at') IS NOT NULL AND json_extract(record, '$.reconciliation') IS NULL", (finalized["trace_id"], record_json, decision_id, nonce))
+            updated = (decision_id,) if updated.rowcount == 1 else None
+        if not updated:
+            con.rollback()
+            return None
+        con.commit()
+        finalized["reconciliation_id"] = reconciliation_id
         return finalized
     except Exception:
         con.rollback()
