@@ -1,0 +1,76 @@
+name: Autonomous CI Supervisor
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/15 * * * *"
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  supervise:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Autonomous control loop
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          workflows=(
+            "MCP Ephemeral HTTPS E2E"
+            "Action Gate Production E2E Smoke"
+            "Broker Gateway Tests"
+            "Product Verification"
+          )
+
+          echo "=== Autonomous CI Supervisor ==="
+          echo "Repository: $REPO"
+
+          for cycle in 1 2 3 4 5; do
+            echo
+            echo "=== CONTROL CYCLE $cycle/5 ==="
+
+            for workflow in "${workflows[@]}"; do
+              echo "--- $workflow ---"
+
+              run_json="$(gh run list                 --repo "$REPO"                 --workflow "$workflow"                 --branch main                 --limit 1                 --json databaseId,status,conclusion,headSha,createdAt,url)"
+
+              echo "$run_json"
+
+              run_id="$(echo "$run_json" | jq -r '.[0].databaseId // empty')"
+              status="$(echo "$run_json" | jq -r '.[0].status // empty')"
+              conclusion="$(echo "$run_json" | jq -r '.[0].conclusion // empty')"
+
+              if [ -z "$run_id" ]; then
+                echo "No run found."
+                continue
+              fi
+
+              if [ "$status" = "in_progress" ] || [ "$status" = "queued" ] || [ "$status" = "waiting" ]; then
+                echo "Run $run_id is still active."
+                continue
+              fi
+
+              if [ "$conclusion" = "failure" ] || [ "$conclusion" = "timed_out" ] || [ "$conclusion" = "cancelled" ]; then
+                echo "Detected recoverable failed run $run_id."
+                echo "Rerunning failed jobs."
+                gh run rerun "$run_id" --repo "$REPO" --failed
+              elif [ "$conclusion" = "success" ]; then
+                echo "PASS: latest run succeeded."
+              else
+                echo "No autonomous action for conclusion=$conclusion."
+              fi
+            done
+
+            echo
+            echo "Control cycle complete. Waiting before next observation."
+            sleep 60
+          done
