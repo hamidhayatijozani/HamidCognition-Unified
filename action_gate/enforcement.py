@@ -15,7 +15,11 @@ AUTHORITY_HEADER = "X-Action-Gate-Authority"
 
 
 def _authority_secret(key_id: str) -> bytes:
-    secret = secret_for_key_id(key_id)
+    # Execution Authority has its own secret boundary. Do not silently bind
+    # authority verification to the decision-signing secret when both exist.
+    secret = os.getenv("ACTION_GATE_AUTHORITY_SECRET")
+    if not secret:
+        secret = secret_for_key_id(key_id)
     if not secret:
         raise HTTPException(503, f"unknown_or_revoked_authority_key:{key_id}")
     return secret.encode()
