@@ -72,5 +72,7 @@ jobs:
           else
             git add README.md PRODUCT/QUICKSTART.md
             git commit -m "chore(document-sync): synchronize release identity"
-            git push
+            git fetch origin main
+            git rebase origin/main
+            git push origin HEAD:main
           fi
