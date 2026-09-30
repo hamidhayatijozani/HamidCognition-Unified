@@ -14,7 +14,7 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
 from rate_limit import SlidingWindowRateLimiter
-from storage import health as storage_health, init_db, load_record, save_record, finalize_execution, reserve_execution, allow_rate_limit
+from storage import health as storage_health, init_db, load_record, save_record, finalize_execution, reconcile_execution, reserve_execution, allow_rate_limit
 from csg_routes import router as csg_router
 from keyring import configured_key_ids, current_key_id, current_secret, verify_with_keyring
 from policy_store import load_policy, policy_hash
@@ -136,6 +136,14 @@ class ExecutionOutcome(BaseModel):
     actor_id: str | None = None
     session_id: str | None = None
     nonce: str
+    outcome: dict[str, Any] = Field(default_factory=dict)
+
+
+class ReconciliationOutcome(BaseModel):
+    action_hash: str
+    tenant_id: str
+    nonce: str
+    resolution: str
     outcome: dict[str, Any] = Field(default_factory=dict)
 
 
@@ -417,6 +425,8 @@ def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | 
         raise HTTPException(409, "execution_not_reserved")
     if not record.get("execution_authority"):
         raise HTTPException(409, "execution_authority_missing")
+    if record.get("reconciliation") is not None or record.get("execution", {}).get("status") == "RECONCILED":
+        raise HTTPException(409, "execution_already_reconciled")
     consumed_at = now()
     try:
         finalized = finalize_execution(record, outcome.nonce, consumed_at, digest, canonical, now, outcome.outcome)
@@ -424,6 +434,36 @@ def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | 
         raise HTTPException(503, "execution_finalization_store_unavailable") from exc
     if not finalized:
         raise HTTPException(409, "decision_nonce_already_consumed_or_execution_not_reserved")
+    return finalized
+
+
+@app.post("/v1/action/{decision_id}/execution/reconcile")
+def execution_reconcile(decision_id: str, outcome: ReconciliationOutcome, authorization: str | None = Header(default=None)):
+    require_auth(authorization)
+    enforce_rate_limit(authorization, outcome.tenant_id)
+    record = load(decision_id, outcome.tenant_id)
+    ensure_live(record)
+    if record["decision"] != "ALLOW":
+        raise HTTPException(403, "execution_not_permitted_by_gate")
+    if outcome.action_hash != record["action_hash"]:
+        raise HTTPException(409, "reconciliation_action_binding_mismatch")
+    if outcome.nonce != record["nonce"]:
+        raise HTTPException(409, "reconciliation_nonce_mismatch")
+    if record.get("execution_started_at") is None:
+        raise HTTPException(409, "execution_not_reserved")
+    if record.get("consumed_at") is not None:
+        raise HTTPException(409, "execution_already_finalized")
+    if record.get("reconciliation") is not None:
+        raise HTTPException(409, "execution_already_reconciled")
+    if outcome.resolution not in {"CONFIRMED_FILLED", "CONFIRMED_NOT_EXECUTED"}:
+        raise HTTPException(422, "invalid_reconciliation_resolution")
+    resolved_at = now()
+    try:
+        finalized = reconcile_execution(record, outcome.nonce, resolved_at, outcome.resolution, outcome.outcome, digest, canonical, now)
+    except Exception as exc:
+        raise HTTPException(503, "execution_reconciliation_store_unavailable") from exc
+    if not finalized:
+        raise HTTPException(409, "execution_reconciliation_conflict")
     return finalized
 
 
