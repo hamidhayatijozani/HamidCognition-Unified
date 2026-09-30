@@ -52,6 +52,14 @@ def rpc(method: str, params: dict | None = None, *, token: str | None = TOKEN, p
     except urllib.error.HTTPError as exc:
         raw = exc.read().decode(errors="replace")
         raise RuntimeError(f"HTTP {exc.code}: {raw[:1000]}") from exc
+    except urllib.error.URLError as exc:
+        raise RuntimeError(
+            f"NETWORK ERROR: cannot reach MCP endpoint {URL}: {exc.reason}"
+        ) from exc
+    except TimeoutError as exc:
+        raise RuntimeError(
+            f"NETWORK ERROR: MCP endpoint timed out: {URL}"
+        ) from exc
 
 
 def json_payload(raw: str):
