@@ -16,6 +16,6 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install runtime dependencies
-        run: pip install httpx fastapi
+        run: pip install httpx fastapi 'psycopg[binary]'
       - name: Run broker gateway tests
         run: python -m unittest discover -s tests -p "test_oanda_broker.py" -v
