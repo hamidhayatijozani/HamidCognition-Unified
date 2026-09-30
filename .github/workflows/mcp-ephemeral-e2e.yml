@@ -123,8 +123,26 @@ jobs:
           echo "MCP E2E environment is ready."
 
       - name: Run external HTTPS MCP E2E
+        shell: bash
         run: |
-          python3 scripts/mcp_e2e_smoke.py | tee mcp-e2e-result.json
+          set -o pipefail
+          : > mcp-e2e-result.json
+          for attempt in {1..5}; do
+            echo "MCP E2E attempt $attempt/5"
+            host="$(printf '%s' "$MCP_E2E_URL" | sed -E 's#https://([^/]+).*#\1#')"
+            if ! getent hosts "$host" >/dev/null 2>&1; then
+              echo "Tunnel hostname is not currently resolvable: $host"
+              sleep 5
+              continue
+            fi
+            if python3 scripts/mcp_e2e_smoke.py 2>&1 | tee mcp-e2e-result.json; then
+              exit 0
+            fi
+            echo "MCP E2E attempt $attempt failed; retrying after tunnel stabilization..."
+            sleep 5
+          done
+          echo "MCP E2E failed after 5 attempts."
+          exit 1
 
       - name: Upload E2E evidence
         if: always()
