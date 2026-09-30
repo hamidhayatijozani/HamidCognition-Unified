@@ -43,6 +43,7 @@ class BrokerResult:
     request_id: str | None
     raw: dict
     reason: str | None = None
+    reconciliation_reference: dict[str, str] | None = None
 
     @property
     def requires_reconciliation(self) -> bool:
