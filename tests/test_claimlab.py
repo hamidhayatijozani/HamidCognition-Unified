@@ -163,3 +163,23 @@ def test_signal_snapshot_type_requires_structured_payload():
     import pytest
     with pytest.raises(ValueError):
         Evidence("bad",EvidenceRelation.SUPPORT,"feed","missing signals",evidence_type="signal_snapshot")
+
+
+
+def test_evidence_write_requires_api_key(monkeypatch):
+    from fastapi import HTTPException
+    from research.claimlab.http_app import require_api_key
+    monkeypatch.setenv("CLAIMLAB_API_KEY", "test-secret")
+    try:
+        require_api_key(None)
+    except HTTPException as exc:
+        assert exc.status_code == 401
+    else:
+        raise AssertionError("missing API key was accepted")
+    try:
+        require_api_key("wrong")
+    except HTTPException as exc:
+        assert exc.status_code == 401
+    else:
+        raise AssertionError("wrong API key was accepted")
+    require_api_key("test-secret")
