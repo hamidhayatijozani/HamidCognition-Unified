@@ -169,6 +169,28 @@ class OandaBrokerTests(unittest.TestCase):
         self.assertEqual(result.reason, "live_trading_disabled")
         self.assertEqual(transport.posts, [])
 
+    def test_live_disabled_does_not_consume_authority(self):
+        transport = FakeTransport()
+        broker = self.broker(
+            transport, environment=BrokerEnvironment.LIVE, live=False
+        )
+        token = self.authority_for(broker)
+
+        first = broker.submit_market_order(self.order(), authority_token=token)
+        self.assertEqual(first.state, BrokerExecutionState.BLOCKED)
+        self.assertEqual(first.reason, "live_trading_disabled")
+        self.assertEqual(transport.posts, [])
+
+        # Once LIVE is explicitly enabled, the same still-valid authority
+        # remains usable because no external side effect occurred earlier.
+        broker.live_trading_enabled = True
+        broker.live_confirmation = "LIVE"
+        transport.response = self.response()
+        second = broker.submit_market_order(self.order(), authority_token=token)
+
+        self.assertEqual(second.state, BrokerExecutionState.FILLED)
+        self.assertEqual(len(transport.posts), 1)
+
     def test_unknown_transport_result_is_not_retried(self):
         transport = FakeTransport(error=TimeoutError("timeout"))
         broker = self.broker(transport)
