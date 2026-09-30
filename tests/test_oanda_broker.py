@@ -199,6 +199,7 @@ class OandaBrokerTests(unittest.TestCase):
         result = broker.submit_market_order(self.order(), authority_token=token)
 
         self.assertEqual(result.state, BrokerExecutionState.UNKNOWN)
+        self.assertTrue(result.requires_reconciliation)
         self.assertEqual(len(transport.posts), 1)
 
     def test_risk_limit_blocks_before_authority_or_network(self):
