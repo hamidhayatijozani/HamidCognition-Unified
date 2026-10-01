@@ -95,8 +95,7 @@
   "components": [
     {
       "capabilities": [
-        "audit",
-        "escalate"
+        "update"
       ],
       "component_id": "GOVERNANCE",
       "evidence_refs": [],
@@ -350,7 +349,7 @@
       "limits": [
         "cannot manufacture proof"
       ],
-      "maturity": "VERIFIED",
+      "maturity": "SPECIFIED",
       "parent_id": "FEEDBACK",
       "status": "READY"
     },
