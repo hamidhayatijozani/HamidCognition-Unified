@@ -18,22 +18,23 @@ procs = [
     subprocess.Popen([sys.executable, "enforcement_proxy.py"], cwd=ROOT, env={**env, "MODE": "mcp", "PORT": "8081"}),
 ]
 try:
-    def wait_for_http(url: str, label: str, attempts: int = 30) -> None:
+    def wait_for_port(host: str, port: int, label: str, attempts: int = 30) -> None:
+        import socket
         last_error = None
         for attempt in range(1, attempts + 1):
             try:
-                with urllib.request.urlopen(url, timeout=2) as response:
-                    print(f"{label} ready: HTTP {response.status}")
+                with socket.create_connection((host, port), timeout=2):
+                    print(f"{label} ready on {host}:{port}")
                     return
-            except Exception as exc:
+            except OSError as exc:
                 last_error = exc
                 print(f"Waiting for {label} ({attempt}/{attempts}): {exc}")
                 time.sleep(1)
         raise RuntimeError(f"{label} did not become ready: {last_error}")
 
-    wait_for_http("http://127.0.0.1:8000/health", "Action Gate")
-    wait_for_http("http://127.0.0.1:9000/health", "Tool server")
-    wait_for_http("http://127.0.0.1:8081/health", "MCP enforcement proxy")
+    wait_for_port("127.0.0.1", 8000, "Action Gate")
+    wait_for_port("127.0.0.1", 9000, "Tool server")
+    wait_for_port("127.0.0.1", 8081, "MCP enforcement proxy")
 
     def reserve_execution(decision_id, tenant_id, actor_id, session_id, action_hash_value, nonce):
         req = urllib.request.Request(
