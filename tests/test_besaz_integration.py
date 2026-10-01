@@ -72,8 +72,10 @@ def test_verified_state_requires_evidence_reference():
     assert component.state.evidence_refs == []
     try:
         component.complete_action("verify")
-    except Exception as exc:
-        raise AssertionError("verification without evidence must be rejected") from exc
+    except PermissionError:
+        pass
+    else:
+        raise AssertionError("verification without evidence must be rejected")
     assert component.state.status != "VERIFIED"
 
 
