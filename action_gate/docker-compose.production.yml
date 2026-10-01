@@ -89,6 +89,12 @@ services:
     expose:
       - "9000"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.create_connection(('127.0.0.1',9000),2); s.close()"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 2s
 
   enforcement:
     build:
@@ -108,6 +114,8 @@ services:
       - "8080"
     depends_on:
       action-gate:
+        condition: service_healthy
+      tool:
         condition: service_healthy
     restart: unless-stopped
 
@@ -138,7 +146,7 @@ services:
       action-gate:
         condition: service_healthy
       tool:
-        condition: service_started
+        condition: service_healthy
     restart: unless-stopped
 
   edge:
