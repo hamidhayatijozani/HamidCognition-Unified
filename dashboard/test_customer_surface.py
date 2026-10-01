@@ -16,8 +16,13 @@ def test_production_compose_contains_customer_console():
     assert "dashboard:8081" in (ROOT / "action_gate" / "Caddyfile").read_text(encoding="utf-8")
 
 
-def test_dashboard_never_embeds_action_gate_token_in_html():
-    html = (ROOT / "dashboard" / "app.py").read_text(encoding="utf-8")
-    assert "ACTION_GATE_API_TOKEN" in html
-    assert "GATE_TOKEN" in html
-    assert "GATE_TOKEN" not in html.split("INDEX =", 1)[1].split("def gate_headers", 1)[0]
+def test_dashboard_never_embeds_action_gate_token_in_browser_assets():
+    server = (ROOT / "dashboard" / "app.py").read_text(encoding="utf-8")
+    index = (ROOT / "dashboard" / "static" / "index.html").read_text(encoding="utf-8")
+    client = (ROOT / "dashboard" / "static" / "app.js").read_text(encoding="utf-8")
+    assert "ACTION_GATE_API_TOKEN" in server
+    assert "GATE_TOKEN" in server
+    assert "ACTION_GATE_API_TOKEN" not in index
+    assert "GATE_TOKEN" not in index
+    assert "ACTION_GATE_API_TOKEN" not in client
+    assert "GATE_TOKEN" not in client

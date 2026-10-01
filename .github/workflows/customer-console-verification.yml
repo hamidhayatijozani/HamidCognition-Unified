@@ -31,7 +31,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r dashboard/requirements.txt pytest
-          PYTHONPATH=. python -m pytest -q dashboard/test_app.py dashboard/test_customer_surface.py
+          PYTHONPATH=. python -m pytest -q dashboard/test_app.py dashboard/test_customer_surface.py dashboard/test_webapp.py
 
       - name: Validate production Compose
         working-directory: action_gate
