@@ -28,11 +28,34 @@ jobs:
         run: pytest -q tests/test_besaz_innovation_engine.py
       - name: Record report
         run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git fetch origin main
-          git rebase origin/main
-          PYTHONPATH=. python scripts/besaz_innovate.py
-          git add -f data/awareness/innovation-report.json
-          git diff --cached --quiet || git commit -m "BESAZ: record innovation sandbox report"
-          git push origin HEAD:main
+
+          for attempt in 1 2 3 4 5; do
+            echo "=== innovation write attempt $attempt/5 ==="
+            git fetch origin main
+            git reset --hard origin/main
+            PYTHONPATH=. python scripts/besaz_innovate.py
+            git add -f data/awareness/innovation-report.json
+
+            if git diff --cached --quiet; then
+              echo "No innovation report change."
+              exit 0
+            fi
+
+            git commit -m "BESAZ: record innovation sandbox report"
+
+            if git push origin HEAD:main; then
+              echo "Innovation report published successfully."
+              exit 0
+            fi
+
+            echo "Main advanced concurrently; retrying from latest origin/main."
+            git fetch origin main
+            git reset --hard origin/main
+            sleep 2
+          done
+
+          echo "Failed to publish innovation report after 5 attempts."
+          exit 1
