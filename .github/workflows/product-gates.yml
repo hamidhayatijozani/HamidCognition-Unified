@@ -311,8 +311,26 @@ jobs:
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
           DOMAIN: localhost
         run: |
+          set -euo pipefail
+          echo "=== production compose state before evidence collection ==="
+          docker compose -f docker-compose.production.yml ps -a
+
+          container_id="$(docker compose -f docker-compose.production.yml ps -q action-gate || true)"
+          if [ -z "$container_id" ]; then
+            echo "::error::Required service container 'action-gate' does not exist."
+            echo "::error::Evidence cannot be collected because the production Action Gate container was never created or is no longer present."
+            docker compose -f docker-compose.production.yml config
+            docker compose -f docker-compose.production.yml logs --no-color --tail=500 action-gate postgres || true
+            exit 1
+          fi
+
+          state="$(docker inspect -f '{{.State.Status}}' "$container_id" 2>/dev/null || true)"
+          health="$(docker inspect -f '{{.State.Health.Status}}' "$container_id" 2>/dev/null || true)"
+          echo "action-gate container=$container_id state=${state:-unknown} health=${health:-unknown}"
+
           docker compose -f docker-compose.production.yml cp action-gate:/tmp/csg-acceptance-result.json ./csg-acceptance-result.json
           docker compose -f docker-compose.production.yml cp action-gate:/tmp/csg-persistence-replay-result.json ./csg-persistence-replay-result.json
+
       - name: Build validation evidence pack
         if: always()
         working-directory: action_gate
