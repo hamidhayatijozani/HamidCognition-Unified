@@ -264,7 +264,7 @@
       "limits": [
         "cannot manufacture proof"
       ],
-      "maturity": "VERIFIED",
+      "maturity": "SPECIFIED",
       "parent_id": "FEEDBACK",
       "status": "READY"
     },
