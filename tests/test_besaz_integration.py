@@ -88,3 +88,14 @@ def test_execution_requires_explicit_evidence_for_verified_state():
         assert isinstance(exc, PermissionError)
     else:
         raise AssertionError("verification execution without evidence must be rejected")
+
+
+def test_blank_evidence_reference_is_rejected():
+    registry = build_besaz_registry()
+    component = registry.component("VERIFICATION")
+    try:
+        execute_if_authorized(component, "verify", "   ")
+    except PermissionError:
+        pass
+    else:
+        raise AssertionError("blank evidence reference must be rejected")
