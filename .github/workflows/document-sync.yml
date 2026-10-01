@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: main-writers-serialized
+  cancel-in-progress: false
+
 jobs:
   validate:
     name: Evidence-aware documentation consistency
@@ -57,22 +61,49 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
       - name: Apply safe deterministic updates on main
-        run: python tools/document_sync.py --apply-safe
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          for attempt in 1 2 3 4 5; do
+            echo "=== documentation synchronization attempt $attempt/5 ==="
+            git fetch origin main
+            git reset --hard origin/main
+            python tools/document_sync.py --apply-safe
+            python tools/document_sync.py --check
+
+            if git diff --quiet; then
+              echo "No deterministic documentation changes."
+              exit 0
+            fi
+
+            git add README.md PRODUCT/QUICKSTART.md
+            git commit -m "chore(document-sync): synchronize release identity"
+
+            if git push origin HEAD:main; then
+              echo "Documentation synchronization published successfully."
+              exit 0
+            fi
+
+            echo "Main advanced concurrently; retrying from latest origin/main."
+            git fetch origin main
+            git reset --hard origin/main
+            sleep 2
+          done
+
+          echo "Failed to publish documentation synchronization after 5 attempts."
+          exit 1
 
       - name: Validate synchronization after safe updates
         run: python tools/document_sync.py --check
 
       - name: Commit safe documentation synchronization
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet; then
-            echo "No deterministic documentation changes."
-          else
-            git add README.md PRODUCT/QUICKSTART.md
-            git commit -m "chore(document-sync): synchronize release identity"
-            git fetch origin main
-            git rebase origin/main
-            git push origin HEAD:main
-          fi
+          echo "handled by retrying synchronization step"
