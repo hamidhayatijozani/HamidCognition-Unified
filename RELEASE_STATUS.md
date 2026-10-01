@@ -4,8 +4,8 @@
 
 - Repository: hamidhayatijozani/HamidCognition-Unified
 - Canonical branch: main
-- Current HEAD verified at this record update: a6e7aaf7ec346959af1d8d9f6023ec4d501af974
-- Current HEAD was verified directly from the GitHub main branch ref.
+- Current HEAD tracked at this record update: cf8d231f80f7dd4280ac436cddc8824da60d795c
+- Current HEAD is tracked directly from the GitHub main branch ref; this SHA has not yet received a fresh full release-gate validation run.
 - Last fully successful Action Gate Product Gates run recorded here: #809
 - Successful run commit: e20270553b6216f6e4e5e8b1f3242f8f3d1ea788
 - Run ID: 36759424231
