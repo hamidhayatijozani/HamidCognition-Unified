@@ -31,6 +31,8 @@ def execute_if_authorized(component: AwarenessComponent, action: str, evidence_r
     decision=authorize(component, action, approval)
     if decision.decision is not Decision.ALLOW:
         raise PermissionError(f"{decision.decision.value}: {decision.reason}")
+    if component.contract.maturity in (component.contract.maturity.VERIFIED, component.contract.maturity.PRODUCTION) and not evidence_ref:
+        raise PermissionError(f"evidence required for {component.contract.component_id}:{action}")
     component.request_action(action)
     component.complete_action(action, evidence_ref)
     return decision
