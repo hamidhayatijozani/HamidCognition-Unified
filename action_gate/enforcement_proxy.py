@@ -6,6 +6,7 @@ import os
 import urllib.error
 import urllib.parse
 import urllib.request
+import sys
 
 try:
     from .ssrf_guard import require_safe_url
@@ -32,9 +33,29 @@ def auth_headers():
 
 def post_json(url, payload, headers=None):
     safe_url = require_safe_url(url)
-    req = urllib.request.Request(safe_url, data=json.dumps(payload).encode(), headers={"Content-Type": "application/json", **auth_headers(), **(headers or {})})
-    with urllib.request.urlopen(req) as r:
-        return r.status, json.loads(r.read())
+    req = urllib.request.Request(
+        safe_url,
+        data=json.dumps(payload).encode(),
+        headers={"Content-Type": "application/json", **auth_headers(), **(headers or {})},
+    )
+    try:
+        with urllib.request.urlopen(req) as r:
+            return r.status, json.loads(r.read())
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        print(
+            f"UPSTREAM_HTTP_ERROR status={exc.code} url={safe_url} body={body[:1000]}",
+            file=sys.stderr,
+            flush=True,
+        )
+        raise
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        print(
+            f"UPSTREAM_CONNECT_ERROR url={safe_url} error={type(exc).__name__}:{exc}",
+            file=sys.stderr,
+            flush=True,
+        )
+        raise
 
 
 def get_json(url):
@@ -89,7 +110,17 @@ class HTTPHandler(BaseHTTPRequestHandler):
                     authority = reserved["execution_authority"]
                 except Exception:
                     self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
-                status, out = post_json(TOOL_URL + self.path, payload, tool_headers(authority, tenant_id, expected_hash, record["policy_hash"], session_id))
+                try:
+                    status, out = post_json(
+                        TOOL_URL + self.path,
+                        payload,
+                        tool_headers(authority, tenant_id, expected_hash, record["policy_hash"], session_id),
+                    )
+                except urllib.error.HTTPError:
+                    self.send_response(502)
+                    self.end_headers()
+                    self.wfile.write(b'{"error":"protected_tool_rejected_execution"}')
+                    return
                 try:
                     record_execution(decision_id, tenant_id, actor_id, session_id, expected_hash, record["nonce"], {"http_status": status, "tool_response": out})
                 except Exception:
@@ -118,7 +149,17 @@ class MCPHandler(BaseHTTPRequestHandler):
                 authority = reserved["execution_authority"]
             except Exception:
                 self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
-            status, out = post_json(TOOL_URL, message, tool_headers(authority, tenant_id, result["action_hash"], result["policy_hash"], session_id))
+            try:
+                status, out = post_json(
+                    TOOL_URL,
+                    message,
+                    tool_headers(authority, tenant_id, result["action_hash"], result["policy_hash"], session_id),
+                )
+            except urllib.error.HTTPError:
+                self.send_response(502)
+                self.end_headers()
+                self.wfile.write(b'{"error":"protected_tool_rejected_execution"}')
+                return
             try:
                 record_execution(result["decision_id"], tenant_id, actor_id, session_id, result["action_hash"], result["nonce"], {"http_status": status, "tool_response": out, "protocol": "MCP", "method": "tools/call", "tool": tool})
             except Exception:
