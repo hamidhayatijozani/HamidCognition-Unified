@@ -84,7 +84,7 @@
   <div class="flow-node"><b>Protected Tool</b><span>Execution Authority</span></div>
 </div>
 <div class="security-grid">
-  <article class="panel"><h3>Credential handling</h3><p><code>ACTION_GATE_API_TOKEN</code> is read from the dashboard process environment and only attached to server-to-server requests. It is never placed in HTML, JavaScript, or API responses.</p><p>The Gate separately maintains signing and authority secrets. Those secrets are not supplied to callers or agents.</p></article>
+  <article class="panel"><h3>Credential handling</h3><p>The Gate bearer credential is read from the dashboard process environment and only attached to server-to-server requests. It is never placed in HTML, JavaScript, or API responses.</p><p>The Gate separately maintains signing and authority secrets. Those secrets are not supplied to callers or agents.</p></article>
   <article class="panel"><h3>Execution authority</h3><p>After an ALLOW path reaches execution reservation, the Gate issues a short-lived signed authority bound to tenant, action, policy and nonce. The protected layer verifies it and consumes the nonce atomically.</p></article>
   <article class="panel"><h3>Fail-closed</h3><p>Missing credentials, invalid signatures, expired decisions, tenant/action/policy binding failures and nonce reuse stop the protected execution path.</p></article>
   <article class="panel"><h3>Important boundary</h3><p>The console can initiate evaluation, but it cannot bypass Action Gate to execute a tool. That distinction is the whole point, annoyingly enough.</p></article>
