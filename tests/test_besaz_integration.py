@@ -63,3 +63,26 @@ def test_self_observation_does_not_claim_verification_without_evidence():
     for component in payload["components"]:
         if component["maturity"] == "VERIFIED":
             assert component["evidence_refs"], component["component_id"]
+
+
+def test_verified_state_requires_evidence_reference():
+    registry = build_besaz_registry()
+    component = registry.component("VERIFICATION")
+    assert component.contract.maturity is Maturity.VERIFIED
+    assert component.state.evidence_refs == []
+    try:
+        component.complete_action("verify")
+    except Exception as exc:
+        raise AssertionError("verification without evidence must be rejected") from exc
+    assert component.state.status != "VERIFIED"
+
+
+def test_execution_requires_explicit_evidence_for_verified_state():
+    registry = build_besaz_registry()
+    component = registry.component("VERIFICATION")
+    try:
+        execute_if_authorized(component, "verify")
+    except Exception as exc:
+        assert isinstance(exc, PermissionError)
+    else:
+        raise AssertionError("verification execution without evidence must be rejected")
