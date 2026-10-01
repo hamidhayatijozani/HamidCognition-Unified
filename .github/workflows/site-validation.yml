@@ -1,0 +1,48 @@
+name: Site Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - ".github/workflows/site-validation.yml"
+  pull_request:
+    paths:
+      - "index.html"
+      - ".github/workflows/site-validation.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate HTML structure
+        run: |
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          class Parser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.ids=set()
+                  self.errors=[]
+              def handle_starttag(self, tag, attrs):
+                  d=dict(attrs)
+                  if "id" in d:
+                      if d["id"] in self.ids:
+                          self.errors.append("duplicate id: "+d["id"])
+                      self.ids.add(d["id"])
+          p=Parser()
+          p.feed(Path("index.html").read_text(encoding="utf-8"))
+          p.close()
+          if p.errors:
+              raise SystemExit("\n".join(p.errors))
+          required=["dashboard","architecture","risk","evidence","policy","security","release","demo"]
+          missing=[x for x in required if x not in p.ids]
+          if missing:
+              raise SystemExit("missing sections: "+", ".join(missing))
+          print("site validation passed")
+          PY
