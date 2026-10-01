@@ -20,12 +20,12 @@
 <h1>Control the action before the agent executes it.</h1>
 <p>HamidCognition Action Gate is a deployable control boundary between an AI agent and protected tools. It evaluates an action, binds authorization to its execution context, records evidence, and permits execution only through the governed path.</p>
 <div class="tagline">Not just authorization.<span>Action-in-Trajectory.</span><span>Action-against-Reality.</span></div>
-<div class="actions"><a class="btn primary" href="#demo">Explore live product demo</a><a class="btn" href="#architecture">Explore architecture</a></div>
+<div class="actions"><a class="btn primary" href="#demo">Explore product interface</a><a class="btn" href="#architecture">Explore architecture</a></div>
 </div>
 <div class="control-card">
-<div class="control-head"><span>Governed execution path</span><span class="ok">SYSTEM OPERATIONAL</span></div>
+<div class="control-head"><span>Governed execution path</span><span id="runtimeStatus" class="warn">PROTOTYPE · RUNTIME UNVERIFIED</span></div>
 <div class="flow"><div class="node active">AI Agent</div><div class="arrow">→</div><div class="node active">Action Gate</div><div class="arrow">→</div><div class="node">Protected Tool</div></div>
-<div class="decision"><span class="label">Current decision</span><br><strong id="heroDecision">ALLOW</strong><small>tenant: acme-prod · action: protected.read · nonce: single-use</small></div>
+<div class="decision"><span class="label">Current demo decision</span><br><strong id="heroDecision">ALLOW</strong><small>tenant: acme-prod · action: protected.read · nonce: single-use</small></div>
 <div class="metrics"><div class="metric"><b>4</b><small>Decision modes</small></div><div class="metric"><b>1×</b><small>Authority nonce</small></div><div class="metric"><b>HTTP</b><small>Enforcement</small></div><div class="metric"><b>MCP</b><small>Boundary</small></div></div>
 </div>
 </div></section>
@@ -60,7 +60,8 @@
 
 <section id="demo" class="section"><div class="wrap"><div class="section-head"><div><div class="label">Product Interface</div><h2>A dashboard built around decisions.</h2></div><p class="section-intro">The production interface should expose operational evidence rather than decorative telemetry. This prototype mirrors the fields and boundaries implemented by Action Gate; displayed values are explicitly illustrative until connected to a live API.</p></div>
 <div class="card"><div class="status"><strong>Dashboard / Decisions</strong><span class="pill allow">PROTOTYPE</span></div><div style="overflow:auto;margin-top:16px"><table class="table"><thead><tr><th>Time</th><th>Agent</th><th>Tenant</th><th>Action</th><th>Decision</th><th>Authority</th><th>Evidence</th></tr></thead><tbody><tr><td>09:41:08</td><td>agent-prod-07</td><td>acme-prod</td><td>protected.read</td><td><span class="pill allow">ALLOW</span></td><td>verified</td><td>recorded</td></tr><tr><td>09:40:51</td><td>agent-prod-07</td><td>acme-prod</td><td>protected.delete</td><td><span class="pill deny">DENY</span></td><td>rejected</td><td>recorded</td></tr><tr><td>09:39:22</td><td>agent-staging-02</td><td>acme-staging</td><td>tool.call</td><td><span class="pill hold">ASK</span></td><td>approval</td><td>pending</td></tr></tbody></table></div></div>
-<div class="health" style="margin-top:14px"><div class="card"><div class="status"><span>Policy Engine</span><i></i></div></div><div class="card"><div class="status"><span>Enforcement</span><i></i></div></div><div class="card"><div class="status"><span>MCP Boundary</span><i></i></div></div><div class="card"><div class="status"><span>PostgreSQL</span><i></i></div></div></div></div></section>
+<div class="health" style="margin-top:14px"><div class="card"><div class="status"><span>Policy Engine</span><i data-health="policy"></i></div></div><div class="card"><div class="status"><span>Enforcement</span><i data-health="enforcement"></i></div></div><div class="card"><div class="status"><span>MCP Boundary</span><i data-health="mcp"></i></div></div><div class="card"><div class="status"><span>PostgreSQL</span><i data-health="storage"></i></div></div></div>
+<div class="card" style="margin-top:14px"><div class="status"><strong>Runtime connection</strong><span id="runtimeMode" class="pill hold">OFFLINE DEMO</span></div><p id="runtimeMessage" style="margin-top:10px">The public page does not assume a live API. If the page is served from the Action Gate runtime origin, it will probe <code>/health</code> and only then expose observed runtime status.</p></div></div></section>
 
 <section id="dashboard" class="section"><div class="wrap"><div class="section-head"><div><div class="label">Dashboard</div><h2>Operational control, not decorative telemetry.</h2></div><p class="section-intro">The interface mirrors the fields that matter at the execution boundary. Values in this public prototype are illustrative unless explicitly backed by a live deployment.</p></div><div class="grid3"><div class="card"><div class="label">Decisions</div><h3>ALLOW 128 · ASK 9 · DENY 17</h3><p>Recent decision distribution for the prototype view.</p></div><div class="card"><div class="label">Authority</div><h3>Gate-issued · single-use</h3><p>Execution authority is bound to the governed request context.</p></div><div class="card"><div class="label">Evidence</div><h3>Recorded / replayable</h3><p>Decision and execution evidence are treated as part of the boundary.</p></div></div></div></section>
 
@@ -77,6 +78,28 @@
 <footer class="footer"><div class="wrap footergrid"><div><div class="brand"><span>HAMID</span>COGNITION</div><p>Runtime authorization and execution governance for AI agents.</p><p class="fine">Copyright © 2026 Hamid Hayati Jozani. All rights reserved.</p></div><div><a href="https://github.com/hamidhayatijozani/HamidCognition-Unified">Source repository ↗</a><br><a href="https://github.com/hamidhayatijozani/HamidCognition-Unified/blob/main/PRODUCT/QUICKSTART.md">Quickstart ↗</a><br><a href="https://github.com/hamidhayatijozani/HamidCognition-Unified/blob/main/PRODUCT/CUSTOMER_ACCEPTANCE.md">Customer acceptance ↗</a></div></div></footer>
 
 <script>
+async function probeRuntime(){
+  const status=document.getElementById("runtimeStatus"), mode=document.getElementById("runtimeMode"), msg=document.getElementById("runtimeMessage");
+  try{
+    const response=await fetch("/health",{headers:{"Accept":"application/json"},cache:"no-store"});
+    if(!response.ok) throw new Error("HTTP "+response.status);
+    const data=await response.json();
+    status.textContent="RUNTIME CONNECTED";
+    status.className="ok";
+    mode.textContent="CONNECTED";
+    mode.className="pill allow";
+    msg.textContent="Observed /health response: "+(data.status||"unknown")+" · version "+(data.version||"unknown")+" · storage "+((data.storage&&data.storage.status)||"unknown")+". No decision data is inferred from this probe.";
+    ["policy","enforcement","mcp","storage"].forEach(k=>{const el=document.querySelector('[data-health="'+k+'"]'); if(el) el.style.background="var(--green)";});
+  }catch(error){
+    status.textContent="PROTOTYPE · RUNTIME UNVERIFIED";
+    status.className="warn";
+    mode.textContent="OFFLINE DEMO";
+    mode.className="pill hold";
+    msg.textContent="No same-origin /health response was verified. The interface remains in demonstration mode and does not claim live telemetry.";
+  }
+}
+probeRuntime();
+
 const scenarios={
 "protected.read":{decision:"ALLOW",reason:"Valid governed path for the simulated read-only request.",factors:[["Tenant binding","MATCH","ok"],["Actor / session","MATCH","ok"],["Policy binding","MATCH","ok"],["Gate authority","VALID","ok"],["Nonce","SINGLE-USE","ok"],["Protected tool","GOVERNED","ok"]]},
 "tool.call":{decision:"ASK",reason:"The demo routes this tool call through an approval state before execution.",factors:[["Tenant binding","MATCH","ok"],["Actor / session","MATCH","ok"],["Policy binding","MATCH","ok"],["Gate authority","PENDING","warn"],["Nonce","NOT CONSUMED","warn"],["Protected tool","BLOCKED","warn"]]},
