@@ -201,6 +201,38 @@ jobs:
           docker compose -f docker-compose.production.yml logs --no-color chatgpt-mcp
           exit 1
 
+      - name: Verify customer web console end-to-end
+        working-directory: action_gate
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
+          ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          MCP_BEARER_TOKEN: ci-mcp-bearer-token
+          DOMAIN: localhost
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error --header 'Host: localhost' http://127.0.0.1/ > /tmp/customer-console.html; then
+              grep -q 'HAMIDCOGNITION' /tmp/customer-console.html
+              grep -q 'Action Gate' /tmp/customer-console.html
+              break
+            fi
+            sleep 1
+          done
+          curl --fail --silent --show-error --header 'Host: localhost' http://127.0.0.1/api/health > /tmp/customer-console-health.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          body = json.loads(Path('/tmp/customer-console-health.json').read_text())
+          assert isinstance(body, dict)
+          print('CUSTOMER_CONSOLE_HEALTH=', json.dumps(body, sort_keys=True))
+          PY
+          docker compose -f docker-compose.production.yml exec -T dashboard python -c "import urllib.request; r=urllib.request.urlopen('http://127.0.0.1:8081/'); assert r.status == 200; assert b'HAMIDCOGNITION' in r.read()"
+
       - name: Verify authenticated MCP boundary
         working-directory: action_gate
         env:
