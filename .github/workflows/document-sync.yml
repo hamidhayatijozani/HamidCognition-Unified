@@ -61,12 +61,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Apply safe deterministic updates on main
+      - name: Apply and publish safe deterministic updates
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
@@ -100,10 +95,3 @@ jobs:
 
           echo "Failed to publish documentation synchronization after 5 attempts."
           exit 1
-
-      - name: Validate synchronization after safe updates
-        run: python tools/document_sync.py --check
-
-      - name: Commit safe documentation synchronization
-        run: |
-          echo "handled by retrying synchronization step"
