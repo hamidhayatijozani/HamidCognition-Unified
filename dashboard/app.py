@@ -11,10 +11,11 @@ from fastapi.staticfiles import StaticFiles
 
 GATE_URL = os.getenv("ACTION_GATE_URL", "http://action-gate:8000").rstrip("/")
 GATE_TOKEN = os.getenv("ACTION_GATE_API_TOKEN", "")
+TENANT_ID = os.getenv("DASHBOARD_TENANT_ID", "dashboard-demo")
 ROOT = Path(__file__).resolve().parent
 STATIC_DIR = ROOT / "static"
 
-app = FastAPI(title="HamidCognition Console", version="2.0.0")
+app = FastAPI(title="HamidCognition Console", version="2.0.1")
 app.mount("/assets", StaticFiles(directory=STATIC_DIR), name="assets")
 
 
@@ -22,7 +23,13 @@ def gate_headers() -> dict[str, str]:
     return {"Authorization": f"Bearer {GATE_TOKEN}"} if GATE_TOKEN else {}
 
 
-async def gate_request(method: str, path: str, *, json_body: dict[str, Any] | None = None, params: dict[str, str] | None = None) -> Any:
+async def gate_request(
+    method: str,
+    path: str,
+    *,
+    json_body: dict[str, Any] | None = None,
+    params: dict[str, str] | None = None,
+) -> Any:
     async with httpx.AsyncClient(timeout=10) as client:
         response = await client.request(
             method,
@@ -66,7 +73,7 @@ async def evaluate(payload: dict[str, Any]) -> dict[str, Any]:
         raise HTTPException(422, "action_required")
 
     body = {
-        "tenant_id": "dashboard-demo",
+        "tenant_id": TENANT_ID,
         "agent_id": agent_id,
         "actor_id": actor_id,
         "session_id": "dashboard-session",
@@ -86,22 +93,18 @@ async def evaluate(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 @app.get("/api/evidence/{decision_id}")
-async def evidence(decision_id: str, tenant_id: str) -> dict[str, Any]:
-    if not tenant_id:
-        raise HTTPException(422, "tenant_id_required")
+async def evidence(decision_id: str) -> dict[str, Any]:
     return await gate_request(
         "GET",
         f"/v1/evidence/{decision_id}",
-        params={"tenant_id": tenant_id},
+        params={"tenant_id": TENANT_ID},
     )
 
 
 @app.get("/api/replay/{decision_id}")
-async def replay(decision_id: str, tenant_id: str) -> dict[str, Any]:
-    if not tenant_id:
-        raise HTTPException(422, "tenant_id_required")
+async def replay(decision_id: str) -> dict[str, Any]:
     return await gate_request(
         "GET",
         f"/v1/replay/{decision_id}",
-        params={"tenant_id": tenant_id},
+        params={"tenant_id": TENANT_ID},
     )
