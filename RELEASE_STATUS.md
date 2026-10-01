@@ -71,4 +71,4 @@ Commercial status remains separate from engineering verification.
 
 PROJECT STATUS: VALIDATION IN PROGRESS
 
-The repository now has a directly verified current main SHA, but that does not retroactively validate current HEAD through Product Gates run #809. A new verification run bound to 0834850ea95bcd49c217798a9eed815c30b0c942 is required before claiming current-main release readiness.
+The repository now has a directly verified current main SHA, but that does not retroactively validate current HEAD through Product Gates run #809. A new verification run bound to the current main SHA is required before claiming current-main release readiness.
