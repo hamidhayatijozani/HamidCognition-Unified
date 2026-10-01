@@ -58,12 +58,12 @@ class AwarenessComponent:
         if permission is None: raise PermissionError(f"{self.contract.component_id} is not authorized for {action}")
         self.state.pending_actions.append(action); return permission
     def complete_action(self,action:str,evidence_ref:str|None=None):
-        if action in self.state.pending_actions: self.state.pending_actions.remove(action)
         if not evidence_ref and self.contract.maturity in (Maturity.VERIFIED, Maturity.PRODUCTION):
             self.state.status="ACTION_COMPLETED"
             raise PermissionError(f"{self.contract.component_id} requires evidence for completion")
         if evidence_ref and not str(evidence_ref).strip():
             raise PermissionError(f"{self.contract.component_id} requires a non-empty evidence reference")
+        if action in self.state.pending_actions: self.state.pending_actions.remove(action)
         if evidence_ref: self.state.evidence_refs.append(evidence_ref)
         self.state.status="VERIFIED" if evidence_ref else "ACTION_COMPLETED"
     def escalate(self,reason:str):
