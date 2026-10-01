@@ -20,15 +20,18 @@ def post(url, payload, headers):
     return json.load(urllib.request.urlopen(req))
 
 
-for _ in range(30):
-    try:
-        s = socket.create_connection(("enforcement", 8080), 2)
-        s.close()
-        break
-    except OSError:
-        time.sleep(1)
-else:
-    raise RuntimeError("enforcement_service_not_ready")
+def wait_for_service(host: str, port: int, name: str) -> None:
+    for _ in range(30):
+        try:
+            s = socket.create_connection((host, port), 2)
+            s.close()
+            return
+        except OSError:
+            time.sleep(1)
+    raise RuntimeError(f"{name}_service_not_ready")
+
+wait_for_service("enforcement", 8080, "enforcement")
+wait_for_service("tool", 9000, "tool")
 
 # Negative control: direct tool access without Gate-issued authority must fail closed.
 try:
