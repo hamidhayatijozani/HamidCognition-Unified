@@ -99,3 +99,16 @@ def test_blank_evidence_reference_is_rejected():
         pass
     else:
         raise AssertionError("blank evidence reference must be rejected")
+
+
+def test_failed_completion_preserves_pending_action():
+    registry = build_besaz_registry()
+    component = registry.component("VERIFICATION")
+    component.request_action("verify")
+    try:
+        component.complete_action("verify", "   ")
+    except PermissionError:
+        pass
+    else:
+        raise AssertionError("blank evidence reference must be rejected")
+    assert "verify" in component.state.pending_actions
