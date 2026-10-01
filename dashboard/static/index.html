@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HamidCognition · Action Gate Console</title><link rel="stylesheet" href="/assets/style.css"></head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <div class="brand"><span class="brand-mark">HC</span><div><strong>HAMIDCOGNITION</strong><small>ACTION GATE</small></div></div>
+  <nav>
+    <a class="nav-item active" href="#dashboard">Dashboard</a>
+    <a class="nav-item" href="#decision">Decision Trace</a>
+    <a class="nav-item" href="#security">Security Boundary</a>
+    <a class="nav-item" href="#about">Runtime Contract</a>
+  </nav>
+  <div class="sidebar-foot"><span class="dot" id="edge-dot"></span><span id="edge-label">Checking runtime</span></div>
+</aside>
+
+<main class="content">
+<header class="topbar"><div><p class="eyebrow">Execution governance console</p><h1>Control the action boundary.</h1><p class="subhead">Evaluate exact actions, inspect evidence, and replay the recorded decision without exposing the Gate credential to the browser.</p></div><div class="status-chip" id="status-chip">CHECKING</div></header>
+
+<section id="dashboard" class="view">
+<div class="metrics">
+  <article class="metric-card"><span>Runtime</span><strong id="runtime">—</strong><small id="storage">storage: —</small></article>
+  <article class="metric-card"><span>Policy</span><strong id="policy-version">—</strong><small id="policy-hash">hash: —</small></article>
+  <article class="metric-card"><span>Signing key</span><strong id="key-id">—</strong><small>verified by Action Gate</small></article>
+  <article class="metric-card"><span>Auth path</span><strong>Server-side</strong><small>Browser never receives Gate token</small></article>
+</div>
+
+<div class="two-col">
+<section class="panel">
+  <div class="panel-head"><div><span class="kicker">Action request</span><h2>Evaluate an action</h2></div><span class="secure-badge">FAIL-CLOSED</span></div>
+  <form id="evaluate-form">
+    <label>Action<input id="action" name="action" value="read_customer" maxlength="256" required></label>
+    <label>Target<input id="target" name="target" value="customer/123" maxlength="2048"></label>
+    <div class="form-grid">
+      <label>Agent<input id="agent" name="agent" value="hamidcognition-console" maxlength="128"></label>
+      <label>Actor<input id="actor" name="actor" value="dashboard-user" maxlength="128"></label>
+    </div>
+    <div class="preset-row">
+      <button type="button" class="ghost" data-action="read_customer" data-target="customer/123">Read</button>
+      <button type="button" class="ghost warning" data-action="send_external_email" data-target="customer/123">External email</button>
+      <button type="button" class="ghost danger" data-action="delete_database" data-target="production/customer-db">Production delete</button>
+      <button type="button" class="ghost dark" data-action="transfer_funds" data-target="bank/account-42">Transfer</button>
+    </div>
+    <button class="primary" type="submit">Evaluate through Action Gate</button>
+  </form>
+  <p class="form-note">This console calls <code>/api/evaluate</code>. The server adds the Action Gate bearer credential before calling the private Gate service.</p>
+</section>
+
+<section class="panel">
+  <div class="panel-head"><div><span class="kicker">Decision</span><h2 id="decision-title">No request yet</h2></div><span id="decision-badge" class="decision-badge neutral">IDLE</span></div>
+  <div class="decision-summary">
+    <div><span>Decision ID</span><strong id="decision-id">—</strong></div>
+    <div><span>Risk</span><strong id="decision-risk">—</strong></div>
+    <div><span>Policy</span><strong id="decision-policy">—</strong></div>
+    <div><span>Expires</span><strong id="decision-expires">—</strong></div>
+  </div>
+  <div class="trace-line" id="trace-line">Submit an action to create a trace.</div>
+  <details class="json-block"><summary>Raw decision response</summary><pre id="decision-json">{}</pre></details>
+</section>
+</div>
+
+<div class="two-col">
+<section class="panel" id="decision">
+  <div class="panel-head"><div><span class="kicker">Evidence</span><h2>Recorded evidence</h2></div><button class="ghost" id="refresh-evidence" disabled>Refresh</button></div>
+  <div id="evidence-meta" class="empty-state">Run a decision first. Evidence will be loaded from the Action Gate record.</div>
+  <details class="json-block" id="evidence-detail" hidden><summary>Evidence payload</summary><pre id="evidence-json">{}</pre></details>
+</section>
+
+<section class="panel">
+  <div class="panel-head"><div><span class="kicker">Replay</span><h2>Deterministic re-check</h2></div><button class="ghost" id="refresh-replay" disabled>Replay</button></div>
+  <div id="replay-state" class="empty-state">The recorded decision can be replayed against the stored policy snapshot and action hash.</div>
+  <details class="json-block" id="replay-detail" hidden><summary>Replay payload</summary><pre id="replay-json">{}</pre></details>
+</section>
+</div>
+</section>
+
+<section id="security" class="view">
+<div class="section-header"><p class="eyebrow">Security boundary</p><h2>Credentials stay behind the console.</h2><p>The web application is a presentation/operator layer. It does not become an alternative authorization engine.</p></div>
+<div class="flow">
+  <div class="flow-node browser"><b>Browser</b><span>Session/UI only</span></div><div class="flow-arrow">→</div>
+  <div class="flow-node"><b>Console API</b><span>Server-side proxy</span></div><div class="flow-arrow">→</div>
+  <div class="flow-node"><b>Action Gate</b><span>Bearer credential</span></div><div class="flow-arrow">→</div>
+  <div class="flow-node"><b>Protected Tool</b><span>Execution Authority</span></div>
+</div>
+<div class="security-grid">
+  <article class="panel"><h3>Credential handling</h3><p><code>ACTION_GATE_API_TOKEN</code> is read from the dashboard process environment and only attached to server-to-server requests. It is never placed in HTML, JavaScript, or API responses.</p><p>The Gate separately maintains signing and authority secrets. Those secrets are not supplied to callers or agents.</p></article>
+  <article class="panel"><h3>Execution authority</h3><p>After an ALLOW path reaches execution reservation, the Gate issues a short-lived signed authority bound to tenant, action, policy and nonce. The protected layer verifies it and consumes the nonce atomically.</p></article>
+  <article class="panel"><h3>Fail-closed</h3><p>Missing credentials, invalid signatures, expired decisions, tenant/action/policy binding failures and nonce reuse stop the protected execution path.</p></article>
+  <article class="panel"><h3>Important boundary</h3><p>The console can initiate evaluation, but it cannot bypass Action Gate to execute a tool. That distinction is the whole point, annoyingly enough.</p></article>
+</div>
+</section>
+
+<section id="about" class="view">
+<div class="section-header"><p class="eyebrow">Runtime contract</p><h2>Agent → Decision → Enforcement → Evidence → Replay</h2><p>Only the components that are actually present in the repository are represented here. No OAuth provider, HSM/KMS, SIEM or universal identity layer is implied by this console.</p></div>
+<div class="contract-list">
+  <div><span>01</span><b>Authenticate</b><p>Action Gate validates the server-side bearer credential on protected API routes.</p></div>
+  <div><span>02</span><b>Bind identity</b><p>Tenant, actor, session and action context become part of the decision and evidence record.</p></div>
+  <div><span>03</span><b>Evaluate</b><p>The current policy assigns risk and returns ALLOW, DENY, ASK or SANDBOX.</p></div>
+  <div><span>04</span><b>Enforce</b><p>Execution requires Gate-issued authority with signature, expiry, binding and one-time nonce checks.</p></div>
+  <div><span>05</span><b>Replay</b><p>The stored policy snapshot and action digest are re-evaluated to test decision consistency.</p></div>
+</div>
+</section>
+
+<footer><span>HamidCognition Action Gate Console</span><span id="footer-version">version —</span></footer>
+</main></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="/assets/app.js"></script>
+</body></html>
