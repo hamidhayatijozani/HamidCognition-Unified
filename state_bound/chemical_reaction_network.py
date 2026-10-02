@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Literal
+import hashlib
+import json
 
 ReactionMode = Literal["PROCEED", "HOLD", "INHIBIT", "UNKNOWN"]
 
@@ -38,6 +40,7 @@ class ReactionNetworkResult:
     cascade_pressure: float
     weakest_node: str
     trace: tuple[str, ...]
+    trace_digest: str
 
 
 def _clamp(value: float) -> float:
@@ -117,11 +120,15 @@ def evaluate_reaction_network(
         reason = "insufficient_reactivity"
 
     trace.append(f"decision={mode}:reason={reason}")
+    trace_tuple = tuple(trace)
+    trace_canonical = json.dumps({"trace": trace_tuple}, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    trace_digest = hashlib.sha256(trace_canonical.encode("utf-8")).hexdigest()
     return ReactionNetworkResult(
         mode=mode,
         network_reactivity=sum(reactivities) / len(reactivities),
         barrier=barrier,
         cascade_pressure=cascade_pressure,
         weakest_node=weakest.name,
-        trace=tuple(trace),
+        trace=trace_tuple,
+        trace_digest=trace_digest,
     )
