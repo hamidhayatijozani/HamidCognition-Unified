@@ -22,6 +22,16 @@ class DocumentSyncTests(unittest.TestCase):
         self.assertFalse(state["missing_sources"])
         self.assertFalse(state["stale_documents"])
 
+    def test_only_one_version_source_exists(self):
+        version_files = [
+            path for path in ROOT.rglob("VERSION")
+            if ".git" not in path.parts
+        ]
+        self.assertEqual(
+            [path.relative_to(ROOT).as_posix() for path in version_files],
+            ["action_gate/VERSION"],
+        )
+
     def test_state_schema(self):
         result = self.run_sync()
         self.assertEqual(result.returncode, 0)
@@ -34,6 +44,8 @@ class DocumentSyncTests(unittest.TestCase):
         result = self.run_sync("--check")
         state = json.loads(result.stdout)
         identity = state["canonical_release"]
+        version_file = (ROOT / "action_gate" / "VERSION").read_text(encoding="utf-8").strip()
+        self.assertEqual(identity["release_version"], version_file)
         self.assertEqual(identity["release_version"], "1.1.1")
         self.assertEqual(identity["release_tag"], "action-gate-v1.1.1")
         self.assertEqual(len(identity["source_commit"]), 40)
