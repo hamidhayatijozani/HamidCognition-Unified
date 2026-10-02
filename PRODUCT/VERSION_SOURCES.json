@@ -1,0 +1,6 @@
+{
+  "schema": "hamidcognition.version-sources.v1",
+  "canonical": "action_gate/VERSION",
+  "derived": ["README.md", "PRODUCT/QUICKSTART.md", "PRODUCT/CURRENT_COMMERCIAL_RELEASE.md", "PRODUCT/RELEASE_NOTES_1.1.1.md"],
+  "version_bearing_source_classes": ["pyproject.toml", "package.json", "**/package.json", "**/__init__.py", "**/*.py", "**/*.toml", "**/*.yaml", "**/*.yml", "**/*.json", "**/*.md"]
+}
