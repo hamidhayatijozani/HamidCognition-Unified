@@ -138,7 +138,7 @@ jobs:
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
           MCP_BEARER_TOKEN: ci-mcp-bearer-token
           MCP_RESOURCE_URL: http://127.0.0.1:8787/mcp
-          DOMAIN: localhost
+          DOMAIN: localhost:80
         run: docker compose -f docker-compose.production.yml up -d --build
       - name: Verify production stack health before replay
         working-directory: action_gate
