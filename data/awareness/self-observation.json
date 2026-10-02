@@ -346,7 +346,9 @@
         "y"
       ],
       "component_id": "VERIFICATION",
-      "evidence_refs": [],
+      "evidence_refs": [
+        "github-actions:run/36965286803"
+      ],
       "limits": [
         "cannot manufacture proof"
       ],
