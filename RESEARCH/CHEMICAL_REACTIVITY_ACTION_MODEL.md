@@ -63,3 +63,28 @@ The model must never:
 Promotion beyond research requires measured improvement against a baseline,
 including false-allow behavior, false-deny behavior, latency, deterministic replay,
 adversarial drift handling, and enforcement-boundary regression tests.
+
+
+## Import and authority boundary
+
+The direction is one-way:
+
+**Action Gate may consume a research assessment; the chemical/state-bound research layer must not import or invoke Action Gate.**
+
+The current implementation keeps the chemical modules independent of `action_gate.*`.
+A subprocess runtime probe verifies that importing `state_bound` does not load any
+`action_gate` module. This runtime check complements static inspection because AST
+inspection alone cannot detect dynamic imports.
+
+`PROCEED` means only **REQUEST_ACTION_GATE_AUTHORIZATION**.
+`HOLD` means **REQUIRE_REEVALUATION**.
+`UNKNOWN` means **REQUIRE_EVIDENCE**.
+`INHIBIT` means **BLOCK_REACTION**.
+
+None of these outputs is an execution authority.
+
+## Determinism proof boundary
+
+Determinism is tested both twice in-process and across two fresh Python processes.
+A single hash fixture is therefore not treated as proof of cross-version
+determinism. Python-version upgrades remain a separate reproducibility dimension.
