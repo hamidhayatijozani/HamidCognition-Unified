@@ -33,8 +33,8 @@ class ReactionEnvironment:
 class ReactionAssessment:
     environment_digest: str
     network: ReactionNetworkResult
-    post_reaction_digest: str
-    state_transition_required: bool
+    reaction_summary_digest: str
+    state_transition_observation_required: bool
 
 
 def _canonical(value: Any) -> str:
@@ -65,11 +65,8 @@ def _stability(value: Any) -> float:
 def build_reaction_assessment(env: ReactionEnvironment) -> ReactionAssessment:
     """Turn one execution snapshot into a replayable reaction-network assessment.
 
-    Architecture:
-        snapshot -> conditions -> reaction network -> decision state
-                 -> post-reaction digest -> next-state requirement
-
-    The layer can recommend HOLD/INHIBIT but never authorizes execution.
+    The returned summary describes the assessment only. It is not a
+    post-transition state because this function performs no state mutation.
     """
 
     evidence_strength = _evidence_strength(env.evidence)
@@ -116,18 +113,19 @@ def build_reaction_assessment(env: ReactionEnvironment) -> ReactionAssessment:
     }
     environment_digest = _digest(snapshot)
 
-    post_reaction = {
+    reaction_summary = {
         "environment_digest": environment_digest,
         "mode": network.mode,
         "weakest_node": network.weakest_node,
         "network_reactivity": network.network_reactivity,
         "barrier": network.barrier,
         "cascade_pressure": network.cascade_pressure,
+        "trace": network.trace,
     }
 
     return ReactionAssessment(
         environment_digest=environment_digest,
         network=network,
-        post_reaction_digest=_digest(post_reaction),
-        state_transition_required=network.mode in {"PROCEED", "HOLD", "INHIBIT"},
+        reaction_summary_digest=_digest(reaction_summary),
+        state_transition_observation_required=network.mode in {"PROCEED", "HOLD", "INHIBIT"},
     )
