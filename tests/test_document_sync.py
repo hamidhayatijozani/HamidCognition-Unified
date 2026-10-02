@@ -34,8 +34,8 @@ class DocumentSyncTests(unittest.TestCase):
         result = self.run_sync("--check")
         state = json.loads(result.stdout)
         identity = state["canonical_release"]
-        self.assertEqual(identity["release_version"], "1.0.10")
-        self.assertEqual(identity["release_tag"], "action-gate-v1.0.10")
+        self.assertEqual(identity["release_version"], "1.1.1")
+        self.assertEqual(identity["release_tag"], "action-gate-v1.1.1")
         self.assertEqual(len(identity["source_commit"]), 40)
 
 if __name__ == "__main__":
