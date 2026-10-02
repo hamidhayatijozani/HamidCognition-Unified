@@ -34,7 +34,7 @@ def test_importing_state_bound_does_not_load_action_gate_modules():
     assert result.returncode == 0
 
 
-def test_reactivity_is_deterministic_across_processes():
+def test_reactivity_is_deterministic_across_fixed_and_random_hash_seeds():
     code = """
 import json
 from state_bound.chemical_reactivity import ReactivityFactors, calculate_reactivity
@@ -47,11 +47,16 @@ print(json.dumps({
     "reason": r.reason,
 }, sort_keys=True))
 """
+    seeds = ["0", "1", "random"]
     outputs = [
-        subprocess.check_output([sys.executable, "-c", code], text=True, env={**os.environ, "PYTHONHASHSEED": "random"}).strip()
+        subprocess.check_output(
+            [sys.executable, "-c", code], text=True,
+            env={**os.environ, "PYTHONHASHSEED": seed},
+        ).strip()
+        for seed in seeds
         for _ in range(2)
     ]
-    assert outputs[0] == outputs[1]
+    assert len(set(outputs)) == 1
     json.loads(outputs[0])
 
 
