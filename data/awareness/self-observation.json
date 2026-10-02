@@ -346,9 +346,7 @@
         "y"
       ],
       "component_id": "VERIFICATION",
-      "evidence_refs": [
-        "github-actions:run/36965286803"
-      ],
+      "evidence_refs": [],
       "limits": [
         "cannot manufacture proof"
       ],
@@ -395,7 +393,7 @@
   ],
   "hard_boundary": "self-observation cannot execute, self-upgrade, self-grant authority, or rewrite contracts",
   "mode": "SELF_OBSERVE_ONLY",
-  "observation_time": "2026-10-02T04:36:45.525731+00:00",
+  "observation_time": "2026-10-02T04:44:18.765133+00:00",
   "project": "BESAZ",
   "proposals": [
     {
