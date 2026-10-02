@@ -2,5 +2,6 @@
   "schema": "hamidcognition.version-sources.v1",
   "canonical": "action_gate/VERSION",
   "derived": ["README.md", "PRODUCT/QUICKSTART.md", "PRODUCT/CURRENT_COMMERCIAL_RELEASE.md", "PRODUCT/RELEASE_NOTES_1.1.1.md"],
-  "version_bearing_source_classes": ["pyproject.toml", "package.json", "**/package.json", "**/__init__.py", "**/*.py", "**/*.toml", "**/*.yaml", "**/*.yml", "**/*.json", "**/*.md"]
+  "authoritative_source_classes": ["pyproject.toml", "package.json", "**/package.json", "**/setup.py", "**/setup.cfg", "**/__init__.py", "**/*.toml"],
+  "derived_document_policy": "Only files listed in derived may contain release-version literals. Other documentation is not treated as an authority source by this gate."
 }
