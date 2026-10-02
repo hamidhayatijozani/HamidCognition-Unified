@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Literal
+import math
 
 ReactionMode = Literal["PROCEED", "HOLD", "INHIBIT", "UNKNOWN"]
 
@@ -23,7 +24,11 @@ class ReactivityFactors:
 
     def __post_init__(self) -> None:
         for name in self.__dataclass_fields__:
+            if name == "consumer_action":
+                continue
             value = getattr(self, name)
+            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+                raise TypeError(f"{name} must be a finite numeric value")
             if not 0.0 <= value <= 1.0:
                 raise ValueError(f"{name} must be in [0, 1]")
 
@@ -34,6 +39,7 @@ class ReactivityResult:
     reactivity: float
     activation_margin: float
     reason: str
+    consumer_action: str
 
 
 def calculate_reactivity(
@@ -69,9 +75,9 @@ def calculate_reactivity(
     margin = reactivity - activation_threshold
 
     if factors.inhibition >= inhibition_threshold:
-        return ReactivityResult("INHIBIT", reactivity, margin, "inhibitor_above_threshold")
+        return ReactivityResult("INHIBIT", reactivity, margin, "inhibitor_above_threshold", "BLOCK_REACTION")
     if stability < minimum_stability:
-        return ReactivityResult("HOLD", reactivity, margin, "stability_below_threshold")
+        return ReactivityResult("HOLD", reactivity, margin, "stability_below_threshold", "REQUIRE_REEVALUATION")
     if reactivity >= activation_threshold:
-        return ReactivityResult("PROCEED", reactivity, margin, "activation_conditions_satisfied")
-    return ReactivityResult("UNKNOWN", reactivity, margin, "activation_conditions_insufficient")
+        return ReactivityResult("PROCEED", reactivity, margin, "REQUEST_ACTION_GATE_AUTHORIZATION")
+    return ReactivityResult("UNKNOWN", reactivity, margin, "REQUIRE_EVIDENCE")
