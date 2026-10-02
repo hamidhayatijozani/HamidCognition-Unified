@@ -2,22 +2,22 @@
 
 ## Customer-facing baseline
 
-The last independently validated and published Action Gate release is **v1.0.10**, published as GitHub release `action-gate-v1.0.10`.
+The latest independently validated and published Action Gate release is **v1.1.1**, published as GitHub release `action-gate-v1.1.1`.
 
 Verified source commit:
-`77d820e99dc78a6a9e3217d3c1c49d5cdf07813f`
+`e9ea7565f4ddea91f5c45104237bd20564c80894`
 
 Release-candidate workflow run:
-`36303350191`
+`36966012148`
 
 Artifact digest:
-`sha256:10bb53b69b56ff86146f5c71e3e5d7e34dacb4e12dba2adafc59f9d5276abd91`
+`sha256:517064de0427286ff4f346d46996642aca3b9def891d1c08bfaebc25546fb791`
 
-The current `main` development line is v1.1.0. It must not be represented as a published commercial release until the release rule below is satisfied.
+The current `main` development line is v1.1.1, and the v1.1.1 release record now satisfies the technical release rule below.
 
-## v1.1.0 release rule
+## v1.1.1 release rule
 
-v1.1.0 becomes offerable as a published release only after:
+v1.1.1 is technically offerable as a published release because:
 
 1. product gates pass;
 2. security validation passes;
