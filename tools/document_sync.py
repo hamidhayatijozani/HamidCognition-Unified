@@ -16,7 +16,8 @@ CANONICAL_RELEASE = ROOT / "PRODUCT" / "CURRENT_COMMERCIAL_RELEASE.md"
 STATE_PATH = ROOT / "evidence" / "document-sync-state.json"
 
 VERSION_RE = re.compile(r"\bv(\d+\.\d+\.\d+)\b")
-TAG_RE = re.compile(r"(?:GitHub release\s+|published as\s+(?:the immutable\s+)?(?:GitHub release\s+)?)`?([A-Za-z0-9._-]+)`?", re.I)
+TAG_RE = re.compile(r"(?:GitHub release\s+|published as\s+(?:the\s+)?immutable\s+GitHub release\s+)`?([A-Za-z0-9._-]+)`?", re.I)
+VERSION_PATH = ROOT / "action_gate" / "VERSION"
 COMMIT_RE = re.compile(r"Verified source commit:\s*[^0-9a-f]*([0-9a-f]{40})", re.I)
 
 def sha256_text(value: str) -> str:
@@ -39,15 +40,20 @@ def published_release_text(text: str) -> str:
 
     return text
 
+def product_version() -> str:
+    version = VERSION_PATH.read_text(encoding="utf-8").strip()
+    if not re.fullmatch(r"\d+\.\d+\.\d+", version):
+        raise ValueError("action_gate/VERSION must contain exactly one semantic version")
+    return version
+
 def parse_release_identity(text: str) -> dict[str, str]:
     source = published_release_text(text)
-    version = VERSION_RE.search(source)
     tag = TAG_RE.search(source)
     commit = COMMIT_RE.search(source)
-    if not (version and tag and commit):
+    if not (tag and commit):
         raise ValueError("Canonical commercial release identity is incomplete")
     return {
-        "release_version": version.group(1),
+        "release_version": product_version(),
         "release_tag": tag.group(1),
         "source_commit": commit.group(1),
     }
