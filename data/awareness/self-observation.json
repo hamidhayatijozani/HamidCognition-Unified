@@ -95,7 +95,8 @@
   "components": [
     {
       "capabilities": [
-        "update"
+        "audit",
+        "escalate"
       ],
       "component_id": "GOVERNANCE",
       "evidence_refs": [],
@@ -349,7 +350,7 @@
       "limits": [
         "cannot manufacture proof"
       ],
-      "maturity": "SPECIFIED",
+      "maturity": "VERIFIED",
       "parent_id": "FEEDBACK",
       "status": "READY"
     },
@@ -392,7 +393,7 @@
   ],
   "hard_boundary": "self-observation cannot execute, self-upgrade, self-grant authority, or rewrite contracts",
   "mode": "SELF_OBSERVE_ONLY",
-  "observation_time": "2026-10-01T23:48:06.345559+00:00",
+  "observation_time": "2026-10-02T04:36:45.525731+00:00",
   "project": "BESAZ",
   "proposals": [
     {
