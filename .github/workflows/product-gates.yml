@@ -223,14 +223,14 @@ jobs:
         run: |
           set -euo pipefail
           for attempt in $(seq 1 30); do
-            if curl --fail --silent --show-error --insecure --header 'Host: localhost' https://127.0.0.1/ > /tmp/customer-console.html; then
+            if curl --fail --silent --show-error --header 'Host: localhost' http://127.0.0.1/ > /tmp/customer-console.html; then
               grep -q 'HAMIDCOGNITION' /tmp/customer-console.html
               grep -q 'Action Gate' /tmp/customer-console.html
               break
             fi
             sleep 1
           done
-          curl --fail --silent --show-error --insecure --header 'Host: localhost' https://127.0.0.1/api/health > /tmp/customer-console-health.json
+          curl --fail --silent --show-error --header 'Host: localhost' http://127.0.0.1/api/health > /tmp/customer-console-health.json
           python - <<'PY'
           import json
           from pathlib import Path
