@@ -52,3 +52,12 @@ def test_replay_is_deterministic():
     assert evaluate_reaction_network(nodes, catalyst=0.2) == evaluate_reaction_network(
         nodes, catalyst=0.2
     )
+
+
+def test_trace_digest_is_canonical_and_locked():
+    nodes = (
+        ReactionNode("a", 0.8, 0.1, 0.9, 0.8, 0.1),
+        ReactionNode("b", 0.9, 0.0, 0.95, 0.9, 0.2),
+    )
+    result = evaluate_reaction_network(nodes, catalyst=0.2)
+    assert result.trace_digest == "b2ba5069e14491d51db12ad6637ab65018f35502cc53c39157ce1f10161b5fa9"
