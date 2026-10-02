@@ -121,6 +121,7 @@ def build_reaction_assessment(env: ReactionEnvironment) -> ReactionAssessment:
         "barrier": network.barrier,
         "cascade_pressure": network.cascade_pressure,
         "trace": network.trace,
+        "trace_digest": network.trace_digest,
     }
 
     return ReactionAssessment(
