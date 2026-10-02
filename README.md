@@ -34,11 +34,11 @@ AI agents increasingly have the ability to call APIs, MCP tools, databases, clou
 
 ## Commercial release state
 
-The current development product version is **HamidCognition Action Gate v1.1.0**, sourced from `action_gate/VERSION`.
+The current published product version is **HamidCognition Action Gate v1.1.1**, sourced from `action_gate/VERSION`.
 
-The last validated published commercial release is **v1.0.10**, published as the immutable GitHub release `action-gate-v1.0.10` at source commit `77d820e99dc78a6a9e3217d3c1c49d5cdf07813f`.
+The latest same-SHA validated and published release is **v1.1.1**, published as GitHub release `action-gate-v1.1.1` at source commit `e9ea7565f4ddea91f5c45104237bd20564c80894`.
 
-The mutable main branch is not itself a customer release. v1.1.0 becomes customer-offerable only after same-SHA product/security/Clean-Room/production-E2E validation, reproducible artifact generation, and release publication.
+The mutable main branch is not itself a customer release. v1.1.1 has passed the same-SHA product/security/Clean-Room/production-E2E/release-readiness chain and has a published reproducible artifact. Customer acceptance, licensing, payment and deployment evidence remain separate commercial records.
 
 See PRODUCT/CURRENT_COMMERCIAL_RELEASE.md for the release-control state.
 
