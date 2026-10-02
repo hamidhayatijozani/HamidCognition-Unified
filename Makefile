@@ -15,7 +15,7 @@ version-source:
 
 security-acceptance:
 	$(PYTHON) scripts/check_enforcement_coverage.py
-	$(PYTEST) -q tests/test_protected_tool_enforcement.py tests/test_chemical_runtime_boundary.py tests/test_chemical_reactivity.py
+	$(PYTEST) -q tests
 
 state-bound:
 	$(PYTEST) -q tests/test_state_bound.py tests/test_ta001_benchmark.py tests/test_trajectory_reality.py
@@ -25,3 +25,4 @@ product-gates:
 
 clean-room:
 	$(PYTHON) -m compileall -q action_gate state_bound
+	$(PYTEST) -q action_gate tests
