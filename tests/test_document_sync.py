@@ -22,6 +22,24 @@ class DocumentSyncTests(unittest.TestCase):
         self.assertFalse(state["missing_sources"])
         self.assertFalse(state["stale_documents"])
 
+    def test_parser_regression_exact_immutable_release_phrase(self):
+        identity = self.run_sync("--check")
+        self.assertEqual(identity.returncode, 0, identity.stdout + identity.stderr)
+
+        source = (ROOT / "tools" / "document_sync.py").read_text(encoding="utf-8")
+        self.assertIn("published as", source)
+        self.assertIn("immutable", source)
+
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("document_sync", SCRIPT)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        parsed = module.parse_release_identity(
+            "published as immutable GitHub release `action-gate-v1.1.1` at source commit "
+            "e9ea7565f4ddea91f5c45104237bd20564c80894"
+        )
+        self.assertEqual(parsed["release_tag"], "action-gate-v1.1.1")
+
     def test_only_one_version_source_exists(self):
         version_files = [
             path for path in ROOT.rglob("VERSION")
