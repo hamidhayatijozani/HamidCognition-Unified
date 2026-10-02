@@ -38,5 +38,5 @@ def assessment_record(result: ReactionAssessment) -> Mapping[str, Any]:
         "environment_digest": result.environment_digest,
         "reaction_summary_digest": result.reaction_summary_digest,
         "state_transition_observation_required": result.state_transition_observation_required,
-        "trace": tuple(result.network.trace),
+        "trace": list(result.network.trace),
     }
