@@ -19,6 +19,8 @@ from csg_routes import router as csg_router
 from keyring import configured_key_ids, current_key_id, current_secret, verify_with_keyring
 from policy_store import load_policy, policy_hash
 from security_authority import issue_authority
+from state_bound.chemical_execution import ReactionEnvironment
+from state_bound.reaction_capability import ReactionAssessmentRequest, ReactionPolicyInput, assess_reaction, assessment_record
 
 APP_VERSION = Path(__file__).with_name("VERSION").read_text(encoding="utf-8").strip()
 API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
@@ -117,6 +119,8 @@ class ActionRequest(BaseModel):
     context: dict[str, Any] = Field(default_factory=dict)
     evidence: list[dict[str, Any]] = Field(default_factory=list)
     risk_hint: str | None = None
+    reaction_override: bool = False
+    reaction_override_reason: str | None = None
 
 
 class Approval(BaseModel):
@@ -183,6 +187,58 @@ def normalized_action(req: ActionRequest):
     return {"tenant_id": req.tenant_id, "actor_id": req.actor_id, "session_id": req.session_id, "action": req.action.lower(), "target": req.target, "parameters": req.parameters}
 
 
+def reaction_environment(req: ActionRequest) -> ReactionEnvironment:
+    """Build a typed, deterministic reaction snapshot from the action request."""
+    context = dict(req.context)
+    state = context.pop("state", {}) if isinstance(context.get("state", {}), dict) else {}
+    trajectory = context.pop("trajectory", []) if isinstance(context.get("trajectory", []), list) else []
+    activation = context.pop("activation", 1.0)
+    inhibition = context.pop("inhibition", 0.0)
+    catalyst = context.pop("catalyst", 0.0)
+    values = {"activation": activation, "inhibition": inhibition, "catalyst": catalyst}
+    for name, value in values.items():
+        if not isinstance(value, (int, float)) or isinstance(value, bool):
+            raise HTTPException(422, f"reaction_{name}_must_be_numeric")
+    if not all(0.0 <= float(value) <= 1.0 for value in values.values()):
+        raise HTTPException(422, "reaction_parameters_out_of_range")
+    if not all(isinstance(item, dict) for item in trajectory):
+        raise HTTPException(422, "reaction_trajectory_items_must_be_objects")
+    return ReactionEnvironment(
+        context=context,
+        state=state,
+        evidence=tuple(req.evidence),
+        trajectory=tuple(trajectory),
+        activation=float(activation),
+        inhibition=float(inhibition),
+        catalyst=float(catalyst),
+    )
+
+
+def evaluate_reaction_policy(req: ActionRequest):
+    assessment = assess_reaction(ReactionAssessmentRequest(environment=reaction_environment(req)))
+    policy_input = ReactionPolicyInput(
+        assessment=assessment,
+        override_requested=req.reaction_override,
+        override_reason=req.reaction_override_reason,
+    )
+    if assessment.network.mode == "INHIBIT":
+        if not policy_input.override_requested:
+            return assessment, "DENY", [{
+                "policy": "chemical-reaction-inhibitor",
+                "result": "DENY",
+                "reason": "reaction_inhibit_is_binding_without_explicit_override",
+            }]
+        if not policy_input.override_reason or not policy_input.override_reason.strip():
+            raise HTTPException(422, "reaction_override_reason_required")
+        return assessment, None, [{
+            "policy": "chemical-reaction-inhibitor",
+            "result": "OVERRIDE",
+            "reason": policy_input.override_reason.strip(),
+        }]
+    return assessment, None, []
+
+
+
 def save(record: dict[str, Any], event_type: str) -> None:
     save_record(record, event_type, digest, canonical, now)
 
@@ -228,7 +284,11 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
     trace_id = f"trace_{uuid.uuid4().hex}"
     nonce = uuid.uuid4().hex
     risk, risk_reasons = evaluate_risk(req)
+    reaction, reaction_decision, reaction_checks = evaluate_reaction_policy(req)
     decision, policy_checks = decide(req, risk)
+    if reaction_decision is not None:
+        decision = reaction_decision
+    policy_checks = reaction_checks + policy_checks
     normalized = normalized_action(req)
     created = now()
     if DECISION_TTL_SECONDS <= 0 or DECISION_TTL_SECONDS > 86400:
@@ -255,6 +315,8 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
         "policy_hash": POLICY_HASH,
         "key_id": current_key_id(),
         "risk_assessment": {"level": risk, "reasons": risk_reasons, "agent_risk_hint": req.risk_hint},
+        "reaction_assessment": assessment_record(reaction),
+        "reaction_policy": {"mode": reaction.network.mode, "binding": reaction.network.mode == "INHIBIT", "override_requested": req.reaction_override, "override_reason": req.reaction_override_reason},
         "evidence": req.evidence,
         "decision": decision,
         "policy_checks": policy_checks,
@@ -481,9 +543,13 @@ def replay(decision_id: str, tenant_id: str, authorization: str | None = Header(
     risk, _ = evaluate_risk(req, snapshot)
     decision, checks = decide(req, risk, snapshot)
     original = record["decision"]
+    reaction, reaction_decision, reaction_checks = evaluate_reaction_policy(req)
+    reaction_match = assessment_record(reaction) == record.get("reaction_assessment")
+    if reaction_decision is not None:
+        decision = reaction_decision
     expected = "ASK" if record["approval"] is not None and original in {"ALLOW", "DENY"} else original
-    match = decision == expected and policy_hash_match and action_hash_match
-    return {"decision_id": decision_id, "trace_id": record["trace_id"], "replayed_decision": decision, "recorded_preapproval_decision": expected, "match": match, "risk": risk, "policy_checks": checks, "policy_hash": record["policy_hash"], "policy_hash_match": policy_hash_match, "action_hash": record["action_hash"], "action_hash_match": action_hash_match, "evidence_hash": record["evidence_hash"], "audit_event_hash": record.get("audit_event_hash")}
+    match = decision == expected and policy_hash_match and action_hash_match and reaction_match
+    return {"decision_id": decision_id, "trace_id": record["trace_id"], "replayed_decision": decision, "recorded_preapproval_decision": expected, "match": match, "risk": risk, "policy_checks": reaction_checks + checks, "reaction_assessment": assessment_record(reaction), "reaction_match": reaction_match, "policy_hash": record["policy_hash"], "policy_hash_match": policy_hash_match, "action_hash": record["action_hash"], "action_hash_match": action_hash_match, "evidence_hash": record["evidence_hash"], "audit_event_hash": record.get("audit_event_hash")}
 
 
 @app.get("/v1/evidence/{decision_id}")
