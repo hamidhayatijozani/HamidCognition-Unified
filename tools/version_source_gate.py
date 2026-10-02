@@ -18,7 +18,7 @@ def main():
         relative = path.relative_to(ROOT).as_posix()
         if relative == canonical or relative == "PRODUCT/VERSION_SOURCES.json" or not path.is_file():
             continue
-        if not any(fnmatch.fnmatch(relative, pattern) for pattern in spec["version_bearing_source_classes"]):
+        if not any(fnmatch.fnmatch(relative, pattern) for pattern in spec["authoritative_source_classes"]):
             continue
         try:
             text = path.read_text(encoding="utf-8")
