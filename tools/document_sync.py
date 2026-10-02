@@ -104,8 +104,8 @@ def apply_safe_updates(identity: dict[str, str]) -> list[str]:
                 updated,
             )
             updated = re.sub(
-                r"published as [A-Za-z0-9._-]+ immutable GitHub release `[^`]+`",
-                f"published as {identity['release_tag']} immutable GitHub release `{identity['release_tag']}`",
+                r"published as (?:the immutable\s+)?GitHub release `[^`]+`",
+                f"published as the immutable GitHub release `{identity['release_tag']}`",
                 updated,
             )
         if updated != original:
