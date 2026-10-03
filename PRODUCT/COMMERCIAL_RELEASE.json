@@ -1,0 +1,9 @@
+{
+  "schema": "hamidcognition.commercial-release.v1",
+  "product": "HamidCognition Action Gate",
+  "version": "1.1.1",
+  "release_tag": "action-gate-v1.1.1",
+  "source_commit": "e9ea7565f4ddea91f5c45104237bd20564c80894",
+  "release_candidate_workflow_run": "36966012148",
+  "artifact_sha256": "517064de0427286ff4f346d46996642aca3b9def891d1c08bfaebc25546fb791"
+}
