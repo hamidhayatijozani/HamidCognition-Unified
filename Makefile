@@ -29,8 +29,9 @@ security-acceptance:
 	$(PYTEST) -q tests
 
 clean-room:
+	rm -f /tmp/hamidcognition-clean-room.db
 	$(PYTHON) -m compileall -q action_gate state_bound
-	$(PYTEST) -q action_gate tests
+	ACTION_GATE_DB=/tmp/hamidcognition-clean-room.db $(PYTEST) -q action_gate tests
 
 ifeq ($(findstring n,$(MAKEFLAGS)),n)
 gates-timed:
