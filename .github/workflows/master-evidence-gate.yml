@@ -1,10 +1,7 @@
 name: Master Evidence Gate
 
 on:
-  push:
-    branches: [ main, 'integration/**', 'research/**' ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: read
