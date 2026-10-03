@@ -5,11 +5,12 @@ import pytest
 def isolate_api_token(request):
     import app as gate
 
-    previous = gate.API_TOKEN
     if request.module.__name__.endswith("test_csg_vertical_slice"):
-        gate.API_TOKEN = "ci-csg-token"
-    else:
-        gate.API_TOKEN = None
+        yield
+        return
+
+    previous = gate.API_TOKEN
+    gate.API_TOKEN = None
     try:
         yield
     finally:
