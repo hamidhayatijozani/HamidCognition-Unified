@@ -18,7 +18,7 @@ import app as gate
 from app import app
 from canonicalization import canonicalize
 
-gate.API_TOKEN = "ci-csg-token"
+gate.API_TOKEN = None
 gate.SIGNING_SECRET = "ci-csg-secret"
 gate.ENVIRONMENT = "test"
 
