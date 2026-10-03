@@ -1,12 +1,6 @@
 name: Action Gate Security Authority Gate
 
 on:
-  push:
-    branches: [main, 'feat/security-authority-v1']
-  pull_request:
-    paths:
-      - 'action_gate/**'
-      - '.github/workflows/security-authority-gate.yml'
   workflow_dispatch:
 
 permissions:
