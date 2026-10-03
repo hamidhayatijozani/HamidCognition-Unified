@@ -83,6 +83,7 @@
     "index.html",
     "integrated/realtime/app.py",
     "integrated/research/epistemic-filter/rfc/RFC-0001_Runtime_Event_Model.md",
+    "integrated/research/epistemic-filter/rfc/RFC-0000.5_AgentRQ_Integration_Boundary.md",
     "integrated/web/app.py",
     "manifest-v1.0.10.json",
     "protected_tools/reference_tool.py",
