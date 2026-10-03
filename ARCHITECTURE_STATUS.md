@@ -15,7 +15,7 @@ HOLD and UNKNOWN currently have explicit consumer semantics: REQUIRE_REEVALUATIO
 
 ## Version invariant
 
-action_gate/VERSION is the canonical product-version source. PRODUCT/VERSION_SOURCES.json classifies derived files, while the version-source gate scans all tracked text files for semantic-version literals. Any tracked text file containing such a literal must be classified as derived or the gate fails.
+action_gate/VERSION is the canonical product-version source. PRODUCT/VERSION_SOURCES.json classifies derived files, while the version-source gate scans all tracked text files for semantic-version literals. The gate scans all tracked text, but only a version-like literal in product-version context is an undeclared source. CI/runtime environment literals are classified under env_metadata; historical records remain explicitly ignored.
 
 ## Verification discipline
 
@@ -30,3 +30,22 @@ A signal without an enforcer is a tested signal, not an execution control.
 - Remote execution via the canonical `make gates-local` chain: REQUIRED and authoritative for this HEAD.
 - If the remote canonical chain is GREEN for the exact HEAD, the local-execution gap is acceptable for this HEAD; it remains an environment limitation, not a claim of local execution.
 - Action Gate signals: authority = NONE for all four research signals. INHIBIT blocks only within the research layer.
+
+
+## Release identity debt closure
+
+Release source_commit is no longer parsed from customer-facing prose. The structured authority is PRODUCT/COMMERCIAL_RELEASE.json, and action_gate/VERSION remains the sole product-version source.
+
+The prior parser compatibility path for prose source-commit strings is intentionally retired. Future release identity changes must update the structured record and its synchronized documents.
+
+## Canonical gate execution
+
+make gates-local is the canonical execution entry point. It now delegates to the sequential gates-timed chain, which records per-gate elapsed time and gate logs under evidence/gates-timing/.
+
+The canonical GitHub Actions workflow executes make -n gates-local before execution and then runs make gates-local with a 30-minute workflow timeout. Timing output is uploaded as an artifact.
+
+Commit-level local execution in this ChatGPT runtime remains unavailable because no repository working tree is mounted here. CI execution is therefore the execution evidence for this branch until a real local working tree is available.
+
+## Research authority closure
+
+docs: close INHIBIT binding claim; all four research signals authority=NONE and INHIBIT=research-only. The chemical research surface does not mint Action Gate execution authority.
