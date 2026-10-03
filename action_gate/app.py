@@ -11,7 +11,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Literal
 
 from fastapi import FastAPI, Header, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from rate_limit import SlidingWindowRateLimiter
 from storage import health as storage_health, init_db, load_record, save_record, finalize_execution, reconcile_execution, reserve_execution, allow_rate_limit
@@ -128,6 +128,8 @@ class PreExecutionSignal(BaseModel):
 
 
 class ActionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     request_id: str | None = None
     tenant_id: str
     agent_id: str
@@ -139,7 +141,6 @@ class ActionRequest(BaseModel):
     context: dict[str, Any] = Field(default_factory=dict)
     evidence: list[dict[str, Any]] = Field(default_factory=list)
     risk_hint: str | None = None
-    pre_execution_signal: PreExecutionSignal | None = None
 
 
 class Approval(BaseModel):
@@ -190,14 +191,88 @@ def evaluate_risk(req: ActionRequest, snapshot: dict[str, Any] = POLICY_SNAPSHOT
     return "LOW", ["no_intrinsic_high_risk_rule_matched"]
 
 
-def decide(req: ActionRequest, risk: str, snapshot: dict[str, Any] = POLICY_SNAPSHOT):
+def compute_signal(
+    req: ActionRequest,
+    risk: str,
+    snapshot: dict[str, Any] = POLICY_SNAPSHOT,
+) -> PreExecutionSignal:
+    high_risk, external, _critical = policy_sets(snapshot)
+    a = req.action.lower()
+    if risk == "CRITICAL":
+        return PreExecutionSignal(
+            mode="INHIBIT",
+            reactivity=1.0,
+            reason="critical_risk_detected",
+            consumer_action="BLOCK_REACTION",
+        )
+    if risk == "HIGH" and a in high_risk:
+        return PreExecutionSignal(
+            mode="HOLD",
+            reactivity=0.75,
+            reason="high_risk_action_requires_review",
+            consumer_action="REQUIRE_REEVALUATION",
+        )
+    if not req.evidence and (a in high_risk or a in external):
+        return PreExecutionSignal(
+            mode="UNKNOWN",
+            reactivity=0.5,
+            reason="no_evidence_for_high_risk_action",
+            consumer_action="REQUIRE_EVIDENCE",
+        )
+    return PreExecutionSignal(
+        mode="PROCEED",
+        reactivity=0.1,
+        reason="default_proceed",
+        consumer_action="REQUEST_ACTION_GATE_AUTHORIZATION",
+    )
+
+
+def decide(
+    req: ActionRequest,
+    risk: str,
+    signal: PreExecutionSignal,
+    snapshot: dict[str, Any] = POLICY_SNAPSHOT,
+):
     high_risk, external, critical = policy_sets(snapshot)
     a = req.action.lower()
 
-    if req.pre_execution_signal is not None:
-        signal = req.pre_execution_signal
-        if not PreExecutionSignal.validate_consumer_action(signal.mode, signal.consumer_action):
-            raise HTTPException(422, "invalid_pre_execution_signal_binding")
+    if not PreExecutionSignal.validate_consumer_action(signal.mode, signal.consumer_action):
+        raise HTTPException(422, "invalid_pre_execution_signal_binding")
+
+    if signal.mode == "INHIBIT":
+        return "DENY", [{
+            "policy": "pre-execution-signal",
+            "result": "DENY",
+            "reason": "pre_execution_signal_inhibit",
+            "signal_mode": signal.mode,
+            "signal_reactivity": signal.reactivity,
+            "signal_reason": signal.reason,
+        }]
+
+    if signal.mode in {"HOLD", "UNKNOWN"}:
+        return "ASK", [{
+            "policy": "pre-execution-signal",
+            "result": "ASK",
+            "reason": f"pre_execution_signal_{signal.mode.lower()}",
+            "signal_mode": signal.mode,
+            "signal_reactivity": signal.reactivity,
+            "signal_reason": signal.reason,
+        }]
+
+    if a in critical:
+        return "SANDBOX", [{"policy": "financial-transfer", "result": "SANDBOX", "reason": "critical_action_requires_containment_or_human_review"}]
+    if a in high_risk and risk == "CRITICAL":
+        return "DENY", [{"policy": "production-destructive-action", "result": "DENY", "reason": "destructive_production_action_blocked"}]
+    if a in high_risk or a in external:
+        return "ASK", [{"policy": "sensitive-action-approval", "result": "ASK", "reason": "human_approval_required"}]
+    return "ALLOW", [{"policy": "default", "result": "ALLOW", "reason": "no_blocking_policy_matched"}]
+
+
+def decide_legacy(req: ActionRequest, risk: str, snapshot: dict[str, Any] = POLICY_SNAPSHOT, signal: PreExecutionSignal | None = None):
+    high_risk, external, critical = policy_sets(snapshot)
+    a = req.action.lower()
+
+    if signal is not None:
         if signal.mode == "INHIBIT":
             return "DENY", [{
                 "policy": "pre-execution-signal",
@@ -216,7 +291,6 @@ def decide(req: ActionRequest, risk: str, snapshot: dict[str, Any] = POLICY_SNAP
                 "signal_reactivity": signal.reactivity,
                 "signal_reason": signal.reason,
             }]
-        # PROCEED never grants authority. Normal Action Gate policy still decides.
 
     if a in critical:
         return "SANDBOX", [{"policy": "financial-transfer", "result": "SANDBOX", "reason": "critical_action_requires_containment_or_human_review"}]
@@ -227,7 +301,20 @@ def decide(req: ActionRequest, risk: str, snapshot: dict[str, Any] = POLICY_SNAP
     return "ALLOW", [{"policy": "default", "result": "ALLOW", "reason": "no_blocking_policy_matched"}]
 
 
-def normalized_action(req: ActionRequest):
+def normalized_action(req: ActionRequest, signal: PreExecutionSignal) -> dict[str, Any]:
+    normalized = {
+        "tenant_id": req.tenant_id,
+        "actor_id": req.actor_id,
+        "session_id": req.session_id,
+        "action": req.action.lower(),
+        "target": req.target,
+        "parameters": req.parameters,
+        "pre_execution_signal": signal.model_dump(),
+    }
+    return normalized
+
+
+def legacy_normalized_action(req: ActionRequest, signal: PreExecutionSignal | None = None) -> dict[str, Any]:
     normalized = {
         "tenant_id": req.tenant_id,
         "actor_id": req.actor_id,
@@ -236,8 +323,8 @@ def normalized_action(req: ActionRequest):
         "target": req.target,
         "parameters": req.parameters,
     }
-    if req.pre_execution_signal is not None:
-        normalized["pre_execution_signal"] = req.pre_execution_signal.model_dump()
+    if signal is not None:
+        normalized["pre_execution_signal"] = signal.model_dump()
     return normalized
 
 
@@ -286,8 +373,9 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
     trace_id = f"trace_{uuid.uuid4().hex}"
     nonce = uuid.uuid4().hex
     risk, risk_reasons = evaluate_risk(req)
-    decision, policy_checks = decide(req, risk)
-    normalized = normalized_action(req)
+    signal = compute_signal(req, risk)
+    decision, policy_checks = decide(req, risk, signal)
+    normalized = normalized_action(req, signal)
     created = now()
     if DECISION_TTL_SECONDS <= 0 or DECISION_TTL_SECONDS > 86400:
         raise HTTPException(500, "invalid_server_decision_ttl")
@@ -295,7 +383,7 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
     action_hash = digest(normalized)
     signature = sign({"decision_id": decision_id, "tenant_id": req.tenant_id, "action_hash": action_hash, "policy_hash": POLICY_HASH, "nonce": nonce, "expires_at": expires})
     record = {
-        "schema_version": "action-gate-evidence-3.0",
+        "schema_version": "action-gate-evidence-3.1",
         "product_version": APP_VERSION,
         "decision_id": decision_id,
         "trace_id": trace_id,
@@ -316,6 +404,7 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
         "evidence": req.evidence,
         "decision": decision,
         "policy_checks": policy_checks,
+        "pre_execution_signal": signal.model_dump(),
         "constraints": [],
         "approval": None,
         "execution": None,
@@ -532,12 +621,30 @@ def replay(decision_id: str, tenant_id: str, authorization: str | None = Header(
     require_auth(authorization)
     enforce_rate_limit(authorization, tenant_id)
     record = load(decision_id, tenant_id)
-    req = ActionRequest.model_validate(record["request"])
     snapshot = record["policy_snapshot"]
+    schema_version = record.get("schema_version", "action-gate-evidence-3.0")
+    raw_request = dict(record["request"])
+    stored_signal = None
+    if schema_version == "action-gate-evidence-3.1":
+        stored_signal = PreExecutionSignal.model_validate(record["pre_execution_signal"])
+        raw_request.pop("pre_execution_signal", None)
+    elif schema_version == "action-gate-evidence-3.0":
+        legacy_signal_data = raw_request.pop("pre_execution_signal", None)
+        if legacy_signal_data is not None:
+            stored_signal = PreExecutionSignal.model_validate(legacy_signal_data)
+    else:
+        raise HTTPException(500, "unsupported_decision_schema_version")
+    req = ActionRequest.model_validate(raw_request)
     policy_hash_match = digest(snapshot) == record["policy_hash"]
-    action_hash_match = digest(normalized_action(req)) == record["action_hash"]
+    if schema_version == "action-gate-evidence-3.1":
+        action_hash_match = digest(normalized_action(req, stored_signal)) == record["action_hash"]
+    else:
+        action_hash_match = digest(legacy_normalized_action(req, stored_signal)) == record["action_hash"]
     risk, _ = evaluate_risk(req, snapshot)
-    decision, checks = decide(req, risk, snapshot)
+    if schema_version == "action-gate-evidence-3.1":
+        decision, checks = decide(req, risk, stored_signal, snapshot)
+    else:
+        decision, checks = decide_legacy(req, risk, snapshot, stored_signal)
     original = record["decision"]
     expected = "ASK" if record["approval"] is not None and original in {"ALLOW", "DENY"} else original
     match = decision == expected and policy_hash_match and action_hash_match
