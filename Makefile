@@ -19,7 +19,7 @@ version-source:
 	$(PYTEST) -q tests/test_version_source_gate.py
 
 state-bound:
-	$(PYTEST) -q tests/test_state_bound.py tests/test_ta001_benchmark.py tests/test_trajectory_reality.py
+	$(PYTEST) -q tests/test_state_bound.py tests/test_chemical_reactivity.py tests/test_pre_execution_signal_integration.py tests/test_ta001_benchmark.py tests/test_trajectory_reality.py
 
 product-gates:
 	cd action_gate && $(PYTEST) -q
@@ -42,4 +42,4 @@ gates-timed:
 		end=$$(date +%s%N); elapsed=$$(( (end-start)/1000000 )); \
 		if [ $$rc -ne 0 ]; then echo "$$g $$elapsed ms FAIL" | tee -a evidence/gates-timing/gates-timing.log; exit $$rc; fi; \
 		echo "$$g $$elapsed ms PASS" | tee -a evidence/gates-timing/gates-timing.log; \
-	done\n
+	done
