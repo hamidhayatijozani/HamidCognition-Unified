@@ -79,7 +79,8 @@ def test_pre_execution_proceed_does_not_grant_authority():
 
 
 def test_pre_execution_signal_binding_is_strict():
-    data = evaluate({
+    response = client.post("/v1/action/evaluate", json={
+        "tenant_id": TENANT,
         "agent_id": "a",
         "action": "read_public_file",
         "pre_execution_signal": {
@@ -89,7 +90,8 @@ def test_pre_execution_signal_binding_is_strict():
             "consumer_action": "REQUEST_ACTION_GATE_AUTHORIZATION",
         },
     })
-    assert data["decision"] == "DENY"
+    assert response.status_code == 422
+    assert response.json()["detail"] == "invalid_pre_execution_signal_binding"
 
 
 def test_external_email_requires_bound_approval_then_replay_matches():
