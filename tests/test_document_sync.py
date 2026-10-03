@@ -23,16 +23,16 @@ class DocumentSyncTests(unittest.TestCase):
         self.assertFalse(state["missing_sources"])
         self.assertFalse(state["stale_documents"])
 
-    def test_parser_regression_exact_immutable_release_phrase(self):
-        import importlib.util
-        spec = importlib.util.spec_from_file_location("document_sync", SCRIPT)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        parsed = module.parse_release_identity(
-            "published as immutable GitHub release `action-gate-v1.1.1` at source commit "
-            "e9ea7565f4ddea91f5c45104237bd20564c80894"
-        )
-        self.assertEqual(parsed["release_tag"], "action-gate-v1.1.1")
+    def test_structured_release_identity(self):
+        release = json.loads((ROOT / "PRODUCT/COMMERCIAL_RELEASE.json").read_text())
+        self.assertEqual(release["version"], "1.1.1")
+        self.assertEqual(release["release_tag"], "action-gate-v1.1.1")
+        self.assertEqual(len(release["source_commit"]), 40)
+        self.assertEqual(release["source_commit"], "e9ea7565f4ddea91f5c45104237bd20564c80894")
+
+    def test_source_commit_is_not_in_customer_release_prose(self):
+        text = (ROOT / "PRODUCT/CURRENT_COMMERCIAL_RELEASE.md").read_text(encoding="utf-8")
+        self.assertNotIn("e9ea7565f4ddea91f5c45104237bd20564c80894", text)
 
     def test_quickstart_contains_no_semver_literal(self):
         text = (ROOT / "PRODUCT/QUICKSTART.md").read_text(encoding="utf-8")
