@@ -65,10 +65,24 @@ def get_json(url):
         return r.status, json.loads(r.read())
 
 
-def permitted(decision_id: str, tenant_id: str, expected_action_hash: str) -> dict | None:
+def permitted(decision_id: str, tenant_id: str, actor_id: str | None, session_id: str | None, action: str, target: str, parameters: dict) -> dict | None:
     try:
-        _, record = get_json(GATE_URL + "/v1/evidence/" + urllib.parse.quote(decision_id, safe="") + "?tenant_id=" + urllib.parse.quote(tenant_id, safe=""))
-        if record.get("tenant_id") != tenant_id or record.get("decision") != "ALLOW" or record.get("action_hash") != expected_action_hash:
+        _, record = get_json(
+            GATE_URL
+            + "/v1/evidence/"
+            + urllib.parse.quote(decision_id, safe="")
+            + "?tenant_id="
+            + urllib.parse.quote(tenant_id, safe="")
+        )
+        request = record.get("request") or {}
+        identity = record.get("identity") or {}
+        if record.get("tenant_id") != tenant_id or record.get("decision") != "ALLOW":
+            return None
+        if request.get("action", "").lower() != action.lower():
+            return None
+        if request.get("target") != target or request.get("parameters", {}) != parameters:
+            return None
+        if identity.get("actor_id") != actor_id or identity.get("session_id") != session_id:
             return None
         return record
     except Exception:
@@ -102,9 +116,10 @@ class HTTPHandler(BaseHTTPRequestHandler):
             action = self.headers.get("X-Action", "http_post"); target = self.headers.get("X-Action-Target", self.path); decision_id = self.headers.get("X-HCJ-Decision-ID")
             expected_hash = action_hash(tenant_id, actor_id, session_id, action, target, payload)
             if decision_id:
-                record = permitted(decision_id, tenant_id, expected_hash)
+                record = permitted(decision_id, tenant_id, actor_id, session_id, action, target, payload)
                 if not record:
                     self.send_response(403); self.end_headers(); self.wfile.write(b'{"error":"action_gate_denied_or_binding_mismatch"}'); return
+                expected_hash = record["action_hash"]
                 try:
                     reserved = reserve_execution(decision_id, tenant_id, actor_id, session_id, expected_hash, record["nonce"])
                     authority = reserved["execution_authority"]
