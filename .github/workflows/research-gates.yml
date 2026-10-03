@@ -4,16 +4,7 @@ permissions:
   contents: read
 
 on:
-  push:
-    paths:
-      - 'RESEARCH/**'
-      - 'experiments/**'
-      - '.github/workflows/**'
-  pull_request:
-    paths:
-      - 'RESEARCH/**'
-      - 'experiments/**'
-      - '.github/workflows/**'
+  workflow_dispatch:
 
 jobs:
   evidence-gates:
