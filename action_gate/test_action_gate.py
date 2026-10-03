@@ -5,7 +5,12 @@ os.environ["ACTION_GATE_DB"] = os.path.join(tempfile.gettempdir(), "hamidcogniti
 os.environ["ACTION_GATE_ENV"] = "development"
 
 from fastapi.testclient import TestClient
+import app as gate
 from app import app
+
+gate.API_TOKEN = None
+gate.ENVIRONMENT = "development"
+gate.REQUIRE_SESSION_BINDING = False
 
 client = TestClient(app)
 TENANT = "tenant-a"
