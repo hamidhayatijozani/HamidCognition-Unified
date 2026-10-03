@@ -64,7 +64,7 @@ def test_state_bound_does_not_import_action_gate():
         [
             sys.executable,
             "-c",
-            "import sys; import state_bound.chemical_reactivity; "
+            "import sys; import state_bound.pre_execution_signals; "
             "print(any(name == 'action_gate' or name.startswith('action_gate.') "
             "for name in sys.modules))",
         ],
