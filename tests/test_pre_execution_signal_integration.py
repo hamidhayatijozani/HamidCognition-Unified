@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "action_gate"))
 
 from fastapi.testclient import TestClient
 from app import app
-from state_bound.chemical_reactivity import ReactivityFactors, calculate_reactivity
+from state_bound.pre_execution_signals import ReactivityFactors, calculate_reactivity
 
 client = TestClient(app)
 
