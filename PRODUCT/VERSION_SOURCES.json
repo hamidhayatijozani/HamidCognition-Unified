@@ -1,18 +1,17 @@
 {
-  "schema": "hamidcognition.version-sources.v2",
+  "schema": "hamidcognition.version-sources.v3",
   "canonical": "action_gate/VERSION",
+  "env_metadata": [
+    ".github/workflows/**",
+    "PRODUCT/.env*.example",
+    "render.yaml"
+  ],
   "derived": [
     "README.md",
     "PRODUCT/CURRENT_COMMERCIAL_RELEASE.md",
     "PRODUCT/RELEASE_NOTES_1.1.1.md"
   ],
   "ignored": [
-    ".github/workflows/action-gate-mvp.yml",
-    ".github/workflows/claimlab-ci.yml",
-    ".github/workflows/master-evidence-gate.yml",
-    ".github/workflows/mcp-ephemeral-e2e.yml",
-    ".github/workflows/product-gates.yml",
-    ".github/workflows/research-gates.yml",
     "CHANGELOG.md",
     "CITATION.cff",
     "MIGRATION/INTEGRATED_PROJECTS.md",
