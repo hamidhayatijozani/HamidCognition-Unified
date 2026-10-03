@@ -32,7 +32,7 @@ def published_release_text(text: str) -> str:
     if marker in text:
         return text.split(marker, 1)[1]
 
-    # README and Quickstart use prose rather than the canonical section heading.
+    # Customer-facing README may carry the published identity; QUICKSTART is intentionally version-free.
     prose = "last validated published commercial release"
     lower = text.lower()
     if prose in lower:
@@ -88,7 +88,7 @@ def load_declared_paths() -> list[str]:
 def apply_safe_updates(identity: dict[str, str]) -> list[str]:
     """Update only deterministic release identity in approved AUTO documents."""
     changed: list[str] = []
-    for relative in ("README.md", "PRODUCT/QUICKSTART.md"):
+    for relative in ("README.md",):
         path = ROOT / relative
         original = path.read_text(encoding="utf-8")
         updated = original
@@ -101,17 +101,6 @@ def apply_safe_updates(identity: dict[str, str]) -> list[str]:
             updated = re.sub(
                 r"published as (?:the immutable\s+)?GitHub release\s+`?[^` )]+`? at source commit [0-9a-f]{40}",
                 f"published as the immutable GitHub release `{identity['release_tag']}` at source commit {identity['source_commit']}",
-                updated,
-            )
-        else:
-            updated = re.sub(
-                r"current validated release is \*\*v\d+\.\d+\.\d+\*\*",
-                f"current validated release is **v{identity['release_version']}**",
-                updated,
-            )
-            updated = re.sub(
-                r"published as (?:the immutable\s+)?GitHub release `[^`]+`",
-                f"published as the immutable GitHub release `{identity['release_tag']}`",
                 updated,
             )
         if updated != original:
@@ -131,7 +120,7 @@ def build_state() -> dict[str, Any]:
             missing.append(relative)
 
     stale: list[dict[str, Any]] = []
-    for relative in ("README.md", "PRODUCT/QUICKSTART.md"):
+    for relative in ("README.md",):
         path = ROOT / relative
         if not path.exists():
             stale.append({"document": relative, "reason": "missing"})
