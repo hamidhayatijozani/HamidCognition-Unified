@@ -26,10 +26,10 @@ class VersionSourceGateTests(unittest.TestCase):
         self.assertIn("CHANGELOG.md", spec["ignored"])
     def test_workflow_metadata_is_explicitly_ignored(self):
         spec = json.loads((ROOT / "PRODUCT/VERSION_SOURCES.json").read_text())
-        self.assertIn(".github/workflows/product-gates.yml", spec["ignored"])
+        self.assertIn(".github/workflows/**", spec["env_metadata"])
     def test_product_context_is_required(self):
         module = self.load_module()
-        two_part = "For version " + "1" + ".1"
+        two_part = "For product version " + "1" + ".1"
         prerelease = "For version v1.1.2-beta." + "1"
         self.assertIsNotNone(module.VERSION_LIKE.search(two_part))
         self.assertIsNotNone(module.VERSION_LIKE.search(prerelease))
