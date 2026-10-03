@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-.NOTPARALLEL: gates-local
+.NOTPARALLEL: gates-local gates-timed
 
 .PHONY: gates-local document-sync version-source security-acceptance state-bound product-gates clean-room gates-timed
 
@@ -8,7 +8,7 @@ PYTEST ?= $(PYTHON) -m pytest
 
 # Evidence rule: a target whose output is not recorded is not evidence.
 # gates-local is the canonical gate chain for both local and CI execution.
-gates-local: document-sync version-source state-bound product-gates security-acceptance clean-room
+gates-local: gates-timed
 
 document-sync:
 	$(PYTHON) tools/document_sync.py --check
@@ -33,8 +33,13 @@ clean-room:
 	$(PYTEST) -q action_gate tests
 
 gates-timed:
+	@mkdir -p evidence/gates-timing
+	@rm -f evidence/gates-timing/gates-timing.log
 	@for g in document-sync version-source state-bound product-gates security-acceptance clean-room; do \
 		start=$$(date +%s%N); \
-		$(MAKE) $$g >/tmp/gate-$$g.log 2>&1 || { rc=$$?; end=$$(date +%s%N); echo "$$g $$(( (end-start)/1000000 )) ms FAIL"; tail -20 /tmp/gate-$$g.log; exit $$rc; }; \
-		end=$$(date +%s%N); echo "$$g $$(( (end-start)/1000000 )) ms PASS"; \
-done
+		echo "=== $$g START $$(date -u +%Y-%m-%dT%H:%M:%SZ) ===" | tee -a evidence/gates-timing/gates-timing.log; \
+		$(MAKE) $$g >evidence/gates-timing/$$g.log 2>&1; rc=$$?; cat evidence/gates-timing/$$g.log | tee -a evidence/gates-timing/gates-timing.log; \
+		end=$$(date +%s%N); elapsed=$$(( (end-start)/1000000 )); \
+		if [ $$rc -ne 0 ]; then echo "$$g $$elapsed ms FAIL" | tee -a evidence/gates-timing/gates-timing.log; exit $$rc; fi; \
+		echo "$$g $$elapsed ms PASS" | tee -a evidence/gates-timing/gates-timing.log; \
+	done\n
