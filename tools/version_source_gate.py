@@ -24,7 +24,7 @@ def has_product_context(text: str, start: int, end: int, window: int = 100) -> b
     context = re.compile(
         r"(?:product\s+version|version\s+source|current\s+(?:customer-facing\s+)?release"
         r"|release\s+(?:version|tag)|published\s+as|semantic\s+version"
-        r"|(?:current|latest|canonical)\s+version)\\b",
+        r"|(?:current|latest|canonical)\s+version)\b",
         re.IGNORECASE,
     )
     before = text[max(0, start - window):start]
