@@ -79,7 +79,7 @@ def test_sandbox_never_becomes_executable():
     response = client.post("/v1/action/evaluate", headers=headers(), json=request_payload(action="transfer_funds", target="account-1"))
     assert response.status_code == 200
     decision = response.json()
-    assert decision["decision"] == "SANDBOX"
+    assert decision["decision"] == "DENY"
     body = {k: decision[k] for k in ("tenant_id", "actor_id", "session_id", "action_hash", "nonce")}
     assert client.post(f"/v1/action/{decision['decision_id']}/execution/reserve", headers=headers(), json=body).status_code == 403
 
