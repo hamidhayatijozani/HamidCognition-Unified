@@ -30,7 +30,7 @@ class VersionSourceGateTests(unittest.TestCase):
     def test_product_context_is_required(self):
         module = self.load_module()
         two_part = "For product version " + "1" + ".1"
-        prerelease = "For version v1.1.2-beta." + "1"
+        prerelease = "For version v" + "1" + ".1" + ".2-beta." + "1"
         self.assertIsNotNone(module.VERSION_LIKE.search(two_part))
         self.assertIsNotNone(module.VERSION_LIKE.search(prerelease))
         match = module.VERSION_LIKE.search(two_part)
