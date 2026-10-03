@@ -32,8 +32,11 @@ clean-room:
 	$(PYTHON) -m compileall -q action_gate state_bound
 	$(PYTEST) -q action_gate tests
 
+ifeq ($(findstring n,$(MAKEFLAGS)),n)
 gates-timed:
-	@case "$(MAKEFLAGS)" in *n*) echo "DRY-RUN: gates-local -> document-sync version-source state-bound product-gates security-acceptance clean-room"; exit 0;; esac
+	@echo "DRY-RUN: gates-local -> document-sync version-source state-bound product-gates security-acceptance clean-room"
+else
+gates-timed:
 	@mkdir -p evidence/gates-timing
 	@rm -f evidence/gates-timing/gates-timing.log
 	@for g in document-sync version-source state-bound product-gates security-acceptance clean-room; do \
@@ -44,3 +47,4 @@ gates-timed:
 		if [ $$rc -ne 0 ]; then echo "$$g $$elapsed ms FAIL" | tee -a evidence/gates-timing/gates-timing.log; exit $$rc; fi; \
 		echo "$$g $$elapsed ms PASS" | tee -a evidence/gates-timing/gates-timing.log; \
 	done
+endif
