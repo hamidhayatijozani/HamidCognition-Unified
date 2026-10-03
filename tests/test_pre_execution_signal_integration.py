@@ -8,9 +8,11 @@ os.environ["ACTION_GATE_API_TOKEN"] = "integration-test-token"
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "action_gate"))
 
 from fastapi.testclient import TestClient
+import app as gate
 from app import app
 from state_bound.pre_execution_signals import ReactivityFactors, calculate_reactivity
 
+gate.API_TOKEN = "integration-test-token"
 client = TestClient(app)
 
 
