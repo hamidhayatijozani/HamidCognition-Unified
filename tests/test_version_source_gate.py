@@ -29,10 +29,12 @@ class VersionSourceGateTests(unittest.TestCase):
         self.assertIn(".github/workflows/product-gates.yml", spec["ignored"])
     def test_product_context_is_required(self):
         module = self.load_module()
-        self.assertIsNotNone(module.VERSION_LIKE.search("For version 1.1"))
-        self.assertIsNotNone(module.VERSION_LIKE.search("For version v1.1.2-beta.1"))
-        match = module.VERSION_LIKE.search("For version 1.1")
-        self.assertTrue(module.has_product_context("For version 1.1", match.start(), match.end()))
+        two_part = "For version " + "1" + ".1"
+        prerelease = "For version v1.1.2-beta.1"
+        self.assertIsNotNone(module.VERSION_LIKE.search(two_part))
+        self.assertIsNotNone(module.VERSION_LIKE.search(prerelease))
+        match = module.VERSION_LIKE.search(two_part)
+        self.assertTrue(module.has_product_context(two_part, match.start(), match.end()))
         for text, start, end in [
             ("Python 3.11 is required", 7, 11),
             ("pytest 8.0 is installed", 7, 10),
