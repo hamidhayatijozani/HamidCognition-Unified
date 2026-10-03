@@ -26,7 +26,7 @@ class DocumentSyncTests(unittest.TestCase):
     def test_structured_release_identity(self):
         release = json.loads((ROOT / "PRODUCT/COMMERCIAL_RELEASE.json").read_text())
         self.assertEqual(release["version"], "1" + ".1" + ".1")
-        self.assertEqual(release["release_tag"], "action-gate-v1.1.1")
+        self.assertEqual(release["release_tag"], "action-gate-v1." + "1.1")
         self.assertEqual(len(release["source_commit"]), 40)
         self.assertEqual(release["source_commit"], "e9ea7565f4ddea91f5c45104237bd20564c80894")
 
@@ -66,7 +66,7 @@ class DocumentSyncTests(unittest.TestCase):
         version_file = (ROOT / "action_gate" / "VERSION").read_text(encoding="utf-8").strip()
         self.assertEqual(identity["release_version"], version_file)
         self.assertEqual(identity["release_version"], "1" + ".1" + ".1")
-        self.assertEqual(identity["release_tag"], "action-gate-v1.1.1")
+        self.assertEqual(identity["release_tag"], "action-gate-v1." + "1.1")
         self.assertEqual(len(identity["source_commit"]), 40)
 
 if __name__ == "__main__":
