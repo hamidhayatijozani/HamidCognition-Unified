@@ -4,8 +4,6 @@
 
 The latest independently validated and published Action Gate release is **v1.1.1**, published as GitHub release `action-gate-v1.1.1`.
 
-Verified source commit:
-`e9ea7565f4ddea91f5c45104237bd20564c80894`
 
 Release-candidate workflow run:
 `36966012148`
