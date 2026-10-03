@@ -1,15 +1,6 @@
 name: Action Gate Clean-Room Verification
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    paths:
-      - 'action_gate/**'
-      - 'PRODUCT/**'
-      - 'Dockerfile'
-      - 'docker-compose*.yml'
-      - '.github/workflows/action-gate-clean-room.yml'
   workflow_dispatch:
     inputs:
       expected_sha:

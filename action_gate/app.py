@@ -8,7 +8,7 @@ import uuid
 import time
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
@@ -105,6 +105,28 @@ def enforce_rate_limit(authorization: str | None, tenant_id: str | None) -> None
         raise HTTPException(429, "action_gate_rate_limit_exceeded")
 
 
+class PreExecutionSignal(BaseModel):
+    mode: Literal["PROCEED", "INHIBIT", "HOLD", "UNKNOWN"]
+    reactivity: float = Field(ge=0.0, le=1.0)
+    reason: str = Field(min_length=1, max_length=256)
+    consumer_action: Literal[
+        "REQUEST_ACTION_GATE_AUTHORIZATION",
+        "BLOCK_REACTION",
+        "REQUIRE_REEVALUATION",
+        "REQUIRE_EVIDENCE",
+    ]
+
+    @classmethod
+    def validate_consumer_action(cls, mode: str, consumer_action: str) -> bool:
+        expected = {
+            "PROCEED": "REQUEST_ACTION_GATE_AUTHORIZATION",
+            "INHIBIT": "BLOCK_REACTION",
+            "HOLD": "REQUIRE_REEVALUATION",
+            "UNKNOWN": "REQUIRE_EVIDENCE",
+        }
+        return expected[mode] == consumer_action
+
+
 class ActionRequest(BaseModel):
     request_id: str | None = None
     tenant_id: str
@@ -117,6 +139,7 @@ class ActionRequest(BaseModel):
     context: dict[str, Any] = Field(default_factory=dict)
     evidence: list[dict[str, Any]] = Field(default_factory=list)
     risk_hint: str | None = None
+    pre_execution_signal: PreExecutionSignal | None = None
 
 
 class Approval(BaseModel):
@@ -170,6 +193,31 @@ def evaluate_risk(req: ActionRequest, snapshot: dict[str, Any] = POLICY_SNAPSHOT
 def decide(req: ActionRequest, risk: str, snapshot: dict[str, Any] = POLICY_SNAPSHOT):
     high_risk, external, critical = policy_sets(snapshot)
     a = req.action.lower()
+
+    if req.pre_execution_signal is not None:
+        signal = req.pre_execution_signal
+        if not PreExecutionSignal.validate_consumer_action(signal.mode, signal.consumer_action):
+            raise HTTPException(422, "invalid_pre_execution_signal_binding")
+        if signal.mode == "INHIBIT":
+            return "DENY", [{
+                "policy": "pre-execution-signal",
+                "result": "DENY",
+                "reason": "pre_execution_signal_inhibit",
+                "signal_mode": signal.mode,
+                "signal_reactivity": signal.reactivity,
+                "signal_reason": signal.reason,
+            }]
+        if signal.mode in {"HOLD", "UNKNOWN"}:
+            return "ASK", [{
+                "policy": "pre-execution-signal",
+                "result": "ASK",
+                "reason": f"pre_execution_signal_{signal.mode.lower()}",
+                "signal_mode": signal.mode,
+                "signal_reactivity": signal.reactivity,
+                "signal_reason": signal.reason,
+            }]
+        # PROCEED never grants authority. Normal Action Gate policy still decides.
+
     if a in critical:
         return "SANDBOX", [{"policy": "financial-transfer", "result": "SANDBOX", "reason": "critical_action_requires_containment_or_human_review"}]
     if a in high_risk and risk == "CRITICAL":
@@ -180,7 +228,17 @@ def decide(req: ActionRequest, risk: str, snapshot: dict[str, Any] = POLICY_SNAP
 
 
 def normalized_action(req: ActionRequest):
-    return {"tenant_id": req.tenant_id, "actor_id": req.actor_id, "session_id": req.session_id, "action": req.action.lower(), "target": req.target, "parameters": req.parameters}
+    normalized = {
+        "tenant_id": req.tenant_id,
+        "actor_id": req.actor_id,
+        "session_id": req.session_id,
+        "action": req.action.lower(),
+        "target": req.target,
+        "parameters": req.parameters,
+    }
+    if req.pre_execution_signal is not None:
+        normalized["pre_execution_signal"] = req.pre_execution_signal.model_dump()
+    return normalized
 
 
 def save(record: dict[str, Any], event_type: str) -> None:

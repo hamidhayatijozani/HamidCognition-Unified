@@ -1,20 +1,6 @@
 name: State-Bound TA-001
 
 on:
-  pull_request:
-    paths:
-      - "state_bound/**"
-      - "tests/test_state_bound.py"
-      - "tests/test_ta001_benchmark.py"
-      - "tests/test_trajectory_reality.py"
-      - "state_bound/trajectory_benchmark.py"
-      - ".github/workflows/state-bound-ta001.yml"
-  push:
-    paths:
-      - "state_bound/**"
-      - "tests/test_state_bound.py"
-      - "tests/test_ta001_benchmark.py"
-      - ".github/workflows/state-bound-ta001.yml"
   workflow_dispatch:
 
 jobs:

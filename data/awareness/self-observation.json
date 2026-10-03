@@ -350,7 +350,7 @@
       "limits": [
         "cannot manufacture proof"
       ],
-      "maturity": "VERIFIED",
+      "maturity": "PROTOTYPE",
       "parent_id": "FEEDBACK",
       "status": "READY"
     },

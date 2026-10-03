@@ -12,12 +12,12 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 MAP_PATH = ROOT / "PRODUCT" / "DOCUMENT_DEPENDENCY_MAP.yaml"
-CANONICAL_RELEASE = ROOT / "PRODUCT" / "CURRENT_COMMERCIAL_RELEASE.md"
+CANONICAL_RELEASE = ROOT / "PRODUCT" / "COMMERCIAL_RELEASE.json"
 STATE_PATH = ROOT / "evidence" / "document-sync-state.json"
 
 VERSION_RE = re.compile(r"\bv(\d+\.\d+\.\d+)\b")
-TAG_RE = re.compile(r"(?:GitHub release\s+|published as\s+(?:the immutable\s+)?(?:GitHub release\s+)?)`?([A-Za-z0-9._-]+)`?", re.I)
-COMMIT_RE = re.compile(r"Verified source commit:\s*[^0-9a-f]*([0-9a-f]{40})", re.I)
+TAG_RE = re.compile(r"(?:GitHub release\s+|published as\s+(?:the\s+)?immutable\s+GitHub release\s+)`?([A-Za-z0-9._-]+)`?", re.I)
+VERSION_PATH = ROOT / "action_gate" / "VERSION"
 
 def sha256_text(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
@@ -31,7 +31,7 @@ def published_release_text(text: str) -> str:
     if marker in text:
         return text.split(marker, 1)[1]
 
-    # README and Quickstart use prose rather than the canonical section heading.
+    # Customer-facing README may carry the published identity; QUICKSTART is intentionally version-free.
     prose = "last validated published commercial release"
     lower = text.lower()
     if prose in lower:
@@ -39,31 +39,35 @@ def published_release_text(text: str) -> str:
 
     return text
 
-def parse_release_identity(text: str) -> dict[str, str]:
-    source = published_release_text(text)
-    version = VERSION_RE.search(source)
-    tag = TAG_RE.search(source)
-    commit = COMMIT_RE.search(source)
-    if not (version and tag and commit):
-        raise ValueError("Canonical commercial release identity is incomplete")
-    return {
-        "release_version": version.group(1),
-        "release_tag": tag.group(1),
-        "source_commit": commit.group(1),
-    }
+def product_version() -> str:
+    version = VERSION_PATH.read_text(encoding="utf-8").strip()
+    if not re.fullmatch(r"\d+\.\d+\.\d+", version):
+        raise ValueError("action_gate/VERSION must contain exactly one semantic version")
+    return version
 
 def canonical_identity() -> dict[str, str]:
-    text = CANONICAL_RELEASE.read_text(encoding="utf-8")
-    identity = parse_release_identity(text)
-    identity["canonical_sha256"] = sha256_text(text)
-    return identity
+    identity = json.loads(CANONICAL_RELEASE.read_text(encoding="utf-8"))
+    required = ("version", "release_tag", "source_commit")
+    if any(not identity.get(key) for key in required):
+        raise ValueError("Structured commercial release identity is incomplete")
+    if not re.fullmatch(r"\d+\.\d+\.\d+", identity["version"]):
+        raise ValueError("Commercial release version is invalid")
+    if not re.fullmatch(r"[0-9a-f]{40}", identity["source_commit"], re.I):
+        raise ValueError("Commercial release source_commit is invalid")
+    if identity["version"] != product_version():
+        raise ValueError("Commercial release version does not match action_gate/VERSION")
+    return {
+        "release_version": identity["version"],
+        "release_tag": identity["release_tag"],
+        "source_commit": identity["source_commit"],
+        "canonical_sha256": sha256_text(CANONICAL_RELEASE.read_text(encoding="utf-8")),
+    }
 
 def documented_identity(path: Path) -> dict[str, str]:
     text = path.read_text(encoding="utf-8")
     source = published_release_text(text)
     result: dict[str, str] = {}
-    for key, pattern in (("release_version", VERSION_RE), ("release_tag", TAG_RE),
-                         ("source_commit", COMMIT_RE)):
+    for key, pattern in (("release_version", VERSION_RE), ("release_tag", TAG_RE)):
         match = pattern.search(source)
         if match:
             result[key] = match.group(1)
@@ -82,7 +86,7 @@ def load_declared_paths() -> list[str]:
 def apply_safe_updates(identity: dict[str, str]) -> list[str]:
     """Update only deterministic release identity in approved AUTO documents."""
     changed: list[str] = []
-    for relative in ("README.md", "PRODUCT/QUICKSTART.md"):
+    for relative in ("README.md",):
         path = ROOT / relative
         original = path.read_text(encoding="utf-8")
         updated = original
@@ -93,19 +97,8 @@ def apply_safe_updates(identity: dict[str, str]) -> list[str]:
                 updated,
             )
             updated = re.sub(
-                r"published as (?:the immutable\s+)?GitHub release\s+`?[^` )]+`? at source commit [0-9a-f]{40}",
+                r"published as (?:the immutable\s+)?GitHub release\s+`?[^` )]+`?(?: at source commit `?[0-9a-f]{40}`?)?",
                 f"published as the immutable GitHub release `{identity['release_tag']}` at source commit {identity['source_commit']}",
-                updated,
-            )
-        else:
-            updated = re.sub(
-                r"current validated release is \*\*v\d+\.\d+\.\d+\*\*",
-                f"current validated release is **v{identity['release_version']}**",
-                updated,
-            )
-            updated = re.sub(
-                r"published as [A-Za-z0-9._-]+ immutable GitHub release `[^`]+`",
-                f"published as {identity['release_tag']} immutable GitHub release `{identity['release_tag']}`",
                 updated,
             )
         if updated != original:
@@ -125,7 +118,7 @@ def build_state() -> dict[str, Any]:
             missing.append(relative)
 
     stale: list[dict[str, Any]] = []
-    for relative in ("README.md", "PRODUCT/QUICKSTART.md"):
+    for relative in ("README.md",):
         path = ROOT / relative
         if not path.exists():
             stale.append({"document": relative, "reason": "missing"})

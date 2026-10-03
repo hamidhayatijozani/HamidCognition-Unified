@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import os
+import pytest
 from datetime import datetime, timezone
 
 os.environ["ACTION_GATE_API_TOKEN"] = "ci-csg-token"
@@ -13,8 +14,23 @@ os.environ.pop("ACTION_GATE_AUTHORITY_SECRET", None)
 
 from fastapi.testclient import TestClient
 
+import app as gate
 from app import app
 from canonicalization import canonicalize
+
+gate.API_TOKEN = None
+gate.SIGNING_SECRET = "ci-csg-secret"
+gate.ENVIRONMENT = "test"
+
+
+@pytest.fixture(autouse=True)
+def csg_runtime():
+    previous = (gate.API_TOKEN, gate.SIGNING_SECRET, gate.ENVIRONMENT)
+    gate.API_TOKEN = "ci-csg-token"
+    gate.SIGNING_SECRET = "ci-csg-secret"
+    gate.ENVIRONMENT = "test"
+    yield
+    gate.API_TOKEN, gate.SIGNING_SECRET, gate.ENVIRONMENT = previous
 
 
 def sign(payload: dict) -> str:
@@ -33,7 +49,7 @@ def payload(request_id="evt-001", action="read_public"):
 def test_contract_first_allow_and_idempotency():
     client = TestClient(app)
     body = payload()
-    headers = {"Authorization": "Bearer ci-csg-token", "Idempotency-Key": "evt-001", "X-HCJ-Request-Signature": sign(body)}
+    headers = {"Authorization": f"Bearer {os.environ['ACTION_GATE_API_TOKEN']}", "Idempotency-Key": "evt-001", "X-HCJ-Request-Signature": sign(body)}
     first = client.post("/v1/csg/decide", json=body, headers=headers)
     second = client.post("/v1/csg/decide", json=body, headers=headers)
     assert first.status_code == 200, first.text
@@ -46,7 +62,7 @@ def test_contract_first_allow_and_idempotency():
 def test_idempotency_rejects_changed_request():
     client = TestClient(app)
     body = payload("evt-002")
-    headers = {"Authorization": "Bearer ci-csg-token", "Idempotency-Key": "evt-002", "X-HCJ-Request-Signature": sign(body)}
+    headers = {"Authorization": f"Bearer {os.environ['ACTION_GATE_API_TOKEN']}", "Idempotency-Key": "evt-002", "X-HCJ-Request-Signature": sign(body)}
     assert client.post("/v1/csg/decide", json=body, headers=headers).status_code == 200
     changed = dict(body)
     changed["parameters"] = {"limit": 99}
@@ -60,7 +76,7 @@ def test_idempotency_rejects_changed_request():
 def test_signature_failure_is_rejected():
     client = TestClient(app)
     body = payload("evt-003")
-    response = client.post("/v1/csg/decide", json=body, headers={"Authorization": "Bearer ci-csg-token", "Idempotency-Key": "evt-003", "X-HCJ-Request-Signature": "0" * 64})
+    response = client.post("/v1/csg/decide", json=body, headers={"Authorization": f"Bearer {os.environ['ACTION_GATE_API_TOKEN']}", "Idempotency-Key": "evt-003", "X-HCJ-Request-Signature": "0" * 64})
     assert response.status_code == 401
     assert response.json()["detail"] == "request_signature_invalid"
 
@@ -71,7 +87,7 @@ def test_risk_decisions_are_deterministic_and_fail_closed():
     for index, (action, expected) in enumerate(cases, start=10):
         body = payload(f"evt-{index}", action)
         if action == "delete_database": body["target"] = "production-db"
-        headers = {"Authorization": "Bearer ci-csg-token", "Idempotency-Key": body["request_id"], "X-HCJ-Request-Signature": sign(body)}
+        headers = {"Authorization": f"Bearer {os.environ['ACTION_GATE_API_TOKEN']}", "Idempotency-Key": body["request_id"], "X-HCJ-Request-Signature": sign(body)}
         response = client.post("/v1/csg/decide", json=body, headers=headers)
         assert response.status_code == 200, response.text
         assert response.json()["decision"] == expected
@@ -84,13 +100,13 @@ def test_malformed_contract_is_rejected_with_correlation_id():
     client = TestClient(app)
     body = payload("evt-malformed")
     body.pop("contract_version")
-    response = client.post("/v1/csg/decide", json=body, headers={"Authorization": "Bearer ci-csg-token", "Idempotency-Key": "evt-malformed", "X-Correlation-ID": "corr-malformed"})
+    response = client.post("/v1/csg/decide", json=body, headers={"Authorization": f"Bearer {os.environ['ACTION_GATE_API_TOKEN']}", "Idempotency-Key": "evt-malformed", "X-Correlation-ID": "corr-malformed"})
     assert response.status_code == 422
     assert response.json() == {"detail": "schema_validation_failed", "correlation_id": "corr-malformed"}
 
 
 def test_invalid_json_is_rejected_with_correlation_id():
     client = TestClient(app)
-    response = client.post("/v1/csg/decide", content=b"{not-json", headers={"Authorization": "Bearer ci-csg-token", "Idempotency-Key": "evt-invalid-json", "X-Correlation-ID": "corr-invalid-json", "Content-Type": "application/json"})
+    response = client.post("/v1/csg/decide", content=b"{not-json", headers={"Authorization": f"Bearer {os.environ['ACTION_GATE_API_TOKEN']}", "Idempotency-Key": "evt-invalid-json", "X-Correlation-ID": "corr-invalid-json", "Content-Type": "application/json"})
     assert response.status_code == 400
     assert response.json() == {"detail": "invalid_json", "correlation_id": "corr-invalid-json"}

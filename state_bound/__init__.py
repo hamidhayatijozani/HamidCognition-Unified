@@ -1,6 +1,6 @@
 """Experimental state-bound execution governance prototype.
 
-This module is research-only and does not alter the Action Gate v1.0.10
+This module is research-only and does not alter the Action Gate commercial
 commercial release path.
 """
 from .models import Decision, ExecutionAuthority, WorldState
