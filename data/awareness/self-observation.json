@@ -346,7 +346,9 @@
         "y"
       ],
       "component_id": "VERIFICATION",
-      "evidence_refs": [],
+      "evidence_refs": [
+        "gates-local-proof-3ed565733a62f318f9a8939f7df5fe5dd0859abe"
+      ],
       "limits": [
         "cannot manufacture proof"
       ],
