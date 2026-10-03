@@ -350,7 +350,7 @@
       "limits": [
         "cannot manufacture proof"
       ],
-      "maturity": "SPECIFIED",
+      "maturity": "VERIFIED",
       "parent_id": "FEEDBACK",
       "status": "READY"
     },
@@ -393,7 +393,7 @@
   ],
   "hard_boundary": "self-observation cannot execute, self-upgrade, self-grant authority, or rewrite contracts",
   "mode": "SELF_OBSERVE_ONLY",
-  "observation_time": "2026-10-03T05:28:57.888698+00:00",
+  "observation_time": "2026-10-03T07:55:45.815305+00:00",
   "project": "BESAZ",
   "proposals": [
     {
