@@ -37,7 +37,7 @@ class DocumentSyncTests(unittest.TestCase):
     def test_quickstart_contains_no_semver_literal(self):
         text = (ROOT / "PRODUCT/QUICKSTART.md").read_text(encoding="utf-8")
         self.assertIsNone(
-            re.search(r"(?<![A-Za-z0-9])v?\\d+\\.\\d+\\.\\d+(?![A-Za-z0-9])", text),
+            re.search(r"(?<![A-Za-z0-9])v?\\d+\\.\\d+(?:\\.\\d+)?(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?(?![A-Za-z0-9])", text),
             "PRODUCT/QUICKSTART.md must remain version-free; release identity belongs in the canonical record",
         )
 
