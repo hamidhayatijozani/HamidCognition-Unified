@@ -2,16 +2,6 @@ name: Action Gate Product Gates
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-  pull_request:
-    paths:
-      - 'action_gate/**'
-      - 'src/**'
-      - 'tests/**'
-      - 'data/awareness/**'
-      - '.github/workflows/product-gates.yml'
-      - '.github/workflows/besaz-awareness.yml'
 
 permissions:
   contents: read
