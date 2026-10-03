@@ -3,6 +3,7 @@ import sys
 
 os.environ["ACTION_GATE_DB"] = "/tmp/hamidcognition-pre-execution-signal.db"
 os.environ["ACTION_GATE_ENV"] = "development"
+os.environ["ACTION_GATE_API_TOKEN"] = "integration-test-token"
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "action_gate"))
 
@@ -27,7 +28,7 @@ def test_research_inhibit_is_consumed_by_action_gate():
     assert result.mode == "INHIBIT"
     assert result.consumer_action == "BLOCK_REACTION"
 
-    response = client.post("/v1/action/evaluate", json={
+    response = client.post("/v1/action/evaluate", headers={"Authorization": "Bearer integration-test-token"}, json={
         "tenant_id": "signal-tenant",
         "agent_id": "research-agent",
         "actor_id": "research-actor",
@@ -48,7 +49,8 @@ def test_research_inhibit_is_consumed_by_action_gate():
     assert data["policy_checks"][0]["policy"] == "pre-execution-signal"
 
     replay = client.get(
-        f"/v1/replay/{data['decision_id']}?tenant_id=signal-tenant"
+        f"/v1/replay/{data['decision_id']}?tenant_id=signal-tenant",
+        headers={"Authorization": "Bearer integration-test-token"},
     )
     assert replay.status_code == 200
     assert replay.json()["replayed_decision"] == "DENY"
