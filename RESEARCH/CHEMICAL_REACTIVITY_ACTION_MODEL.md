@@ -76,12 +76,12 @@ A subprocess runtime probe verifies that importing `state_bound` does not load a
 `action_gate` module. This runtime check complements static inspection because AST
 inspection alone cannot detect dynamic imports.
 
-`PROCEED` means only **REQUEST_ACTION_GATE_AUTHORIZATION**.
-`HOLD` means **REQUIRE_REEVALUATION**.
-`UNKNOWN` means **REQUIRE_EVIDENCE**.
-`INHIBIT` means **BLOCK_REACTION**.
+`PROCEED` means **REQUEST_ACTION_GATE_AUTHORIZATION** and never grants authority.
+`HOLD` means **REQUIRE_REEVALUATION**; Action Gate consumes it as `ASK`.
+`UNKNOWN` means **REQUIRE_EVIDENCE**; Action Gate consumes it as `ASK`.
+`INHIBIT` means **BLOCK_REACTION**; Action Gate consumes it as `DENY`.
 
-None of these outputs is an execution authority.
+The research output is a condition signal, not an authority token. Only Action Gate converts the signal into an execution decision.
 
 ## Determinism proof boundary
 
