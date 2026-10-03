@@ -70,7 +70,7 @@ def test_research_proceed_does_not_bypass_action_gate_policy():
     )
     assert result.mode == "PROCEED"
 
-    response = client.post("/v1/action/evaluate", json={
+    response = client.post("/v1/action/evaluate", headers={"Authorization": "Bearer integration-test-token"}, json={
         "tenant_id": "signal-tenant",
         "agent_id": "research-agent",
         "actor_id": "research-actor",
