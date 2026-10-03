@@ -228,7 +228,17 @@ def decide(req: ActionRequest, risk: str, snapshot: dict[str, Any] = POLICY_SNAP
 
 
 def normalized_action(req: ActionRequest):
-    return {"tenant_id": req.tenant_id, "actor_id": req.actor_id, "session_id": req.session_id, "action": req.action.lower(), "target": req.target, "parameters": req.parameters, "pre_execution_signal": req.pre_execution_signal.model_dump() if req.pre_execution_signal else None}
+    normalized = {
+        "tenant_id": req.tenant_id,
+        "actor_id": req.actor_id,
+        "session_id": req.session_id,
+        "action": req.action.lower(),
+        "target": req.target,
+        "parameters": req.parameters,
+    }
+    if req.pre_execution_signal is not None:
+        normalized["pre_execution_signal"] = req.pre_execution_signal.model_dump()
+    return normalized
 
 
 def save(record: dict[str, Any], event_type: str) -> None:
