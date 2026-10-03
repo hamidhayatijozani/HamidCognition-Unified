@@ -54,3 +54,22 @@ def test_runtime_numeric_contract_rejects_boolean_values():
     except TypeError:
         return
     raise AssertionError("boolean activation must not satisfy the numeric contract")
+
+
+def test_state_bound_does_not_import_action_gate():
+    import subprocess
+    import sys
+
+    probe = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import sys; import state_bound.chemical_reactivity; "
+            "print(any(name == 'action_gate' or name.startswith('action_gate.') "
+            "for name in sys.modules))",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert probe.stdout.strip() == "False"
