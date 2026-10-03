@@ -28,6 +28,70 @@ def test_delete_production_is_denied():
     assert data["decision_signature"]
 
 
+def test_pre_execution_inhibit_is_consumed_as_deny_and_replayed():
+    signal = {
+        "mode": "INHIBIT",
+        "reactivity": 0.02,
+        "reason": "inhibitor_above_threshold",
+        "consumer_action": "BLOCK_REACTION",
+    }
+    data = evaluate({
+        "agent_id": "a",
+        "action": "read_public_file",
+        "target": "/public/info.txt",
+        "pre_execution_signal": signal,
+    })
+    assert data["decision"] == "DENY"
+    assert data["policy_checks"][0]["reason"] == "pre_execution_signal_inhibit"
+
+    denied = client.post(
+        f"/v1/action/{data['decision_id']}/execution",
+        json={
+            "tenant_id": TENANT,
+            "action_hash": data["action_hash"],
+            "nonce": data["nonce"],
+            "outcome": {"status": "must-not-execute"},
+        },
+    )
+    assert denied.status_code == 403
+
+    replay = client.get(f"/v1/replay/{data['decision_id']}?tenant_id={TENANT}")
+    assert replay.status_code == 200
+    assert replay.json()["replayed_decision"] == "DENY"
+    assert replay.json()["match"] is True
+
+
+def test_pre_execution_proceed_does_not_grant_authority():
+    signal = {
+        "mode": "PROCEED",
+        "reactivity": 0.95,
+        "reason": "stable_conditions",
+        "consumer_action": "REQUEST_ACTION_GATE_AUTHORIZATION",
+    }
+    data = evaluate({
+        "agent_id": "a",
+        "action": "delete_file",
+        "target": "/production/data.db",
+        "pre_execution_signal": signal,
+    })
+    assert data["decision"] == "DENY"
+    assert data["risk_assessment"]["level"] == "CRITICAL"
+
+
+def test_pre_execution_signal_binding_is_strict():
+    data = evaluate({
+        "agent_id": "a",
+        "action": "read_public_file",
+        "pre_execution_signal": {
+            "mode": "INHIBIT",
+            "reactivity": 0.1,
+            "reason": "blocked",
+            "consumer_action": "REQUEST_ACTION_GATE_AUTHORIZATION",
+        },
+    })
+    assert data["decision"] == "DENY"
+
+
 def test_external_email_requires_bound_approval_then_replay_matches():
     data = evaluate({"agent_id": "a", "action": "send_email", "target": "customer@example.com"})
     assert data["decision"] == "ASK"
