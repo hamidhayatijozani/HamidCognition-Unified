@@ -25,10 +25,12 @@ gate.ENVIRONMENT = "test"
 
 @pytest.fixture(autouse=True)
 def csg_runtime():
+    previous = (gate.API_TOKEN, gate.SIGNING_SECRET, gate.ENVIRONMENT)
     gate.API_TOKEN = "ci-csg-token"
     gate.SIGNING_SECRET = "ci-csg-secret"
     gate.ENVIRONMENT = "test"
     yield
+    gate.API_TOKEN, gate.SIGNING_SECRET, gate.ENVIRONMENT = previous
 
 
 def sign(payload: dict) -> str:
