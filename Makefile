@@ -19,7 +19,7 @@ version-source:
 	$(PYTEST) -q tests/test_version_source_gate.py
 
 state-bound:
-	$(PYTEST) -q tests/test_state_bound.py tests/test_chemical_reactivity.py tests/test_pre_execution_signal_integration.py tests/test_ta001_benchmark.py tests/test_trajectory_reality.py
+	$(PYTEST) -q tests/test_state_bound.py state_bound/test_chemical_reactivity.py tests/test_pre_execution_signal_integration.py tests/test_ta001_benchmark.py tests/test_trajectory_reality.py
 
 product-gates:
 	cd action_gate && $(PYTEST) -q
