@@ -301,7 +301,10 @@ def decide_legacy(req: ActionRequest, risk: str, snapshot: dict[str, Any] = POLI
     return "ALLOW", [{"policy": "default", "result": "ALLOW", "reason": "no_blocking_policy_matched"}]
 
 
-def normalized_action(req: ActionRequest, signal: PreExecutionSignal) -> dict[str, Any]:
+def normalized_action(req: ActionRequest, signal: PreExecutionSignal | None = None) -> dict[str, Any]:
+    if signal is None:
+        risk, _ = evaluate_risk(req)
+        signal = compute_signal(req, risk)
     normalized = {
         "tenant_id": req.tenant_id,
         "actor_id": req.actor_id,

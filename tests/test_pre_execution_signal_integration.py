@@ -35,20 +35,15 @@ def test_research_inhibit_is_consumed_by_action_gate():
         "agent_id": "research-agent",
         "actor_id": "research-actor",
         "session_id": "research-session",
-        "action": "read_public_file",
-        "target": "/public/info.txt",
-        "pre_execution_signal": {
-            "mode": result.mode,
-            "reactivity": result.reactivity,
-            "reason": result.reason,
-            "consumer_action": result.consumer_action,
-        },
+        "action": "delete_file",
+        "target": "/production/data.db",
     })
 
     assert response.status_code == 200
     data = response.json()
     assert data["decision"] == "DENY"
     assert data["policy_checks"][0]["policy"] == "pre-execution-signal"
+    assert data["policy_checks"][0]["signal_mode"] == "INHIBIT"
 
     replay = client.get(
         f"/v1/replay/{data['decision_id']}?tenant_id=signal-tenant",
@@ -59,7 +54,7 @@ def test_research_inhibit_is_consumed_by_action_gate():
     assert replay.json()["match"] is True
 
 
-def test_research_proceed_does_not_bypass_action_gate_policy():
+def test_research_proceed_does_not_bypass_server_computed_signal_boundary():
     result = calculate_reactivity(
         ReactivityFactors(
             activation=1.0,
@@ -77,15 +72,10 @@ def test_research_proceed_does_not_bypass_action_gate_policy():
         "agent_id": "research-agent",
         "actor_id": "research-actor",
         "session_id": "research-session",
-        "action": "delete_file",
-        "target": "/production/data.db",
-        "pre_execution_signal": {
-            "mode": result.mode,
-            "reactivity": result.reactivity,
-            "reason": result.reason,
-            "consumer_action": result.consumer_action,
-        },
+        "action": "read_public_file",
+        "target": "/public/info.txt",
     })
 
     assert response.status_code == 200
-    assert response.json()["decision"] == "DENY"
+    assert response.json()["decision"] == "ALLOW"
+    assert response.json()["policy_checks"][0]["policy"] == "default"

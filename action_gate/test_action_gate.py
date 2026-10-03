@@ -42,9 +42,9 @@ def test_pre_execution_inhibit_is_consumed_as_deny_and_replayed():
     }
     data = evaluate({
         "agent_id": "a",
-        "action": "read_public_file",
-        "target": "/public/info.txt",
-        "pre_execution_signal": signal,
+        "action": "transfer_funds",
+        "target": "account-1",
+        "parameters": {"amount": 1000},
     })
     assert data["decision"] == "DENY"
     assert data["policy_checks"][0]["reason"] == "pre_execution_signal_inhibit"
@@ -77,7 +77,6 @@ def test_pre_execution_proceed_does_not_grant_authority():
         "agent_id": "a",
         "action": "delete_file",
         "target": "/production/data.db",
-        "pre_execution_signal": signal,
     })
     assert data["decision"] == "DENY"
     assert data["risk_assessment"]["level"] == "CRITICAL"
@@ -96,7 +95,8 @@ def test_pre_execution_signal_binding_is_strict():
         },
     })
     assert response.status_code == 422
-    assert response.json()["detail"] == "invalid_pre_execution_signal_binding"
+    assert response.json()["detail"][0]["type"] == "extra_forbidden"
+    assert response.json()["detail"][0]["loc"] == ["body", "pre_execution_signal"]
 
 
 def test_external_email_requires_bound_approval_then_replay_matches():
@@ -116,9 +116,9 @@ def test_external_email_requires_bound_approval_then_replay_matches():
     assert replayed.status_code == 409
 
 
-def test_financial_action_is_sandboxed():
+def test_financial_action_is_inhibited_and_denied():
     data = evaluate({"agent_id": "a", "action": "transfer_funds", "target": "account-1", "parameters": {"amount": 1000}})
-    assert data["decision"] == "SANDBOX"
+    assert data["decision"] == "DENY"
 
 
 def test_agent_risk_hint_cannot_lower_intrinsic_risk():

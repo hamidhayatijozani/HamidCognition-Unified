@@ -9,7 +9,7 @@ DEFAULT_POLICY: dict[str, Any] = {
     "policy_version": "builtin-v1",
     "high_risk": ["delete_file", "delete_customer", "delete_database", "transfer_funds", "transfer_money"],
     "external": ["send_email", "send_external_email", "http_post_external"],
-    "critical": ["transfer_funds", "transfer_money"],
+    "critical": ["financial_transfer", "transfer_funds", "transfer_money"],
     "rules": [
         "critical financial action -> SANDBOX",
         "critical destructive production action -> DENY",
