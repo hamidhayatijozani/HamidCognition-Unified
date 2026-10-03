@@ -33,6 +33,7 @@ clean-room:
 	$(PYTEST) -q action_gate tests
 
 gates-timed:
+	@case "$(MAKEFLAGS)" in *n*) echo "DRY-RUN: gates-local -> document-sync version-source state-bound product-gates security-acceptance clean-room"; exit 0;; esac
 	@mkdir -p evidence/gates-timing
 	@rm -f evidence/gates-timing/gates-timing.log
 	@for g in document-sync version-source state-bound product-gates security-acceptance clean-room; do \
