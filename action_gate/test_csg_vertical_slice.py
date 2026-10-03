@@ -13,8 +13,13 @@ os.environ.pop("ACTION_GATE_AUTHORITY_SECRET", None)
 
 from fastapi.testclient import TestClient
 
+import app as gate
 from app import app
 from canonicalization import canonicalize
+
+gate.API_TOKEN = "ci-csg-token"
+gate.SIGNING_SECRET = "ci-csg-secret"
+gate.ENVIRONMENT = "test"
 
 
 def sign(payload: dict) -> str:
