@@ -1,4 +1,4 @@
-from state_bound.chemical_reactivity import ReactivityFactors, calculate_reactivity
+from state_bound.pre_execution_signals import ReactivityFactors, calculate_reactivity
 
 
 def test_stable_high_activation_proceeds():
