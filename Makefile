@@ -31,7 +31,7 @@ security-acceptance:
 clean-room:
 	rm -f /tmp/hamidcognition-clean-room.db /tmp/hamidcognition-action-gate.db action_gate.db
 	$(PYTHON) -m compileall -q action_gate state_bound
-	env -u DATABASE_URL ACTION_GATE_DB=/tmp/hamidcognition-clean-room.db $(PYTEST) -q action_gate tests
+	$(PYTEST) -q tests
 
 ifeq ($(findstring n,$(MAKEFLAGS)),n)
 gates-timed:
