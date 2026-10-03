@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import os
+import pytest
 from datetime import datetime, timezone
 
 os.environ["ACTION_GATE_API_TOKEN"] = "ci-csg-token"
@@ -20,6 +21,14 @@ from canonicalization import canonicalize
 gate.API_TOKEN = "ci-csg-token"
 gate.SIGNING_SECRET = "ci-csg-secret"
 gate.ENVIRONMENT = "test"
+
+
+@pytest.fixture(autouse=True)
+def csg_runtime():
+    gate.API_TOKEN = "ci-csg-token"
+    gate.SIGNING_SECRET = "ci-csg-secret"
+    gate.ENVIRONMENT = "test"
+    yield
 
 
 def sign(payload: dict) -> str:
