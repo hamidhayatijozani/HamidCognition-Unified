@@ -1,6 +1,6 @@
 # Architecture Status
 
-## Chemical Reactivity Research Surface
+## Pre-execution Policy Signals
 
 | Signal | Emitted | Tested | Enforced | Authority effect |
 |---|---|---|---|---|
@@ -9,7 +9,7 @@
 | HOLD | YES | YES | NO | NONE |
 | UNKNOWN | YES | YES | NO | NONE |
 
-PROCEED is deliberately non-authoritative: it never bypasses normal Action Gate policy. INHIBIT is consumed by Action Gate as an execution decision input and maps to DENY. The chemical/state-bound layer still cannot mint execution authority; Action Gate remains the only enforcer.
+PROCEED is deliberately non-authoritative: it never bypasses normal Action Gate policy. INHIBIT is consumed by Action Gate as an execution decision input and maps to DENY. The pre-execution/state-bound layer still cannot mint execution authority; Action Gate remains the only enforcer.
 
 HOLD and UNKNOWN currently have explicit research consumer semantics: REQUIRE_REEVALUATION and REQUIRE_EVIDENCE. They are consumed by Action Gate as ASK, requiring further decision handling, but they do not grant execution authority.
 
