@@ -1,0 +1,59 @@
+name: Canonical Gates
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: canonical-gates-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  canonical-gates:
+    name: Canonical make gates-local
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install pytest fastapi httpx uvicorn pydantic "psycopg[binary]"
+
+      - name: Parse Makefile without execution
+        run: make -n gates-local | tee make-dry-run.log
+
+      - name: Execute canonical gate chain
+        env:
+          ACTION_GATE_API_TOKEN: "test_api_token"
+          ACTION_GATE_SIGNING_SECRET: "test_signing_secret"
+          ACTION_GATE_APPROVAL_SECRET: "test_approval_secret"
+          ACTION_GATE_AUTHORITY_SECRET: "test_authority_secret"
+        run: make gates-local
+
+      - name: Upload gate timing evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gates-timing-${{ github.run_id }}
+          path: |
+            evidence/gates-timing/
+            make-dry-run.log
+          if-no-files-found: error
+          retention-days: 30
