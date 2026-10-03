@@ -1,4 +1,4 @@
-.PHONY: gates-local document-sync security-acceptance clean-room state-bound product-gates version-source
+.NOTPARALLEL: gates-local\n\n.PHONY: gates-local document-sync security-acceptance clean-room state-bound product-gates version-source
 
 PYTHON ?= python3
 PYTEST ?= $(PYTHON) -m pytest
