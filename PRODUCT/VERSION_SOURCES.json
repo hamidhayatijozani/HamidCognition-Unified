@@ -1,7 +1,7 @@
 {
   "schema": "hamidcognition.version-sources.v1",
   "canonical": "action_gate/VERSION",
-  "derived": ["README.md", "PRODUCT/QUICKSTART.md", "PRODUCT/CURRENT_COMMERCIAL_RELEASE.md", "PRODUCT/RELEASE_NOTES_1.1.1.md"],
-  "authoritative_source_classes": ["pyproject.toml", "package.json", "**/package.json", "**/setup.py", "**/setup.cfg", "**/__init__.py", "**/*.toml"],
-  "derived_document_policy": "Only files listed in derived may contain release-version literals. Other documentation is not treated as an authority source by this gate."
+  "derived": ["README.md", "PRODUCT/CURRENT_COMMERCIAL_RELEASE.md", "PRODUCT/RELEASE_NOTES_1.1.1.md"],
+  "authoritative_source_classes": "deprecated; gate scans all tracked text files",
+  "derived_document_policy": "Any tracked text file containing a semantic-version literal must be listed in derived. Canonical action_gate/VERSION is the sole product-version source."
 }
