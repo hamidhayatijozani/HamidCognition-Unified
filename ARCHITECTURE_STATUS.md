@@ -22,3 +22,11 @@ action_gate/VERSION is the canonical product-version source. PRODUCT/VERSION_SOU
 A CI failure must be diagnosed from raw failing job output before a hypothesis or fix is proposed.
 
 A signal without an enforcer is a tested signal, not an execution control.
+
+
+## Verification environment status
+
+- Local execution: NOT VERIFIED in the current ChatGPT runtime because outbound network access is unavailable and no repository working tree is mounted.
+- Remote execution via the canonical `make gates-local` chain: REQUIRED and authoritative for this HEAD.
+- If the remote canonical chain is GREEN for the exact HEAD, the local-execution gap is acceptable for this HEAD; it remains an environment limitation, not a claim of local execution.
+- Action Gate signals: authority = NONE for all four research signals. INHIBIT blocks only within the research layer.
