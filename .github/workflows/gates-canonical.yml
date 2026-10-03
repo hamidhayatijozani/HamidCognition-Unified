@@ -40,11 +40,6 @@ jobs:
         run: make -n gates-local | tee make-dry-run.log
 
       - name: Execute canonical gate chain
-        env:
-          ACTION_GATE_API_TOKEN: "test_api_token"
-          ACTION_GATE_SIGNING_SECRET: "test_signing_secret"
-          ACTION_GATE_APPROVAL_SECRET: "test_approval_secret"
-          ACTION_GATE_AUTHORITY_SECRET: "test_authority_secret"
         run: make gates-local
 
       - name: Upload gate timing evidence
