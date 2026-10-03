@@ -18,7 +18,7 @@ STATE_PATH = ROOT / "evidence" / "document-sync-state.json"
 VERSION_RE = re.compile(r"\bv(\d+\.\d+\.\d+)\b")
 TAG_RE = re.compile(r"(?:GitHub release\s+|published as\s+(?:the\s+)?immutable\s+GitHub release\s+)`?([A-Za-z0-9._-]+)`?", re.I)
 VERSION_PATH = ROOT / "action_gate" / "VERSION"
-COMMIT_RE = re.compile(r"Verified source commit:\s*[^0-9a-f]*([0-9a-f]{40})", re.I)
+COMMIT_RE = re.compile(r"(?:Verified\s+)?source commit:\s*[^0-9a-f]*([0-9a-f]{40})", re.I)
 
 def sha256_text(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
