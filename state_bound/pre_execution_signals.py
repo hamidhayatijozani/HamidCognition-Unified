@@ -79,5 +79,5 @@ def calculate_reactivity(
     if stability < minimum_stability:
         return ReactivityResult("HOLD", reactivity, margin, "stability_below_threshold", "REQUIRE_REEVALUATION")
     if reactivity >= activation_threshold:
-        return ReactivityResult("PROCEED", reactivity, margin, "REQUEST_ACTION_GATE_AUTHORIZATION")
-    return ReactivityResult("UNKNOWN", reactivity, margin, "REQUIRE_EVIDENCE")
+        return ReactivityResult("PROCEED", reactivity, margin, "stable_conditions", "REQUEST_ACTION_GATE_AUTHORIZATION")
+    return ReactivityResult("UNKNOWN", reactivity, margin, "insufficient_activation", "REQUIRE_EVIDENCE")
