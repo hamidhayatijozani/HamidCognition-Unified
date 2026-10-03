@@ -49,7 +49,7 @@ def payload(request_id="evt-001", action="read_public"):
 def test_contract_first_allow_and_idempotency():
     client = TestClient(app)
     body = payload()
-    headers = {"Authorization": "Bearer ci-csg-token", "Idempotency-Key": "evt-001", "X-HCJ-Request-Signature": sign(body)}
+    headers = {"Authorization": f"Bearer {os.environ['ACTION_GATE_API_TOKEN']}", "Idempotency-Key": "evt-001", "X-HCJ-Request-Signature": sign(body)}
     first = client.post("/v1/csg/decide", json=body, headers=headers)
     second = client.post("/v1/csg/decide", json=body, headers=headers)
     assert first.status_code == 200, first.text
