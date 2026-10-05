@@ -346,9 +346,7 @@
         "y"
       ],
       "component_id": "VERIFICATION",
-      "evidence_refs": [
-        "gates-local-proof-3ed565733a62f318f9a8939f7df5fe5dd0859abe"
-      ],
+      "evidence_refs": [],
       "limits": [
         "cannot manufacture proof"
       ],
@@ -395,7 +393,7 @@
   ],
   "hard_boundary": "self-observation cannot execute, self-upgrade, self-grant authority, or rewrite contracts",
   "mode": "SELF_OBSERVE_ONLY",
-  "observation_time": "2026-10-03T07:55:45.815305+00:00",
+  "observation_time": "2026-10-05T21:15:49.447260+00:00",
   "project": "BESAZ",
   "proposals": [
     {
