@@ -118,7 +118,11 @@ def _canonical(value:Any)->bytes:
 
 
 class ClaimLab:
-    """Deterministic claim-integrity engine for research, not a truth oracle."""
+    """Deterministic claim-integrity engine for research, not a truth oracle.
+
+    Decisions use structured claim/evidence fields supplied to the engine. This
+    module does not call an external LLM and does not treat prose labels as proof.
+    """
 
     def assess(self,claim:Claim,evidence:list[Evidence])->ClaimAssessment:
         support_evidence=[e for e in evidence if e.relation==EvidenceRelation.SUPPORT and e.fresh]
