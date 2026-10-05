@@ -1,74 +1,56 @@
 # HamidCognition-Unified Release Status
 
-## Verified mainline
+## Verified commercial release
 
-- Repository: hamidhayatijozani/HamidCognition-Unified
-- Canonical branch: main
-- Current HEAD tracked at this record update: cf8d231f80f7dd4280ac436cddc8824da60d795c
-- Current HEAD is tracked directly from the GitHub main branch ref; this SHA has not yet received a fresh full release-gate validation run.
-- Last fully successful Action Gate Product Gates run recorded here: #809
-- Successful run commit: e20270553b6216f6e4e5e8b1f3242f8f3d1ea788
-- Run ID: 36759424231
-- Result: success
+- Repository: `hamidhayatijozani/HamidCognition-Unified`
+- Canonical branch: `main`
+- Canonical product version: `action_gate/VERSION` = **1.1.1**
+- Published release: **action-gate-v1.1.1**
+- Verified release source: `e9ea7565f4ddea91f5c45104237bd20564c80894`
+- Release-candidate workflow run: `36966012148`
+- Workflow conclusion: **success**
+- Release artifact SHA-256: `517064de0427286ff4f346d46996642aca3b9def891d1c08bfaebc25546fb791`
+- Release evidence artifact digest: `sha256:2e59173f96517cff0f02dc0e3ef88dc5ba6604c0eb3be3d46cb0c823168d127`
 
-## Verified gates
+The release workflow's successful job performed validated-revision checkout, canonical-version validation, production-image build, archive export, SHA-256 generation, release-manifest creation and evidence upload.
 
-Run #809 completed successfully through:
-- product tests
-- meta-validation
-- validation-boundary conformance
-- real HTTP enforcement integration
-- real MCP enforcement integration
-- Agent Action Risk Lab evidence
-- sellable product readiness gate
-- package compilation
-- ChatGPT MCP surface/import validation
-- production Compose validation
-- production stack startup and health
-- authenticated MCP boundary
-- MCP ALLOW/DENY/EVIDENCE end-to-end
-- PostgreSQL production E2E smoke
-- 200-event HHJ-CSG decision replay
-- service restart and 200 persisted-decision replay
-- validation evidence-pack generation and artifact upload
+## Mainline boundary
 
-## Mainline delta after the verified run
+The release above is immutable evidence for commit `e9ea7565f4ddea91f5c45104237bd20564c80894`.
 
-The current main is 29 commits ahead of e20270553b6216f6e4e5e8b1f3242f8f3d1ea788.
+Current `main` is a development line and may contain commits after the release. A green run against an older commit must never be represented as verification of a newer HEAD.
 
-The verified comparison shows changes in:
-- .github/workflows/autonomous-ci-supervisor.yml
-- .github/workflows/autonomous-repair-loop.yml
-- .github/workflows/release-readiness-gate.yml
-- .github/workflows/site-validation.yml
-- PRODUCT/PRODUCT_COMPLETION_CONTROL.md
-- PRODUCT/RELEASE_TRUTH_RECORD.md
-- RELEASE_STATUS.md
-- data/awareness/innovation-report.json
-- data/awareness/self-observation.json
-- index.html
+The current completion state is therefore:
 
-Therefore run #809 must not be represented as a full verification of the current HEAD. It verifies the tested commit e20270553b6216f6e4e5e8b1f3242f8f3d1ea788 and its tested environment only.
-
-## Commercial release boundary
-
-The repository's current development version is 1.1.0.
-
-The validated and immutable commercial release remains:
-- release: action-gate-v1.0.10
-- source: 77d820e99dc78a6a9e3217d3c1c49d5cdf07813f
-- artifact SHA-256: 10bb53b69b56ff86146f5c71e3e5d7e34dacb4e12dba2adafc59f9d5276abd91
-
-v1.1.0 must not be presented as a commercial release until release-readiness, reproducibility, required security/production evidence, and the release record are all bound to the same source revision.
+```
+RELEASE v1.1.1 = VERIFIED
+CURRENT MAIN = DEVELOPMENT LINE
+CURRENT MAIN RELEASE READINESS = REQUIRES FRESH SAME-SHA GATE
+```
 
 ## Evidence boundary
 
-A green Product Gates run proves the tested repository behavior and integration path for that commit. It does not prove general AI safety, universal policy correctness, infrastructure security, customer acceptance, payment, or downstream real-world outcome safety.
+A green release-candidate run proves the tested repository revision and its executed workflow. It does not prove general AI safety, universal policy correctness, infrastructure security, customer acceptance, payment settlement, regulatory certification, or downstream real-world outcome safety.
 
-Commercial status remains separate from engineering verification.
+## Commercial boundary
+
+v1.1.1 is a technically validated published release. Customer transaction, licensing, deployment, acceptance and settlement remain separate evidence-bearing events.
+
+## Anti-drift rule
+
+Every future release claim must bind:
+
+```
+VERSION
++ SOURCE SHA
++ WORKFLOW RUN
++ ARTIFACT
++ ARTIFACT DIGEST
++ RELEASE TAG
+```
+
+If one element is missing, release readiness is **NOT VERIFIED**.
 
 ## Current completion status
 
-PROJECT STATUS: VALIDATION IN PROGRESS
-
-The repository now has a directly verified current main SHA, but that does not retroactively validate current HEAD through Product Gates run #809. A new verification run bound to the current main SHA is required before claiming current-main release readiness.
+PROJECT STATUS: **RELEASE VERIFIED / MAINLINE CONTINUATION IN PROGRESS**
