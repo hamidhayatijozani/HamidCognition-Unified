@@ -199,6 +199,101 @@ class EventGenerator:
         return events
 
 
+
+class BenchmarkEvaluator:
+    """Evaluate supplied decision records against supplied labels.
+
+    This computes descriptive metrics only. It does not create ground truth and
+    does not establish product safety, latency targets, or human agreement
+    unless real labelled decision records are supplied by the caller.
+    """
+
+    def __init__(self, decisions: list[dict[str, Any]], labels: list[dict[str, Any]]):
+        self.decisions = decisions
+        self.labels = labels
+
+    def compute_agreement(self) -> dict[str, Any]:
+        if not self.labels:
+            return {"agreement_rate": None, "total_labeled": 0, "status": "NO_LABELS"}
+
+        by_id = {
+            d.get("input", {}).get("event_id"): d
+            for d in self.decisions
+        }
+        agreement_count = sum(
+            1
+            for label in self.labels
+            if by_id.get(label.get("event_id"), {}).get("decision", {}).get("verdict")
+            == label.get("verdict")
+        )
+        rate = agreement_count / len(self.labels) * 100
+        return {
+            "agreement_rate": rate,
+            "agreement_count": agreement_count,
+            "total_labeled": len(self.labels),
+            "status": "DESCRIPTIVE_ONLY",
+        }
+
+    def compute_metrics(self) -> dict[str, Any]:
+        return {
+            "total_decisions": len(self.decisions),
+            "agreement": self.compute_agreement(),
+            "decision_distribution": self._compute_distribution(),
+            "latency_stats": self._compute_latency_stats(),
+            "scenario_breakdown": self._compute_scenario_breakdown(),
+            "interpretation_boundary": "descriptive metrics over supplied records only",
+        }
+
+    def _compute_distribution(self) -> dict[str, int]:
+        distribution = {decision: 0 for decision in CURRENT_DECISIONS}
+        for decision in self.decisions:
+            verdict = decision.get("decision", {}).get("verdict")
+            if verdict in distribution:
+                distribution[verdict] += 1
+        return distribution
+
+    def _compute_latency_stats(self) -> dict[str, float]:
+        latencies = sorted(
+            float(d["processing_time_ms"])
+            for d in self.decisions
+            if "processing_time_ms" in d
+        )
+        if not latencies:
+            return {}
+        def percentile(q: float) -> float:
+            if len(latencies) == 1:
+                return latencies[0]
+            index = (len(latencies) - 1) * q
+            lower = int(index)
+            upper = min(lower + 1, len(latencies) - 1)
+            fraction = index - lower
+            return latencies[lower] + (latencies[upper] - latencies[lower]) * fraction
+        return {
+            "p50": percentile(0.50),
+            "p95": percentile(0.95),
+            "p99": percentile(0.99),
+            "mean": sum(latencies) / len(latencies),
+            "max": max(latencies),
+        }
+
+    def _compute_scenario_breakdown(self) -> dict[str, dict[str, int]]:
+        breakdown: dict[str, dict[str, int]] = {}
+        for scenario in ScenarioType:
+            rows = [d for d in self.decisions if d.get("scenario") == scenario.value]
+            if rows:
+                breakdown[scenario.value] = {
+                    "total": len(rows),
+                    **{
+                        decision.lower(): sum(
+                            1 for row in rows
+                            if row.get("decision", {}).get("verdict") == decision
+                        )
+                        for decision in CURRENT_DECISIONS
+                    },
+                }
+        return breakdown
+
+
 def write_jsonl(events: list[dict[str, Any]], output: Path) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     with output.open("w", encoding="utf-8") as handle:
