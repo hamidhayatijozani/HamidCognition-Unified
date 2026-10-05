@@ -4,20 +4,22 @@ This file is the execution control for turning HamidCognition-Unified into a coh
 
 ## Canonical product
 
-Current product boundary: **HamidCognition Action Gate v1.1.0**.
+Current product boundary: **HamidCognition Action Gate**.
 
-The executable product version is sourced from `action_gate/VERSION`. The current main branch is the v1.1.0 development/release-candidate line.
+The executable product version is sourced from `action_gate/VERSION`.
 
-**Offerable release and current product version are separate facts:** v1.0.10 is the last independently validated and published commercial release. v1.1.0 must not be presented as an offerable published release until its exact source SHA, CI evidence, artifact digest and release record are validated together.
+**Current main development line:** v1.1.1.
 
-The commercial product is the executable Action Gate boundary. Research lines remain separate evidence-bearing assets until they have their own implementation, tests, reproducibility record, and explicit product boundary.
+**Latest independently validated and published commercial release:** v1.1.1, release tag `action-gate-v1.1.1`, source commit `e9ea7565f4ddea91f5c45104237bd20564c80894`.
+
+The v1.1.1 release evidence is bound to the exact source revision above. The mutable `main` branch may move beyond that revision and therefore is not automatically equivalent to the immutable release.
 
 ## Completion gates
 
 1. **Repository integrity**
    - one canonical main branch;
    - version references agree with `action_gate/VERSION`;
-   - obsolete product claims are removed or marked historical;
+   - obsolete product claims are removed or explicitly marked historical;
    - provenance and rights records remain intact.
 
 2. **Executable integrity**
@@ -42,26 +44,58 @@ The commercial product is the executable Action Gate boundary. Research lines re
 5. **Research portfolio**
    - every research line is classified as IMPLEMENTED, HYPOTHESIS, UNKNOWN, FALSIFIED or SUPERSEDED;
    - only evidence-backed candidates move toward productization;
-   - opportunities outside the repository are evaluated separately for challenge, bounty, grant or prize eligibility.
+   - opportunities outside the repository are evaluated separately.
+
+## Verified v1.1.1 release evidence
+
+The release-candidate workflow completed successfully for source commit `e9ea7565f4ddea91f5c45104237bd20564c80894`:
+
+- workflow run: `36966012148`;
+- release tag: `action-gate-v1.1.1`;
+- release artifact: `action-gate-1.1.1.tar`;
+- release artifact SHA-256: `517064de0427286ff4f346d46996642aca3b9def891d1c08bfaebc25546fb791`;
+- release-candidate evidence artifact digest: `sha256:2e59173f96517cff0f02dc0e3ef88dc5ba6604c0eb3be3d46cb0c823168d127`;
+- workflow result: success.
+
+The workflow job explicitly checked out the validated revision, read the canonical version, validated the release baseline, built the production image, exported the image archive, generated SHA-256 evidence, created the release manifest, and uploaded release evidence.
+
+## Mainline rule
+
+A successful release run proves the tested release revision. It does **not** prove later commits on `main`.
+
+Therefore:
+
+```
+RELEASE_VERIFIED(commit X)
+≠
+MAIN_VERIFIED(commit Y)
+```
+
+unless `X == Y` or a new verification chain proves `Y`.
+
+## Documentation execution-gap rule
+
+The repository treats **DOCUMENTATION_EXECUTION_GAP** as a failure hypothesis, not as a fact. It is considered falsified only when claims can be traced through:
+
+```
+SOURCE SHA
+→ clean checkout
+→ execution
+→ real output
+→ artifact
+→ digest
+→ independent reproduction
+→ release record
+```
+
+No document may upgrade an unverified claim to VERIFIED merely by repeating it.
 
 ## Portfolio rule
 
 Do not merge research into the commercial runtime merely because it is interesting. Promote a research line only when it provides a concrete capability, an executable test, reproducible evidence, and a defensible user problem.
 
-## Opportunity pipeline
+## Commercial truth
 
-**Discover → verify eligibility → estimate effort → build minimum winning artifact → validate → submit → preserve evidence.**
+Technical release evidence does not establish customer transaction, revenue, regulatory certification, universal AI safety, downstream correctness, or guaranteed business outcomes.
 
-No prize or market claim is considered real until its external rules and the submission evidence are verified.
-
-## Current product state
-
-**Current development product: Action Gate v1.1.0.**
-
-**Last validated published commercial release: Action Gate v1.0.10.**
-
-Current release evidence is valid only when the same source SHA is used by the product evidence, workflow run, artifact digest and release record.
-
-Commercial payment is USDT only. Payment settlement is deliberately outside the Action Gate authorization path and is governed by PRODUCT/USDT_PAYMENT_POLICY.md.
-
-The product is not considered commercially verified merely because the repository contains release documents. A current offerable release requires same-SHA product/security/clean-room validation and a reproducible release artifact, followed by customer-specific acceptance for production execution.
+Commercial payment remains governed separately by `PRODUCT/USDT_PAYMENT_POLICY.md`.
