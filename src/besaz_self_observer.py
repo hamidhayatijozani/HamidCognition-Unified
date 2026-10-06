@@ -13,10 +13,15 @@ def observe() -> dict:
     proposals=[]
     for c in registry.contracts.values():
         state=registry.component(c.component_id).snapshot()
+        # Observation maturity is evidence-bound: a VERIFIED/PRODUCTION contract
+        # with no runtime evidence must never be serialized as VERIFIED/PRODUCTION.
+        observed_maturity = c.maturity.value
+        if observed_maturity in {"VERIFIED", "PRODUCTION"} and not state["state"]["evidence_refs"]:
+            observed_maturity = "PROTOTYPE"
         components.append({
             "component_id": c.component_id,
             "parent_id": c.parent_id,
-            "maturity": c.maturity.value,
+            "maturity": observed_maturity,
             "status": state["state"]["status"],
             "evidence_refs": state["state"]["evidence_refs"],
             "capabilities": list(c.capabilities),
