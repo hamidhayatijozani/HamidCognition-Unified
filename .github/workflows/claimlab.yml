@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install test runner
-        run: python -m pip install --upgrade pip pytest fastapi httpx uvicorn pydantic
+        run: python -m pip install --upgrade pip pytest fastapi httpx uvicorn pydantic "psycopg[binary]"
       - name: Run ClaimLab tests
         run: python -m pytest -q tests/test_claimlab.py
       - name: Compile ClaimLab
