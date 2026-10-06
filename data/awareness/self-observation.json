@@ -346,9 +346,7 @@
         "y"
       ],
       "component_id": "VERIFICATION",
-      "evidence_refs": [
-        "release:action-gate-v1.1.1:artifact-sha256:517064de0427286ff4f346d46996642aca3b9def891d1c08bfaebc25546fb791"
-      ],
+      "evidence_refs": [],
       "limits": [
         "cannot manufacture proof"
       ],
@@ -395,7 +393,7 @@
   ],
   "hard_boundary": "self-observation cannot execute, self-upgrade, self-grant authority, or rewrite contracts",
   "mode": "SELF_OBSERVE_ONLY",
-  "observation_time": "2026-10-06T03:22:49.304195+00:00",
+  "observation_time": "2026-10-06T14:12:10.704057+00:00",
   "project": "BESAZ",
   "proposals": [
     {
