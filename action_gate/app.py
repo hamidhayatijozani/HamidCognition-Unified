@@ -19,6 +19,7 @@ from csg_routes import router as csg_router
 from keyring import configured_key_ids, current_key_id, current_secret, verify_with_keyring
 from policy_store import load_policy, policy_hash
 from security_authority import issue_authority
+from initiative import InitiativeRequest, propose as propose_initiative
 
 APP_VERSION = Path(__file__).with_name("VERSION").read_text(encoding="utf-8").strip()
 API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
@@ -352,6 +353,66 @@ def ensure_live(record: dict[str, Any]):
         raise HTTPException(409, "decision_nonce_already_consumed")
     if datetime.fromisoformat(record["expires_at"]) <= datetime.now(timezone.utc):
         raise HTTPException(403, "decision_expired")
+
+
+class InitiativeEvidenceItem(BaseModel):
+    source: str
+    verified: bool = False
+    supports: list[str] = Field(default_factory=list)
+    note: str | None = None
+
+
+class InitiativeRequestModel(BaseModel):
+    tenant_id: str
+    actor_id: str
+    session_id: str
+    goal: str
+    state: dict[str, Any] = Field(default_factory=dict)
+    evidence: list[InitiativeEvidenceItem] = Field(default_factory=list)
+    prior_actions: list[dict[str, Any]] = Field(default_factory=list)
+    constraints: list[str] = Field(default_factory=list)
+    allow_external_side_effect: bool = False
+    max_candidates: int = Field(default=3, ge=1, le=10)
+
+
+@app.post("/v1/initiative/propose")
+def initiative_propose(req: InitiativeRequestModel, authorization: str | None = Header(default=None)):
+    """Construct bounded next-action candidates without executing them."""
+    require_auth(authorization)
+    enforce_rate_limit(authorization, req.tenant_id)
+    result = propose_initiative(InitiativeRequest(
+        goal=req.goal,
+        state=req.state,
+        evidence=tuple({
+            "source": item.source,
+            "verified": item.verified,
+            "supports": tuple(item.supports),
+            "note": item.note,
+        } for item in req.evidence),
+        prior_actions=tuple(req.prior_actions),
+        constraints=tuple(req.constraints),
+        allow_external_side_effect=req.allow_external_side_effect,
+        max_candidates=req.max_candidates,
+    ))
+    return {
+        "tenant_id": req.tenant_id,
+        "actor_id": req.actor_id,
+        "session_id": req.session_id,
+        "status": result.status,
+        "candidates": [
+            {
+                "action": candidate.action,
+                "rationale": candidate.rationale,
+                "mode": candidate.mode.value,
+                "requires_gate": candidate.requires_gate,
+                "evidence_refs": list(candidate.evidence_refs),
+                "fingerprint": candidate.fingerprint,
+            }
+            for candidate in result.candidates
+        ],
+        "reasoning_trace": list(result.reasoning_trace),
+        "execution_boundary": "Action Gate remains authoritative; proposals are not execution.",
+    }
 
 
 @app.get("/health")
