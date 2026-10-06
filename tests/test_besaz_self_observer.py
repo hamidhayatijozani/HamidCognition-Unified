@@ -12,3 +12,10 @@ def test_self_observer_sees_all_components():
     assert len(report["components"])==15
     assert len(report["bindings"])==15
     assert report["proposals"]
+
+
+def test_observed_verified_maturity_requires_runtime_evidence():
+    payload = observe()
+    for component in payload["components"]:
+        if component["maturity"] in {"VERIFIED", "PRODUCTION"}:
+            assert component["evidence_refs"], component["component_id"]
