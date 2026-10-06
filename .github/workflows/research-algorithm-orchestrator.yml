@@ -1,0 +1,32 @@
+name: Research Algorithm Orchestrator
+
+on:
+  push:
+    branches: [main, feat/research-algorithm-orchestrator]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  orchestrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test dependencies
+        run: python -m pip install -U pytest
+      - name: Execute orchestrator test
+        run: pytest -q tests/test_algorithm_orchestrator.py
+      - name: Execute orchestrator and emit evidence
+        run: |
+          python -m RESEARCH.algorithm_orchestrator > algorithm-orchestrator-evidence.json
+          python -m json.tool algorithm-orchestrator-evidence.json >/dev/null
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: research-algorithm-orchestrator
+          path: algorithm-orchestrator-evidence.json
