@@ -14,6 +14,8 @@ The executable product version is sourced from `action_gate/VERSION`.
 
 The v1.1.1 release evidence is bound to the exact source revision above. The mutable `main` branch may move beyond that revision and therefore is not automatically equivalent to the immutable release.
 
+For every mainline verification record, the evidence pack must state the **same source SHA** as `GITHUB_SHA`; a successful release record for an older commit does not satisfy this requirement.
+
 ## Completion gates
 
 1. **Repository integrity**
