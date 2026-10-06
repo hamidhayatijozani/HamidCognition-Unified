@@ -1,0 +1,47 @@
+name: Research Completion Harness
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "RESEARCH/research_completion.py"
+      - "RESEARCH/algorithm_orchestrator.py"
+      - "RESEARCH/EXP003EXTERNAL_REPLAY.py"
+      - "RESEARCH/EXP004_WALKFORWARD.py"
+      - "RESEARCH/EXP004_VALIDATOR.py"
+      - "RESEARCH/EXP005_ADVERSARIAL.py"
+      - "RESEARCH/experiments/sti_001.py"
+      - "RESEARCH/market_lab/**"
+
+jobs:
+  completion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Execute all currently executable research lines
+        run: python RESEARCH/research_completion.py
+      - name: Validate aggregate evidence
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path("RESEARCH/RESEARCH_COMPLETION_RESULT.json").read_text())
+          assert p["status"] == "COMPLETE_AT_EXECUTION_BOUNDARY"
+          assert all(r["status"] == "EXECUTED_SUCCESS" for r in p["runs"])
+          PY
+      - name: Upload aggregate evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: research-completion-evidence
+          path: |
+            RESEARCH/RESEARCH_COMPLETION_RESULT.json
+            RESEARCH/EXP003RESULT.json
+            RESEARCH/EXP004RESULT.json
+            RESEARCH/MAAT_THOTH_PAPER_001_RESULT.json
