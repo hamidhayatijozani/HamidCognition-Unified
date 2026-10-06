@@ -152,24 +152,7 @@
     },
     {
       "capabilities": [
-        "r",
-        "e",
-        "f",
-        "r",
-        "e",
-        "s",
-        "h",
-        "_",
-        "c",
-        "a",
-        "p",
-        "a",
-        "b",
-        "i",
-        "l",
-        "i",
-        "t",
-        "y"
+        "refresh_capability"
       ],
       "component_id": "SELF-MODEL",
       "evidence_refs": [],
@@ -182,20 +165,7 @@
     },
     {
       "capabilities": [
-        "r",
-        "e",
-        "c",
-        "o",
-        "r",
-        "d",
-        "_",
-        "c",
-        "o",
-        "n",
-        "t",
-        "e",
-        "x",
-        "t"
+        "record_context"
       ],
       "component_id": "CREATOR-CONTEXT",
       "evidence_refs": [],
@@ -222,15 +192,7 @@
     },
     {
       "capabilities": [
-        "r",
-        "e",
-        "c",
-        "o",
-        "m",
-        "p",
-        "u",
-        "t",
-        "e"
+        "recompute"
       ],
       "component_id": "REASONING",
       "evidence_refs": [],
@@ -243,16 +205,7 @@
     },
     {
       "capabilities": [
-        "r",
-        "u",
-        "n",
-        "_",
-        "p",
-        "r",
-        "o",
-        "m",
-        "p",
-        "t"
+        "run_prompt"
       ],
       "component_id": "PROMPTS",
       "evidence_refs": [],
@@ -265,16 +218,7 @@
     },
     {
       "capabilities": [
-        "r",
-        "u",
-        "n",
-        "_",
-        "m",
-        "o",
-        "d",
-        "u",
-        "l",
-        "e"
+        "run_module"
       ],
       "component_id": "MODULES",
       "evidence_refs": [],
@@ -287,17 +231,7 @@
     },
     {
       "capabilities": [
-        "i",
-        "n",
-        "v",
-        "o",
-        "k",
-        "e",
-        "_",
-        "t",
-        "o",
-        "o",
-        "l"
+        "invoke_tool"
       ],
       "component_id": "TOOLS",
       "evidence_refs": [],
@@ -310,22 +244,7 @@
     },
     {
       "capabilities": [
-        "a",
-        "d",
-        "v",
-        "a",
-        "n",
-        "c",
-        "e",
-        "_",
-        "w",
-        "o",
-        "r",
-        "k",
-        "f",
-        "l",
-        "o",
-        "w"
+        "advance_workflow"
       ],
       "component_id": "WORKFLOWS",
       "evidence_refs": [],
@@ -338,30 +257,20 @@
     },
     {
       "capabilities": [
-        "v",
-        "e",
-        "r",
-        "i",
-        "f",
-        "y"
+        "verify"
       ],
       "component_id": "VERIFICATION",
       "evidence_refs": [],
       "limits": [
         "cannot manufacture proof"
       ],
-      "maturity": "VERIFIED",
+      "maturity": "PROTOTYPE",
       "parent_id": "FEEDBACK",
       "status": "READY"
     },
     {
       "capabilities": [
-        "r",
-        "e",
-        "c",
-        "o",
-        "r",
-        "d"
+        "record"
       ],
       "component_id": "MEMORY",
       "evidence_refs": [],
@@ -374,12 +283,7 @@
     },
     {
       "capabilities": [
-        "u",
-        "p",
-        "d",
-        "a",
-        "t",
-        "e"
+        "update"
       ],
       "component_id": "LEARNING",
       "evidence_refs": [],
