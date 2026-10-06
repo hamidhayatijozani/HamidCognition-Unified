@@ -152,7 +152,24 @@
     },
     {
       "capabilities": [
-        "refresh_capability"
+        "r",
+        "e",
+        "f",
+        "r",
+        "e",
+        "s",
+        "h",
+        "_",
+        "c",
+        "a",
+        "p",
+        "a",
+        "b",
+        "i",
+        "l",
+        "i",
+        "t",
+        "y"
       ],
       "component_id": "SELF-MODEL",
       "evidence_refs": [],
@@ -165,7 +182,20 @@
     },
     {
       "capabilities": [
-        "record_context"
+        "r",
+        "e",
+        "c",
+        "o",
+        "r",
+        "d",
+        "_",
+        "c",
+        "o",
+        "n",
+        "t",
+        "e",
+        "x",
+        "t"
       ],
       "component_id": "CREATOR-CONTEXT",
       "evidence_refs": [],
@@ -192,7 +222,15 @@
     },
     {
       "capabilities": [
-        "recompute"
+        "r",
+        "e",
+        "c",
+        "o",
+        "m",
+        "p",
+        "u",
+        "t",
+        "e"
       ],
       "component_id": "REASONING",
       "evidence_refs": [],
@@ -205,7 +243,16 @@
     },
     {
       "capabilities": [
-        "run_prompt"
+        "r",
+        "u",
+        "n",
+        "_",
+        "p",
+        "r",
+        "o",
+        "m",
+        "p",
+        "t"
       ],
       "component_id": "PROMPTS",
       "evidence_refs": [],
@@ -218,7 +265,16 @@
     },
     {
       "capabilities": [
-        "run_module"
+        "r",
+        "u",
+        "n",
+        "_",
+        "m",
+        "o",
+        "d",
+        "u",
+        "l",
+        "e"
       ],
       "component_id": "MODULES",
       "evidence_refs": [],
@@ -231,7 +287,17 @@
     },
     {
       "capabilities": [
-        "invoke_tool"
+        "i",
+        "n",
+        "v",
+        "o",
+        "k",
+        "e",
+        "_",
+        "t",
+        "o",
+        "o",
+        "l"
       ],
       "component_id": "TOOLS",
       "evidence_refs": [],
@@ -244,7 +310,22 @@
     },
     {
       "capabilities": [
-        "advance_workflow"
+        "a",
+        "d",
+        "v",
+        "a",
+        "n",
+        "c",
+        "e",
+        "_",
+        "w",
+        "o",
+        "r",
+        "k",
+        "f",
+        "l",
+        "o",
+        "w"
       ],
       "component_id": "WORKFLOWS",
       "evidence_refs": [],
@@ -257,7 +338,12 @@
     },
     {
       "capabilities": [
-        "verify"
+        "v",
+        "e",
+        "r",
+        "i",
+        "f",
+        "y"
       ],
       "component_id": "VERIFICATION",
       "evidence_refs": [],
@@ -270,7 +356,12 @@
     },
     {
       "capabilities": [
-        "record"
+        "r",
+        "e",
+        "c",
+        "o",
+        "r",
+        "d"
       ],
       "component_id": "MEMORY",
       "evidence_refs": [],
@@ -283,7 +374,12 @@
     },
     {
       "capabilities": [
-        "update"
+        "u",
+        "p",
+        "d",
+        "a",
+        "t",
+        "e"
       ],
       "component_id": "LEARNING",
       "evidence_refs": [],
@@ -297,7 +393,7 @@
   ],
   "hard_boundary": "self-observation cannot execute, self-upgrade, self-grant authority, or rewrite contracts",
   "mode": "SELF_OBSERVE_ONLY",
-  "observation_time": "2026-10-06T14:42:09.666856+00:00",
+  "observation_time": "2026-10-06T15:38:07.495917+00:00",
   "project": "BESAZ",
   "proposals": [
     {
