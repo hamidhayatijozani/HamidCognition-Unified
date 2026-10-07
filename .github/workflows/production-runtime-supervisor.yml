@@ -1,0 +1,52 @@
+name: Production Runtime Supervisor
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/10 * * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check deployment target configuration
+        id: config
+        env:
+          PRODUCTION_BASE_URL: ${{ secrets.PRODUCTION_BASE_URL }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${PRODUCTION_BASE_URL:-}" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "PRODUCTION_BASE_URL is not configured. Runtime probe skipped."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+            echo "Production target configured."
+          fi
+
+      - name: Probe production dashboard
+        if: steps.config.outputs.configured == 'true'
+        env:
+          PRODUCTION_BASE_URL: ${{ secrets.PRODUCTION_BASE_URL }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="${PRODUCTION_BASE_URL%/}"
+          echo "== Dashboard health =="
+          curl --fail --silent --show-error --max-time 20 "$base/health"
+          echo
+          echo "== Dashboard root =="
+          curl --fail --silent --show-error --max-time 20 -I "$base/" >/dev/null
+          echo "Production dashboard is reachable."
+
+      - name: Record pending deployment state
+        if: steps.config.outputs.configured != 'true'
+        run: |
+          echo "Runtime supervisor installed."
+          echo "Deployment target will be probed automatically after PRODUCTION_BASE_URL is configured."
