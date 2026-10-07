@@ -3,7 +3,6 @@ import hmac
 import json
 import os
 import tempfile
-import uuid
 
 import pytest
 
@@ -15,21 +14,25 @@ os.environ.setdefault("ACTION_GATE_ENV", "development")
 
 from fastapi.testclient import TestClient
 import app as gate
-from state_oracle import commit_snapshot
 
 
 client = TestClient(gate.app)
 
 
 @pytest.fixture(autouse=True)
-def production_runtime():
+def production_runtime(monkeypatch):
     gate.ENVIRONMENT = "production"
     gate.API_TOKEN = "final-token"
     gate.SIGNING_SECRET = "final-signing-secret"
     gate.APPROVAL_SECRET = "final-approval-secret"
     gate.REQUIRE_SESSION_BINDING = True
-    gate.STATE_ORACLE_SECRET = "ci-csg-state-oracle-secret"
-    commit_snapshot({"source": "test-final-authority", "status": "ready", "execution_boundary": "test"}, world_version=f"final-authority-test-world-{uuid.uuid4().hex}")
+    monkeypatch.setattr(gate, "get_current_snapshot", lambda: {
+        "snapshot_id": "test-final-authority-snapshot",
+        "world_version": "final-authority-test-world",
+        "snapshot_hash": "test-final-authority-hash",
+        "snapshot": {"source": "test-final-authority", "status": "ready"},
+        "committed_at": "2026-01-01T00:00:00+00:00",
+    })
     yield
     gate.ENVIRONMENT = "development"
     gate.API_TOKEN = os.environ.get("ACTION_GATE_API_TOKEN") or "ci-csg-token"
