@@ -67,7 +67,7 @@ def run():
         evaluate={"agent_id":"risk-lab-agent","actor_id":ACTOR,"session_id":SESSION,"tenant_id":TENANT,"action":ACTION,"target":TARGET,"parameters":payload}
         _,ev=request("http://127.0.0.1:8000/v1/action/evaluate",evaluate,{"Authorization":f"Bearer {TOKEN}"})
         assert ev["decision"]=="ALLOW",ev
-        reserve={"tenant_id":TENANT,"actor_id":ACTOR,"session_id":SESSION,"action_hash":ev["action_hash"],"nonce":ev["nonce"]}
+        reserve={"tenant_id":TENANT,"actor_id":ACTOR,"session_id":SESSION,"action_hash":ev["action_hash"],"nonce":ev["nonce"],"world_version":ev.get("world_version")}
         _,res=request(f"http://127.0.0.1:8000/v1/action/{ev['decision_id']}/execution/reserve",reserve,{"Authorization":f"Bearer {TOKEN}"})
         headers={"X-HCJ-Execution-Authority":res["execution_authority"],"X-HCJ-Action-Hash":ev["action_hash"],"X-HCJ-Policy-Hash":ev["policy_hash"],"X-Tenant-ID":TENANT}
         g_status,g_body=request("http://127.0.0.1:9000/tool",payload,headers)
