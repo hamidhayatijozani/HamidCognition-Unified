@@ -21,6 +21,7 @@ jobs:
       POSTGRES_PASSWORD: e2e-postgres-password
       ACTION_GATE_API_TOKEN: e2e-action-gate-token
       ACTION_GATE_SIGNING_SECRET: e2e-signing-secret
+      ACTION_GATE_APPROVAL_SECRET: e2e-approval-secret
       ACTION_GATE_AUTHORITY_SECRET: e2e-authority-secret
       MCP_BEARER_TOKEN: e2e-mcp-bearer-token
       MCP_ISSUER_URL: https://e2e.invalid
@@ -34,30 +35,17 @@ jobs:
 
       - name: Build and start production stack with ephemeral tunnel
         run: |
-          docker compose \
-            -f action_gate/docker-compose.production.yml \
-            -f action_gate/docker-compose.chatgpt-quick-tunnel.yml \
-            up -d --build
+          docker compose             -f action_gate/docker-compose.production.yml             -f action_gate/docker-compose.chatgpt-quick-tunnel.yml             up -d --build
 
       - name: Wait for PostgreSQL, Action Gate and MCP readiness
         run: |
           set -euo pipefail
           for i in {1..60}; do
-            if docker compose \
-              -f action_gate/docker-compose.production.yml \
-              -f action_gate/docker-compose.chatgpt-quick-tunnel.yml \
-              exec -T postgres pg_isready -U action_gate -d action_gate >/dev/null 2>&1 && \
-              docker compose \
-              -f action_gate/docker-compose.production.yml \
-              -f action_gate/docker-compose.chatgpt-quick-tunnel.yml \
-              exec -T action-gate python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health').read()" >/dev/null 2>&1; then
+            if docker compose               -f action_gate/docker-compose.production.yml               -f action_gate/docker-compose.chatgpt-quick-tunnel.yml               exec -T postgres pg_isready -U action_gate -d action_gate >/dev/null 2>&1 &&               docker compose               -f action_gate/docker-compose.production.yml               -f action_gate/docker-compose.chatgpt-quick-tunnel.yml               exec -T action-gate python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health').read()" >/dev/null 2>&1; then
               break
             fi
             if [ "$i" -eq 60 ]; then
-              docker compose \
-                -f action_gate/docker-compose.production.yml \
-                -f action_gate/docker-compose.chatgpt-quick-tunnel.yml \
-                logs --no-color action-gate
+              docker compose                 -f action_gate/docker-compose.production.yml                 -f action_gate/docker-compose.chatgpt-quick-tunnel.yml                 logs --no-color action-gate
               exit 1
             fi
             sleep 2
@@ -70,12 +58,7 @@ jobs:
           set -euo pipefail
           for i in {1..60}; do
             url="$(
-              docker compose \
-                -f action_gate/docker-compose.production.yml \
-                -f action_gate/docker-compose.chatgpt-quick-tunnel.yml \
-                logs chatgpt-quick-tunnel 2>&1 \
-                | grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' | grep -v '^https://api\.trycloudflare\.com$' \
-                | head -n1 || true
+              docker compose                 -f action_gate/docker-compose.production.yml                 -f action_gate/docker-compose.chatgpt-quick-tunnel.yml                 logs chatgpt-quick-tunnel 2>&1                 | grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' | grep -v '^https://api\.trycloudflare\.com$'                 | head -n1 || true
             )"
             if [ -n "$url" ]; then
               endpoint="$url/mcp"
@@ -100,18 +83,12 @@ jobs:
                 sleep 2
               done
               echo "Tunnel URL was discovered but never became DNS/HTTPS reachable: $endpoint"
-              docker compose \
-                -f action_gate/docker-compose.production.yml \
-                -f action_gate/docker-compose.chatgpt-quick-tunnel.yml \
-                logs --no-color chatgpt-quick-tunnel
+              docker compose                 -f action_gate/docker-compose.production.yml                 -f action_gate/docker-compose.chatgpt-quick-tunnel.yml                 logs --no-color chatgpt-quick-tunnel
               exit 1
             fi
             sleep 2
           done
-          docker compose \
-            -f action_gate/docker-compose.production.yml \
-            -f action_gate/docker-compose.chatgpt-quick-tunnel.yml \
-            logs --no-color chatgpt-quick-tunnel
+          docker compose             -f action_gate/docker-compose.production.yml             -f action_gate/docker-compose.chatgpt-quick-tunnel.yml             logs --no-color chatgpt-quick-tunnel
           exit 1
 
       - name: Verify E2E environment
@@ -134,12 +111,7 @@ jobs:
           for attempt in {1..8}; do
             echo "MCP E2E attempt $attempt/8"
             url="$(
-              docker compose \
-                -f action_gate/docker-compose.production.yml \
-                -f action_gate/docker-compose.chatgpt-quick-tunnel.yml \
-                logs chatgpt-quick-tunnel 2>&1 \
-                | grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' | grep -v '^https://api\.trycloudflare\.com$' \
-                | tail -n1 || true
+              docker compose                 -f action_gate/docker-compose.production.yml                 -f action_gate/docker-compose.chatgpt-quick-tunnel.yml                 logs chatgpt-quick-tunnel 2>&1                 | grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' | grep -v '^https://api\.trycloudflare\.com$'                 | tail -n1 || true
             )"
             if [ -z "$url" ]; then
               echo "No current Quick Tunnel URL found."
@@ -182,19 +154,10 @@ jobs:
       - name: Collect service diagnostics
         if: always()
         run: |
-          docker compose \
-            -f action_gate/docker-compose.production.yml \
-            -f action_gate/docker-compose.chatgpt-quick-tunnel.yml \
-            ps
-          docker compose \
-            -f action_gate/docker-compose.production.yml \
-            -f action_gate/docker-compose.chatgpt-quick-tunnel.yml \
-            logs --no-color --tail=200 chatgpt-mcp action-gate tool chatgpt-quick-tunnel || true
+          docker compose             -f action_gate/docker-compose.production.yml             -f action_gate/docker-compose.chatgpt-quick-tunnel.yml             ps
+          docker compose             -f action_gate/docker-compose.production.yml             -f action_gate/docker-compose.chatgpt-quick-tunnel.yml             logs --no-color --tail=200 chatgpt-mcp action-gate tool chatgpt-quick-tunnel || true
 
       - name: Tear down
         if: always()
         run: |
-          docker compose \
-            -f action_gate/docker-compose.production.yml \
-            -f action_gate/docker-compose.chatgpt-quick-tunnel.yml \
-            down -v
+          docker compose             -f action_gate/docker-compose.production.yml             -f action_gate/docker-compose.chatgpt-quick-tunnel.yml             down -v
