@@ -33,6 +33,8 @@
     <label>Action<input id="action" name="action" value="read_customer" maxlength="256" required></label>
     <label>Target<input id="target" name="target" value="customer/123" maxlength="2048"></label>
     <div class="form-grid">
+      <label>Tenant<input id="tenant" name="tenant" value="dashboard-demo" maxlength="128"></label>
+      <label>Session<input id="session" name="session" value="dashboard-session" maxlength="128"></label>
       <label>Agent<input id="agent" name="agent" value="hamidcognition-console" maxlength="128"></label>
       <label>Actor<input id="actor" name="actor" value="dashboard-user" maxlength="128"></label>
     </div>
@@ -55,7 +57,7 @@
     <div><span>Policy</span><strong id="decision-policy">—</strong></div>
     <div><span>Expires</span><strong id="decision-expires">—</strong></div>
   </div>
-  <div class="trace-line" id="trace-line">Submit an action to create a trace.</div>
+  <div class="trace-line" id="trace-line">Submit an action to create a trace.</div><div class="preset-row"><button type="button" class="ghost" id="approve-action" disabled>Approve ASK</button><button type="button" class="ghost" id="execute-action" disabled>Execute through enforcement</button></div>
   <details class="json-block"><summary>Raw decision response</summary><pre id="decision-json">{}</pre></details>
 </section>
 </div>
