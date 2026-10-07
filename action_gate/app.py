@@ -663,6 +663,12 @@ def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | 
         raise HTTPException(409, "execution_session_binding_mismatch")
     if outcome.nonce != record["nonce"]:
         raise HTTPException(409, "execution_nonce_mismatch")
+    if record.get("world_version") is not None and outcome.world_version != record.get("world_version"):
+        raise HTTPException(409, "execution_world_version_mismatch")
+    if record.get("evidence_state", {}).get("contradictions"):
+        raise HTTPException(409, "execution_blocked_by_evidence_contradiction")
+    if record.get("evidence_state", {}).get("status") == "BLOCK":
+        raise HTTPException(409, "execution_blocked_by_evidence_state")
     if record["approval"] and record["approval"].get("approved") and datetime.fromisoformat(record["approval"]["expires_at"]) <= datetime.now(timezone.utc):
         raise HTTPException(403, "approval_expired")
     if record.get("execution_started_at") is None:
