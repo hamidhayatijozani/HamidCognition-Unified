@@ -94,7 +94,8 @@
     "tests/test_claimlab.py",
     "tests/test_commercial_sale.py",
     "tests/test_ssrf_guard.py",
-    "tools/run_risk_lab_demo.py"
+    "tools/run_risk_lab_demo.py",
+    "evidence/release-integrity-v1.0.10.md"
   ],
   "policy": "action_gate/VERSION is the sole canonical product-version source; derived files are synchronized product documents; ignored files are historical, compatibility, CI, configuration, or implementation artifacts and do not establish current product version."
 }
