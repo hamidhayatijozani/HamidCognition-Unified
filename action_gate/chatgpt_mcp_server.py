@@ -163,6 +163,7 @@ def protected_read_public_file(target: str) -> dict[str, Any]:
         session_id=session_id,
         action_hash=evaluated["action_hash"],
         nonce=evaluated["nonce"],
+        world_version=evaluated.get("world_version"),
     )
     try:
         result = call_protected_tool(
