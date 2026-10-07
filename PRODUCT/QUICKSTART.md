@@ -6,6 +6,26 @@ Action Gate is a deployable policy-enforcement boundary between an agent and pro
 
 The canonical product version is defined only by action_gate/VERSION. The published release identity is maintained in PRODUCT/CURRENT_COMMERCIAL_RELEASE.md. This document deliberately does not duplicate a version or release tag.
 
+## Local deployment commands
+
+From the repository root:
+
+```bash
+cp PRODUCT/.env.example .env
+# Replace every REPLACE_IN_SECRET_MANAGER value with unique secrets.
+# Also set POSTGRES_PASSWORD, DOMAIN, ACTION_GATE_API_TOKEN,
+# ACTION_GATE_AUTHORITY_SECRET and MCP_BEARER_TOKEN.
+
+docker compose -f action_gate/docker-compose.production.yml --env-file .env build
+docker compose -f action_gate/docker-compose.production.yml --env-file .env up -d
+docker compose -f action_gate/docker-compose.production.yml --env-file .env ps
+docker compose -f action_gate/docker-compose.production.yml --env-file .env logs --tail=200 action-gate enforcement tool
+```
+
+The public edge is Caddy on ports 80/443. Action Gate and the protected tool are not directly published. Do not expose ports 8000 or 9000 to the Internet.
+
+For a first non-production smoke test, keep production execution disabled and complete the acceptance procedure before enabling real execution.
+
 ## Production deployment
 
 The production Compose definition is action_gate/docker-compose.production.yml.
