@@ -141,6 +141,7 @@ class ActionRequest(BaseModel):
     context: dict[str, Any] = Field(default_factory=dict)
     evidence: list[dict[str, Any]] = Field(default_factory=list)
     risk_hint: str | None = None
+    world_version: str | None = None
 
 
 class Approval(BaseModel):
@@ -154,12 +155,73 @@ class Approval(BaseModel):
     approval_signature: str | None = None
 
 
+class FactState(BaseModel):
+    """Evidence truth-state metadata. State is explicit and never inferred as trust."""
+    state: Literal["FACT", "VERIFIED_FACT", "OBSERVATION", "DERIVED", "PREDICTION", "CLAIM", "UNKNOWN", "STALE", "CONTRADICTED"]
+    source: str | None = None
+    observed_at: str | None = None
+    expires_at: str | None = None
+    confidence: float | None = Field(default=None, ge=0.0, le=1.0)
+
+
+def normalize_evidence(evidence: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Normalize evidence state and detect explicit contradictions without inventing facts."""
+    normalized: list[dict[str, Any]] = []
+    contradictions: list[dict[str, Any]] = []
+    seen: dict[str, tuple[Any, str]] = {}
+    allowed = {"FACT", "VERIFIED_FACT", "OBSERVATION", "DERIVED", "PREDICTION", "CLAIM", "UNKNOWN", "STALE", "CONTRADICTED"}
+
+    for item in evidence:
+        row = dict(item)
+        state = str(row.get("state", "UNKNOWN")).upper()
+        if state not in allowed:
+            state = "UNKNOWN"
+        row["state"] = state
+
+        key = row.get("key") or row.get("subject") or row.get("name")
+        if key is not None and "value" in row:
+            key = str(key)
+            value = row.get("value")
+            if key in seen and seen[key][0] != value:
+                contradiction = {
+                    "key": key,
+                    "previous_value": seen[key][0],
+                    "current_value": value,
+                    "previous_state": seen[key][1],
+                    "current_state": state,
+                    "reason": "conflicting_evidence_values",
+                }
+                contradictions.append(contradiction)
+            else:
+                seen[key] = (value, state)
+
+        expires_at = row.get("expires_at")
+        if expires_at:
+            try:
+                if datetime.fromisoformat(str(expires_at)) <= datetime.now(timezone.utc):
+                    row["state"] = "STALE"
+            except ValueError:
+                row["state"] = "UNKNOWN"
+
+        normalized.append(row)
+
+    return normalized, contradictions
+
+
+def evidence_gate(evidence: list[dict[str, Any]]) -> tuple[str, list[dict[str, Any]], list[dict[str, Any]]]:
+    normalized, contradictions = normalize_evidence(evidence)
+    blocking_states = {"UNKNOWN", "STALE", "CONTRADICTED"}
+    blocking = [x for x in normalized if x.get("state") in blocking_states]
+    return ("BLOCK" if contradictions or blocking else "PASS", normalized, contradictions)
+
+
 class ExecutionOutcome(BaseModel):
     action_hash: str
     tenant_id: str
     actor_id: str | None = None
     session_id: str | None = None
     nonce: str
+    world_version: str | None = None
     outcome: dict[str, Any] = Field(default_factory=dict)
 
 
@@ -377,7 +439,25 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
     nonce = uuid.uuid4().hex
     risk, risk_reasons = evaluate_risk(req)
     signal = compute_signal(req, risk)
-    decision, policy_checks = decide(req, risk, signal)
+    evidence_status, normalized_evidence, contradictions = evidence_gate(req.evidence)
+    if contradictions:
+        decision = "ASK"
+        policy_checks = [{
+            "policy": "evidence-integrity",
+            "result": "ASK",
+            "reason": "contradictory_evidence_requires_recheck",
+            "contradictions": contradictions,
+        }]
+    elif evidence_status == "BLOCK":
+        decision = "ASK"
+        policy_checks = [{
+            "policy": "evidence-integrity",
+            "result": "ASK",
+            "reason": "unknown_or_stale_evidence_requires_recheck",
+        }]
+    else:
+        decision, policy_checks = decide(req, risk, signal)
+    req.evidence = normalized_evidence
     normalized = normalized_action(req, signal)
     created = now()
     if DECISION_TTL_SECONDS <= 0 or DECISION_TTL_SECONDS > 86400:
@@ -408,7 +488,13 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
         "decision": decision,
         "policy_checks": policy_checks,
         "pre_execution_signal": signal.model_dump(),
-        "constraints": [],
+        "constraints": [
+            {"name": "unknown_is_not_allow", "enforced": True},
+            {"name": "stale_is_not_allow", "enforced": True},
+            {"name": "contradiction_requires_recheck", "enforced": True},
+        ],
+        "world_version": req.world_version,
+        "evidence_state": {"status": evidence_status, "contradictions": contradictions},
         "approval": None,
         "execution": None,
         "outcome": None,
@@ -522,6 +608,12 @@ def execution_reserve(decision_id: str, outcome: ExecutionOutcome, authorization
         raise HTTPException(409, "execution_session_binding_mismatch")
     if outcome.nonce != record["nonce"]:
         raise HTTPException(409, "execution_nonce_mismatch")
+    if record.get("world_version") is not None and outcome.world_version != record.get("world_version"):
+        raise HTTPException(409, "execution_world_version_mismatch")
+    if record.get("evidence_state", {}).get("contradictions"):
+        raise HTTPException(409, "execution_blocked_by_evidence_contradiction")
+    if record.get("evidence_state", {}).get("status") == "BLOCK":
+        raise HTTPException(409, "execution_blocked_by_evidence_state")
     if record["approval"] and record["approval"].get("approved") and datetime.fromisoformat(record["approval"]["expires_at"]) <= datetime.now(timezone.utc):
         raise HTTPException(403, "approval_expired")
     started_at = now()
@@ -639,6 +731,8 @@ def replay(decision_id: str, tenant_id: str, authorization: str | None = Header(
         raise HTTPException(500, "unsupported_decision_schema_version")
     req = ActionRequest.model_validate(raw_request)
     policy_hash_match = digest(snapshot) == record["policy_hash"]
+    replay_evidence_status, replay_evidence, replay_contradictions = evidence_gate(record.get("evidence", []))
+    req.evidence = replay_evidence
     if schema_version == "action-gate-evidence-3.1":
         action_hash_match = digest(normalized_action(req, stored_signal)) == record["action_hash"]
     else:
@@ -650,8 +744,8 @@ def replay(decision_id: str, tenant_id: str, authorization: str | None = Header(
         decision, checks = decide_legacy(req, risk, snapshot, stored_signal)
     original = record["decision"]
     expected = "ASK" if record["approval"] is not None and original in {"ALLOW", "DENY"} else original
-    match = decision == expected and policy_hash_match and action_hash_match
-    return {"decision_id": decision_id, "trace_id": record["trace_id"], "replayed_decision": decision, "recorded_preapproval_decision": expected, "match": match, "risk": risk, "policy_checks": checks, "policy_hash": record["policy_hash"], "policy_hash_match": policy_hash_match, "action_hash": record["action_hash"], "action_hash_match": action_hash_match, "evidence_hash": record["evidence_hash"], "audit_event_hash": record.get("audit_event_hash")}
+    match = decision == expected and policy_hash_match and action_hash_match and not replay_contradictions
+    return {"decision_id": decision_id, "trace_id": record["trace_id"], "replayed_decision": decision, "recorded_preapproval_decision": expected, "match": match, "risk": risk, "policy_checks": checks, "policy_hash": record["policy_hash"], "policy_hash_match": policy_hash_match, "action_hash": record["action_hash"], "action_hash_match": action_hash_match, "evidence_hash": record["evidence_hash"], "audit_event_hash": record.get("audit_event_hash"), "evidence_state": replay_evidence_status, "contradictions": replay_contradictions}
 
 
 @app.get("/v1/evidence/{decision_id}")
