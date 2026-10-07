@@ -1,0 +1,46 @@
+name: Evidence Chain Integrity
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact source SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - name: Verify same-SHA release lineage
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          PRODUCTION_BASE_URL: ${{ secrets.PRODUCTION_BASE_URL }}
+          EVIDENCE_OUTPUT: evidence/evidence-chain-integrity.json
+        run: |
+          set -euo pipefail
+          python3 tools/verify_release_truth.py
+
+      - name: Hash evidence
+        run: |
+          set -euo pipefail
+          sha256sum evidence/evidence-chain-integrity.json | tee evidence/evidence-chain-integrity.json.sha256
+
+      - name: Upload audit evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-chain-integrity-${{ github.sha }}
+          path: |
+            evidence/evidence-chain-integrity.json
+            evidence/evidence-chain-integrity.json.sha256
+          if-no-files-found: error
+          retention-days: 30
