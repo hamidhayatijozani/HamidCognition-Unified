@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import hmac
 import json
 import os
 import subprocess
@@ -18,6 +20,7 @@ ENV.update({
     "ACTION_GATE_API_TOKEN": TOKEN,
     "ACTION_GATE_SIGNING_SECRET": "sellable-signing-secret",
     "ACTION_GATE_APPROVAL_SECRET": "sellable-approval-secret",
+    "ACTION_GATE_STATE_ORACLE_SECRET": "sellable-state-oracle-secret",
     "ACTION_GATE_REQUIRE_SESSION_BINDING": "1",
     "ACTION_GATE_DB": DB,
     "PYTHONPATH": ROOT,
@@ -42,6 +45,14 @@ def request(method: str, path: str, payload: dict | None = None, token: str | No
         return exc.code, data
 
 
+def initialize_state_oracle() -> None:
+    payload = {"world_version": "sellable-gate-world-v1", "snapshot": {"source": "sellable_gate", "status": "ready"}}
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+    signature = hmac.new(ENV["ACTION_GATE_STATE_ORACLE_SECRET"].encode(), canonical, hashlib.sha256).hexdigest()
+    status, body = request("POST", "/v1/state/commit", {**payload, "oracle_signature": signature})
+    assert status == 200, f"state oracle initialization failed: {status} {body}"
+
+
 def wait_for_health(proc: subprocess.Popen) -> None:
     for _ in range(40):
         if proc.poll() is not None:
@@ -63,6 +74,17 @@ def main() -> int:
         pass
     proc = subprocess.Popen([sys.executable, "-m", "uvicorn", "app:app", "--host", "127.0.0.1", "--port", PORT], cwd=ROOT, env=ENV)
     try:
+        for _ in range(40):
+            if proc.poll() is not None:
+                raise AssertionError(f"action-gate exited early: {proc.returncode}")
+            try:
+                status, _ = request("GET", "/health", token=TOKEN)
+                if status == 200:
+                    break
+            except Exception:
+                pass
+            time.sleep(0.25)
+        initialize_state_oracle()
         wait_for_health(proc)
 
         status, _ = request("GET", "/v1/evidence/nonexistent?tenant_id=sellable-tenant", token=None)
