@@ -88,6 +88,12 @@ def main() -> int:
 
     report = {
         "schema": "evidence-chain-integrity/v1",
+        "execution": {
+            "repository": os.environ.get("GITHUB_REPOSITORY", ""),
+            "run_id": os.environ.get("GITHUB_RUN_ID", ""),
+            "workflow_ref": os.environ.get("GITHUB_WORKFLOW_REF", ""),
+            "event": os.environ.get("GITHUB_EVENT_NAME", ""),
+        },
         "current_source_sha": current,
         "published_release": {
             "version": version,
