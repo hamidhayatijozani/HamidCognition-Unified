@@ -1,112 +1,86 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="HamidCognition Action Gate. Runtime authorization and execution governance for AI agents.">
-<title>HamidCognition | Action Gate</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HamidCognition Action Gate | Console</title>
 <style>
-:root{--bg:#060a0f;--panel:#0b1118;--panel2:#0e1720;--line:#1d2b37;--text:#edf5f8;--muted:#8ea3af;--cyan:#5ce1e6;--blue:#5b8cff;--green:#4ade80;--yellow:#f5c451;--red:#ff6675;--shadow:0 24px 70px rgba(0,0,0,.35)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 75% -10%,#102a35 0,transparent 32%),linear-gradient(180deg,#05090d,#070c12 45%,#05080c);color:var(--text);font:15px/1.65 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:inherit;text-decoration:none}.wrap{max-width:1220px;margin:auto;padding:0 24px}.nav{position:sticky;top:0;z-index:20;background:rgba(5,9,13,.84);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.06)}.navin{height:70px;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:800;letter-spacing:.08em}.brand span{color:var(--cyan)}.links{display:flex;gap:22px;color:#a9bbc5;font-size:13px}.links a:hover{color:#fff}.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 15px;border:1px solid #2a3b48;border-radius:10px;background:#0d161e}.btn.primary{background:#dffcff;color:#071014;border-color:#dffcff;font-weight:800}.hero{padding:100px 0 72px}.eyebrow{display:inline-flex;gap:9px;align-items:center;color:var(--cyan);font-size:12px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 16px rgba(74,222,128,.8)}h1{font-size:clamp(44px,7vw,86px);line-height:.98;letter-spacing:-.055em;max-width:920px;margin:20px 0}.hero p{font-size:19px;color:#aebfc8;max-width:760px}.tagline{font-size:clamp(20px,3vw,34px);font-weight:750;line-height:1.2;margin:30px 0;color:#fff}.tagline span{display:block;color:var(--cyan)}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:30px;align-items:stretch}.control-card{border:1px solid var(--line);background:linear-gradient(145deg,rgba(14,23,32,.92),rgba(7,13,19,.94));border-radius:18px;padding:22px;box-shadow:var(--shadow)}.control-head{display:flex;justify-content:space-between;color:#8fa5b0;font-size:12px;text-transform:uppercase;letter-spacing:.1em}.flow{display:flex;align-items:center;gap:8px;margin-top:28px;flex-wrap:wrap}.node{border:1px solid #27404c;background:#0c171f;border-radius:10px;padding:12px 13px;font-size:12px}.node.active{border-color:#3fcfd6;box-shadow:0 0 0 1px rgba(92,225,230,.15) inset}.arrow{color:#4e6875}.decision{margin-top:24px;padding:18px;border-radius:13px;background:#081016;border:1px solid #20343f}.decision strong{font-size:25px;color:var(--green)}.decision small{display:block;color:#78909c;margin-top:4px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.metric{padding:14px;background:#091118;border:1px solid #1a2b35;border-radius:11px}.metric b{display:block;font-size:19px}.metric small{color:#718792}.section{padding:82px 0}.section-head{display:flex;justify-content:space-between;gap:30px;align-items:end;margin-bottom:28px}.section h2{font-size:clamp(30px,4vw,48px);line-height:1.05;letter-spacing:-.035em;margin:8px 0}.section-intro{max-width:620px;color:#94a9b4}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.card{background:linear-gradient(160deg,#0c151d,#091018);border:1px solid var(--line);border-radius:15px;padding:22px}.card h3{margin:0 0 8px;font-size:18px}.card p{color:#8fa5b0;margin:0}.label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#6f8792}.architecture{display:grid;grid-template-columns:repeat(9,1fr);gap:8px;align-items:center}.arch{padding:18px 8px;text-align:center;border:1px solid #223744;background:#0a1219;border-radius:12px;font-size:12px}.arch:nth-child(odd){border-color:#294852}.archarrow{text-align:center;color:#52717c}.risk{display:grid;grid-template-columns:1fr 1fr;gap:14px}.risk-left{min-height:430px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.tab{cursor:pointer;padding:8px 11px;border-radius:8px;border:1px solid #253944;background:#091119;color:#9fb1b9}.tab.selected{border-color:#5ce1e6;color:#fff}.terminal{background:#050a0e;border:1px solid #1a2a33;border-radius:12px;padding:16px;font:12px/1.8 ui-monospace,SFMono-Regular,Menlo,monospace;color:#9fb9c4}.ok{color:var(--green)}.warn{color:var(--yellow)}.bad{color:var(--red)}.table{width:100%;border-collapse:collapse;font-size:13px}.table th,.table td{padding:13px 10px;border-bottom:1px solid #1b2a33;text-align:left}.table th{color:#708792;font-weight:600}.pill{display:inline-flex;padding:4px 8px;border-radius:99px;font-size:11px;font-weight:800}.allow{background:rgba(74,222,128,.12);color:var(--green)}.hold{background:rgba(245,196,81,.12);color:var(--yellow)}.deny{background:rgba(255,102,117,.12);color:var(--red)}.chain{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}.chain .step{padding:15px 10px;border:1px solid #233641;border-radius:11px;text-align:center;background:#091119;font-size:12px}.step em{display:block;font-style:normal;color:var(--green);font-size:11px;margin-top:5px}.health{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.health .card{padding:16px}.status{display:flex;justify-content:space-between;align-items:center}.status i{width:8px;height:8px;border-radius:50%;background:var(--green)}.footer{padding:45px 0 70px;border-top:1px solid #17252e;color:#71858f}.footergrid{display:flex;justify-content:space-between;gap:20px}.release{border:1px solid #29434c;background:#081117;padding:16px;border-radius:12px}.release b{color:#fff}.fine{font-size:12px;color:#667b85}.research{border-color:#4a3c1d}.research .label{color:var(--yellow)}@media(max-width:900px){.hero-grid,.grid2,.risk{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}.architecture{grid-template-columns:1fr 1fr}.chain{grid-template-columns:1fr 1fr}.health{grid-template-columns:1fr 1fr}.links{display:none}}@media(max-width:560px){.wrap{padding:0 16px}.hero{padding-top:70px}.grid3,.health{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}.footergrid{flex-direction:column}}
-</style>
-</head>
+:root{--bg:#070b10;--p:#0d141c;--p2:#111b25;--line:#243542;--txt:#eef7fa;--mut:#8fa4af;--cyan:#5ce1e6;--g:#4ade80;--y:#f5c451;--r:#ff6675;--b:#6d8cff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.top{position:sticky;top:0;z-index:5;background:#080d12eF;border-bottom:1px solid var(--line);padding:14px 20px;display:flex;justify-content:space-between;align-items:center}.brand{font-weight:800;letter-spacing:.08em}.brand i{color:var(--cyan);font-style:normal}.status{color:var(--y);font-size:12px}.wrap{max-width:1200px;margin:auto;padding:24px}.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}.card{background:var(--p);border:1px solid var(--line);border-radius:14px;padding:18px}.card h2,.card h3{margin:0 0 12px}.label{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.12em}.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field span{color:var(--mut);font-size:12px}.field input,.field textarea,.field select{background:#081017;color:var(--txt);border:1px solid #29404d;border-radius:8px;padding:10px;outline:none}.field textarea{min-height:100px;resize:vertical}.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--cyan)}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.btn{border:1px solid #304754;background:#101b24;color:var(--txt);padding:10px 14px;border-radius:8px}.primary{background:#dffcff;color:#071014;border-color:#dffcff;font-weight:800}.danger{border-color:#71333d}.decision{margin-top:16px;padding:18px;border-radius:10px;border:1px solid var(--line);background:#080e14}.verdict{font-size:30px;font-weight:900}.allow{color:var(--g)}.ask{color:var(--y)}.deny{color:var(--r)}.sandbox{color:#a9b7ff}.kv{display:grid;grid-template-columns:150px 1fr;gap:7px;border-bottom:1px solid #182731;padding:8px 0}.kv b{color:var(--mut);font-weight:500}.mono{font:12px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;word-break:break-word;background:#05090d;padding:14px;border-radius:9px;border:1px solid #1b2b35}.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}.tab{padding:8px 11px;border:1px solid #304754;background:#0b141b;color:#9eb1bb;border-radius:8px}.tab.on{border-color:var(--cyan);color:#fff}.log{max-height:260px;overflow:auto}.entry{padding:9px 0;border-bottom:1px solid #182731}.entry small{color:#708691}.badge{display:inline-block;padding:3px 7px;border-radius:20px;font-size:11px;font-weight:800}.ballow{background:#12301e;color:var(--g)}.bask{background:#332b10;color:var(--y)}.bdeny{background:#35151b;color:var(--r)}.notice{margin-top:12px;color:var(--mut);font-size:12px}.fullrow{margin-top:16px}.health{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.health div{padding:12px;background:var(--p);border:1px solid var(--line);border-radius:9px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--y);margin-right:7px}.nav{display:flex;gap:12px;margin-bottom:18px;overflow:auto}.nav button{background:none;border:0;color:var(--mut);padding:5px}.nav button.on{color:#fff;border-bottom:2px solid var(--cyan)}@media(max-width:800px){.grid,.form{grid-template-columns:1fr}.field.full{grid-column:auto}.health{grid-template-columns:1fr 1fr}.wrap{padding:14px}.top{padding:12px 14px}}
+</style></head>
 <body>
-<header class="nav"><div class="wrap navin"><a class="brand" href="#"><span>HAMID</span>COGNITION</a><nav class="links"><a href="#dashboard">Dashboard</a><a href="#architecture">Architecture</a><a href="#risk">Risk Lab</a><a href="#evidence">Evidence</a><a href="#policy">Policy Graph</a><a href="#security">Security</a><a href="#release">Release</a></nav><a class="btn" href="https://github.com/hamidhayatijozani/HamidCognition-Unified">Repository ↗</a></div></header>
+<header class="top"><div class="brand"><i>HAMID</i>COGNITION · ACTION GATE</div><div id="conn" class="status">● OFFLINE DEMO</div></header>
+<main class="wrap">
+<nav class="nav"><button class="on" data-page="console">Action Console</button><button data-page="evidence">Evidence</button><button data-page="architecture">Architecture</button></nav>
 
-<main>
-<section class="hero"><div class="wrap hero-grid">
-<div>
-<div class="eyebrow"><i class="dot"></i> Runtime authorization & execution governance</div>
-<h1>Control the action before the agent executes it.</h1>
-<p>HamidCognition Action Gate is a deployable control boundary between an AI agent and protected tools. It evaluates an action, binds authorization to its execution context, records evidence, and permits execution only through the governed path.</p>
-<div class="tagline">Not just authorization.<span>Action-in-Trajectory.</span><span>Action-against-Reality.</span></div>
-<div class="actions"><a class="btn primary" href="#demo">Explore product interface</a><a class="btn" href="#architecture">Explore architecture</a></div>
+<section id="console">
+<div class="grid">
+<div class="card"><div class="label">1 · Action Request</div><h2>Submit an agent action</h2>
+<div class="form">
+<label class="field"><span>Tenant</span><input id="tenant" value="acme-prod"></label>
+<label class="field"><span>Actor</span><input id="actor" value="alice"></label>
+<label class="field"><span>Agent</span><input id="agent" value="finance-agent"></label>
+<label class="field"><span>Session</span><input id="session" value="sess-001"></label>
+<label class="field"><span>Action</span><select id="action"><option>protected.read</option><option>tool.call</option><option>protected.delete</option><option>payment.execute</option></select></label>
+<label class="field"><span>Resource</span><input id="resource" value="/protected/invoice/9281"></label>
+<label class="field full"><span>Arguments / payload</span><textarea id="payload">{ "reason": "customer-request" }</textarea></label>
 </div>
-<div class="control-card">
-<div class="control-head"><span>Governed execution path</span><span id="runtimeStatus" class="warn">PROTOTYPE · RUNTIME UNVERIFIED</span></div>
-<div class="flow"><div class="node active">AI Agent</div><div class="arrow">→</div><div class="node active">Action Gate</div><div class="arrow">→</div><div class="node">Protected Tool</div></div>
-<div class="decision"><span class="label">Current demo decision</span><br><strong id="heroDecision">ALLOW</strong><small>tenant: acme-prod · action: protected.read · nonce: single-use</small></div>
-<div class="metrics"><div class="metric"><b>4</b><small>Decision modes</small></div><div class="metric"><b>1×</b><small>Authority nonce</small></div><div class="metric"><b>HTTP</b><small>Enforcement</small></div><div class="metric"><b>MCP</b><small>Boundary</small></div></div>
+<div class="actions"><button class="btn primary" id="evaluate">EVALUATE ACTION</button><button class="btn" id="clear">CLEAR</button></div>
+<div class="notice">This public GitHub Pages console is a deterministic simulator until a live Action Gate API is configured. It does not pretend otherwise.</div>
 </div>
-</div></section>
 
-<section id="product" class="section"><div class="wrap"><div class="section-head"><div><div class="label">Product</div><h2>A narrow boundary for a hard problem.</h2></div><p class="section-intro">Action Gate asks whether the protected tool can independently verify that this exact agent action is authorized, correctly bound, current enough for the governed path, and not being replayed.</p></div>
-<div class="grid3">
-<div class="card"><h3>Decision integrity</h3><p>Decisions are bound to tenant, actor, session and action context, with cryptographically bound records.</p></div>
-<div class="card"><h3>Execution authority</h3><p>Gate-issued authority is required at the protected execution boundary. A boolean “authorized” flag is not the boundary.</p></div>
-<div class="card"><h3>Replay resistance</h3><p>Single-use nonces and persistent authority state prevent the same execution authority from crossing the barrier twice.</p></div>
-<div class="card"><h3>Fail-closed evidence</h3><p>If required evidence or execution reservation cannot be established, the governed path does not silently become permissive.</p></div>
-<div class="card"><h3>HTTP + MCP</h3><p>The same governed authority model can protect HTTP and MCP tool paths rather than treating transport as the security boundary.</p></div>
-<div class="card"><h3>PostgreSQL persistence</h3><p>Production operation supports persistent state so decisions and authority nonce state survive service restarts.</p></div>
-</div></div></section>
-
-<section id="architecture" class="section"><div class="wrap"><div class="section-head"><div><div class="label">Architecture Explorer</div><h2>From request to governed execution.</h2></div><p class="section-intro">The product boundary is intentionally visible. Each stage answers a different question before the protected tool is allowed to act.</p></div>
-<div class="architecture">
-<div class="arch">Agent</div><div class="archarrow">→</div><div class="arch">Action Request</div><div class="archarrow">→</div><div class="arch">Identity / Tenant / Session</div><div class="archarrow">→</div><div class="arch">Policy + Decision Integrity</div><div class="archarrow">→</div><div class="arch">Execution Authority</div>
+<div class="card"><div class="label">2 · Decision</div><h2 id="decisionTitle">No request evaluated</h2>
+<div class="decision"><div id="verdict" class="verdict">READY</div><div id="reason">Enter or edit the request and evaluate it.</div></div>
+<div id="facts"></div>
+<div class="actions"><button class="btn primary" id="execute" disabled>EXECUTE GOVERNED ACTION</button><button class="btn" id="approve" disabled>APPROVE ASK</button><button class="btn danger" id="replay" disabled>REPLAY SAME AUTHORITY</button></div>
 </div>
-<div class="architecture" style="margin-top:10px"><div class="arch">Protected Tool</div><div class="archarrow">←</div><div class="arch">Enforcement</div><div class="archarrow">←</div><div class="arch">ALLOW / DENY / ASK / SANDBOX</div><div class="archarrow">←</div><div class="arch">Evidence</div><div class="archarrow">←</div><div class="arch">Audit / Replay</div></div>
-</div></section>
+</div>
 
-<section id="risk" class="section"><div class="wrap"><div class="section-head"><div><div class="label">Action Risk Lab</div><h2>Inspect the decision, not just the verdict.</h2></div><p class="section-intro">This interactive surface is a product demonstration. It uses the documented Action Gate boundary and does not imply unsupported universal risk scoring.</p></div>
-<div class="risk"><div class="card risk-left"><div class="label">Simulated request</div><div class="tabs"><button class="tab selected" data-action="protected.read">GET protected resource</button><button class="tab" data-action="tool.call">MCP tool call</button><button class="tab" data-action="protected.delete">DELETE resource</button></div><div class="terminal" id="riskOutput"></div></div>
-<div class="card"><div class="label">Decision factors</div><table class="table"><tbody id="factorTable"></tbody></table><div class="decision" style="margin-top:18px"><span class="label">Decision</span><br><strong id="riskDecision">ALLOW</strong><small id="riskReason">Valid governed path for the simulated read-only request.</small></div></div></div></div></section>
+<div class="card fullrow"><div class="label">Live Decision Log</div><div id="log" class="log"><div class="entry"><small>system</small> Console initialized. No action has been executed.</div></div></div>
+<div class="health fullrow"><div><span class="dot"></span>Policy Engine</div><div><span class="dot"></span>Enforcement</div><div><span class="dot"></span>MCP Boundary</div><div><span class="dot"></span>PostgreSQL</div></div>
+</section>
 
-<section id="evidence" class="section"><div class="wrap"><div class="section-head"><div><div class="label">Evidence</div><h2>Make the execution trace reviewable.</h2></div><p class="section-intro">Customer acceptance requires recorded evidence for identity binding, decision integrity, nonce single-use, policy binding, fail-closed evidence handling, persistence and replay.</p></div>
-<div class="chain"><div class="step">Identity<em>verified</em></div><div class="step">Policy<em>bound</em></div><div class="step">Authority<em>issued</em></div><div class="step">State<em>captured</em></div><div class="step">Action<em>hashed</em></div><div class="step">Execution<em>reserved</em></div><div class="step">Evidence<em>recorded</em></div></div>
-<div class="grid2" style="margin-top:14px"><div class="card"><h3>What can be reconstructed?</h3><p>The implemented evidence record includes agent, tenant, actor, session, normalized action, action hash, policy snapshot/hash, nonce, risk assessment, decision, timestamps, execution outcome and evidence hashes.</p></div><div class="card"><h3>Replay is verification, not theatre.</h3><p>The acceptance procedure requires replay after restart to reproduce stored decisions and hashes. A passing demo alone is not treated as a customer security acceptance.</p></div></div></div></section>
+<section id="evidence" hidden><div class="card"><div class="label">Evidence Ledger</div><h2>Decision and execution evidence</h2><div id="evidenceBox" class="mono">No evidence yet.</div></div></section>
+<section id="architecture" hidden><div class="grid"><div class="card"><div class="label">Governed path</div><h2>One boundary, four decisions</h2><div class="kv"><b>ALLOW</b><span>authority issued → execution permitted</span></div><div class="kv"><b>DENY</b><span>execution blocked</span></div><div class="kv"><b>ASK</b><span>approval required → re-evaluate</span></div><div class="kv"><b>SANDBOX</b><span>isolated execution only</span></div></div><div class="card"><div class="label">Runtime topology</div><div class="mono">AI Agent
+   │
+   ▼
+Enforcement :8080
+   │
+   ▼
+Action Gate :8000
+   │
+   ├── PostgreSQL
+   │
+   └── Execution Authority
+          │
+          ▼
+Protected Tool :9000
 
-<section id="security" class="section"><div class="wrap"><div class="section-head"><div><div class="label">Security Boundary</div><h2>Fail closed where authorization cannot be established.</h2></div><p class="section-intro">These are documented product boundaries, not a promise of universal AI safety, policy correctness, regulatory certification or downstream correctness.</p></div>
-<div class="grid3"><div class="card"><h3>Tenant isolation</h3><p>Cross-tenant decision retrieval and execution are rejected when the binding does not match.</p></div><div class="card"><h3>Action binding</h3><p>The action hash must match the execution request at the protected boundary.</p></div><div class="card"><h3>Policy binding</h3><p>A mismatched or missing policy binding is rejected fail-closed.</p></div><div class="card"><h3>Nonce protection</h3><p>Consumed authority cannot be reused, including after protected-tool restart.</p></div><div class="card"><h3>Direct-access rejection</h3><p>Protected endpoints and tools reject calls that arrive without Gate-issued execution authority.</p></div><div class="card"><h3>Evidence failure</h3><p>If execution cannot be reserved or recorded as required, the downstream call is not treated as authorized.</p></div></div></div></section>
-
-<section id="demo" class="section"><div class="wrap"><div class="section-head"><div><div class="label">Product Interface</div><h2>A dashboard built around decisions.</h2></div><p class="section-intro">The production interface should expose operational evidence rather than decorative telemetry. This prototype mirrors the fields and boundaries implemented by Action Gate; displayed values are explicitly illustrative until connected to a live API.</p></div>
-<div class="card"><div class="status"><strong>Dashboard / Decisions</strong><span class="pill allow">PROTOTYPE</span></div><div style="overflow:auto;margin-top:16px"><table class="table"><thead><tr><th>Time</th><th>Agent</th><th>Tenant</th><th>Action</th><th>Decision</th><th>Authority</th><th>Evidence</th></tr></thead><tbody><tr><td>09:41:08</td><td>agent-prod-07</td><td>acme-prod</td><td>protected.read</td><td><span class="pill allow">ALLOW</span></td><td>verified</td><td>recorded</td></tr><tr><td>09:40:51</td><td>agent-prod-07</td><td>acme-prod</td><td>protected.delete</td><td><span class="pill deny">DENY</span></td><td>rejected</td><td>recorded</td></tr><tr><td>09:39:22</td><td>agent-staging-02</td><td>acme-staging</td><td>tool.call</td><td><span class="pill hold">ASK</span></td><td>approval</td><td>pending</td></tr></tbody></table></div></div>
-<div class="health" style="margin-top:14px"><div class="card"><div class="status"><span>Policy Engine</span><i data-health="policy"></i></div></div><div class="card"><div class="status"><span>Enforcement</span><i data-health="enforcement"></i></div></div><div class="card"><div class="status"><span>MCP Boundary</span><i data-health="mcp"></i></div></div><div class="card"><div class="status"><span>PostgreSQL</span><i data-health="storage"></i></div></div></div>
-<div class="card" style="margin-top:14px"><div class="status"><strong>Runtime connection</strong><span id="runtimeMode" class="pill hold">OFFLINE DEMO</span></div><p id="runtimeMessage" style="margin-top:10px">The public page does not assume a live API. If the page is served from the Action Gate runtime origin, it will probe <code>/health</code> and only then expose observed runtime status.</p></div></div></section>
-
-<section id="dashboard" class="section"><div class="wrap"><div class="section-head"><div><div class="label">Dashboard</div><h2>Operational control, not decorative telemetry.</h2></div><p class="section-intro">The interface mirrors the fields that matter at the execution boundary. Values in this public prototype are illustrative unless explicitly backed by a live deployment.</p></div><div class="grid3"><div class="card"><div class="label">Decisions</div><h3>ALLOW 128 · ASK 9 · DENY 17</h3><p>Recent decision distribution for the prototype view.</p></div><div class="card"><div class="label">Authority</div><h3>Gate-issued · single-use</h3><p>Execution authority is bound to the governed request context.</p></div><div class="card"><div class="label">Evidence</div><h3>Recorded / replayable</h3><p>Decision and execution evidence are treated as part of the boundary.</p></div></div></div></section>
-
-<section id="policy" class="section"><div class="wrap"><div class="section-head"><div><div class="label">Policy Graph</div><h2>See what the decision is bound to.</h2></div><p class="section-intro">A conceptual graph view of the relationships that Action Gate evaluates. This is an architecture explorer, not a claim that every graph operation is exposed as a public API.</p></div><div class="card"><div class="architecture"><div class="arch">Tenant</div><div class="archarrow">→</div><div class="arch">Actor</div><div class="archarrow">→</div><div class="arch">Agent</div><div class="archarrow">→</div><div class="arch">Session</div><div class="archarrow">→</div><div class="arch">Action</div></div><div class="architecture" style="margin-top:10px"><div class="arch">Policy</div><div class="archarrow">→</div><div class="arch">Decision</div><div class="archarrow">→</div><div class="arch">Authority</div><div class="archarrow">→</div><div class="arch">Protected Tool</div><div class="archarrow">→</div><div class="arch">Evidence</div></div></div><div class="grid2" style="margin-top:14px"><div class="card"><div class="label">Agents</div><h3>agent-prod-07</h3><p>Tenant-bound identity, session context, policy binding and governed execution history are the relevant dimensions.</p></div><div class="card"><div class="label">Tenants</div><h3>acme-prod</h3><p>Tenant isolation is enforced at decision retrieval and execution boundaries.</p></div></div></div></section>
-
-<section id="release" class="section"><div class="wrap"><div class="section-head"><div><div class="label">Commercial Truth</div><h2>Release state is part of the product.</h2></div><p class="section-intro">The site intentionally separates development state from a validated commercial release. Humans have invented enough ways to turn version labels into fiction.</p></div>
-<div class="grid2"><div class="release"><span class="label">Published product release</span><h3>HamidCognition Action Gate v1.1.1</h3><p>Immutable release: <b>action-gate-v1.1.1</b></p><p class="fine">Source: e9ea7565f4ddea91f5c45104237bd20564c80894</p><p class="fine">Artifact: sha256:517064de0427286ff4f346d46996642aca3b9def891d1c08bfaebc25546fb791</p><p class="fine">Release-candidate run: 36966012148 · published by github-actions[bot]</p><a class="btn" style="margin-top:12px" href="https://github.com/hamidhayatijozani/HamidCognition-Unified/releases/tag/action-gate-v1.1.1">View release ↗</a></div>
-<div class="release"><span class="label">Current development line</span><h3>main · post-release development</h3><p>The mutable <code>main</code> branch continues after the v1.1.1 source commit.</p><p class="fine">The public page does not represent current main as a new commercial release. Published release evidence and customer acceptance remain separate records.</p></div></div>
-<div class="card research" style="margin-top:14px"><div class="label">Research boundary</div><p>Research lines such as P/S/T experiments, LUMEN, KIRGANDE and Farahoosh-Prime remain separate evidence-bearing research assets unless they receive their own implementation, tests, reproducibility record and explicit product boundary.</p></div></div></section>
-
-<section class="section"><div class="wrap"><div class="section-head"><div><div class="label">Deployment</div><h2>Three delivery boundaries.</h2></div><p class="section-intro">Delivery mode describes who operates the boundary. It does not create a claim of universal safety or compliance.</p></div><div class="grid3"><div class="card"><h3>SELF_HOSTED</h3><p>The customer operates the deployment.</p></div><div class="card"><h3>MANAGED</h3><p>HamidCognition operates the service boundary.</p></div><div class="card"><h3>ENTERPRISE</h3><p>Negotiated integration, security review, support, deployment architecture and SLA scope.</p></div></div></div></section>
+MCP :8787 → same governed boundary</div></div></div></section>
 </main>
-
-<footer class="footer"><div class="wrap footergrid"><div><div class="brand"><span>HAMID</span>COGNITION</div><p>Runtime authorization and execution governance for AI agents.</p><p class="fine">Copyright © 2026 Hamid Hayati Jozani. All rights reserved.</p></div><div><a href="https://github.com/hamidhayatijozani/HamidCognition-Unified">Source repository ↗</a><br><a href="https://github.com/hamidhayatijozani/HamidCognition-Unified/blob/main/PRODUCT/QUICKSTART.md">Quickstart ↗</a><br><a href="https://github.com/hamidhayatijozani/HamidCognition-Unified/blob/main/PRODUCT/CUSTOMER_ACCEPTANCE.md">Customer acceptance ↗</a></div></div></footer>
-
 <script>
-async function probeRuntime(){
-  const status=document.getElementById("runtimeStatus"), mode=document.getElementById("runtimeMode"), msg=document.getElementById("runtimeMessage");
-  try{
-    const response=await fetch("/health",{headers:{"Accept":"application/json"},cache:"no-store"});
-    if(!response.ok) throw new Error("HTTP "+response.status);
-    const data=await response.json();
-    status.textContent="RUNTIME CONNECTED";
-    status.className="ok";
-    mode.textContent="CONNECTED";
-    mode.className="pill allow";
-    msg.textContent="Observed /health response: "+(data.status||"unknown")+" · version "+(data.version||"unknown")+" · storage "+((data.storage&&data.storage.status)||"unknown")+". No decision data is inferred from this probe.";
-    ["policy","enforcement","mcp","storage"].forEach(k=>{const el=document.querySelector('[data-health="'+k+'"]'); if(el) el.style.background="var(--green)";});
-  }catch(error){
-    status.textContent="PROTOTYPE · RUNTIME UNVERIFIED";
-    status.className="warn";
-    mode.textContent="OFFLINE DEMO";
-    mode.className="pill hold";
-    msg.textContent="No same-origin /health response was verified. The interface remains in demonstration mode and does not claim live telemetry.";
-  }
+const $=id=>document.getElementById(id), state={decision:null,evidence:null};
+const hash=s=>{let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return ("00000000"+(h>>>0).toString(16)).slice(-8)};
+function request(){return {tenant:$("tenant").value.trim(),actor:$("actor").value.trim(),agent:$("agent").value.trim(),session:$("session").value.trim(),action:$("action").value,resource:$("resource").value.trim(),payload:$("payload").value}};
+function decide(r){
+ if(!r.tenant||!r.actor||!r.agent||!r.session||!r.resource)return ["DENY","Required identity/context field is missing.","deny"];
+ if(r.action==="protected.delete")return ["DENY","Destructive action is not authorized by the demo policy.","deny"];
+ if(r.action==="tool.call")return ["ASK","Tool call requires explicit approval before execution.","ask"];
+ if(r.action==="payment.execute")return ["SANDBOX","Payment execution is isolated in the public simulator.","sandbox"];
+ return ["ALLOW","Request matches the simulated governed read policy.","allow"];
 }
-probeRuntime();
-
-const scenarios={
-"protected.read":{decision:"ALLOW",reason:"Valid governed path for the simulated read-only request.",factors:[["Tenant binding","MATCH","ok"],["Actor / session","MATCH","ok"],["Policy binding","MATCH","ok"],["Gate authority","VALID","ok"],["Nonce","SINGLE-USE","ok"],["Protected tool","GOVERNED","ok"]]},
-"tool.call":{decision:"ASK",reason:"The demo routes this tool call through an approval state before execution.",factors:[["Tenant binding","MATCH","ok"],["Actor / session","MATCH","ok"],["Policy binding","MATCH","ok"],["Gate authority","PENDING","warn"],["Nonce","NOT CONSUMED","warn"],["Protected tool","BLOCKED","warn"]]},
-"protected.delete":{decision:"DENY",reason:"The demo deliberately shows a destructive operation being rejected by policy.",factors:[["Tenant binding","MATCH","ok"],["Actor / session","MATCH","ok"],["Policy binding","REJECT","bad"],["Gate authority","NOT ISSUED","bad"],["Nonce","NOT CONSUMED","bad"],["Protected tool","BLOCKED","bad"]]}
-};
-function render(action){const s=scenarios[action];document.getElementById("riskOutput").innerHTML="request.action = "+action+"<br>tenant = acme-prod<br>agent = agent-prod-07<br>session = sess-91a2<br>policy = production-default<br>authority = gate-issued<br>execution = protected-tool<br><br><span class='"+s.factors.at(-1)[2]+"'>decision = "+s.decision+"</span>";document.getElementById("riskDecision").textContent=s.decision;document.getElementById("riskDecision").className=s.decision==="ALLOW"?"ok":s.decision==="ASK"?"warn":"bad";document.getElementById("riskReason").textContent=s.reason;document.getElementById("factorTable").innerHTML=s.factors.map(x=>"<tr><td>"+x[0]+"</td><td class='"+x[2]+"'>"+x[1]+"</td></tr>").join("");document.getElementById("heroDecision").textContent=s.decision}
-document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");render(b.dataset.action)}));render("protected.read");
-</script>
-</body>
-</html>
+function log(msg,b){$("log").insertAdjacentHTML("afterbegin",'<div class="entry"><small>'+new Date().toLocaleTimeString()+'</small> <span class="badge '+b+'">'+msg+'</span></div>')}
+function evaluate(){
+ const r=request(), [d,reason,cls]=decide(r), actionHash=hash(JSON.stringify(r)), nonce="nonce-"+hash(actionHash+"|"+r.session);
+ state.decision=d;state.evidence={timestamp:new Date().toISOString(),request:r,decision:d,reason,action_hash:"demo:"+actionHash,authority_nonce:nonce,execution:"NOT_EXECUTED"};
+ $("decisionTitle").textContent="Evaluated request";$("verdict").textContent=d;$("verdict").className="verdict "+cls;$("reason").textContent=reason;
+ $("facts").innerHTML='<div class="kv"><b>Action hash</b><span class="mono">demo:'+actionHash+'</span></div><div class="kv"><b>Authority nonce</b><span class="mono">'+nonce+'</span></div><div class="kv"><b>Tenant / actor</b><span>'+r.tenant+' / '+r.actor+'</span></div><div class="kv"><b>Session</b><span>'+r.session+'</span></div>';
+ $("execute").disabled=d!=="ALLOW"&&d!=="SANDBOX";$("approve").disabled=d!=="ASK";$("replay").disabled=false;$("evidenceBox").textContent=JSON.stringify(state.evidence,null,2);
+ log(r.action+" → "+d,d==="ALLOW"?"ballow":d==="ASK"?"bask":"bdeny");
+}
+$("evaluate").onclick=evaluate;
+$("execute").onclick=()=>{if(!state.evidence)return;state.evidence.execution="EXECUTED (SIMULATED PROTECTED TOOL)";$("evidenceBox").textContent=JSON.stringify(state.evidence,null,2);log("PROTECTED TOOL executed (simulated)","ballow");$("execute").disabled=true};
+$("approve").onclick=()=>{if(state.decision==="ASK"){state.decision="ALLOW";$("verdict").textContent="ALLOW";$("verdict").className="verdict allow";$("reason").textContent="Approval recorded in simulator. Re-evaluation grants governed execution.";$("execute").disabled=false;$("approve").disabled=true;state.evidence.decision="ALLOW";state.evidence.reason="Approved ASK";$("evidenceBox").textContent=JSON.stringify(state.evidence,null,2);log("ASK → APPROVED → ALLOW","ballow")}};
+$("replay").onclick=()=>{if(state.evidence){$("reason").textContent="Replay blocked: the authority nonce is single-use.";log("REPLAY → BLOCKED","bdeny")}};
+$("clear").onclick=()=>location.reload();
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("on"));b.classList.add("on");["console","evidence","architecture"].forEach(p=>$(p).hidden=p!==b.dataset.page)});
+async function probe(){try{let r=await fetch("/health",{cache:"no-store"});if(!r.ok)throw 0;$("conn").textContent="● RUNTIME CONNECTED";$("conn").style.color="var(--g)"}catch(e){}}
+probe();
+</script></body></html>
