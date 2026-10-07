@@ -25,6 +25,7 @@ def evaluate(action="read_public_file", target="/public/info.txt", **extra):
 def execute(data, tenant=TENANT, action_hash=None, nonce=None, outcome=None):
     reserve = client.post(f"/v1/action/{data['decision_id']}/execution/reserve", json={"tenant_id": tenant, "actor_id": data.get("actor_id"), "action_hash": action_hash or data["action_hash"], "nonce": nonce or data["nonce"], "world_version": data.get("world_version")})
     if reserve.status_code != 200:
+        print("RESERVE_FAILURE", reserve.status_code, reserve.text)
         return reserve
     return client.post(
         f"/v1/action/{data['decision_id']}/execution",
