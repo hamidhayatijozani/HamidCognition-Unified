@@ -45,10 +45,10 @@ class ActionGateClient:
 
 
     def reserve_execution(self, decision_id: str, *, tenant_id: str, actor_id: str | None, session_id: str | None,
-                          action_hash: str, nonce: str) -> dict[str, Any]:
+                          action_hash: str, nonce: str, world_version: str | None = None) -> dict[str, Any]:
         return self._request("POST", f"/v1/action/{decision_id}/execution/reserve", {
             "tenant_id": tenant_id, "actor_id": actor_id, "session_id": session_id,
-            "action_hash": action_hash, "nonce": nonce,
+            "action_hash": action_hash, "nonce": nonce, "world_version": world_version,
         })
 
     def record_execution(self, decision_id: str, *, tenant_id: str, actor_id: str | None, session_id: str | None,
