@@ -1,4 +1,5 @@
 name: Evidence Chain Integrity
+# Every main push must leave a same-SHA audit trail.
 
 on:
   push:
