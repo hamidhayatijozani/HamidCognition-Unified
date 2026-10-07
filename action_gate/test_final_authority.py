@@ -3,6 +3,7 @@ import hmac
 import json
 import os
 import tempfile
+import uuid
 
 import pytest
 
