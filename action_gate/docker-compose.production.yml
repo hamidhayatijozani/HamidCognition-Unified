@@ -23,6 +23,9 @@ services:
     environment:
       ACTION_GATE_URL: http://action-gate:8000
       ACTION_GATE_API_TOKEN: $ACTION_GATE_API_TOKEN
+      ACTION_GATE_APPROVAL_SECRET: ${ACTION_GATE_APPROVAL_SECRET:?set ACTION_GATE_APPROVAL_SECRET}
+      ENFORCEMENT_URL: http://enforcement:8080
+      PORT: "8081"
     networks:
       - edge
       - backend
