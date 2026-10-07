@@ -14,6 +14,7 @@ jobs:
     env:
       PYTHONPATH: .
       ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+      ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
       MCP_BEARER_TOKEN: ci-mcp-bearer-token
     steps:
       - uses: actions/checkout@v4
@@ -31,6 +32,7 @@ jobs:
         env:
           ACTION_GATE_ENV: development
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           ACTION_GATE_SIGNING_SECRET: ci-signing-secret
         run: pytest -q
       - name: Run Action Gate meta-validation boundary
@@ -38,6 +40,7 @@ jobs:
         env:
           ACTION_GATE_ENV: development
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           ACTION_GATE_SIGNING_SECRET: ci-signing-secret
         run: pytest -q test_meta_validation.py
       - name: Run Validation Boundary conformance suite
@@ -45,12 +48,14 @@ jobs:
         env:
           ACTION_GATE_ENV: development
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           ACTION_GATE_SIGNING_SECRET: ci-signing-secret
         run: pytest -q test_validation_boundary_conformance.py --junitxml=validation-boundary-junit.xml
       - name: Run real HTTP enforcement integration
         working-directory: action_gate
         env:
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           ACTION_GATE_SIGNING_SECRET: ci-signing-secret
         run: python enforcement_integration.py
       - name: Run real MCP enforcement integration
@@ -93,6 +98,7 @@ jobs:
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           DOMAIN: localhost
           MCP_BEARER_TOKEN: ci-mcp-bearer-token
         run: docker compose -f docker-compose.production.yml -f docker-compose.chatgpt-quick-tunnel.yml config
@@ -116,6 +122,7 @@ jobs:
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml config
       - name: Start production stack
@@ -128,6 +135,7 @@ jobs:
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           MCP_BEARER_TOKEN: ci-mcp-bearer-token
           MCP_RESOURCE_URL: http://127.0.0.1:8787/mcp
           DOMAIN: localhost:80
@@ -148,6 +156,7 @@ jobs:
           ACTION_GATE_APPROVAL_TTL_SECONDS: "300"
           ACTION_GATE_POLICY_JSON: "{}"
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           DEMO_TENANT_ID: integration-tenant
           DEMO_ACTOR_ID: actor-1
           DEMO_AGENT_ID: demo
@@ -189,6 +198,7 @@ jobs:
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           DOMAIN: localhost
         run: |
           for attempt in $(seq 1 30); do
@@ -211,6 +221,7 @@ jobs:
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           MCP_BEARER_TOKEN: ci-mcp-bearer-token
           DOMAIN: localhost
         run: |
@@ -243,6 +254,7 @@ jobs:
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           MCP_BEARER_TOKEN: ci-mcp-bearer-token
           MCP_RESOURCE_URL: http://127.0.0.1:8787/mcp
           DOMAIN: localhost
@@ -257,6 +269,7 @@ jobs:
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           MCP_BEARER_TOKEN: ci-mcp-bearer-token
           MCP_RESOURCE_URL: http://127.0.0.1:8787/mcp
           DOMAIN: localhost
@@ -272,6 +285,7 @@ jobs:
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml exec -T action-gate python production_e2e_smoke.py
       - name: HHJ-CSG 200-event decision replay acceptance
@@ -284,6 +298,7 @@ jobs:
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           DOMAIN: localhost
           ACTION_GATE_URL: http://action-gate:8000
         run: docker compose -f docker-compose.production.yml exec -T action-gate python csg_acceptance.py
@@ -297,6 +312,7 @@ jobs:
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           DOMAIN: localhost
         run: |
           docker compose -f docker-compose.production.yml restart action-gate
@@ -319,6 +335,7 @@ jobs:
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           DOMAIN: localhost
           ACTION_GATE_URL: http://action-gate:8000
         run: docker compose -f docker-compose.production.yml exec -T action-gate python csg_persistence_replay.py
@@ -341,6 +358,7 @@ jobs:
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           DOMAIN: localhost
         run: |
           set -euo pipefail
@@ -415,5 +433,6 @@ jobs:
           ACTION_GATE_REQUIRE_SESSION_BINDING: "1"
           ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml down -v
