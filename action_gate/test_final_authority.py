@@ -29,7 +29,7 @@ def production_runtime():
     gate.APPROVAL_SECRET = "final-approval-secret"
     gate.REQUIRE_SESSION_BINDING = True
     gate.STATE_ORACLE_SECRET = "ci-csg-state-oracle-secret"
-    commit_snapshot({"source": "test-final-authority", "status": "ready", "execution_boundary": "test"}, world_version="final-authority-test-world")
+    commit_snapshot({"source": "test-final-authority", "status": "ready", "execution_boundary": "test"}, world_version=f"final-authority-test-world-{uuid.uuid4().hex}")
     yield
     gate.ENVIRONMENT = "development"
     gate.API_TOKEN = os.environ.get("ACTION_GATE_API_TOKEN") or "ci-csg-token"
