@@ -19,6 +19,7 @@ from csg_routes import router as csg_router
 from keyring import configured_key_ids, current_key_id, current_secret, verify_with_keyring
 from policy_store import load_policy, policy_hash
 from security_authority import issue_authority
+from state_oracle import STATE_ORACLE_SECRET, commit_snapshot, get_current_snapshot, verify_commit_signature
 
 APP_VERSION = Path(__file__).with_name("VERSION").read_text(encoding="utf-8").strip()
 API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
@@ -416,11 +417,41 @@ def ensure_live(record: dict[str, Any]):
         raise HTTPException(403, "decision_expired")
 
 
+@app.get("/v1/state/current")
+def state_current(authorization: str | None = Header(default=None)):
+    require_auth(authorization)
+    current = get_current_snapshot()
+    if current is None:
+        raise HTTPException(503, "state_oracle_not_initialized")
+    return {k: current[k] for k in ("snapshot_id", "world_version", "snapshot_hash", "committed_at")}
+
+
+class StateSnapshotRequest(BaseModel):
+    world_version: str
+    snapshot: dict[str, Any] = Field(default_factory=dict)
+    oracle_signature: str
+
+
+@app.post("/v1/state/commit")
+def state_commit(req: StateSnapshotRequest, authorization: str | None = Header(default=None)):
+    require_auth(authorization)
+    if ENVIRONMENT == "production" and not STATE_ORACLE_SECRET:
+        raise HTTPException(503, "production_state_oracle_secret_not_configured")
+    payload = {"world_version": req.world_version, "snapshot": req.snapshot}
+    if not verify_commit_signature(payload, req.oracle_signature):
+        raise HTTPException(401, "state_oracle_signature_invalid")
+    try:
+        return commit_snapshot(req.snapshot, req.world_version)
+    except Exception as exc:
+        raise HTTPException(503, "state_oracle_commit_failed") from exc
+
+
 @app.get("/health")
 def health():
     db_health = storage_health()
     status = "ok" if db_health["status"] == "ok" else "degraded"
-    return {"status": status, "product": "HamidCognition Action Gate", "version": APP_VERSION, "policy_hash": POLICY_HASH, "policy_version": POLICY_SNAPSHOT["policy_version"], "key_ids": configured_key_ids(), "current_key_id": current_key_id(), "environment": ENVIRONMENT, "storage": db_health}
+    current_state = get_current_snapshot()
+    return {"status": status if current_state is not None or ENVIRONMENT != "production" else "degraded", "product": "HamidCognition Action Gate", "version": APP_VERSION, "policy_hash": POLICY_HASH, "policy_version": POLICY_SNAPSHOT["policy_version"], "key_ids": configured_key_ids(), "current_key_id": current_key_id(), "environment": ENVIRONMENT, "storage": db_health, "state_oracle": {"status": "ready" if current_state else "uninitialized", "world_version": current_state["world_version"] if current_state else None}}
 
 
 @app.post("/v1/action/evaluate")
@@ -439,6 +470,14 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
     nonce = uuid.uuid4().hex
     risk, risk_reasons = evaluate_risk(req)
     signal = compute_signal(req, risk)
+    current_state = get_current_snapshot()
+    if current_state is None:
+        if ENVIRONMENT == "production":
+            raise HTTPException(503, "state_oracle_not_initialized")
+    else:
+        if req.world_version is not None and req.world_version != current_state["world_version"]:
+            raise HTTPException(409, "request_world_version_is_not_current")
+        req.world_version = current_state["world_version"]
     evidence_status, normalized_evidence, contradictions = evidence_gate(req.evidence)
     if contradictions:
         decision = "ASK"
@@ -608,8 +647,12 @@ def execution_reserve(decision_id: str, outcome: ExecutionOutcome, authorization
         raise HTTPException(409, "execution_session_binding_mismatch")
     if outcome.nonce != record["nonce"]:
         raise HTTPException(409, "execution_nonce_mismatch")
-    if record.get("world_version") is not None and outcome.world_version != record.get("world_version"):
-        raise HTTPException(409, "execution_world_version_mismatch")
+    current_state = get_current_snapshot()
+    if record.get("world_version") is not None:
+        if outcome.world_version != record.get("world_version"):
+            raise HTTPException(409, "execution_world_version_mismatch")
+        if current_state is None or current_state["world_version"] != record.get("world_version"):
+            raise HTTPException(409, "execution_world_state_changed")
     if record.get("evidence_state", {}).get("contradictions"):
         raise HTTPException(409, "execution_blocked_by_evidence_contradiction")
     if record.get("evidence_state", {}).get("status") == "BLOCK":
@@ -663,8 +706,12 @@ def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | 
         raise HTTPException(409, "execution_session_binding_mismatch")
     if outcome.nonce != record["nonce"]:
         raise HTTPException(409, "execution_nonce_mismatch")
-    if record.get("world_version") is not None and outcome.world_version != record.get("world_version"):
-        raise HTTPException(409, "execution_world_version_mismatch")
+    current_state = get_current_snapshot()
+    if record.get("world_version") is not None:
+        if outcome.world_version != record.get("world_version"):
+            raise HTTPException(409, "execution_world_version_mismatch")
+        if current_state is None or current_state["world_version"] != record.get("world_version"):
+            raise HTTPException(409, "execution_world_state_changed")
     if record.get("evidence_state", {}).get("contradictions"):
         raise HTTPException(409, "execution_blocked_by_evidence_contradiction")
     if record.get("evidence_state", {}).get("status") == "BLOCK":
