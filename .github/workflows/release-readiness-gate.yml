@@ -37,6 +37,21 @@ jobs:
 
           echo "Release readiness target SHA: $TARGET_SHA"
 
+          # Ordinary main commits are not release candidates. Validation on
+          # every commit caused false failures when path-filtered workflows
+          # legitimately did not run for that SHA. A release candidate is
+          # identified by an existing action-gate-v* tag pointing at TARGET_SHA.
+          tagged="$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/git/refs/tags" | \
+            jq -r --arg sha "$TARGET_SHA" '.[] | select(.object.sha==$sha) | .ref' | \
+            grep -E "^refs/tags/action-gate-v" | head -n1 || true)"
+          if [ -z "$tagged" ]; then
+            echo "RELEASE_READINESS_SKIP_NON_RELEASE_SHA"
+            echo "validated_sha=$TARGET_SHA"
+            exit 0
+          fi
+          echo "Release candidate tag: $tagged"
+
           required_workflows=(
             "Action Gate Product Gates"
             "Action Gate Product Integrity"
