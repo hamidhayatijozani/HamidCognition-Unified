@@ -42,9 +42,9 @@ A successful witness establishes that:
 
 It does **not** prove that the underlying software is safe, correct, commercially successful, or independently audited. Humans remain remarkably inventive at confusing cryptographic integrity with truth.
 
-## Private-repository constraint
+## GitHub attestation versus Sigstore
 
-GitHub Artifact Attestations are not used for this private repository. GitHub's current documentation states that Artifact Attestations for private repositories require GitHub Enterprise Cloud. The public Sigstore path is used instead so the transparency witness is outside the repository's storage boundary.
+The repository is currently public. This workflow intentionally uses the public Sigstore path rather than making GitHub Artifact Attestations the sole witness. Sigstore keyless signing publishes the signing event to the public Rekor transparency log, keeping the witness independently auditable outside the repository's own storage and GitHub Actions artifact store.
 
 ## Verification
 
