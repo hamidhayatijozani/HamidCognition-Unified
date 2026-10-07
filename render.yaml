@@ -16,6 +16,131 @@ services:
           name: hamidcognition-claimlab-db
           property: connectionString
 
+  - type: pserv
+    name: hamidcognition-action-gate
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./action_gate/Dockerfile
+    dockerContext: .
+    envVars:
+      - fromGroup: hamidcognition-action-gate-secrets
+      - key: ACTION_GATE_ENV
+        value: production
+      - key: ACTION_GATE_DATABASE_URL
+        fromDatabase:
+          name: hamidcognition-action-gate-db
+          property: connectionString
+      - key: ACTION_GATE_REQUIRE_SESSION_BINDING
+        value: "1"
+      - key: ACTION_GATE_KEY_ID
+        value: hhj-csg-render-1
+      - key: ACTION_GATE_RATE_LIMIT_PER_MINUTE
+        value: "120"
+      - key: ACTION_GATE_DECISION_TTL_SECONDS
+        value: "300"
+      - key: ACTION_GATE_APPROVAL_TTL_SECONDS
+        value: "300"
+
+  - type: pserv
+    name: hamidcognition-protected-tool
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./action_gate/Dockerfile.tool
+    dockerContext: ./action_gate
+    envVars:
+      - fromGroup: hamidcognition-action-gate-secrets
+      - key: TOOL_NONCE_DB
+        value: /data/tool_authority.db
+    disk:
+      name: tool-data
+      mountPath: /data
+      sizeGB: 1
+
+  - type: pserv
+    name: hamidcognition-enforcement
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./action_gate/Dockerfile.enforcement
+    dockerContext: ./action_gate
+    envVars:
+      - fromGroup: hamidcognition-action-gate-secrets
+      - key: GATE_URL
+        fromService:
+          name: hamidcognition-action-gate
+          type: pserv
+          hostport: 8000
+      - key: TOOL_URL
+        fromService:
+          name: hamidcognition-protected-tool
+          type: pserv
+          hostport: 9000
+      - key: MODE
+        value: http
+      - key: PORT
+        value: "8080"
+
+  - type: web
+    name: hamidcognition-action-gate-console
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./dashboard/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - fromGroup: hamidcognition-action-gate-secrets
+      - key: ACTION_GATE_URL
+        fromService:
+          name: hamidcognition-action-gate
+          type: pserv
+          hostport: 8000
+      - key: ENFORCEMENT_URL
+        fromService:
+          name: hamidcognition-enforcement
+          type: pserv
+          hostport: 8080
+      - key: DASHBOARD_TENANT_ID
+        value: dashboard-demo
+      - key: PORT
+        value: "10000"
+
+  - type: web
+    name: hamidcognition-action-gate-mcp
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./action_gate/Dockerfile.mcp
+    dockerContext: .
+    envVars:
+      - fromGroup: hamidcognition-action-gate-secrets
+      - key: ACTION_GATE_URL
+        fromService:
+          name: hamidcognition-action-gate
+          type: pserv
+          hostport: 8000
+      - key: PROTECTED_TOOL_URL
+        fromService:
+          name: hamidcognition-protected-tool
+          type: pserv
+          hostport: 9000
+      - key: MCP_HOST
+        value: "0.0.0.0"
+      - key: MCP_PORT
+        value: "10000"
+      - key: MCP_RESOURCE_URL
+        value: https://hamidcognition-action-gate-mcp.onrender.com/mcp
+      - key: MCP_ISSUER_URL
+        value: https://hamidcognition-action-gate-mcp.onrender.com
+      - key: MCP_REQUIRED_SCOPE
+        value: mcp:execute
+      - key: MCP_CLIENT_ID
+        value: hamidcognition-console
+      - key: MCP_TOKEN_TTL_SECONDS
+        value: "3600"
+
 databases:
   - name: hamidcognition-claimlab-db
     plan: free
@@ -23,3 +148,10 @@ databases:
     postgresMajorVersion: "17"
     databaseName: claimlab
     user: claimlab
+  - name: hamidcognition-action-gate-db
+    plan: free
+    region: frankfurt
+    postgresMajorVersion: "17"
+    databaseName: action_gate
+    user: action_gate
+    ipAllowList: []
