@@ -32,7 +32,7 @@ def main():
         if missing: fail(f"decision missing required fields: {missing}")
         if decision.get("decision")!="ALLOW": fail("inert acceptance action was not allowed: "+str(decision.get("decision")))
         did=decision["decision_id"]
-        execution={"tenant_id":TENANT,"actor_id":ACTOR,"session_id":SESSION,"action_hash":decision["action_hash"],"nonce":decision["nonce"],"outcome":{"status":"acceptance_smoke_ok","side_effect":False}}
+        execution={"tenant_id":TENANT,"actor_id":ACTOR,"session_id":SESSION,"action_hash":decision["action_hash"],"nonce":decision["nonce"],"world_version":decision.get("world_version"),"outcome":{"status":"acceptance_smoke_ok","side_effect":False}}
         _,reserved=request("POST",f"/v1/action/{did}/execution/reserve",execution)
         if reserved.get("execution",{}).get("status")!="RESERVED": fail("execution reservation was not recorded")
         _,executed=request("POST",f"/v1/action/{did}/execution",execution)
