@@ -1,5 +1,6 @@
 import os
 import tempfile
+import pytest
 
 os.environ["ACTION_GATE_DB"] = os.path.join(tempfile.gettempdir(), "hamidcognition-action-gate-test.db")
 os.environ["ACTION_GATE_ENV"] = "development"
@@ -14,6 +15,11 @@ gate.REQUIRE_SESSION_BINDING = False
 
 client = TestClient(app)
 TENANT = "tenant-a"
+
+
+@pytest.fixture(autouse=True)
+def isolate_state_oracle(monkeypatch):
+    monkeypatch.setattr(gate, "get_current_snapshot", lambda: None)
 
 
 def evaluate(payload):
