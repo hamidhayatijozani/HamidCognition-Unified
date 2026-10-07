@@ -20,7 +20,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 TRUTH = ROOT / "PRODUCT" / "RELEASE_TRUTH_RECORD.md"
 CONTROL = ROOT / "PRODUCT" / "PRODUCT_COMPLETION_CONTROL.md"
 SHA_RE = re.compile(r"\b[0-9a-f]{40}\b")
