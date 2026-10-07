@@ -77,11 +77,13 @@ async def evaluate(payload: dict[str, Any]) -> dict[str, Any]:
     if not action:
         raise HTTPException(422, "action_required")
 
+    tenant_id = str(payload.get("tenant_id") or TENANT_ID)
+    session_id = str(payload.get("session_id") or "dashboard-session")
     body = {
-        "tenant_id": TENANT_ID,
+        "tenant_id": tenant_id,
         "agent_id": agent_id,
         "actor_id": actor_id,
-        "session_id": "dashboard-session",
+        "session_id": session_id,
         "action": action,
         "target": target,
         "parameters": {},
