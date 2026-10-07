@@ -47,5 +47,30 @@ for i in {1..30}; do
   sleep 2
 done
 
+echo "Committing initial runtime state snapshot..."
+docker compose -f action_gate/docker-compose.production.yml --env-file "$ENV_FILE" exec -T action-gate python - <<'PY'
+import hashlib, hmac, json, os, urllib.request
+
+payload = {
+    "world_version": "bootstrap-" + os.environ.get("HOSTNAME", "runtime"),
+    "snapshot": {
+        "source": "runtime-bootstrap-self-observation",
+        "components": ["postgres", "action-gate", "enforcement", "tool", "dashboard", "mcp", "edge"],
+        "execution_boundary": "internal-tool-not-directly-public",
+    },
+}
+canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+signature = hmac.new(os.environ["ACTION_GATE_STATE_ORACLE_SECRET"].encode(), canonical.encode(), hashlib.sha256).hexdigest()
+body = json.dumps({**payload, "oracle_signature": signature}).encode()
+req = urllib.request.Request(
+    "http://127.0.0.1:8000/v1/state/commit",
+    data=body,
+    headers={"Authorization": "Bearer " + os.environ["ACTION_GATE_API_TOKEN"], "Content-Type": "application/json"},
+    method="POST",
+)
+with urllib.request.urlopen(req, timeout=10) as response:
+    print(response.read().decode())
+PY
+
 echo "Runtime capsule started."
 docker compose -f action_gate/docker-compose.production.yml --env-file "$ENV_FILE" ps
