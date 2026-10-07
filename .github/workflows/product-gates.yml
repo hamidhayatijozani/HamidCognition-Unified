@@ -35,6 +35,16 @@ jobs:
           ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           ACTION_GATE_SIGNING_SECRET: ci-signing-secret
         run: pytest -q
+      - name: Verify State Oracle and Runtime Capsule integrity
+        working-directory: action_gate
+        env:
+          ACTION_GATE_ENV: development
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+        run: |
+          pytest -q test_state_oracle.py test_decision_integrity.py
+          bash -n ../tools/runtime_capsule_bootstrap.sh
+
       - name: Run Action Gate meta-validation boundary
         working-directory: action_gate
         env:
