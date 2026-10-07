@@ -1,5 +1,5 @@
 name: Evidence Chain Integrity
-# Every main push must leave a same-SHA audit trail.
+# Every main push must leave a same-SHA audit trail and an externally witnessed digest.
 
 on:
   push:
@@ -16,7 +16,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - name: Checkout exact source SHA
         uses: actions/checkout@v4
@@ -27,6 +27,10 @@ jobs:
       - name: Verify same-SHA release lineage
         env:
           GITHUB_SHA: ${{ github.sha }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_WORKFLOW_REF: ${{ github.workflow_ref }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
           PRODUCTION_BASE_URL: ${{ secrets.PRODUCTION_BASE_URL }}
           EVIDENCE_OUTPUT: evidence/evidence-chain-integrity.json
         run: |
@@ -38,6 +42,28 @@ jobs:
           set -euo pipefail
           sha256sum evidence/evidence-chain-integrity.json | tee evidence/evidence-chain-integrity.json.sha256
 
+      # GitHub Artifact Attestations are not used here because this repository is
+      # private. Keyless Sigstore signing publishes the digest to the public
+      # Rekor transparency log, creating a witness outside this repository.
+      - name: Create public Sigstore witness
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: sigstore/gh-action-sigstore-python@v3.4.0
+        with:
+          inputs: evidence/evidence-chain-integrity.json
+          verify: true
+          verify-cert-identity: https://github.com/hamidhayatijozani/HamidCognition-Unified/.github/workflows/evidence-chain-integrity.yml@refs/heads/main
+          verify-oidc-issuer: https://token.actions.githubusercontent.com
+          upload-signing-artifacts: true
+
+      - name: Normalize Sigstore witness bundle
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          bundle="$(find evidence -maxdepth 1 -type f \( -name '*.sigstore' -o -name '*.sigstore.json' \) -print -quit)"
+          test -n "$bundle"
+          cp "$bundle" evidence/evidence-chain-integrity.sigstore.json
+          sha256sum evidence/evidence-chain-integrity.sigstore.json | tee evidence/evidence-chain-integrity.sigstore.json.sha256
+
       - name: Upload audit evidence
         uses: actions/upload-artifact@v4
         with:
@@ -45,5 +71,7 @@ jobs:
           path: |
             evidence/evidence-chain-integrity.json
             evidence/evidence-chain-integrity.json.sha256
+            evidence/evidence-chain-integrity.sigstore.json
+            evidence/evidence-chain-integrity.sigstore.json.sha256
           if-no-files-found: error
           retention-days: 30
