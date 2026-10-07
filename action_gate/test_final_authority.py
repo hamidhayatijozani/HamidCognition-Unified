@@ -9,10 +9,12 @@ import pytest
 os.environ["ACTION_GATE_DB"] = os.path.join(tempfile.gettempdir(), "hamidcognition-action-gate-final.db")
 os.environ.setdefault("ACTION_GATE_API_TOKEN", "ci-csg-token")
 os.environ.setdefault("ACTION_GATE_SIGNING_SECRET", "ci-csg-secret")
+os.environ.setdefault("ACTION_GATE_STATE_ORACLE_SECRET", "ci-csg-state-oracle-secret")
 os.environ.setdefault("ACTION_GATE_ENV", "development")
 
 from fastapi.testclient import TestClient
 import app as gate
+from state_oracle import commit_snapshot
 
 
 client = TestClient(gate.app)
@@ -26,6 +28,8 @@ def production_runtime():
     gate.SIGNING_SECRET = "final-signing-secret"
     gate.APPROVAL_SECRET = "final-approval-secret"
     gate.REQUIRE_SESSION_BINDING = True
+    gate.STATE_ORACLE_SECRET = "ci-csg-state-oracle-secret"
+    commit_snapshot({"source": "test-final-authority", "status": "ready", "execution_boundary": "test"}, world_version="final-authority-test-world")
     yield
     gate.ENVIRONMENT, gate.API_TOKEN, gate.SIGNING_SECRET, gate.APPROVAL_SECRET, gate.REQUIRE_SESSION_BINDING = old
 
