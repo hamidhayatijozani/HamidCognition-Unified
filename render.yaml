@@ -1,3 +1,17 @@
+envVarGroups:
+  - name: hamidcognition-action-gate-secrets
+    envVars:
+      - key: ACTION_GATE_API_TOKEN
+        generateValue: true
+      - key: ACTION_GATE_SIGNING_SECRET
+        generateValue: true
+      - key: ACTION_GATE_APPROVAL_SECRET
+        generateValue: true
+      - key: ACTION_GATE_AUTHORITY_SECRET
+        generateValue: true
+      - key: MCP_BEARER_TOKEN
+        generateValue: true
+
 services:
   - type: web
     name: hamidcognition-claimlab
