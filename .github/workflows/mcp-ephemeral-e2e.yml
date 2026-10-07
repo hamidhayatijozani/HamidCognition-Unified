@@ -38,6 +38,27 @@ jobs:
         run: |
           docker compose             -f action_gate/docker-compose.production.yml             -f action_gate/docker-compose.chatgpt-quick-tunnel.yml             up -d --build
 
+      - name: Initialize production State Oracle
+        env:
+          ACTION_GATE_API_TOKEN: e2e-action-gate-token
+          ACTION_GATE_STATE_ORACLE_SECRET: e2e-state-oracle-secret
+        run: |
+          set -euo pipefail
+          for i in {1..60}; do
+            if docker compose -f action_gate/docker-compose.production.yml -f action_gate/docker-compose.chatgpt-quick-tunnel.yml exec -T action-gate python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health').read()" >/dev/null 2>&1; then break; fi
+            sleep 2
+          done
+          docker compose -f action_gate/docker-compose.production.yml -f action_gate/docker-compose.chatgpt-quick-tunnel.yml exec -T action-gate python - <<'PY'
+          import hashlib, hmac, json, os, urllib.request
+          payload = {"world_version": "e2e-ephemeral-world-v1", "snapshot": {"source": "mcp-ephemeral-e2e", "status": "ready"}}
+          canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+          signature = hmac.new(os.environ["ACTION_GATE_STATE_ORACLE_SECRET"].encode(), canonical, hashlib.sha256).hexdigest()
+          body = json.dumps({**payload, "oracle_signature": signature}).encode()
+          req = urllib.request.Request("http://127.0.0.1:8000/v1/state/commit", data=body, headers={"Authorization": "Bearer " + os.environ["ACTION_GATE_API_TOKEN"], "Content-Type": "application/json"}, method="POST")
+          with urllib.request.urlopen(req, timeout=10) as response:
+              assert response.status == 200
+              print(response.read().decode())
+          PY
       - name: Wait for PostgreSQL, Action Gate and MCP readiness
         run: |
           set -euo pipefail
