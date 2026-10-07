@@ -96,6 +96,7 @@ def main() -> int:
             "session_id": decision["session_id"],
             "action_hash": decision["action_hash"],
             "nonce": decision["nonce"],
+            "world_version": decision.get("world_version"),
             "outcome": {"status": "synthetic-success", "gate": "sellable"},
         }
         status, reserved = request("POST", f"/v1/action/{decision_id}/execution/reserve", execution)
