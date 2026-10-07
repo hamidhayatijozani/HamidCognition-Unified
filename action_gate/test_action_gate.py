@@ -23,7 +23,10 @@ def evaluate(payload):
 
 
 def reserve(data):
-    return client.post(f"/v1/action/{data['decision_id']}/execution/reserve", json={"tenant_id": TENANT, "actor_id": data.get("actor_id", "vb-actor"), "action_hash": data["action_hash"], "nonce": data["nonce"], "world_version": data.get("world_version")})
+    response = client.post(f"/v1/action/{data['decision_id']}/execution/reserve", json={"tenant_id": TENANT, "actor_id": data.get("actor_id", "vb-actor"), "action_hash": data["action_hash"], "nonce": data["nonce"], "world_version": data.get("world_version")})
+    if response.status_code != 200:
+        print("RESERVE_FAILURE", response.status_code, response.text)
+    return response
 
 
 def test_delete_production_is_denied():
