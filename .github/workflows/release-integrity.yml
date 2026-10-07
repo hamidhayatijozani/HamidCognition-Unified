@@ -1,5 +1,7 @@
 name: Release Integrity — v1 Baseline
 
+# Automated verification of published release assets.
+
 on:
   push:
     branches: ["main"]
