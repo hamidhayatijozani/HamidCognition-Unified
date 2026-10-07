@@ -710,6 +710,8 @@ def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | 
         raise HTTPException(409, "execution_nonce_mismatch")
     current_state = get_current_snapshot()
     if record.get("world_version") is not None:
+        if outcome.world_version is None:
+            outcome.world_version = record.get("world_version")
         if outcome.world_version != record.get("world_version"):
             raise HTTPException(409, "execution_world_version_mismatch")
         if current_state is None or current_state["world_version"] != record.get("world_version"):
