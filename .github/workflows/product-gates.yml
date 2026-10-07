@@ -383,6 +383,17 @@ jobs:
           docker compose -f docker-compose.production.yml logs --no-color --tail=1000 action-gate postgres tool enforcement > production-startup-logs.txt 2>&1 || true
           docker inspect $(docker compose -f docker-compose.production.yml ps -q action-gate 2>/dev/null || true) > production-action-gate-inspect.json 2>&1 || true
 
+      - name: Upload production diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-diagnostics-${{ github.run_id }}
+          path: |
+            action_gate/production-startup-ps.txt
+            action_gate/production-startup-logs.txt
+            action_gate/production-action-gate-inspect.json
+          if-no-files-found: warn
+
       - name: Collect replay evidence from production container
         if: always()
         working-directory: action_gate
