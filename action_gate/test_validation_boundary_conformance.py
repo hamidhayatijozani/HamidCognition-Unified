@@ -15,6 +15,14 @@ TENANT = "vb-tenant-a"
 OTHER_TENANT = "vb-tenant-b"
 
 
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def isolate_state_oracle(monkeypatch):
+    monkeypatch.setattr(gate, "get_current_snapshot", lambda: None)
+
+
 def evaluate(action="read_public_file", target="/public/info.txt", **extra):
     payload = {"tenant_id": TENANT, "agent_id": "vb-agent", "actor_id": "vb-actor", "action": action, "target": target, **extra}
     response = client.post("/v1/action/evaluate", json=payload)
