@@ -37,6 +37,7 @@ def init_db() -> None:
         con.execute("CREATE INDEX IF NOT EXISTS idx_rate_limit_events_key_time ON rate_limit_events(rate_key, created_at)")
         con.execute("CREATE TABLE IF NOT EXISTS authority_nonces (nonce TEXT PRIMARY KEY, decision_id TEXT NOT NULL, consumed_at TEXT NOT NULL)")
         con.execute("CREATE TABLE IF NOT EXISTS execution_reconciliations (reconciliation_id TEXT PRIMARY KEY, decision_id TEXT NOT NULL UNIQUE, tenant_id TEXT NOT NULL, nonce TEXT NOT NULL, resolution TEXT NOT NULL, outcome TEXT NOT NULL, created_at TEXT NOT NULL, resolved_at TEXT NOT NULL)")
+        con.execute("CREATE TABLE IF NOT EXISTS state_snapshots (snapshot_id TEXT PRIMARY KEY, world_version TEXT UNIQUE NOT NULL, snapshot_hash TEXT NOT NULL, snapshot TEXT NOT NULL, committed_at TEXT NOT NULL)")
         con.commit()
         if backend() == "sqlite":
             con.execute("CREATE TRIGGER IF NOT EXISTS audit_events_no_update BEFORE UPDATE ON audit_events BEGIN SELECT RAISE(ABORT, 'audit_events_are_append_only'); END")
