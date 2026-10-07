@@ -22,7 +22,6 @@ client = TestClient(gate.app)
 
 @pytest.fixture(autouse=True)
 def production_runtime():
-    old = (gate.ENVIRONMENT, gate.API_TOKEN, gate.SIGNING_SECRET, gate.APPROVAL_SECRET, gate.REQUIRE_SESSION_BINDING)
     gate.ENVIRONMENT = "production"
     gate.API_TOKEN = "final-token"
     gate.SIGNING_SECRET = "final-signing-secret"
@@ -31,7 +30,11 @@ def production_runtime():
     gate.STATE_ORACLE_SECRET = "ci-csg-state-oracle-secret"
     commit_snapshot({"source": "test-final-authority", "status": "ready", "execution_boundary": "test"}, world_version="final-authority-test-world")
     yield
-    gate.ENVIRONMENT, gate.API_TOKEN, gate.SIGNING_SECRET, gate.APPROVAL_SECRET, gate.REQUIRE_SESSION_BINDING = old
+    gate.ENVIRONMENT = "development"
+    gate.API_TOKEN = os.environ.get("ACTION_GATE_API_TOKEN") or "ci-csg-token"
+    gate.SIGNING_SECRET = os.environ.get("ACTION_GATE_SIGNING_SECRET") or "ci-csg-secret"
+    gate.APPROVAL_SECRET = os.environ.get("ACTION_GATE_APPROVAL_SECRET")
+    gate.REQUIRE_SESSION_BINDING = False
 
 
 def request_payload(**extra):
