@@ -81,3 +81,56 @@ def test_evidence_plane_detects_payload_tampering(monkeypatch, tmp_path):
     result = plane.verify_integrity()
     assert result["valid"] is False
     assert result["reason"] == "event_content_tampered"
+
+
+
+def _allow_record(target="tool://safe"):
+    from datetime import datetime, timedelta, timezone
+    return {
+        "tenant_id": "t1",
+        "actor_id": "u1",
+        "session_id": "s1",
+        "nonce": "nonce-1",
+        "action_hash": "hash-1",
+        "decision": "ALLOW",
+        "consumed_at": None,
+        "expires_at": (datetime.now(timezone.utc) + timedelta(minutes=5)).isoformat(),
+        "request": {"agent_id": "a1", "action": "read", "target": target, "session_id": "s1"},
+        "approval": None,
+        "evidence_state": {"status": "PASS", "contradictions": []},
+        "policy_snapshot": {"policy_version": "test", "rules": []},
+        "policy_version": "test",
+    }
+
+
+def test_kill_switch_blocks_real_execution_route(monkeypatch, tmp_path):
+    plane = load_plane(monkeypatch, tmp_path)
+    import app as gate
+    from fastapi.testclient import TestClient
+    monkeypatch.setattr(gate, "load", lambda decision_id, tenant_id: _allow_record())
+    monkeypatch.setattr(gate, "require_auth", lambda authorization: None)
+    monkeypatch.setattr(gate, "enforce_rate_limit", lambda authorization, tenant_id: None)
+    plane.set_kill_switch(True, "e2e-incident")
+    client = TestClient(gate.app)
+    response = client.post(
+        "/v1/action/d1/execution/reserve",
+        json={"action_hash": "hash-1", "tenant_id": "t1", "actor_id": "u1", "session_id": "s1", "nonce": "nonce-1"},
+    )
+    assert response.status_code == 503
+    assert response.json()["detail"] == "security_kill_switch_active"
+
+
+def test_tripwire_blocks_real_execution_route(monkeypatch, tmp_path):
+    plane = load_plane(monkeypatch, tmp_path)
+    import app as gate
+    from fastapi.testclient import TestClient
+    monkeypatch.setattr(gate, "load", lambda decision_id, tenant_id: _allow_record("decoy://secret"))
+    monkeypatch.setattr(gate, "require_auth", lambda authorization: None)
+    monkeypatch.setattr(gate, "enforce_rate_limit", lambda authorization, tenant_id: None)
+    client = TestClient(gate.app)
+    response = client.post(
+        "/v1/action/d1/execution/reserve",
+        json={"action_hash": "hash-1", "tenant_id": "t1", "actor_id": "u1", "session_id": "s1", "nonce": "nonce-1"},
+    )
+    assert response.status_code == 403
+    assert response.json()["detail"] == "security_tripwire_triggered"
