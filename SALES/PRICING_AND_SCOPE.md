@@ -8,11 +8,11 @@ The initial offer is a **30-day one-tool proof-of-value pilot**. It is intention
 
 ## Pilot price
 
-**Proposed pilot fee: USD 7,500–10,000 for 30 days.**
+**Standard scoped pilot fee: USD $2,500 fixed for 30 days.**
 
 This is a commercial proposal, not a claim that a market transaction has already occurred.
 
-The final quote is selected within this band according to integration complexity, number of protected paths, customer support requirements and acceptance scope.
+This standard price covers one protected HTTP/MCP tool, one controlled test environment, agreed acceptance cases, deployment assistance and an evidence package. Any expanded scope or price variation requires a separate written quote before work begins.
 
 ## Pilot includes
 
