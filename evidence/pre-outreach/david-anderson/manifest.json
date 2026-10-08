@@ -1,0 +1,22 @@
+{
+  "purpose": "pre-outreach technical evidence package",
+  "created": "2026-10-08",
+  "repository": "hamidhayatijozani/HamidCognition-Unified",
+  "main_head_observed": "9a964478e04000ca8a9f14d3212ee94674e49b30",
+  "canonical_release": "1.1.1",
+  "release_tag": "action-gate-v1.1.1",
+  "release_source_commit": "e9ea7565f4ddea91f5c45104237bd20564c80894",
+  "release_workflow_run": "36966012148",
+  "release_workflow_conclusion": "success",
+  "artifact_sha256": "517064de0427286ff4f346d46996642aca3b9def891d1c08bfaebc25546fb791",
+  "live_external_mcp_verification": "NOT_VERIFIED",
+  "david_outreach_sent": false,
+  "evidence_documents": [
+    "PRODUCT/VERSION_TRUTH_REPORT.md",
+    "PRODUCT/ACTION_GATE_EVIDENCE_MATRIX.md",
+    "PRODUCT/ANDERSON_GAP_MATRIX.md",
+    "PRODUCT/CUSTOMER_ACCEPTANCE.md",
+    "PRODUCT/PRODUCT_COMPLETION_CONTROL.md",
+    "PRODUCT/RELEASE_TRUTH_RECORD.md"
+  ]
+}
