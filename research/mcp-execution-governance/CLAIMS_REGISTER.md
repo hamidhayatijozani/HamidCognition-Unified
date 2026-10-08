@@ -11,7 +11,7 @@
 | C5 | Mandatory evidence failure prevents execution | Tool executes despite required evidence failure | UNKNOWN | Fault injection + side-effect ledger |
 | C6 | Configured topology blocks direct bypass | Direct caller reaches protected side effect outside the gateway | UNKNOWN | Network/credential test |
 | C7 | Evidence supports independent reconstruction | Reviewer cannot correlate decision, authority, and side effect | UNKNOWN | Independent replay |
-| C8 | Product has continuous anomaly detection, tripwires, or kill-switch containment | Feature absent or nonfunctional in pinned release | NOT CLAIMED | Do not claim without code inspection and tests |
+| C8 | The research branch contains a bounded anomaly detector, tripwire control, and kill-switch containment path | CI run `37835599661` on SHA `8e4d4c019af7a43560617c2a756c33f1f22cdc7e` fails, or route-level controls do not block | PARTIAL / VERSION-SPECIFIC | Six security-plane tests passed, including kill-switch route blocking, tripwire route blocking, bounded anomaly detection, and tamper-evident evidence verification. This does not establish continuous commercial detection or downstream side-effect containment. |
 | C9 | Product is customer-validated or revenue-generating | No verifiable acceptance/transaction record exists | NOT ESTABLISHED | Separate external records |
 
 ## Publication gates
