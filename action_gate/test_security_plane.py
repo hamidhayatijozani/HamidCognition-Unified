@@ -62,3 +62,22 @@ def test_bounded_burst_anomaly_is_replayable(monkeypatch, tmp_path):
     events = plane.recent_events(2)
     assert len(events) == 2
     assert all("event_fingerprint" in e for e in events)
+    assert plane.verify_integrity()["valid"] is True
+
+
+def test_evidence_plane_detects_payload_tampering(monkeypatch, tmp_path):
+    plane = load_plane(monkeypatch, tmp_path)
+    plane.observe(
+        event_type="EXECUTION", tenant_id="t1", agent_id="a1", actor_id="u1",
+        session_id="s1", action="read", target="tool://safe", payload={"value": "original"},
+    )
+    assert plane.verify_integrity()["valid"] is True
+    con = plane._connect()
+    try:
+        con.execute("UPDATE security_events SET payload_json = REPLACE(payload_json, 'original', 'tampered') WHERE id = 1")
+        con.commit()
+    finally:
+        con.close()
+    result = plane.verify_integrity()
+    assert result["valid"] is False
+    assert result["reason"] == "event_content_tampered"
