@@ -20,6 +20,7 @@ from keyring import configured_key_ids, current_key_id, current_secret, verify_w
 from policy_store import load_policy, policy_hash
 from security_authority import issue_authority
 from state_oracle import STATE_ORACLE_SECRET, commit_snapshot, get_current_snapshot, verify_commit_signature
+from security_plane import is_kill_switch_active, observe
 
 APP_VERSION = Path(__file__).with_name("VERSION").read_text(encoding="utf-8").strip()
 API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
@@ -410,6 +411,28 @@ def load(decision_id: str, tenant_id: str):
     return record
 
 
+
+def security_observe_or_block(*, event_type: str, req_tenant: str | None, req_agent: str | None, req_actor: str | None, req_session: str | None, action: str | None, target: str | None, decision: str | None = None, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+    event = observe(
+        event_type=event_type,
+        tenant_id=req_tenant,
+        agent_id=req_agent,
+        actor_id=req_actor,
+        session_id=req_session,
+        action=action,
+        target=target,
+        decision=decision,
+        payload=payload,
+    )
+    if is_kill_switch_active():
+        raise HTTPException(503, "security_kill_switch_active")
+    if event["tripwire"]:
+        raise HTTPException(403, "security_tripwire_triggered")
+    if event["anomaly_detected"]:
+        raise HTTPException(403, "security_anomaly_detected")
+    return event
+
+
 def ensure_live(record: dict[str, Any]):
     if record.get("consumed_at") is not None:
         raise HTTPException(409, "decision_nonce_already_consumed")
@@ -639,6 +662,17 @@ def execution_reserve(decision_id: str, outcome: ExecutionOutcome, authorization
     ensure_live(record)
     if record["decision"] != "ALLOW":
         raise HTTPException(403, "execution_not_permitted_by_gate")
+    security_observe_or_block(
+        event_type="EXECUTION_RESERVE",
+        req_tenant=record.get("tenant_id"),
+        req_agent=record.get("request", {}).get("agent_id"),
+        req_actor=record.get("actor_id"),
+        req_session=record.get("session_id"),
+        action=record.get("request", {}).get("action"),
+        target=record.get("request", {}).get("target"),
+        decision=record.get("decision"),
+        payload={"decision_id": decision_id, "action_hash": outcome.action_hash},
+    )
     if outcome.action_hash != record["action_hash"]:
         raise HTTPException(409, "execution_action_binding_mismatch")
     if record.get("actor_id") is not None and outcome.actor_id != record.get("actor_id"):
@@ -700,6 +734,17 @@ def execution(decision_id: str, outcome: ExecutionOutcome, authorization: str | 
     ensure_live(record)
     if record["decision"] != "ALLOW":
         raise HTTPException(403, "execution_not_permitted_by_gate")
+    security_observe_or_block(
+        event_type="EXECUTION_FINALIZE",
+        req_tenant=record.get("tenant_id"),
+        req_agent=record.get("request", {}).get("agent_id"),
+        req_actor=record.get("actor_id"),
+        req_session=record.get("session_id"),
+        action=record.get("request", {}).get("action"),
+        target=record.get("request", {}).get("target"),
+        decision=record.get("decision"),
+        payload={"decision_id": decision_id, "action_hash": outcome.action_hash},
+    )
     if outcome.action_hash != record["action_hash"]:
         raise HTTPException(409, "execution_action_binding_mismatch")
     if record.get("actor_id") is not None and outcome.actor_id != record.get("actor_id"):
