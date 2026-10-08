@@ -2,12 +2,12 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BESAZ / Action Gate — Technical Pilot</title>
 <style>
-body{margin:0;background:#070b10;color:#eef7fa;font:16px/1.6 system-ui,sans-serif}.wrap{max-width:850px;margin:auto;padding:48px 22px}.card{background:#0d141c;border:1px solid #243542;border-radius:16px;padding:28px}.eyebrow{color:#5ce1e6;letter-spacing:.12em;font-size:12px;font-weight:800}.cta{display:inline-block;margin:8px 8px 8px 0;padding:13px 17px;border-radius:9px;text-decoration:none;font-weight:800;background:#dffcff;color:#071014}.secondary{background:#101b24;color:#eef7fa;border:1px solid #304754}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.item{padding:14px;background:#080e14;border:1px solid #1d2b35;border-radius:10px}.muted{color:#9aadb6}@media(max-width:700px){.grid{grid-template-columns:1fr}}
+body{margin:0;background:#070b10;color:#eef7fa;font:16px/1.6 system-ui,sans-serif}.wrap{max-width:900px;margin:auto;padding:42px 22px}.card{background:#0d141c;border:1px solid #243542;border-radius:16px;padding:28px;margin-bottom:16px}.eyebrow{color:#5ce1e6;letter-spacing:.12em;font-size:12px;font-weight:800}.cta{display:inline-block;margin:8px 8px 8px 0;padding:13px 17px;border-radius:9px;text-decoration:none;font-weight:800;background:#dffcff;color:#071014}.secondary{background:#101b24;color:#eef7fa;border:1px solid #304754}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.item{padding:14px;background:#080e14;border:1px solid #1d2b35;border-radius:10px}.muted{color:#9aadb6}.proof{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.pass{border:1px solid #245d3a;background:#0b1c13;padding:14px;border-radius:10px}.pass b{display:block;color:#4ade80}.meta{font:12px/1.6 ui-monospace,monospace;color:#a9b8c0;word-break:break-word}@media(max-width:700px){.grid,.proof{grid-template-columns:1fr}}
 </style></head>
-<body><main class="wrap"><div class="card">
-<div class="eyebrow">BESAZ / ACTION GATE</div>
+<body><main class="wrap">
+<div class="card"><div class="eyebrow">BESAZ / ACTION GATE</div>
 <h1>Protect one consequential agent tool.</h1>
-<p class="muted">A narrow 30-day technical pilot for teams that need to prove an AI agent cannot bypass an execution authorization boundary.</p>
+<p class="muted">A narrow 30-day technical pilot for teams that need to test whether an AI agent can bypass an execution authorization boundary.</p>
 <div class="grid">
 <div class="item"><b>One HTTP or MCP tool</b><br><span class="muted">One controlled test environment.</span></div>
 <div class="item"><b>Execution enforcement</b><br><span class="muted">ALLOW / DENY / ASK / SANDBOX.</span></div>
@@ -19,6 +19,22 @@ body{margin:0;background:#070b10;color:#eef7fa;font:16px/1.6 system-ui,sans-seri
 <p><b>Best fit:</b> CISO, AI Security, Platform Security, or AI Platform teams with a production/prod-like agent and consequential HTTP/MCP tool access.</p>
 <a class="cta" href="https://github.com/hamidhayatijozani/HamidCognition-Unified/issues/new?title=Pilot%20scoping%20request&body=I%20want%20to%20scope%20a%2030-day%20Action%20Gate%20pilot.%0A%0AAgent/runtime:%0ATool%20(HTTP/MCP):%0AEnvironment:%0AConsequence%20of%20unauthorized%20execution:%0ATechnical%20owner:%0AContact:%0A">Request technical scoping</a>
 <a class="cta secondary" href="https://www.linkedin.com/in/davidandersonorlando">LinkedIn contact</a>
-<a class="cta secondary" href="https://github.com/hamidhayatijozani/HamidCognition-Unified">Review the engineering evidence</a>
-<p class="muted">The scoping request creates a public GitHub issue. Do not put secrets or sensitive customer data in the issue. For confidential discussions, move to a private channel after initial contact.</p>
-</div></main></body></html>
+<a class="cta secondary" href="https://github.com/hamidhayatijozani/HamidCognition-Unified">Review engineering evidence</a>
+</div>
+<div class="card"><div class="eyebrow">OBSERVED ENGINEERING EVIDENCE</div><h2>Risk Lab: real protected HTTP tool</h2>
+<p class="muted">This is repository engineering evidence, not customer acceptance, revenue, certification, or a universal security claim.</p>
+<div class="proof">
+<div class="pass"><b>G01 · PASS</b>Governed authorized execution</div>
+<div class="pass"><b>G02 · PASS</b>Direct bypass rejected · HTTP 403</div>
+<div class="pass"><b>G03 · PASS</b>Authority replay rejected · HTTP 403</div>
+<div class="pass"><b>B01 · OBSERVED</b>Direct reference execution · HTTP 200</div>
+</div>
+<p class="meta">Risk Lab commit: a8861aaea84ac1172c355461ae36bdb10aeaef9a<br>Workflow run: 36429274558<br>Artifact SHA256: 19141b22b0a17488dce982c2593ee66e6e2575dbe2a05f901df22d3a56929684</p>
+<p><a class="cta secondary" href="https://github.com/hamidhayatijozani/HamidCognition-Unified/blob/7bc2460473929af56f2a88f31360494f87d5888b/tools/run_risk_lab_demo.py">Inspect the Risk Lab test code</a></p>
+</div>
+<div class="card"><div class="eyebrow">TECHNICAL SCOPING</div>
+<h2>Bring one tool. We test the boundary.</h2>
+<p class="muted">The first meeting is not a sales presentation. We identify one consequential action, define the protected path, and agree on observable acceptance tests.</p>
+<a class="cta" href="https://github.com/hamidhayatijozani/HamidCognition-Unified/issues/new?title=Pilot%20scoping%20request&body=I%20want%20to%20scope%20a%2030-day%20Action%20Gate%20pilot.%0A%0AAgent/runtime:%0ATool%20(HTTP/MCP):%0AEnvironment:%0AConsequence%20of%20unauthorized%20execution:%0ATechnical%20owner:%0AContact:%0A">Request technical scoping</a>
+</div>
+</main></body></html>
