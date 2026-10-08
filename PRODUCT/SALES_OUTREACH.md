@@ -20,11 +20,9 @@ I’m reaching out regarding HamidCognition Action Gate, a separately deployable
 
 The system evaluates actions before execution, binds authorization to tenant, actor, session, and action identity, enforces execution authority, and retains evidence for replay and audit. It supports ALLOW, DENY, ASK, and SANDBOX decisions and includes HTTP and MCP enforcement boundaries.
 
-We are opening a limited number of enterprise proof-of-value engagements focused on a real agent-to-tool execution path.
+The standard pilot is USD $2,500 fixed for 30 days: one customer-selected HTTP/MCP tool, one controlled test environment, agreed adversarial acceptance cases, and a reproducible evidence package. Expanded scope requires a separate written quote.
 
-The proposed pilot is 6–8 weeks and is scoped at 50,000 USDT, with the objective of demonstrating the control boundary against customer-selected action scenarios and producing an acceptance/evidence report.
-
-If the use case is relevant, the next step is a technical evaluation under an appropriate NDA.
+The first conversation should determine whether one real workflow can be isolated and tested; it is not a claim that Action Gate already integrates with the recipient's detector or environment.
 
 ## NDA boundary
 
@@ -48,7 +46,7 @@ The pilot should define in writing:
 
 ## Payment
 
-Commercial fees are payable in USDT only. The invoice identifies the exact network, receiving address, amount and payment deadline. A transaction is treated as settled only after transaction-hash verification and the required confirmations.
+Commercial fees are payable in USDT only. The invoice identifies the agreed provider/payment route, amount and deadline. Do not claim automatic on-chain verification unless a real blockchain address, network and verification process have been configured. Settlement must be independently recorded before entitlement.
 
 ## Commercial guardrails
 
