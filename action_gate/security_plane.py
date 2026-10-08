@@ -33,9 +33,19 @@ def _connect() -> sqlite3.Connection:
             decision TEXT,
             anomaly_score REAL,
             tripwire INTEGER NOT NULL DEFAULT 0,
-            payload_json TEXT NOT NULL
+            payload_json TEXT NOT NULL,
+            event_fingerprint TEXT,
+            previous_integrity_hash TEXT,
+            integrity_hash TEXT
         )"""
     )
+    columns = {row[1] for row in con.execute("PRAGMA table_info(security_events)")}
+    if "event_fingerprint" not in columns:
+        con.execute("ALTER TABLE security_events ADD COLUMN event_fingerprint TEXT")
+    if "previous_integrity_hash" not in columns:
+        con.execute("ALTER TABLE security_events ADD COLUMN previous_integrity_hash TEXT")
+    if "integrity_hash" not in columns:
+        con.execute("ALTER TABLE security_events ADD COLUMN integrity_hash TEXT")
     con.execute(
         """CREATE TABLE IF NOT EXISTS control_state(
             singleton INTEGER PRIMARY KEY CHECK(singleton=1),
@@ -56,6 +66,12 @@ def _fingerprint(value: Any) -> str:
     return hashlib.sha256(
         json.dumps(value, sort_keys=True, separators=(",", ":"), default=str).encode()
     ).hexdigest()
+
+
+def _integrity_hash(previous: str | None, event: dict[str, Any]) -> str:
+    body = dict(event)
+    body.pop("integrity_hash", None)
+    return _fingerprint({"previous_integrity_hash": previous, "event": body})
 
 
 def set_kill_switch(active: bool, reason: str | None = None) -> dict[str, Any]:
@@ -136,15 +152,24 @@ def observe(
             "event_fingerprint": _fingerprint(payload or {}),
             "observed_at": datetime.fromtimestamp(now, timezone.utc).isoformat(),
         }
+        previous_row = con.execute(
+            "SELECT integrity_hash FROM security_events ORDER BY id DESC LIMIT 1"
+        ).fetchone()
+        previous = previous_row[0] if previous_row else None
+        integrity_hash = _integrity_hash(previous, event)
+        event["previous_integrity_hash"] = previous
+        event["integrity_hash"] = integrity_hash
         con.execute(
             """INSERT INTO security_events(
                ts,event_type,tenant_id,agent_id,actor_id,session_id,action,target,
-               decision,anomaly_score,tripwire,payload_json)
-               VALUES(?,?,?,?,?,?,?,?,?,?,?,?)""",
+               decision,anomaly_score,tripwire,payload_json,event_fingerprint,
+               previous_integrity_hash,integrity_hash)
+               VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (
                 now, event_type, tenant_id, agent_id, actor_id, session_id, action,
                 target, decision, anomaly_score, 1 if tripwire else 0,
                 json.dumps(event, sort_keys=True, separators=(",", ":"), default=str),
+                event["event_fingerprint"], previous, integrity_hash,
             ),
         )
         con.commit()
@@ -163,5 +188,33 @@ def recent_events(limit: int = 100) -> list[dict[str, Any]]:
             (max(1, min(limit, 1000)),),
         ).fetchall()
         return [json.loads(row[0]) for row in rows]
+    finally:
+        con.close()
+
+
+def verify_integrity(limit: int = 100) -> dict[str, Any]:
+    con = _connect()
+    try:
+        rows = con.execute(
+            """SELECT id,payload_json,previous_integrity_hash,integrity_hash
+               FROM security_events ORDER BY id ASC LIMIT ?""",
+            (max(1, min(limit, 1000)),),
+        ).fetchall()
+        previous = None
+        checked = 0
+        for event_id, payload_json, stored_previous, stored_hash in rows:
+            event = json.loads(payload_json)
+            if stored_previous != previous:
+                return {"valid": False, "checked": checked, "failed_event_id": event_id, "reason": "chain_link_mismatch"}
+            if event.get("previous_integrity_hash") != stored_previous:
+                return {"valid": False, "checked": checked, "failed_event_id": event_id, "reason": "payload_previous_hash_mismatch"}
+            if event.get("integrity_hash") != stored_hash:
+                return {"valid": False, "checked": checked, "failed_event_id": event_id, "reason": "payload_hash_mismatch"}
+            expected = _integrity_hash(stored_previous, event)
+            if expected != stored_hash:
+                return {"valid": False, "checked": checked, "failed_event_id": event_id, "reason": "event_content_tampered"}
+            previous = stored_hash
+            checked += 1
+        return {"valid": True, "checked": checked, "failed_event_id": None, "reason": None}
     finally:
         con.close()
