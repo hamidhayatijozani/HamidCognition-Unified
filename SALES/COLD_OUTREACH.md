@@ -12,7 +12,7 @@ Agent → Action Gate → Protected Tool
 
 It can enforce ALLOW / DENY / ASK / SANDBOX decisions, bind authorization to the execution context, issue execution authority, prevent replay, fail closed when required evidence is unavailable, and preserve audit/replay evidence.
 
-The current commercial release is Action Gate v1.0.10.
+The current commercial release is Action Gate v1.1.1.
 
 Rather than proposing a broad platform deployment, the intended first step is a one-tool proof-of-value: protect one high-impact agent action, run the acceptance suite in the target environment, and review the resulting evidence.
 
@@ -20,7 +20,7 @@ Repository:
 https://github.com/hamidhayatijozani/HamidCognition-Unified
 
 Release:
-https://github.com/hamidhayatijozani/HamidCognition-Unified/releases/tag/action-gate-v1.0.10
+https://github.com/hamidhayatijozani/HamidCognition-Unified/releases/tag/action-gate-v1.1.1
 
 Best,
 Hamid Hayati Jozani
