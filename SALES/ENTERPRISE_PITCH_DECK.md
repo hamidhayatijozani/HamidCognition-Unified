@@ -49,21 +49,17 @@ Enterprise
 
 ## 9. Proof of Value
 
-A focused 6–8 week engagement around one protected agent-to-tool execution path, customer-selected scenarios, integration, acceptance testing, and an outcome report.
+The current standard first-deal offer is a focused **USD $2,500 fixed / 30-day pilot** around one protected HTTP/MCP tool, one controlled test environment, agreed acceptance cases, deployment assistance and a reproducible evidence package.
 
-Strategic PoV target: $50,000.
+The older 6–8 week / $50,000 proposal is superseded and is not the current offer.
 
 ## 10. Enterprise commercial model
 
-Indicative annual software license target: $150,000–$300,000/year.
-
-Integration, managed operations, support, SLA, and special security requirements are scoped separately.
+Annual license pricing is **UNVALIDATED / NOT A CURRENT QUOTE**. Deployment, integration, managed operations, support, SLA and security requirements must be scoped after the pilot and customer acceptance.
 
 ## 11. Strategic/OEM
 
-Strategic embedding or OEM arrangements are negotiated separately.
-
-Initial commercial discussion target: $500,000+.
+Strategic embedding or OEM arrangements are possible future negotiations. The earlier $500,000+ discussion target is an unvalidated hypothesis, not a market-validated price or an active offer.
 
 ## 12. Positioning
 
