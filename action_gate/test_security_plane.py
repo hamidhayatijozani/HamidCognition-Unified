@@ -74,7 +74,7 @@ def test_evidence_plane_detects_payload_tampering(monkeypatch, tmp_path):
     assert plane.verify_integrity()["valid"] is True
     con = plane._connect()
     try:
-        con.execute("UPDATE security_events SET payload_json = REPLACE(payload_json, 'original', 'tampered') WHERE id = 1")
+        con.execute("UPDATE security_events SET payload_json = REPLACE(payload_json, 'tool://safe', 'tool://tampered') WHERE id = 1")
         con.commit()
     finally:
         con.close()
