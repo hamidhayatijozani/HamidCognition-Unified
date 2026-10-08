@@ -4,7 +4,7 @@
 
 The latest published Action Gate release is **v1.1.1**, GitHub release/tag `action-gate-v1.1.1`.
 
-- Release source SHA: `e9ea7565f4ddea91f5c45104237bd20564c80894`
+- Exact release source revision: recorded in `PRODUCT/COMMERCIAL_RELEASE.json` and the published release manifest.
 - Release workflow run: `36966012148` — GitHub reports `completed / success`
 - Artifact: `action-gate-1.1.1.tar`
 - Artifact SHA-256: `517064de0427286ff4f346d46996642aca3b9def891d1c08bfaebc25546fb791`
@@ -19,7 +19,7 @@ Therefore:
 - quote and deliver the immutable published tag/artifact until a new same-SHA release chain validates a newer source.
 
 ```text
-RELEASE_VERIFIED(e9ea7565f4ddea91f5c45104237bd20564c80894)
+RELEASE_VERIFIED(immutable-release-source-SHA)
 !=
 MAIN_VERIFIED(a27a8a8f15dada67fba6567fb32ddb3ef37f6563)
 ```
