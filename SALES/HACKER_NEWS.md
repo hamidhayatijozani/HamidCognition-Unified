@@ -14,7 +14,7 @@ Agent → Action Gate → Protected Tool
 
 Action Gate evaluates the requested action, binds the decision to tenant/actor/session/action context, issues execution authority, and enforces the governed path. It supports HTTP and MCP enforcement, replay protection, fail-closed evidence handling, PostgreSQL persistence, and audit/replay evidence.
 
-The current commercial release is v1.0.10. It is proprietary, not open source.
+The current commercial release is v1.1.1. It is proprietary, not open source.
 
 The repository is public for provenance, technical inspection, and reproducibility. Public visibility does not grant a license to reproduce, modify, redistribute, or commercialize the proprietary product.
 
@@ -24,4 +24,4 @@ Repository:
 https://github.com/hamidhayatijozani/HamidCognition-Unified
 
 Commercial release:
-https://github.com/hamidhayatijozani/HamidCognition-Unified/releases/tag/action-gate-v1.0.10
+https://github.com/hamidhayatijozani/HamidCognition-Unified/releases/tag/action-gate-v1.1.1
