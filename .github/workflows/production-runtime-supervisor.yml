@@ -42,19 +42,19 @@ jobs:
           health_json="$(curl --fail --silent --show-error --max-time 20 "$base/health")"
           echo "$health_json"
           python3 - "$health_json" <<'PY'
-import json, sys
-body = json.loads(sys.argv[1])
-if body.get("status") != "ok":
-    raise SystemExit("production runtime is not healthy: " + repr(body))
-oracle = body.get("state_oracle", {})
-if oracle.get("status") != "ready":
-    raise SystemExit("state oracle is not ready: " + repr(oracle))
-PY
+          import json, sys
+          body = json.loads(sys.argv[1])
+          if body.get("status") != "ok":
+          raise SystemExit("production runtime is not healthy: " + repr(body))
+          oracle = body.get("state_oracle", {})
+          if oracle.get("status") != "ready":
+          raise SystemExit("state oracle is not ready: " + repr(oracle))
+          PY
           echo "== Dashboard root =="
           curl --fail --silent --show-error --max-time 20 -I "$base/" >/dev/null
           echo "Production dashboard is reachable."
 
-      - name: Record pending deployment state
+       - name: Record pending deployment state
         if: steps.config.outputs.configured != 'true'
         run: |
           echo "Runtime supervisor installed."
