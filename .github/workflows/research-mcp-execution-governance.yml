@@ -1,0 +1,29 @@
+name: MCP Execution Governance Research
+
+on:
+  push:
+    branches:
+      - "research/mcp-execution-governance-paper-v1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  security-plane:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python setup
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test dependencies
+        run: python -m pip install -r requirements.txt pytest
+      - name: Compile
+        run: python -m compileall -q action_gate
+      - name: Security plane tests
+        env:
+          PYTHONPATH: action_gate
+        run: pytest -q action_gate/test_security_plane.py
