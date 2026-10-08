@@ -8,10 +8,10 @@ This document defines the reproducible handoff path for an Action Gate customer 
 
 Use the exact commercial release, not the mutable main branch.
 
-Current offerable release: **v1.0.10**  
-Tag: `action-gate-v1.0.10`  
-Source commit: `77d820e99dc78a6a9e3217d3c1c49d5cdf07813f`  
-Artifact SHA-256: `10bb53b69b56ff86146f5c71e3e5d7e34dacb4e12dba2adafc59f9d5276abd91`
+Current offerable release: **v1.1.1**  
+Tag: `action-gate-v1.1.1`  
+Source commit: `e9ea7565f4ddea91f5c45104237bd20564c80894`  
+Artifact SHA-256: `517064de0427286ff4f346d46996642aca3b9def891d1c08bfaebc25546fb791`
 
 ## Handoff sequence
 
