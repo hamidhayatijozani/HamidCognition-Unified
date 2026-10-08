@@ -9,9 +9,9 @@ The target is not "more GitHub". The target is one buyer, one protected tool, on
 ## Current verified product position
 
 - Product: HamidCognition Action Gate
-- Published release: v1.0.10
-- Release tag: `action-gate-v1.0.10`
-- Published source: `77d820e99dc78a6a9e3217d3c1c49d5cdf07813f`
+- Published release: v1.1.1
+- Release tag: `action-gate-v1.1.1`
+- Published source: `e9ea7565f4ddea91f5c45104237bd20564c80894`
 - Pilot: 30 days, one protected HTTP or MCP tool
 - Proposed pilot fee: USD 7,500–10,000
 - Delivery models: SELF_HOSTED / MANAGED / ENTERPRISE
