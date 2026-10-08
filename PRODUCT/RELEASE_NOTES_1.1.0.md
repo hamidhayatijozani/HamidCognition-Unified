@@ -1,6 +1,6 @@
 # HamidCognition Action Gate v1.1.0 Development Milestone
 
-> This document records the v1.1.0 development milestone and its feature-level validation. It is **not** the published commercial release record. The last validated published commercial release remains v1.0.10 until the v1.1.0 same-SHA release rule is satisfied.
+> This document records the v1.1.0 development milestone and its feature-level validation. It is **not** the published commercial release record. This document is historical development-milestone documentation. The currently published technical release is v1.1.1. This file does not establish the current commercial release.
 
 ## Development basis
 
