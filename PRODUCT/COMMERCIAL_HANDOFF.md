@@ -1,7 +1,7 @@
 # HamidCognition Action Gate — Commercial Handoff
 
-Version: 1.0.5
-Product runtime: Action Gate v1.0.5
+Version: 1.1.1
+Product runtime: Action Gate v1.1.1
 Repository governance release: v2.0.0
 
 ## 1. What is being sold
@@ -18,7 +18,7 @@ The product is not sold as a claim that an AI decision is objectively correct. I
 
 A standard self-hosted delivery consists of:
 
-- Action Gate v1.0.5 source/runtime from the exact agreed commit or release baseline.
+- Action Gate v1.1.1 source/runtime from the exact agreed commit or release baseline.
 - Production Docker Compose deployment.
 - PostgreSQL persistence.
 - Persistent execution-authority nonce storage.
@@ -65,7 +65,7 @@ The repository's PRODUCT/CUSTOMER_ACCEPTANCE.md defines the detailed procedure.
 
 ## 5. Release identity
 
-The commercial runtime baseline is Action Gate v1.0.5. Current release evidence must identify the exact delivered commit, successful same-SHA validation run, artifact digest and release record. Historical v1.0.4 release references are provenance only and must not be substituted for current evidence.
+The commercial runtime baseline is Action Gate v1.1.1. Current release evidence must identify the exact delivered commit, successful same-SHA validation run, artifact digest and release record. Historical v1.0.4 release references are provenance only and must not be substituted for current evidence.
 
 Commercial settlement is USDT only and follows PRODUCT/USDT_PAYMENT_POLICY.md.
 
