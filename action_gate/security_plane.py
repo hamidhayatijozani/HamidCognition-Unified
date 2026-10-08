@@ -156,8 +156,8 @@ def observe(
             "SELECT integrity_hash FROM security_events ORDER BY id DESC LIMIT 1"
         ).fetchone()
         previous = previous_row[0] if previous_row else None
-        integrity_hash = _integrity_hash(previous, event)
         event["previous_integrity_hash"] = previous
+        integrity_hash = _integrity_hash(previous, event)
         event["integrity_hash"] = integrity_hash
         con.execute(
             """INSERT INTO security_events(
