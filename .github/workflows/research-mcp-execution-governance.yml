@@ -19,8 +19,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install test dependencies
-        run: python -m pip install pytest
+      - name: Install Action Gate test dependencies
+        run: |
+          python -m pip install --disable-pip-version-check -r action_gate/requirements.txt
       - name: Compile
         run: python -m compileall -q action_gate
       - name: Security plane tests
