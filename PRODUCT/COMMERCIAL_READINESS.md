@@ -25,11 +25,11 @@ A customer quote must identify the exact release tag, source commit, artifact an
 ## Current published release
 
 - Product: HamidCognition Action Gate
-- Version: 1.0.10
+- Version: 1.1.1
 - Release tag: `action-gate-v1.1.1`
 - Source commit: `e9ea7565f4ddea91f5c45104237bd20564c80894`
 - Release-candidate workflow run: `36966012148`
-- Artifact: `action-gate-1.0.10.tar`
+- Artifact: `action-gate-1.1.1.tar`
 - Artifact digest: `sha256:517064de0427286ff4f346d46996642aca3b9def891d1c08bfaebc25546fb791`
 
 ## Customer delivery package
