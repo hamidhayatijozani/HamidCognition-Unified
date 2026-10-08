@@ -2,7 +2,7 @@
 
 ## Canonical product
 
-**HamidCognition Action Gate v1.0.10** is the current customer-facing validated product boundary.
+**HamidCognition Action Gate v1.1.1** is the current customer-facing validated product boundary.
 
 A customer quote must identify the exact release tag, source commit, artifact and checksum being offered.
 
@@ -26,11 +26,11 @@ A customer quote must identify the exact release tag, source commit, artifact an
 
 - Product: HamidCognition Action Gate
 - Version: 1.0.10
-- Release tag: `action-gate-v1.0.10`
-- Source commit: `77d820e99dc78a6a9e3217d3c1c49d5cdf07813f`
-- Release-candidate workflow run: `36303350191`
+- Release tag: `action-gate-v1.1.1`
+- Source commit: `e9ea7565f4ddea91f5c45104237bd20564c80894`
+- Release-candidate workflow run: `36966012148`
 - Artifact: `action-gate-1.0.10.tar`
-- Artifact digest: `sha256:10bb53b69b56ff86146f5c71e3e5d7e34dacb4e12dba2adafc59f9d5276abd91`
+- Artifact digest: `sha256:517064de0427286ff4f346d46996642aca3b9def891d1c08bfaebc25546fb791`
 
 ## Customer delivery package
 
