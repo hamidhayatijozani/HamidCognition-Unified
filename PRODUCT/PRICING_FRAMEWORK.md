@@ -48,12 +48,12 @@ Variables:
 
 | Variable | Unit | Value |
 |---|---|---|
-| Pilot / proof-of-value | fixed | 50,000 USDT |
+| Standard first pilot / proof-of-value | fixed for 30 days | USD $2,500 |
 | Production environments | environment | scoped in order form |
 | Integration work | day/project | quoted separately |
-| Annual maintenance | year | 20% of license |
-| Managed service | month | 5,000 USDT starting point |
-| Enterprise support | year | 150,000 USDT starting point |
+| Annual maintenance | year | UNVALIDATED; quote only after scope review |
+| Managed service | month | UNVALIDATED; quote only after scope review |
+| Enterprise support | year | UNVALIDATED; quote only after scope review |
 | Custom security review | project | quoted separately |
 
 ## Payment
@@ -61,4 +61,4 @@ Variables:
 All amounts are payable in USDT only. The invoice states the network, receiving address, amount and deadline.
 
 ## Pricing rule
-Do not quote a number as a technical fact. Final pricing belongs in a signed order form and should reflect delivery responsibility, integration effort, support obligations, and contractual risk.
+The only current standard first-deal offer is one protected HTTP/MCP tool, one controlled environment and 30 days for USD $2,500 fixed. All other figures are intentionally unpriced until customer evidence establishes deployment responsibility, integration effort, support obligations and contractual risk. Do not present hypothetical annual or managed figures as validated market prices.

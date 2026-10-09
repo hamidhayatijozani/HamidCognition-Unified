@@ -1,8 +1,14 @@
 # Action Gate 30-Day Pilot Offer
 
+## Offer
+
+**Standard scoped pilot: USD $2,500 fixed for 30 days.**
+
+This price applies to the narrow scope below: one customer-selected HTTP/MCP tool, one controlled test environment, agreed acceptance cases, deployment assistance and a reproducible evidence package. Any scope or price variation requires a separate written quote before work begins.
+
 ## Objective
 
-Deploy Action Gate around one customer-selected high-impact agent tool or MCP server and produce reproducible evidence that the execution boundary cannot be bypassed through the tested paths.
+Deploy Action Gate around one customer-selected consequential agent tool or MCP server and produce reproducible evidence for the agreed execution-boundary tests.
 
 ## Scope
 
@@ -21,8 +27,10 @@ Deploy Action Gate around one customer-selected high-impact agent tool or MCP se
 - concurrent nonce race testing;
 - restart/persistence validation.
 
+These are proposed acceptance cases. A case is not a verified result until it has actually run and its raw outcome is retained.
+
 ### Week 3 — Operationalization
-- production-like deployment;
+- production-like deployment within the agreed test scope;
 - persistent database;
 - secret separation;
 - audit/evidence review;
@@ -31,11 +39,11 @@ Deploy Action Gate around one customer-selected high-impact agent tool or MCP se
 
 ### Week 4 — Customer acceptance
 Deliver:
-- deployed integration;
-- test report;
+- deployed integration within agreed scope;
+- per-case test report, including failures and untested cases;
 - acceptance evidence;
 - configuration/policy snapshot;
-- release/commit identifiers;
+- exact release/commit identifiers;
 - known limitations;
 - production recommendation.
 
@@ -43,7 +51,7 @@ Deliver:
 
 The customer supplies:
 - one target tool or MCP service;
-- test environment;
+- controlled test environment;
 - required identities and access;
 - representative policy cases;
 - technical owner;
@@ -51,9 +59,11 @@ The customer supplies:
 
 ## Success criteria
 
-The pilot is successful when the agreed acceptance suite passes in the customer's deployment and the customer receives reproducible evidence of the tested controls.
+The pilot is successful when the agreed acceptance suite passes in the customer's deployment and the customer receives reproducible evidence of the tested controls. A failed test is reported as a failure, not hidden or reclassified as a pass.
 
-The pilot does not certify the customer's overall AI system, legal compliance, or downstream business correctness.
+## Exclusions
+
+No organization-wide deployment, compliance certification, universal attack-prevention guarantee, downstream business-correctness guarantee, unrestricted custom development or production SLA is included.
 
 ## Commercial conversion
 
@@ -62,4 +72,6 @@ After acceptance, the customer may continue as:
 - MANAGED service;
 - ENTERPRISE integration and support.
 
-Pricing is negotiated according to deployment responsibility, integration complexity, support scope and contractual risk.
+## Payment and release truth
+
+The quote must identify the exact release/tag and checksum. Payment route, settlement evidence, license and entitlement must be recorded separately. Technical release evidence does not establish a customer transaction or revenue.

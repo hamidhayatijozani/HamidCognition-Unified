@@ -1,41 +1,57 @@
-# Anderson Alignment and Gap Matrix
+# Anderson Gap Matrix — Pre-Outreach Positioning
 
-Date: 2026-10-08
-Purpose: pre-outreach technical positioning, not a claim of equivalence.
+**Audit date:** 2026-10-08  
+**Purpose:** technically honest positioning, not a claim of equivalence or existing integration.
 
-| Anderson-oriented concern | Action Gate position | Conclusion |
-|---|---|---|
-| Telemetry over narrative | Authorization/evidence records are tied to execution | COMPLEMENTARY, not equivalent to a full telemetry plane |
-| Independent evidence plane | Evidence Ledger/replay exists around the execution boundary | PARTIAL |
-| Policy enforcement over intent | Exact action/context/authority/policy binding at enforcement point | STRONG ALIGNMENT |
-| Tripwires / honeytokens | No dedicated implementation found | GAP |
-| Continuous anomaly detection | Forensic signals are referenced, but no demonstrated continuous detection plane | PARTIAL/GAP |
-| Containment / kill switch | DENY/SANDBOX/ASK provide execution controls | PARTIAL; independent kill switch not established |
-| MCP telemetry | MCP enforcement and E2E tooling exist | PARTIAL |
-| MCP server trust / supply chain | No sufficient evidence for full governance | GAP |
-| Behavioral baseline | Research references exist, but no demonstrated commercial behavioral-detection layer | GAP |
-| Business Impact Intelligence | No established implementation found | GAP |
+## Source boundary
 
-## Defensible integration hypothesis
+The public article [“Deception-Resistant MCP Governance: Securing AI Agents in an Era of Strategic Misdirection”](https://www.linkedin.com/pulse/deception-resistant-mcp-governance-securing-ai-agents-david-anderson-yeaye) is attributed to David Anderson and dated August 29, 2025. Its stated principles include: shifting oversight from narrative to telemetry, an independent evidence plane, policy enforcement over intent, tripwires/honeytokens, continuous anomaly detection, and containment/kill switches. These are Anderson's published themes; they are not proof that he personally operates a specific implementation or that he has expressed interest in Action Gate.
 
-Agent -> behavioral observation/detection -> Action Gate -> exact context/policy/authority binding -> protected MCP/tool -> evidence -> containment/response
+## Gap and complementarity matrix
 
-The key distinction is simple: monitoring can establish that something happened; enforcement determines whether the protected action can happen.
+| Published theme | Action Gate evidence today | Honest status | Gap / joint-test question |
+|---|---|---|---|
+| Telemetry over narrative | Action Gate records authorization/execution evidence; a full behavioral MCP flight-recorder plane is not demonstrated in reviewed evidence | COMPLEMENTARY, NOT EQUIVALENT | Can every request/response, target, result and identity be captured independently of the agent's narrative? |
+| Independent evidence plane | Evidence/replay records exist around the execution boundary; immutability/tamper-resistance of a complete MCP telemetry plane not established here | PARTIAL | Can the record be independently reproduced and checked for tampering? |
+| Policy enforcement over intent | Prior Risk Lab evidence records G01 authorized execution, G02 direct protected-path rejection (403), G03 authority replay rejection (403) | NARROW RECORDED EVIDENCE | Does the customer's actual protected tool validate authority on every path? |
+| Tripwires / honeytokens | No dedicated implementation verified in the reviewed materials | GAP | Does the target workflow need decoy tools/data, and can their activation be safely measured? |
+| Continuous anomaly detection | No demonstrated commercial behavior/anomaly detection plane in the reviewed evidence | GAP | Which detector supplies signals, and what are its false-positive/false-negative rates? |
+| Containment / kill switches | ALLOW/DENY/ASK/SANDBOX decisions exist; independent kill-switch control plane not established | PARTIAL | What is the emergency stop, authority revocation and rollback path? |
+| MCP governance / server trust | MCP integration and E2E tooling are documented; live HTTP/MCP parity and comprehensive server supply-chain governance were not verified in this audit | PARTIAL / UNKNOWN | Can one selected MCP server enforce the same authority and preserve server identity/version provenance? |
+| Signal-to-action binding | Context/action/policy binding is part of the Action Gate design; integration from an external behavioral detector to Gate is not evidenced | INTEGRATION GAP | Can the detector's signal be bound to the exact tenant/actor/session/action hash and policy snapshot? |
+| Business impact | No customer outcome, ROI or avoided-loss evidence verified | UNKNOWN | Which concrete consequence and acceptance threshold matter to the buyer? |
 
-## Adversarial challenge
+## Complementary architecture hypothesis
 
-Use one real MCP/tool workflow and attempt to:
+```text
+Behavioral observation / anomaly detection
+          ↓ signal + provenance
+Action Gate binds signal to exact action / context / policy
+          ↓ valid execution authority
+Protected HTTP / MCP tool
+          ↓
+Evidence + replayable acceptance result
+```
 
-1. replay a valid authority;
-2. alter the action after decision;
-3. alter tenant/session context;
-4. use expired authority;
-5. race concurrent execution;
-6. mutate policy binding;
-7. bypass the gate directly.
+The detector may identify suspicious behavior; the Gate's proposed role is to enforce authorization at the execution boundary. This is a complementarity hypothesis, not an existing integrated feature.
 
-Expected invariant: no consequential tool effect crosses the protected boundary unless the exact governed authority and required evidence remain valid.
+## Suggested adversarial experiment
 
-## Non-claims
+1. Select one real, consequential but safely isolated MCP workflow.
+2. Define a normal action and a small set of suspicious or policy-violating variants.
+3. Record detector output separately from the Gate decision.
+4. Bind signal, decision and action to the same tenant/actor/session/action hash and policy snapshot.
+5. Test direct bypass, action/parameter mutation, tenant substitution, expired authority, replay, concurrent reuse, restart and alternate MCP routes.
+6. Capture raw protocol messages, detector output, Gate decision, actual tool side effect, timestamps, exact source/release SHA and artifact digest.
+7. Report each result and false positive/negative separately. Do not collapse the outcome into “secure” or “deception-proof”.
 
-This matrix does not establish that Action Gate implements Anderson's complete governance model, nor does it establish live production behavior against an external MCP server.
+## Safe positioning
+
+> Your article separates behavioral observability from enforcement. Action Gate is focused on the latter: the boundary where a tool call becomes a side effect. The useful question is whether a detector's signal can be bound to the exact MCP action and whether the protected tool enforces the resulting decision under adversarial conditions.
+
+Do not claim Action Gate detects deception, implements or replaces Anderson's approach, is already integrated with any detector, guarantees all MCP security, or has customer validation/revenue.
+
+**Positioning readiness:** READY FOR A SHORT TECHNICAL QUESTION.  
+**Integration readiness:** NOT ESTABLISHED.  
+**Outreach status:** NOT SENT.  
+**CONTACTED status:** NOT VERIFIED until an actual message is sent through a verified channel.

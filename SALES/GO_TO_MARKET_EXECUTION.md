@@ -2,17 +2,15 @@
 
 ## Objective
 
-Convert the commercial Action Gate v1.0.4 into a repeatable B2B sales process.
+Convert the published Action Gate v1.1.1 release into the first externally verified paid pilot. The current main branch is mutable development state and is not equivalent to the immutable release unless its exact SHA is validated.
 
 ## Completed
 
-- Commercial product baseline identified: Action Gate v1.0.4
-- Enterprise sales one-pager
-- Initial outbound messaging
-- Pilot offer: $50,000
-- Indicative enterprise license target: $150,000–$300,000/year
-- Strategic/OEM discussion target: $500,000+
-- Initial target sequence: Noma Security, Okta, Ory, Galileo
+- Published technical baseline: Action Gate v1.1.1, tag `action-gate-v1.1.1`
+- Buyer-facing one-pager and technical evidence packet
+- Standard first pilot: USD $2,500 fixed / 30 days / one protected HTTP or MCP tool
+- Older $50,000 pilot and $150,000–$500,000+ enterprise/OEM targets are superseded hypotheses, not current quotes or market-validated pricing
+- First priority: one qualified prospect, one technical evaluation, one written paid-pilot proposal
 
 ## Execution order
 
@@ -24,7 +22,7 @@ Convert the commercial Action Gate v1.0.4 into a repeatable B2B sales process.
 6. Identify business, product, security, and partnership contacts.
 7. Run a documented outbound sequence.
 8. Conduct technical qualification and demonstration.
-9. Offer a narrowly scoped Proof of Value.
+9. Offer the standard $2,500 / 30-day one-tool pilot, using a written scope and acceptance criteria.
 10. Convert successful PoVs into enterprise agreements.
 11. Obtain a reference customer and repeat the process.
 

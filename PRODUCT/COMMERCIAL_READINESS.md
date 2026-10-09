@@ -2,9 +2,7 @@
 
 ## Canonical product
 
-**HamidCognition Action Gate v1.1.1** is the current customer-facing validated product boundary.
-
-A customer quote must identify the exact release tag, source commit, artifact and checksum being offered.
+The latest published technical release is **HamidCognition Action Gate v1.1.1**. It is the current customer-facing release baseline, not proof of customer acceptance. A customer quote must identify the immutable release tag, source revision, artifact and checksum. The mutable main branch has a different SHA from the published release source; equivalence is not established.
 
 ## Included
 
@@ -57,7 +55,7 @@ The repository does not represent Managed or Enterprise operations as already de
 
 ## Pilot entry point
 
-The first commercial transaction is a narrow one-tool pilot. The pilot protects one customer-selected high-impact HTTP or MCP tool and measures the actual execution boundary.
+The current standard offer is **USD $2,500 fixed / 30 days** for one customer-selected high-impact HTTP/MCP tool, one controlled test environment, agreed acceptance cases, deployment assistance and a reproducible evidence package. Expanded scope requires a separate written quote. The pilot measures the actual execution boundary; it is not a universal security guarantee.
 
 Acceptance is based on executable behavior:
 

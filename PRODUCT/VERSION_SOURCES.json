@@ -17,6 +17,7 @@
     "MIGRATION/INTEGRATED_PROJECTS.md",
     "PRODUCT/.env.example",
     "PRODUCT/.env.production.example",
+    "PRODUCT/ACTION_GATE_EVIDENCE_MATRIX.md",
     "PRODUCT/ACTION_GATE_PRODUCT_SPEC.md",
     "PRODUCT/CHATGPT_MCP_DEMO.md",
     "PRODUCT/COMMERCIAL_HANDOFF.md",
@@ -44,6 +45,7 @@
     "PRODUCT/RELEASE_TRUTH_RECORD.md",
     "PRODUCT/SALES_ONE_PAGER.md",
     "PRODUCT/TRAJECTORY_REALITY_EVALUATION.md",
+    "PRODUCT/VERSION_TRUTH_REPORT.md",
     "PROJECT_CATALOG.md",
     "PROVENANCE_SEAL_ACTION_GATE_0.4.2.md",
     "RELEASE_STATUS.md",
@@ -79,11 +81,12 @@
     "docs/Z-FREEZE-LOCK.md",
     "evidence/RELEASE_VERIFICATION_REPORT_v1.0.md",
     "evidence/clean-room/action-gate-1.0.0-run-35379455008.json",
+    "evidence/release-integrity-v1.0.10.md",
     "evidence/release-seal-v1.0.0.md",
     "index.html",
     "integrated/realtime/app.py",
-    "integrated/research/epistemic-filter/rfc/RFC-0001_Runtime_Event_Model.md",
     "integrated/research/epistemic-filter/rfc/RFC-0000.5_AgentRQ_Integration_Boundary.md",
+    "integrated/research/epistemic-filter/rfc/RFC-0001_Runtime_Event_Model.md",
     "integrated/web/app.py",
     "manifest-v1.0.10.json",
     "protected_tools/reference_tool.py",
@@ -94,8 +97,7 @@
     "tests/test_claimlab.py",
     "tests/test_commercial_sale.py",
     "tests/test_ssrf_guard.py",
-    "tools/run_risk_lab_demo.py",
-    "evidence/release-integrity-v1.0.10.md"
+    "tools/run_risk_lab_demo.py"
   ],
   "policy": "action_gate/VERSION is the sole canonical product-version source; derived files are synchronized product documents; ignored files are historical, compatibility, CI, configuration, or implementation artifacts and do not establish current product version."
 }

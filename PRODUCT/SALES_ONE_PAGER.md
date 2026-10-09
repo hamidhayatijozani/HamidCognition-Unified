@@ -24,17 +24,13 @@ HamidCognition Action Gate is a separately deployable control point between an A
 
 ## Offerable release
 
-The current customer-deliverable release is **Action Gate v1.0.5**, published at exact source commit:
+The latest published technical release is **HamidCognition Action Gate v1.1.1**, tag `action-gate-v1.1.1`. Its source revision and artifact checksum are recorded in `PRODUCT/COMMERCIAL_RELEASE.json` and the published release manifest. The release workflow is [36966012148](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/36966012148).
 
-f3c77cbb314e76911cce37298d58202ffb451d6e
-
-The release contains a versioned container archive, SHA-256 checksum and release manifest. Customer delivery must use this immutable release rather than the mutable main branch.
-
-The current main branch contains later engineering/research changes and is not commercially release-closed until its same-SHA GitHub validation chain is green. This distinction prevents a development head from being represented as a validated customer artifact.
+At the 2026-10-08 audit, main's version file read `1.1.1`, but main's SHA differed from the published release source SHA. Quote and deliver the immutable published release, not the mutable main branch, until a new same-SHA release chain validates a newer source.
 
 ## Validated boundary
 
-The v1.0.5 release evidence covers the documented Action Gate boundary, including production authentication, tenant/actor/session binding, decision integrity, persistent nonce protection, HTTP and MCP enforcement, fail-closed evidence handling, PostgreSQL persistence, production Compose startup, replay/persistence validation, clean-room validation, security-history scanning, and release-readiness gating.
+The published release workflow reports success for its exact tested revision. Prior Risk Lab evidence records a narrow local result for governed authorized execution, direct protected-path rejection and authority replay rejection. These are engineering results for the tested scenarios, not independent proof of every capability listed in the product design or of customer deployment.
 
 These are engineering validation claims for the stated release and tested boundary. They are not claims of universal AI safety, universal policy correctness, regulatory certification, downstream tool safety, or guaranteed business outcomes.
 
@@ -48,21 +44,13 @@ These are engineering validation claims for the stated release and tested bounda
 
 ## Pilot offer
 
-**Strategic Proof-of-Value Pilot: 50,000 USDT**
+**Standard scoped pilot: USD $2,500 fixed / 30 days.**
 
-Recommended scope: one protected agent-to-tool execution path, customer-selected policy scenarios, integration support, acceptance testing, evidence/replay demonstration, and a written pilot outcome report.
+Scope: one customer-selected HTTP/MCP tool, one controlled test environment, agreed acceptance cases, deployment assistance and a reproducible evidence package. Any expanded scope or different price requires a separate written quote before work begins.
 
-Pilot duration: **6–8 weeks**, subject to integration scope.
+## After the pilot
 
-Pilot fee is a commercial proposal, not a claim of market-standard pricing.
-
-## Enterprise conversion
-
-Indicative annual software license target after successful pilot: **150,000–300,000 USDT/year**, with customer-specific integration, managed operations, support, SLA, and special security requirements priced separately.
-
-## Strategic / OEM licensing
-
-For embedding Action Gate capabilities into another vendor's product or platform, use a negotiated technology/OEM license. Initial commercial discussion target: **500,000+ USDT**, with scope, exclusivity, deployment rights, support, and any royalty/minimum-commitment structure negotiated separately.
+SELF_HOSTED, MANAGED and ENTERPRISE are possible next delivery models, but their operational scope and pricing must be negotiated after the customer's acceptance criteria, deployment responsibility and support requirements are known. No annual or OEM price is treated as a validated market price or included in the first-pilot offer.
 
 ## Who should evaluate it
 

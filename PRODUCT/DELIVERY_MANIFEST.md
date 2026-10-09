@@ -2,11 +2,11 @@
 
 ## Customer deliverable
 
-The canonical commercial runtime is `action_gate/` at version **1.0.10**.
+The canonical commercial runtime is `action_gate/` at version **1.1.1** for the published `action-gate-v1.1.1` delivery baseline.
 
-The validated release identity is established by the immutable GitHub release `action-gate-v1.1.1` and its exact source commit `e9ea7565f4ddea91f5c45104237bd20564c80894`.
+The published release identity is established by the immutable GitHub release `action-gate-v1.1.1` and its exact source commit `e9ea7565f4ddea91f5c45104237bd20564c80894`. The release workflow validates that exact revision; it does not establish customer acceptance or validate later `main` commits.
 
-The release artifact and checksum must be taken from the v1.1.1 release assets and verified before delivery.
+The release artifact and checksum must be taken from the v1.1.1 release assets and verified before delivery. Do not substitute the mutable `main` branch for the immutable release baseline.
 
 A delivery must additionally identify:
 - image digest when container images are supplied;

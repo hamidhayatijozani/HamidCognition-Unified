@@ -13,10 +13,10 @@ The target is not "more GitHub". The target is one buyer, one protected tool, on
 - Release tag: `action-gate-v1.1.1`
 - Published source: `e9ea7565f4ddea91f5c45104237bd20564c80894`
 - Pilot: 30 days, one protected HTTP or MCP tool
-- Proposed pilot fee: USD 7,500–10,000
+- Standard scoped pilot fee: USD $2,500 fixed / 30 days
 - Delivery models: SELF_HOSTED / MANAGED / ENTERPRISE
 
-The current mutable `main` branch is development state and must not be quoted as the customer artifact until a new release is deliberately cut and its evidence is complete.
+The current mutable `main` branch is development state and must not be quoted as the customer artifact until a new same-SHA release chain is deliberately completed. Quote the immutable published release tag and checksum. The current main version string matches v1.1.1, but its source SHA differs from the published release source SHA.
 
 ## Sales sequence
 
