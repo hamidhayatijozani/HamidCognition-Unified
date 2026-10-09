@@ -1,0 +1,36 @@
+# Sales Targets — Action Gate
+
+Research date: 2026-10-09  
+Scope: 20 potential B2B buyers in the US, Canada, or Europe. Selection is based on public product descriptions showing AI agents, agentic workflows, AI-powered customer operations, or infrastructure used to deploy LLM/agent applications. Employee bands are preliminary public-profile estimates, not audited headcounts. Recheck company size, current deployment evidence, and role before outreach.
+
+**LinkedIn URL policy:** The column is blank where I could not verify a specific, current personal LinkedIn profile for a person holding the target role. No profile URLs have been guessed. These are prospect accounts, not confirmed buyers or claims that every company runs agents in production.
+
+| # | Company | Website | Decision-maker role | LinkedIn URL | Why this? |
+|---:|---|---|---|---|---|
+| 1 | Dust | https://dust.tt/ | Head of Platform / Head of Security |  | France; public product centers on company AI assistants and agents connected to internal tools/data. Preliminary size band: 51–200. Evidence: [Dust](https://dust.tt/). Personal profile not verified. |
+| 2 | n8n | https://n8n.io/ | VP Engineering / Head of Platform |  | Germany; workflow automation product explicitly supports AI and agent workflows with integrations and tool execution. Preliminary size band: 201–500. Evidence: [n8n](https://n8n.io/). Personal profile not verified. |
+| 3 | Langdock | https://langdock.com/ | Head of Security / Head of Platform |  | Germany; enterprise AI platform for deploying assistants and AI workflows across company systems. Preliminary size band: 51–200. Evidence: [Langdock](https://langdock.com/). Personal profile not verified. |
+| 4 | Parloa | https://www.parloa.com/ | CISO / VP Engineering |  | Germany; AI customer-service agents handle customer interactions and connect to enterprise systems, creating a clear action-governance use case. Preliminary size band: 201–500. Evidence: [Parloa](https://www.parloa.com/). Personal profile not verified. |
+| 5 | Synthflow AI | https://synthflow.ai/ | Head of Platform / Head of Security |  | Germany; voice AI agents automate business calls and workflows. Preliminary size band: 11–50. Evidence: [Synthflow AI](https://synthflow.ai/). Personal profile not verified. |
+| 6 | Voiceflow | https://www.voiceflow.com/ | VP Engineering / Head of Platform |  | Canada; platform for building and deploying AI agents/assistants connected to business systems. Preliminary size band: 51–200. Evidence: [Voiceflow](https://www.voiceflow.com/). Personal profile not verified. |
+| 7 | Ada | https://www.ada.cx/ | CISO / Head of Platform |  | Canada; AI customer-service agents operate across support channels and business integrations. Preliminary size band: 201–500. Evidence: [Ada](https://www.ada.cx/). Personal profile not verified. |
+| 8 | Decagon | https://decagon.ai/ | Head of Security / VP Engineering |  | United States; AI agents automate customer support and take actions through connected systems. Preliminary size band: 201–500. Evidence: [Decagon](https://decagon.ai/). Personal profile not verified. |
+| 9 | Maven AGI | https://www.mavenagi.com/ | Head of Platform / VP Engineering |  | United States; enterprise customer-support agents retrieve context and execute support workflows. Preliminary size band: 51–200. Evidence: [Maven AGI](https://www.mavenagi.com/). Personal profile not verified. |
+| 10 | Vellum | https://www.vellum.ai/ | Head of Platform / Head of Security |  | United States; developer platform for building, evaluating, and deploying LLM applications and agentic workflows. Preliminary size band: 11–50. Evidence: [Vellum](https://www.vellum.ai/). Personal profile not verified. |
+| 11 | Lindy | https://www.lindy.ai/ | Head of Engineering / Head of Platform |  | United States; product creates AI agents that perform multi-step tasks across connected apps. Preliminary size band: 11–50. Evidence: [Lindy](https://www.lindy.ai/). Personal profile not verified. |
+| 12 | Gumloop | https://www.gumloop.com/ | Head of Platform / VP Engineering |  | United States; no-code AI automation and agents operate across third-party tools and business workflows. Preliminary size band: 11–50. Evidence: [Gumloop](https://www.gumloop.com/). Personal profile not verified. |
+| 13 | Retell AI | https://www.retellai.com/ | Head of Engineering / Head of Security |  | United States; voice-agent infrastructure is designed for agents that interact with callers and downstream systems. Preliminary size band: 11–50. Evidence: [Retell AI](https://www.retellai.com/). Personal profile not verified. |
+| 14 | Bland AI | https://www.bland.ai/ | Head of Platform / Head of Security |  | United States; AI phone agents conduct calls and can be connected to operational workflows. Preliminary size band: 11–50. Evidence: [Bland AI](https://www.bland.ai/). Personal profile not verified. |
+| 15 | Trigger.dev | https://trigger.dev/ | VP Engineering / Head of Platform |  | United States; developer infrastructure runs long-lived background jobs, including LLM and AI-agent tasks with external integrations. Preliminary size band: 11–50. Evidence: [Trigger.dev](https://trigger.dev/). Personal profile not verified. |
+| 16 | Inngest | https://www.inngest.com/ | Head of Platform / VP Engineering |  | United States; durable execution and workflow infrastructure is used for production AI and agent workflows. Preliminary size band: 11–50. Evidence: [Inngest](https://www.inngest.com/). Personal profile not verified. |
+| 17 | Langfuse | https://langfuse.com/ | Head of Platform / Head of Security |  | Germany; LLM engineering and observability platform for production LLM applications, including agent traces and tool calls. Preliminary size band: 11–50. Evidence: [Langfuse](https://langfuse.com/). Personal profile not verified. |
+| 18 | Unstructured | https://unstructured.io/ | CISO / VP Engineering |  | United States; data-ingestion infrastructure supports RAG and agent applications that access enterprise data. Preliminary size band: 201–500. Evidence: [Unstructured](https://unstructured.io/). Personal profile not verified. |
+| 19 | Hebbia | https://www.hebbia.com/ | Head of Security / Head of Platform |  | United States; AI research agents work over enterprise documents and finance/research data, making action boundaries and evidence relevant. Preliminary size band: 51–200. Evidence: [Hebbia](https://www.hebbia.com/). Personal profile not verified. |
+| 20 | Pipedream | https://pipedream.com/ | Head of Platform / Head of Security |  | United States; API integration and workflow infrastructure is used by developers and AI agents to call external services. Preliminary size band: 11–50. Evidence: [Pipedream](https://pipedream.com/). Personal profile not verified. |
+
+## Qualification before outreach
+
+- Treat the size bands as estimates; verify the current company profile before contacting.
+- Confirm a concrete production-agent/tool-execution signal from current docs, product pages, or job listings.
+- Find a named, current security/platform/engineering leader and add their personal LinkedIn URL only after verification.
+- Do not infer budget, purchase intent, security gaps, or willingness to pilot from product fit alone.
