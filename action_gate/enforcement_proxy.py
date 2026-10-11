@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 import urllib.error
@@ -17,14 +16,6 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 GATE_URL = os.getenv("GATE_URL", "http://127.0.0.1:8000")
 TOOL_URL = os.getenv("TOOL_URL", "http://127.0.0.1:9000")
 API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
-
-
-def canonical(obj):
-    return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-
-
-def action_hash(tenant_id, actor_id, session_id, action, target, parameters):
-    return hashlib.sha256(canonical({"tenant_id": tenant_id, "actor_id": actor_id, "session_id": session_id, "action": action.lower(), "target": target, "parameters": parameters}).encode()).hexdigest()
 
 
 def auth_headers():
@@ -114,7 +105,6 @@ class HTTPHandler(BaseHTTPRequestHandler):
             size = int(self.headers.get("Content-Length", "0")); body = self.rfile.read(size); payload = json.loads(body or b"{}")
             tenant_id = self.headers.get("X-Tenant-ID", "default"); actor_id = self.headers.get("X-Actor-ID"); session_id = self.headers.get("X-Session-ID"); agent_id = self.headers.get("X-Agent-ID", "unknown")
             action = self.headers.get("X-Action", "http_post"); target = self.headers.get("X-Action-Target", self.path); decision_id = self.headers.get("X-HCJ-Decision-ID")
-            expected_hash = action_hash(tenant_id, actor_id, session_id, action, target, payload)
             if decision_id:
                 record = permitted(decision_id, tenant_id, actor_id, session_id, action, target, payload)
                 if not record:
@@ -142,7 +132,9 @@ class HTTPHandler(BaseHTTPRequestHandler):
                     self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
                 self.send_response(status); self.end_headers(); self.wfile.write(json.dumps(out).encode()); return
             result = post_json(GATE_URL + "/v1/action/evaluate", {"agent_id": agent_id, "actor_id": actor_id, "session_id": session_id, "tenant_id": tenant_id, "action": action, "target": target, "parameters": payload})[1]
-            result["enforcement_action_hash"] = expected_hash
+            # Preserve the Gate-issued digest; the proxy must not independently
+            # recompute an authorization binding after the decision is issued.
+            result["enforcement_action_hash"] = result["action_hash"]
             self.send_response(200); self.end_headers(); self.wfile.write(json.dumps({"enforced": result["decision"] == "ALLOW", "decision": result}).encode())
         except Exception:
             self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"action_gate_or_tool_unreachable"}')
