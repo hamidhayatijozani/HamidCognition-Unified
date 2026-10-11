@@ -41,9 +41,11 @@ try:
     blocked_headers = {**common, "X-Action": "delete_file", "X-Action-Target": "/production/data.db"}
     status, blocked = post("http://127.0.0.1:8080/execute", {"x": 1}, blocked_headers)
     assert status == 200 and blocked["enforced"] is False and blocked["decision"]["decision"] == "DENY"
+    assert blocked["decision"]["enforcement_action_hash"] == blocked["decision"]["action_hash"]
 
     allowed_headers = {**common, "X-Action": "read_public_file", "X-Action-Target": "/public/info.txt"}
     status, allowed = post("http://127.0.0.1:8080/execute", {"x": 1}, allowed_headers)
+    assert allowed["decision"]["enforcement_action_hash"] == allowed["decision"]["action_hash"]
     assert status == 200 and allowed["enforced"] is True
     decision_id = allowed["decision"]["decision_id"]
     bound_headers = {**allowed_headers, "X-HCJ-Decision-ID": decision_id}
