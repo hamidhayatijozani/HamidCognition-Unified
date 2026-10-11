@@ -1,5 +1,6 @@
 """Generate candidates and execute deterministic synthetic smoke experiments."""
 import json
+import os
 from pathlib import Path
 from time import time
 
@@ -73,12 +74,23 @@ def main() -> None:
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    HISTORY_OUT.write_text(json.dumps({
-        "project": "BESAZ",
-        "scope": "SYNTHETIC_ONLY",
-        "experiments": experiments,
-    }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"wrote {OUT}; candidates={len(candidates)} experiments={len(experiments)}")
+    run_id = os.environ.get("GITHUB_RUN_ID") or f"local-{generated_at}"
+    if HISTORY_OUT.exists():
+        try:
+            history_doc = json.loads(HISTORY_OUT.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise RuntimeError(f"Cannot safely read experiment history: {HISTORY_OUT}") from exc
+        if not isinstance(history_doc, dict) or not isinstance(history_doc.get("runs", []), list):
+            raise RuntimeError(f"Unexpected experiment history schema: {HISTORY_OUT}")
+    else:
+        history_doc = {"project": "BESAZ", "scope": "SYNTHETIC_ONLY", "runs": []}
+    history_doc.setdefault("runs", [])
+    history_doc["runs"] = [item for item in history_doc["runs"] if not (isinstance(item, dict) and item.get("run_id") == run_id)]
+    history_doc["runs"].append({"run_id": run_id, "generated_at_unix": generated_at, "execution_scope": "DETERMINISTIC_SYNTHETIC_SMOKE_TESTS", "experiments": experiments})
+    HISTORY_OUT.write_text(json.dumps(history_doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    report["run_id"] = run_id
+    OUT.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(f"wrote {OUT}; candidates={len(candidates)} experiments={len(experiments)} history_runs={len(history_doc['runs'])}")
 
 
 if __name__ == "__main__":
