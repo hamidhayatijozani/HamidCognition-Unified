@@ -28,7 +28,7 @@ Commercial models include self-hosted, managed, and enterprise deployment.
 A narrowly scoped proof of value around one protected agent-to-tool execution path, including integration, acceptance criteria, evidence/replay, and an outcome report.
 
 ## Pricing
-Indicative commercial structure: $50,000 pilot; $150,000–$300,000/year enterprise licensing; strategic/OEM engagements from $500,000+, scope dependent.
+Proposed standard first pilot: **2,500 USDT fixed for 30 days**, covering one protected HTTP/MCP tool, one controlled test environment, agreed acceptance cases, deployment assistance and a reproducible evidence package. This is not market-validated. Annual licensing, managed service and strategic/OEM pricing are unvalidated hypotheses, not current quotes.
 
 ## What is not claimed?
 Action Gate is not presented as universal AI safety, universal correctness, or automatic regulatory compliance. Those claims require separate evidence and contractual scope.

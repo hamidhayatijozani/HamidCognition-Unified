@@ -57,7 +57,7 @@ The repository does not represent Managed or Enterprise operations as already de
 
 ## Pilot entry point
 
-The first commercial transaction is a narrow one-tool pilot. The pilot protects one customer-selected high-impact HTTP or MCP tool and measures the actual execution boundary.
+The proposed standard first-deal offer is **2,500 USDT fixed for 30 days**: one customer-selected HTTP/MCP tool, one controlled test environment, agreed acceptance cases, deployment assistance and a reproducible evidence package. This is a commercial hypothesis, not a market-validated price or evidence of an existing transaction.
 
 Acceptance is based on executable behavior:
 
@@ -83,15 +83,9 @@ A completed sale requires:
 6. customer acceptance evidence;
 7. entitlement/delivery record.
 
-### Current settlement route
+### Settlement handling
 
-The operator's only supplied settlement account is:
-
-- Provider: TopChange
-- Wallet: کیف پول دلار
-- Wallet ID: `USD2134914`
-
-This is not a blockchain address. Until a real on-chain address and network are supplied, the sale flow must use provider/manual settlement verification rather than pretending that blockchain transaction-hash verification exists.
+Commercial settlement is USDT-only. The actual provider, receiving address, network and verification policy must be supplied through an appropriate secure commercial channel, not stored in public source control. Manual/provider settlement must not be described as on-chain verification.
 
 ## Commercial truth rule
 

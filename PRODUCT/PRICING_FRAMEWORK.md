@@ -48,12 +48,12 @@ Variables:
 
 | Variable | Unit | Value |
 |---|---|---|
-| Pilot / proof-of-value | fixed | 50,000 USDT |
+| Pilot / proof-of-value | fixed / 30 days | 2,500 USDT (proposed standard offer; not market-validated) |
 | Production environments | environment | scoped in order form |
 | Integration work | day/project | quoted separately |
-| Annual maintenance | year | 20% of license |
-| Managed service | month | 5,000 USDT starting point |
-| Enterprise support | year | 150,000 USDT starting point |
+| Annual maintenance | year | UNVALIDATED; quote only in a signed order form |
+| Managed service | month | UNVALIDATED HYPOTHESIS; not a current quote |
+| Enterprise support | year | UNVALIDATED HYPOTHESIS; not a current quote |
 | Custom security review | project | quoted separately |
 
 ## Payment

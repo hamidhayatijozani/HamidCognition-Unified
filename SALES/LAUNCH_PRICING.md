@@ -4,15 +4,15 @@ These are proposed launch prices for commercial testing, not claims about market
 
 ## 1. Paid Pilot
 
-**USD 15,000–25,000 fixed**
+**2,500 USDT fixed / 30 days (proposed standard offer; not market-validated)**
 
-One protected tool or MCP server, one deployment environment, integration, acceptance testing, evidence package and 30-day delivery window.
+One customer-selected protected HTTP/MCP tool, one controlled test environment, agreed acceptance cases, deployment assistance and a reproducible evidence package. Expanded scope requires a separate written quote.
 
 Use the pilot to establish customer value and integration effort before negotiating a larger contract.
 
 ## 2. SELF_HOSTED
 
-**Starting hypothesis: USD 30,000/year**
+**UNVALIDATED HYPOTHESIS — NOT A CURRENT QUOTE: 30,000 USDT/year**
 
 Includes the Action Gate runtime, deployment contract, release artifacts, acceptance suite, standard documentation and defined support.
 
@@ -20,7 +20,7 @@ Customer infrastructure and customer-specific integration are separate.
 
 ## 3. MANAGED
 
-**Starting hypothesis: USD 4,000/month**
+**UNVALIDATED HYPOTHESIS — NOT A CURRENT QUOTE: 4,000 USDT/month**
 
 Includes operation of the service boundary, standard monitoring and defined support.
 
@@ -42,6 +42,8 @@ Use when the customer requires:
 - customer-specific acceptance controls.
 
 ## Pricing rule
+
+The only current standard first-deal offer is the proposed 2,500 USDT fixed / 30-day bounded pilot. Annual self-hosted and monthly managed figures remain hypotheses, not market-validated prices or authorized default quotes.
 
 Do not discount the pilot into free consulting.
 
