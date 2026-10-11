@@ -4,6 +4,7 @@ from dataclasses import dataclass, asdict
 from enum import Enum
 from hashlib import sha256
 import json
+import os
 import secrets
 from typing import Any
 
@@ -131,13 +132,16 @@ class Sale:
 def create_invoice(
     buyer: str, product: str, version: str, amount: str,
     currency: str = "USDT", provider: str = "TopChange",
-    settlement_account: str = "USD2134914",
+    settlement_account: str | None = None,
 ) -> Sale:
-    if not all(x.strip() for x in (buyer, product, version, amount, currency, provider, settlement_account)):
+    if not all(x.strip() for x in (buyer, product, version, amount, currency, provider)):
         raise ValueError("invoice_fields_required")
+    account = (settlement_account or os.environ.get("TOPCHANGE_SETTLEMENT_ACCOUNT", "")).strip()
+    if not account:
+        raise ValueError("settlement_account_required")
     return Sale(Invoice(
         invoice_id="inv_" + secrets.token_hex(10),
         buyer=buyer.strip(), product=product.strip(), version=version.strip(),
         amount=amount.strip(), currency=currency.strip().upper(),
-        provider=provider.strip(), settlement_account=settlement_account.strip(),
+        provider=provider.strip(), settlement_account=account,
     )).issue()

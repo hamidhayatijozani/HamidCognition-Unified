@@ -4,16 +4,14 @@
 
 HamidCognition separates commercial settlement from the runtime security boundary. Action Gate never needs custody of funds and never receives wallet private keys.
 
-## Current operator settlement account
+## Current operator settlement configuration
 
-The operator currently has one verified TopChange settlement identifier:
+The provider account identifier is not published in repository source. It must be supplied through private operator configuration or secure invoice instructions.
 
 - Provider: TopChange
-- Wallet name: کیف پول دلار
-- Wallet ID: `USD2134914`
-- Identifier type: TopChange wallet/account identifier
+- Identifier type: provider wallet/account identifier, configured out of band
 
-This identifier is **not a blockchain address**. The product must not present it as a USDT on-chain receiving address.
+A provider account identifier is **not a blockchain address**. The product must not present it as a USDT on-chain receiving address.
 
 ## Current payment mode
 
@@ -60,6 +58,6 @@ Any conflicting, underpaid, wrong-network, provider-unverified, or otherwise unv
 
 ## Current truth
 
-The repository contains the payment contract and the operator's TopChange Wallet ID metadata. It does **not** claim that the operator currently has a blockchain USDT receiving address.
+The repository documents the payment contract but does not publish the operator's provider account identifier. It does **not** claim that the operator currently has a blockchain USDT receiving address.
 
 A live on-chain address, if later supplied, remains deployment configuration and must not be committed to Git.
