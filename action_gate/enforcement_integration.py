@@ -37,7 +37,7 @@ try:
             return e.code, json.loads(e.read())
 
     gate_headers = {"Authorization": f"Bearer {API_TOKEN}"}
-    common = {"X-Agent-ID": "demo", "X-Actor-ID": "actor-1", "X-Tenant-ID": TENANT}
+    common = {"X-Agent-ID": "demo", "X-Actor-ID": "actor-1", "X-Tenant-ID": TENANT, "X-Session-ID": "session-1"}
     blocked_headers = {**common, "X-Action": "delete_file", "X-Action-Target": "/production/data.db"}
     status, blocked = post("http://127.0.0.1:8080/execute", {"x": 1}, blocked_headers)
     assert status == 200 and blocked["enforced"] is False and blocked["decision"]["decision"] == "DENY"
@@ -61,6 +61,14 @@ try:
     altered_headers = {**allowed_headers, "X-HCJ-Decision-ID": decision_id, "X-Action-Target": "/other-target"}
     status, mismatch = post("http://127.0.0.1:8080/execute", {"x": 1}, altered_headers)
     assert status == 403 and mismatch["error"] == "action_gate_denied_or_binding_mismatch"
+
+    altered_actor_headers = {**allowed_headers, "X-HCJ-Decision-ID": decision_id, "X-Actor-ID": "actor-2"}
+    status, actor_mismatch = post("http://127.0.0.1:8080/execute", {"x": 1}, altered_actor_headers)
+    assert status == 403 and actor_mismatch["error"] == "action_gate_denied_or_binding_mismatch"
+
+    altered_session_headers = {**allowed_headers, "X-HCJ-Decision-ID": decision_id, "X-Session-ID": "session-2"}
+    status, session_mismatch = post("http://127.0.0.1:8080/execute", {"x": 1}, altered_session_headers)
+    assert status == 403 and session_mismatch["error"] == "action_gate_denied_or_binding_mismatch"
 
     status, cross_tenant = get(f"http://127.0.0.1:8000/v1/evidence/{decision_id}?tenant_id={OTHER_TENANT}", gate_headers)
     assert status == 404
