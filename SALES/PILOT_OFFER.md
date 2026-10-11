@@ -1,8 +1,12 @@
 # Action Gate 30-Day Pilot Offer
 
+## Standard offer
+
+**Proposed fee: 2,500 USDT fixed for 30 days.** This covers one customer-selected protected HTTP/MCP tool, one controlled test environment, agreed acceptance cases, deployment assistance and a reproducible evidence package. Expanded scope requires a separate written quote. This price is a commercial hypothesis, not a market-validated result.
+
 ## Objective
 
-Deploy Action Gate around one customer-selected high-impact agent tool or MCP server and produce reproducible evidence that the execution boundary cannot be bypassed through the tested paths.
+Deploy Action Gate around one customer-selected consequential agent tool or MCP server and produce reproducible evidence for the agreed execution-boundary tests.
 
 ## Scope
 
