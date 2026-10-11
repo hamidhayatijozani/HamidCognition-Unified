@@ -10,7 +10,7 @@ ACTION = {"action": "protected.execute", "target": "prod"}
 POLICY = {"version": "policy-1"}
 
 
-def mint(decision="ALLOW"):
+def mint(decision="ALLOW", now=None):
     return issue_authority(
         secret=SECRET,
         decision_id="dec-tool-test",
@@ -19,6 +19,7 @@ def mint(decision="ALLOW"):
         policy=POLICY,
         decision=decision,
         ttl_seconds=300,
+        now=now,
     ).token()
 
 
@@ -45,6 +46,15 @@ def test_tool_boundary_rejects_sandbox_authority(monkeypatch, tmp_path):
     payload = {"tenant_id": "tenant-a", "action": ACTION, "policy": POLICY}
     with pytest.raises(AuthorityError, match="decision_not_executable"):
         tool_server.verify_execution_authority(mint("SANDBOX"), "tenant-a", payload)
+
+def test_tool_boundary_rejects_expired_authority(monkeypatch, tmp_path):
+    setup(monkeypatch, tmp_path)
+    # Issue at t=1000 with a 300-second TTL; evaluate at t=2000.
+    monkeypatch.setattr(tool_server.time, "time", lambda: 2000)
+    payload = {"tenant_id": "tenant-a", "action": ACTION, "policy": POLICY}
+    with pytest.raises(AuthorityError, match="expired_or_not_yet_valid"):
+        tool_server.verify_execution_authority(mint(now=1000), "tenant-a", payload)
+
 
 
 def test_tool_boundary_rejects_tenant_substitution(monkeypatch, tmp_path):
