@@ -12,6 +12,7 @@ HISTORY_OUT = Path("data/awareness/experiment-history.json")
 
 
 def main() -> None:
+    generated_at = int(time())
     contracts = canonical_contracts()
     components = [
         {
@@ -51,7 +52,7 @@ def main() -> None:
         "project": "BESAZ",
         "mode": "INNOVATION_SANDBOX",
         "authority": "NONE",
-        "generated_at_unix": int(time()),
+        "generated_at_unix": generated_at,
         "execution_scope": "DETERMINISTIC_SYNTHETIC_SMOKE_TESTS",
         "architecture_component_count": len(components),
         "candidate_count": len(candidates),
