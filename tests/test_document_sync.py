@@ -81,12 +81,12 @@ class VersionSourceGateRegressionTests(unittest.TestCase):
         (self.root / "PRODUCT").mkdir()
         (self.root / "action_gate").mkdir()
         (self.root / "docs").mkdir()
-        (self.root / "action_gate" / "VERSION").write_text("1.1.1\\n", encoding="utf-8")
+        (self.root / "action_gate" / "VERSION").write_text("1.1.1" + chr(10), encoding="utf-8")
         (self.root / "README.md").write_text(
-            "Current product version is " + "1" + "." + "1" + "." + "1" + ".\\n", encoding="utf-8"
+            "Current product version is " + "1" + "." + "1" + "." + "1" + "." + chr(10), encoding="utf-8"
         )
         (self.root / "PRODUCT" / "VERSION_TRUTH_REPORT.md").write_text(
-            "Current product version is " + "1" + "." + "1" + "." + "1" + ". Historical snapshot.\\n", encoding="utf-8"
+            "Current product version is " + "1" + "." + "1" + "." + "1" + ". Historical snapshot." + chr(10), encoding="utf-8"
         )
         self.manifest = self.root / "PRODUCT" / "VERSION_SOURCES.json"
         self.manifest.write_text(json.dumps({
@@ -123,7 +123,7 @@ class VersionSourceGateRegressionTests(unittest.TestCase):
 
     def test_undeclared_product_version_source_fails(self):
         offender = self.root / "docs" / "unexpected-version.md"
-        offender.write_text("The current product version is " + "9" + "." + "9" + "." + "9" + ".\\n", encoding="utf-8")
+        offender.write_text("The current product version is " + "9" + "." + "9" + "." + "9" + "." + chr(10), encoding="utf-8")
         subprocess.run(["git", "-C", str(self.root), "add", "."], check=True)
 
         code, output = self.run_gate()
