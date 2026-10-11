@@ -24,6 +24,7 @@ def test_generates_multiple_innovation_modes():
     assert InnovationKind.REVERSE in kinds
     assert InnovationKind.REMOVE in kinds
     assert InnovationKind.REORDER in kinds
+    assert InnovationKind.TRANSFER in kinds
     assert InnovationKind.EMERGENT in kinds
     assert all(c.status == CandidateStatus.PROPOSED for c in result)
 
@@ -56,6 +57,7 @@ def test_besaz_innovate_script_generates_report_without_contract_evidence_refs(m
 
     output = tmp_path / "innovation-report.json"
     monkeypatch.setattr(module, "OUT", output)
+    monkeypatch.setattr(module, "HISTORY_OUT", tmp_path / "experiment-history.json")
     module.main()
 
     report = json.loads(output.read_text(encoding="utf-8"))
@@ -64,3 +66,7 @@ def test_besaz_innovate_script_generates_report_without_contract_evidence_refs(m
     assert report["authority"] == "NONE"
     assert report["candidate_count"] > 0
     assert all(candidate["source_components"] for candidate in report["candidates"])
+    assert report["experiment_count"] == 3
+    assert report["execution_scope"] == "DETERMINISTIC_SYNTHETIC_SMOKE_TESTS"
+    assert {e["outcome"] for e in report["experiments"]} == {"PASS", "FAIL", "INCONCLUSIVE"}
+    assert (tmp_path / "experiment-history.json").exists()
