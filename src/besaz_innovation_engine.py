@@ -247,8 +247,20 @@ def run_sandbox(candidate: InnovationCandidate, fixture: dict[str, Any]) -> Expe
             "repair_fixture",
         )
 
-    baseline_score = float(baseline.get("score", 0.0))
-    variant_score = float(variant.get("score", 0.0))
+    try:
+        baseline_score = float(baseline.get("score", 0.0))
+        variant_score = float(variant.get("score", 0.0))
+    except (TypeError, ValueError):
+        return ExperimentResult(
+            candidate.candidate_id, "INCONCLUSIVE", {}, (),
+            ("scores must be numeric",), False, (), "repair_fixture"
+        )
+    import math
+    if not math.isfinite(baseline_score) or not math.isfinite(variant_score):
+        return ExperimentResult(
+            candidate.candidate_id, "INCONCLUSIVE", {}, (),
+            ("scores must be finite numbers",), False, (), "repair_fixture"
+        )
     # Normalize IEEE-754 representation noise in the externally visible metric.
     delta = round(variant_score - baseline_score, 10)
     result = "PASS" if delta > 0 else "FAIL" if delta < 0 else "INCONCLUSIVE"
