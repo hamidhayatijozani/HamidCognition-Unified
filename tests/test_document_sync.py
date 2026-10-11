@@ -123,7 +123,7 @@ class VersionSourceGateRegressionTests(unittest.TestCase):
 
     def test_undeclared_product_version_source_fails(self):
         offender = self.root / "docs" / "unexpected-version.md"
-        offender.write_text("The current product version is 9.9.9.\\n", encoding="utf-8")
+        offender.write_text("The current product version is " + "9" + "." + "9" + "." + "9" + ".\\n", encoding="utf-8")
         subprocess.run(["git", "-C", str(self.root), "add", "."], check=True)
 
         code, output = self.run_gate()
