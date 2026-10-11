@@ -57,7 +57,9 @@ def test_besaz_innovate_script_generates_report_without_contract_evidence_refs(m
 
     output = tmp_path / "innovation-report.json"
     monkeypatch.setattr(module, "OUT", output)
-    monkeypatch.setattr(module, "HISTORY_OUT", tmp_path / "experiment-history.json")
+    history_path = tmp_path / "experiment-history.json"
+    monkeypatch.setattr(module, "HISTORY_OUT", history_path)
+    monkeypatch.setenv("GITHUB_RUN_ID", "run-100")
     module.main()
 
     report = json.loads(output.read_text(encoding="utf-8"))
@@ -69,7 +71,34 @@ def test_besaz_innovate_script_generates_report_without_contract_evidence_refs(m
     assert report["experiment_count"] == 3
     assert report["execution_scope"] == "DETERMINISTIC_SYNTHETIC_SMOKE_TESTS"
     assert {e["outcome"] for e in report["experiments"]} == {"PASS", "FAIL", "INCONCLUSIVE"}
-    assert (tmp_path / "experiment-history.json").exists()
+    history = json.loads(history_path.read_text(encoding="utf-8"))
+    assert len(history["runs"]) == 1
+    assert history["runs"][0]["run_id"] == "run-100"
+
+    # Re-running the same workflow run must not duplicate its history entry.
+    module.main()
+    history = json.loads(history_path.read_text(encoding="utf-8"))
+    assert len(history["runs"]) == 1
+
+
+def test_history_preserves_prior_runs(monkeypatch, tmp_path):
+    import json
+    import scripts.besaz_innovate as module
+
+    output = tmp_path / "innovation-report.json"
+    history_path = tmp_path / "experiment-history.json"
+    history_path.write_text(json.dumps({
+        "project": "BESAZ",
+        "scope": "SYNTHETIC_ONLY",
+        "runs": [{"run_id": "older-run", "experiments": []}],
+    }), encoding="utf-8")
+    monkeypatch.setattr(module, "OUT", output)
+    monkeypatch.setattr(module, "HISTORY_OUT", history_path)
+    monkeypatch.setenv("GITHUB_RUN_ID", "new-run")
+    module.main()
+
+    history = json.loads(history_path.read_text(encoding="utf-8"))
+    assert [entry["run_id"] for entry in history["runs"]] == ["older-run", "new-run"]
 
 def test_sandbox_rejects_non_numeric_and_non_finite_scores():
     candidate = generate_candidates(components())[0]
