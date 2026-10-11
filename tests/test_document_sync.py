@@ -1,4 +1,8 @@
 from pathlib import Path
+import contextlib
+import importlib.util
+import io
+import tempfile
 import json
 import re
 import subprocess
@@ -68,6 +72,65 @@ class DocumentSyncTests(unittest.TestCase):
         self.assertEqual(identity["release_version"], "1" + ".1" + ".1")
         self.assertEqual(identity["release_tag"], "action-gate-v1." + "1.1")
         self.assertEqual(len(identity["source_commit"]), 40)
+
+
+class VersionSourceGateRegressionTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp.name)
+        (self.root / "PRODUCT").mkdir()
+        (self.root / "action_gate").mkdir()
+        (self.root / "docs").mkdir()
+        (self.root / "action_gate" / "VERSION").write_text("1.1.1" + chr(10), encoding="utf-8")
+        (self.root / "README.md").write_text(
+            "Current product version is " + "1" + "." + "1" + "." + "1" + "." + chr(10), encoding="utf-8"
+        )
+        (self.root / "PRODUCT" / "VERSION_TRUTH_REPORT.md").write_text(
+            "Current product version is " + "1" + "." + "1" + "." + "1" + ". Historical snapshot." + chr(10), encoding="utf-8"
+        )
+        self.manifest = self.root / "PRODUCT" / "VERSION_SOURCES.json"
+        self.manifest.write_text(json.dumps({
+            "schema": "test",
+            "canonical": "action_gate/VERSION",
+            "derived": ["README.md"],
+            "ignored": ["PRODUCT/VERSION_TRUTH_REPORT.md"],
+            "env_metadata": [],
+        }), encoding="utf-8")
+        subprocess.run(["git", "init", "-q", str(self.root)], check=True)
+        subprocess.run(["git", "-C", str(self.root), "add", "."], check=True)
+
+        source = ROOT / "tools" / "version_source_gate.py"
+        spec = importlib.util.spec_from_file_location("version_source_gate_under_test", source)
+        self.gate = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(self.gate)
+        self.old_root, self.old_manifest = self.gate.ROOT, self.gate.MANIFEST
+        self.gate.ROOT, self.gate.MANIFEST = self.root, self.manifest
+
+    def tearDown(self):
+        self.gate.ROOT, self.gate.MANIFEST = self.old_root, self.old_manifest
+        self.temp.cleanup()
+
+    def run_gate(self):
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            code = self.gate.main()
+        return code, output.getvalue()
+
+    def test_declared_and_historical_sources_pass(self):
+        code, output = self.run_gate()
+        self.assertEqual(code, 0, output)
+        self.assertIn("VERSION_SOURCE_OK", output)
+
+    def test_undeclared_product_version_source_fails(self):
+        offender = self.root / "docs" / "unexpected-version.md"
+        offender.write_text("The current product version is " + "9" + "." + "9" + "." + "9" + "." + chr(10), encoding="utf-8")
+        subprocess.run(["git", "-C", str(self.root), "add", "."], check=True)
+
+        code, output = self.run_gate()
+        self.assertEqual(code, 1, output)
+        self.assertIn("UNDECLARED_VERSION_SOURCES", output)
+        self.assertIn("docs/unexpected-version.md", output)
+
 
 if __name__ == "__main__":
     unittest.main()
