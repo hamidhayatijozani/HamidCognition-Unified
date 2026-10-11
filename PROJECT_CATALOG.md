@@ -1,14 +1,15 @@
-# HamidCognition Project Catalog
+# BESAZ Project Catalog
 
-**Originator:** Hamid Hayati Jozani  
-**Canonical record:** HamidCognition-Unified  
-**Current release:** v1.0.2
+**Canonical project name:** BESAZ  
+**Historical lineage:** HamidCognition  
+**Repository:** HamidCognition-Unified  
+**Current published Action Gate release:** v1.1.1 (product-line baseline only; not a release declaration for the entire BESAZ research program)
 
 ## Purpose
 
 HamidCognition is a research and engineering program exploring computational cognitive-state models, evidence-aware decision systems, execution governance, behavioral state transfer, unknown-space exploration, and experimental forecasting and trading.
 
-HamidCognition-Unified is the canonical integration and provenance record. It connects concepts, implementations, hypotheses, experiments, failures, unknowns, contradictions, and evidence without treating historical implementations as automatically equivalent.
+BESAZ is the canonical project-level coordination system. This repository is its integration and provenance record, preserving historical HamidCognition lineage. It connects concepts, implementations, hypotheses, experiments, failures, unknowns, contradictions, and evidence without treating historical implementations as automatically equivalent.
 
 ## Integrated research lines
 
@@ -41,6 +42,8 @@ An exploratory framework concept for generation, mutation, recombination, experi
 A falsifiable hypothesis concerning whether restoring behavior in some systems depends on shock amplitude and therefore violates amplitude-invariant normalization assumptions. Evidence remains bounded by the documented experiments.
 
 ### Trading / EUR/USD Research
+
+This is a separate research workstream. Forecasting or trading experiments are not part of the Action Gate product boundary and do not establish Action Gate security, customer acceptance, or commercial validation.
 
 Experimental market and EUR/USD simulation work combining market features, predictive models, cognitive-state heuristics, and simulated execution. Simulation must never be represented as live-market evidence.
 
