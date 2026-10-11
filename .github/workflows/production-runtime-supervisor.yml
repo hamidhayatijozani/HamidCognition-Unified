@@ -25,9 +25,24 @@ jobs:
           if [ -z "${PRODUCTION_BASE_URL:-}" ]; then
             echo "configured=false" >> "$GITHUB_OUTPUT"
             echo "PRODUCTION_BASE_URL is not configured. Runtime probe skipped."
+            {
+              echo "## Production runtime status"
+              echo
+              echo "**Status: UNKNOWN — runtime probe skipped.**"
+              echo
+              echo "- Reason: `PRODUCTION_BASE_URL` is not configured."
+              echo "- This successful workflow run confirms only that the supervisor's configuration check ran; it does not establish production health."
+            } >> "$GITHUB_STEP_SUMMARY"
           else
             echo "configured=true" >> "$GITHUB_OUTPUT"
             echo "Production target configured."
+            {
+              echo "## Production runtime status"
+              echo
+              echo "**Status: PROBE PENDING.**"
+              echo
+              echo "- A target is configured; health is not confirmed until the probe step completes."
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Probe production dashboard
@@ -53,6 +68,14 @@ PY
           echo "== Dashboard root =="
           curl --fail --silent --show-error --max-time 20 -I "$base/" >/dev/null
           echo "Production dashboard is reachable."
+          {
+            echo
+            echo "**Status: PROBE PASSED at $(date -u +'%Y-%m-%dT%H:%M:%SZ').**"
+            echo
+            echo "- The configured `/health` endpoint returned `status=ok` and `state_oracle.status=ready`."
+            echo "- The configured dashboard root responded successfully."
+            echo "- This is a point-in-time endpoint probe, not customer acceptance or a universal production-security claim."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Record pending deployment state
         if: steps.config.outputs.configured != 'true'
