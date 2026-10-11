@@ -70,3 +70,19 @@ def test_besaz_innovate_script_generates_report_without_contract_evidence_refs(m
     assert report["execution_scope"] == "DETERMINISTIC_SYNTHETIC_SMOKE_TESTS"
     assert {e["outcome"] for e in report["experiments"]} == {"PASS", "FAIL", "INCONCLUSIVE"}
     assert (tmp_path / "experiment-history.json").exists()
+
+def test_sandbox_rejects_non_numeric_and_non_finite_scores():
+    candidate = generate_candidates(components())[0]
+    bad_text = run_sandbox(candidate, {
+        "baseline": {"score": "not-a-number"},
+        "variant": {"score": 0.5},
+    })
+    assert bad_text.outcome == "INCONCLUSIVE"
+    assert bad_text.next_action == "repair_fixture"
+
+    bad_inf = run_sandbox(candidate, {
+        "baseline": {"score": float("inf")},
+        "variant": {"score": 0.5},
+    })
+    assert bad_inf.outcome == "INCONCLUSIVE"
+    assert bad_inf.next_action == "repair_fixture"
