@@ -2,8 +2,10 @@
   "project": "BESAZ",
   "mode": "INNOVATION_SANDBOX",
   "authority": "NONE",
-  "generated_at": 1791507977,
-  "candidate_count": 6,
+  "generated_at_unix": 1791706350,
+  "execution_scope": "DETERMINISTIC_SYNTHETIC_SMOKE_TESTS",
+  "architecture_component_count": 15,
+  "candidate_count": 8,
   "candidates": [
     {
       "candidate_id": "IN-399e1e5a981d18c9",
@@ -22,6 +24,26 @@
       "risks": [
         "false correlation",
         "duplicated evidence"
+      ],
+      "status": "PROPOSED"
+    },
+    {
+      "candidate_id": "IN-6dca1bd873b88fd7",
+      "kind": "TRANSFER",
+      "title": "Transfer verification pattern: GOVERNANCE -> LEARNING",
+      "hypothesis": "A verification pattern from GOVERNANCE may improve evidence quality in LEARNING.",
+      "source_components": [
+        "GOVERNANCE",
+        "LEARNING"
+      ],
+      "experiment": "Apply the same synthetic verification fixture to both components and compare evidence completeness.",
+      "success_criteria": [
+        "transfer is measurable",
+        "source and destination semantics remain distinct"
+      ],
+      "risks": [
+        "false equivalence",
+        "context mismatch"
       ],
       "status": "PROPOSED"
     },
@@ -105,6 +127,24 @@
       "status": "PROPOSED"
     },
     {
+      "candidate_id": "IN-dd1d68b30ad70cfb",
+      "kind": "CONTRADICTION",
+      "title": "Turn a failed experiment into a boundary test",
+      "hypothesis": "A failed or inconclusive experiment may encode a useful constraint rather than useless noise.",
+      "source_components": [
+        "IN-399e1e5a981d18c9"
+      ],
+      "experiment": "Reproduce the failure with one controlled variable changed at a time.",
+      "success_criteria": [
+        "failure boundary becomes explicit",
+        "result is repeatable or explained"
+      ],
+      "risks": [
+        "confounded variables"
+      ],
+      "status": "PROPOSED"
+    },
+    {
       "candidate_id": "IN-2c101cf6abfc33de",
       "kind": "EMERGENT",
       "title": "Generate a cross-layer probe",
@@ -126,6 +166,78 @@
       ],
       "status": "PROPOSED"
     }
+  ],
+  "experiment_count": 3,
+  "experiments": [
+    {
+      "candidate_id": "IN-399e1e5a981d18c9",
+      "outcome": "PASS",
+      "metrics": {
+        "baseline_score": 0.5,
+        "variant_score": 0.75,
+        "delta": 0.25
+      },
+      "observations": [
+        "score_delta=0.25"
+      ],
+      "failures": [],
+      "repeatable": true,
+      "evidence": [
+        "synthetic-fixture:improvement"
+      ],
+      "next_action": "retain_candidate",
+      "fixture_name": "synthetic_improvement",
+      "evidence_scope": "SYNTHETIC_ONLY"
+    },
+    {
+      "candidate_id": "IN-399e1e5a981d18c9",
+      "outcome": "FAIL",
+      "metrics": {
+        "baseline_score": 0.8,
+        "variant_score": 0.7,
+        "delta": -0.1
+      },
+      "observations": [
+        "score_delta=-0.1"
+      ],
+      "failures": [
+        "variant did not improve baseline: -0.1"
+      ],
+      "repeatable": true,
+      "evidence": [
+        "synthetic-fixture:regression"
+      ],
+      "next_action": "revise_or_reject",
+      "fixture_name": "synthetic_regression",
+      "evidence_scope": "SYNTHETIC_ONLY"
+    },
+    {
+      "candidate_id": "IN-399e1e5a981d18c9",
+      "outcome": "INCONCLUSIVE",
+      "metrics": {
+        "baseline_score": 0.7,
+        "variant_score": 0.7,
+        "delta": 0.0
+      },
+      "observations": [
+        "score_delta=0.0"
+      ],
+      "failures": [
+        "variant did not improve baseline: 0.0"
+      ],
+      "repeatable": false,
+      "evidence": [
+        "synthetic-fixture:no-change"
+      ],
+      "next_action": "revise_or_reject",
+      "fixture_name": "synthetic_no_change",
+      "evidence_scope": "SYNTHETIC_ONLY"
+    }
+  ],
+  "truth_boundary": [
+    "synthetic fixture outcomes are not proof of production performance",
+    "architecture contract evidence_refs are not inferred from code presence",
+    "failure and inconclusive results remain visible"
   ],
   "hard_boundary": [
     "sandbox only",
