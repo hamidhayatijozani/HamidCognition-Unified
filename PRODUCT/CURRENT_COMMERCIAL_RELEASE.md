@@ -47,9 +47,7 @@ Technical release evidence does not establish that a customer transaction occurr
 
 ## Payment boundary
 
-The current operator settlement account is TopChange Wallet ID `USD2134914`.
-
-This is a TopChange account/wallet identifier, not a blockchain address. The repository therefore does not claim automatic on-chain USDT settlement.
+The operator's TopChange account identifier is configured out of band and is not published in repository source. It is not a blockchain address. The repository therefore does not claim automatic on-chain USDT settlement.
 
 Until an on-chain address and network are actually configured, payment verification is provider/manual and must produce an auditable settlement record before entitlement.
 
