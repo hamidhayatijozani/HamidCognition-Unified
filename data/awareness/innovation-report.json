@@ -2,7 +2,7 @@
   "project": "BESAZ",
   "mode": "INNOVATION_SANDBOX",
   "authority": "NONE",
-  "generated_at_unix": 1791706350,
+  "generated_at_unix": 1791706448,
   "execution_scope": "DETERMINISTIC_SYNTHETIC_SMOKE_TESTS",
   "architecture_component_count": 15,
   "candidate_count": 8,
