@@ -28,6 +28,8 @@ jobs:
       - name: Test innovation engine
         run: pytest -q tests/test_besaz_innovation_engine.py
       - name: Record report
+        env:
+          GITHUB_RUN_ID: ${{ github.run_id }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
