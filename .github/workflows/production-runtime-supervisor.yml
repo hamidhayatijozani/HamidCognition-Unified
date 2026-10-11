@@ -30,7 +30,7 @@ jobs:
               echo
               echo "**Status: UNKNOWN — runtime probe skipped.**"
               echo
-              echo "- Reason: `PRODUCTION_BASE_URL` is not configured."
+              echo "- Reason: PRODUCTION_BASE_URL is not configured."
               echo "- This successful workflow run confirms only that the supervisor's configuration check ran; it does not establish production health."
             } >> "$GITHUB_STEP_SUMMARY"
           else
@@ -57,14 +57,14 @@ jobs:
           health_json="$(curl --fail --silent --show-error --max-time 20 "$base/health")"
           echo "$health_json"
           python3 - "$health_json" <<'PY'
-import json, sys
-body = json.loads(sys.argv[1])
-if body.get("status") != "ok":
-    raise SystemExit("production runtime is not healthy: " + repr(body))
-oracle = body.get("state_oracle", {})
-if oracle.get("status") != "ready":
-    raise SystemExit("state oracle is not ready: " + repr(oracle))
-PY
+          import json, sys
+          body = json.loads(sys.argv[1])
+          if body.get("status") != "ok":
+              raise SystemExit("production runtime is not healthy: " + repr(body))
+          oracle = body.get("state_oracle", {})
+          if oracle.get("status") != "ready":
+              raise SystemExit("state oracle is not ready: " + repr(oracle))
+          PY
           echo "== Dashboard root =="
           curl --fail --silent --show-error --max-time 20 -I "$base/" >/dev/null
           echo "Production dashboard is reachable."
@@ -72,7 +72,7 @@ PY
             echo
             echo "**Status: PROBE PASSED at $(date -u +'%Y-%m-%dT%H:%M:%SZ').**"
             echo
-            echo "- The configured `/health` endpoint returned `status=ok` and `state_oracle.status=ready`."
+            echo "- The configured health endpoint returned status=ok and state_oracle.status=ready."
             echo "- The configured dashboard root responded successfully."
             echo "- This is a point-in-time endpoint probe, not customer acceptance or a universal production-security claim."
           } >> "$GITHUB_STEP_SUMMARY"
