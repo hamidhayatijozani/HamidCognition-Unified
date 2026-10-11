@@ -13,7 +13,7 @@ def test_manual_payment_then_automatic_delivery():
     assert sale.delivery_digest == "sha256:artifact"
 
 def test_unverified_payment_never_entitles():
-    sale = create_invoice("buyer@example.test", "Action Gate", "v1.0.10", "100")
+    sale = create_invoice("buyer@example.test", "Action Gate", "v1.0.10", "100", settlement_account="test-provider-account")
     sale.submit_payment(PaymentEvidence("customer-claimed-ref", "100", "USDT", False, VerificationMode.MANUAL_PROVIDER, ""))
     try:
         sale.verify_payment("operator")
@@ -23,7 +23,7 @@ def test_unverified_payment_never_entitles():
     assert sale.entitlement is None
 
 def test_wrong_amount_blocks_delivery():
-    sale = create_invoice("buyer@example.test", "Action Gate", "v1.0.10", "100")
+    sale = create_invoice("buyer@example.test", "Action Gate", "v1.0.10", "100", settlement_account="test-provider-account")
     sale.submit_payment(PaymentEvidence("provider-ref-002", "99", "USDT", True, VerificationMode.MANUAL_PROVIDER, "operator"))
     try:
         sale.verify_payment("operator")
@@ -34,7 +34,7 @@ def test_wrong_amount_blocks_delivery():
 def test_invoice_requires_out_of_band_settlement_account():
     with patch.dict("os.environ", {"TOPCHANGE_SETTLEMENT_ACCOUNT": ""}):
         try:
-            create_invoice("buyer@example.test", "Action Gate", "v1.0.10", "100")
+            create_invoice("buyer@example.test", "Action Gate", "v1.0.10", "100", settlement_account="test-provider-account")
         except ValueError as exc:
             assert str(exc) == "settlement_account_required"
         else:
