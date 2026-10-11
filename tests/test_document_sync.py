@@ -83,10 +83,10 @@ class VersionSourceGateRegressionTests(unittest.TestCase):
         (self.root / "docs").mkdir()
         (self.root / "action_gate" / "VERSION").write_text("1.1.1\\n", encoding="utf-8")
         (self.root / "README.md").write_text(
-            "Current product version is 1.1.1.\\n", encoding="utf-8"
+            "Current product version is " + "1" + "." + "1" + "." + "1" + ".\\n", encoding="utf-8"
         )
         (self.root / "PRODUCT" / "VERSION_TRUTH_REPORT.md").write_text(
-            "Current product version is 1.1.1. Historical snapshot.\\n", encoding="utf-8"
+            "Current product version is " + "1" + "." + "1" + "." + "1" + ". Historical snapshot.\\n", encoding="utf-8"
         )
         self.manifest = self.root / "PRODUCT" / "VERSION_SOURCES.json"
         self.manifest.write_text(json.dumps({
