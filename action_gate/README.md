@@ -1,4 +1,4 @@
-# HamidCognition Action Gate v1.0.2
+# HamidCognition Action Gate v1.1.1
 
 **Runtime Action Governance with Replayable Decision Evidence**
 
@@ -46,6 +46,34 @@ GET  /health
 ```
 
 An Evidence Record contains tenant, actor, request, normalized action, action hash, nonce, policy version and snapshot, policy hash, independent risk assessment, evidence, decision, constraints, approval, execution, outcome, expiry, replay reference and decision signature.
+
+## Getting started in 60 seconds (local demo)
+
+This is a local development demo, not a production deployment or customer acceptance test. It requires Python 3.11+ and a terminal.
+
+Terminal 1:
+
+```bash
+cd action_gate
+python -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app:app --host 127.0.0.1 --port 8000
+```
+
+Terminal 2, from the same `action_gate` directory and virtual environment:
+
+```bash
+python demo.py
+```
+
+The demo calls the running local API. It exits with an error if the API is not reachable. The default local development database is SQLite; this does not validate PostgreSQL deployment, TLS, customer credentials, or production runtime health.
+
+## Production environment template
+
+A template is provided at `.env.example` for `docker-compose.production.yml`. Copy it to `.env`, replace every `REPLACE_ME_...` value with a unique cryptographically random secret, set `DOMAIN` to a DNS name that points to the deployment host, and keep `.env` out of Git. Never use the example values as real credentials. The Compose stack requires Docker Compose and a reachable DNS/TLS setup.
+
+Generate each secret independently, for example with `openssl rand -hex 32`. Do not reuse one secret across variables. After configuring the file, start the production stack using the documented Compose command below.
 
 ## Local development
 
