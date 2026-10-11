@@ -1,7 +1,9 @@
+from unittest.mock import patch
+
 from src.commercial_sale import PaymentEvidence, VerificationMode, SaleStatus, create_invoice
 
 def test_manual_payment_then_automatic_delivery():
-    sale = create_invoice("buyer@example.test", "Action Gate", "v1.0.10", "100")
+    sale = create_invoice("buyer@example.test", "Action Gate", "v1.0.10", "100", settlement_account="test-provider-account")
     assert sale.status == SaleStatus.AWAITING_PAYMENT
     sale.submit_payment(PaymentEvidence("provider-ref-001", "100", "USDT", True, VerificationMode.MANUAL_PROVIDER, "operator"))
     sale.verify_payment("operator")
