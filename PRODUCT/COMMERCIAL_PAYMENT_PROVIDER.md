@@ -2,17 +2,15 @@
 
 ## Settlement account
 
-HamidCognition has one operator-supplied TopChange settlement account for commercial payment handling.
+HamidCognition uses an operator-supplied TopChange settlement account for commercial payment handling.
 
 - Provider: TopChange
-- Wallet name: کیف پول دلار
-- Wallet ID: `USD2134914`
-- Identifier type: TopChange wallet/account identifier
-- Source: Wallet Ownership Certificate supplied by the operator
+- Identifier type: provider wallet/account identifier, configured out of band
+- Source: operator-provided ownership evidence, retained outside public source control
 
 ## Boundary
 
-`USD2134914` is an account/wallet identifier at TopChange. It is **not** a blockchain address and must not be placed in:
+The TopChange account identifier is operational metadata. It is **not** a blockchain address and must not be placed in:
 
 - `USDT_PAYMENT_ADDRESS`
 - `USDT_NETWORK`
@@ -25,7 +23,7 @@ If a blockchain USDT receiving address is later required, it must be supplied se
 
 No seed phrase, private key, password, API secret, or other credential is stored in this repository.
 
-The TopChange Wallet ID is operational metadata only. Payment settlement evidence must still use the transaction hash and network-specific verification defined in `PRODUCT/USDT_PAYMENT_POLICY.md`.
+The provider account identifier is configured outside source control. Payment settlement evidence must still use the appropriate provider reference or, for on-chain payment, the transaction hash and network-specific verification defined in `PRODUCT/USDT_PAYMENT_POLICY.md`.
 
 ## Ownership evidence
 
