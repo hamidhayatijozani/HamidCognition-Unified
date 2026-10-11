@@ -34,7 +34,7 @@ def test_wrong_amount_blocks_delivery():
 def test_invoice_requires_out_of_band_settlement_account():
     with patch.dict("os.environ", {"TOPCHANGE_SETTLEMENT_ACCOUNT": ""}):
         try:
-            create_invoice("buyer@example.test", "Action Gate", "v1.0.10", "100", settlement_account="test-provider-account")
+            create_invoice("buyer@example.test", "Action Gate", "v1.0.10", "100")
         except ValueError as exc:
             assert str(exc) == "settlement_account_required"
         else:
