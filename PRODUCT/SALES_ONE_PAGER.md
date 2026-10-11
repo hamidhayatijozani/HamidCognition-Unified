@@ -48,21 +48,19 @@ These are engineering validation claims for the stated release and tested bounda
 
 ## Pilot offer
 
-**Strategic Proof-of-Value Pilot: 50,000 USDT**
+**Proposed standard pilot: 2,500 USDT fixed / 30 days.**
 
-Recommended scope: one protected agent-to-tool execution path, customer-selected policy scenarios, integration support, acceptance testing, evidence/replay demonstration, and a written pilot outcome report.
+Scope: one customer-selected protected HTTP/MCP tool, one controlled test environment, agreed acceptance cases, deployment assistance and a reproducible evidence package. Expanded scope requires a separate written quote.
 
-Pilot duration: **6–8 weeks**, subject to integration scope.
-
-Pilot fee is a commercial proposal, not a claim of market-standard pricing.
+This is a commercial hypothesis for testing, not a market-validated price or evidence of an existing transaction. The older 50,000 USDT / 6–8 week proposal is superseded and is not the current standard offer.
 
 ## Enterprise conversion
 
-Indicative annual software license target after successful pilot: **150,000–300,000 USDT/year**, with customer-specific integration, managed operations, support, SLA, and special security requirements priced separately.
+Annual software licensing: **UNVALIDATED HYPOTHESIS — NOT A CURRENT QUOTE.** Scope, deployment responsibility, support, integration and SLA must be evaluated after a pilot.
 
 ## Strategic / OEM licensing
 
-For embedding Action Gate capabilities into another vendor's product or platform, use a negotiated technology/OEM license. Initial commercial discussion target: **500,000+ USDT**, with scope, exclusivity, deployment rights, support, and any royalty/minimum-commitment structure negotiated separately.
+Strategic/OEM licensing is a possible future negotiation. The older 500,000+ USDT target is **UNVALIDATED and NOT A CURRENT QUOTE**.
 
 ## Who should evaluate it
 
