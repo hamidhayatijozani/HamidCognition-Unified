@@ -6,11 +6,10 @@ HamidCognition defines a provider-neutral sale state machine that works with the
 current TopChange settlement boundary without pretending that TopChange exposes
 a verified webhook/API integration.
 
-Current settlement account:
+Current settlement mode:
 - Provider: TopChange
-- Wallet name: کیف پول دلار
-- Wallet ID: USD2134914
-- This identifier is not a blockchain address.
+- Provider account instructions are supplied through a secure invoice or private operator channel.
+- Provider account identifiers are not stored in public source control and are not blockchain addresses.
 
 ## Customer flow
 
@@ -28,7 +27,7 @@ The only human step in the current mode is trusted payment verification.
 ## Hard safety rules
 
 - Customer screenshots, chat messages, or copied wallet identifiers never constitute payment confirmation.
-- USD2134914 must never be treated as a blockchain address.
+- A provider account identifier must never be treated as a blockchain address.
 - No entitlement or artifact delivery occurs before CONFIRMED.
 - Amount and currency must match the invoice exactly.
 - Entitlement issuance is idempotent for an existing sale.
