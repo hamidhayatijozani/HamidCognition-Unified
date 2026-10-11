@@ -138,6 +138,15 @@ def generate_candidates(
             ["false correlation", "duplicated evidence"],
         )
 
+    if len(ids) >= 2:
+        a, b = ids[0], ids[-1]
+        add(InnovationKind.TRANSFER, f"Transfer verification pattern: {a} -> {b}",
+            f"A verification pattern from {a} may improve evidence quality in {b}.",
+            [a, b],
+            "Apply the same synthetic verification fixture to both components and compare evidence completeness.",
+            ["transfer is measurable", "source and destination semantics remain distinct"],
+            ["false equivalence", "context mismatch"])
+
     if gaps:
         a = gaps[0]
         add(
