@@ -1,6 +1,6 @@
 # Phase 2 — Non-Default Branch and Unmerged Work Audit (2026-10-12)
 
-**Status:** GitHub branch/compare inspection. No branch was deleted or force-pushed. One reviewed hardening branch was merged through PR #2 after the PR-head contract workflow passed; the post-merge workflow on the merge commit is still pending at the time of this update.
+**Status:** GitHub branch/compare inspection. No branch was deleted or force-pushed. One reviewed hardening branch was merged through PR #2 after the PR-head contract workflow passed; the post-merge workflow on the merge commit also completed successfully.
 **Why this matters:** Archiving a repository does not delete its branches, but it makes the repository read-only. Unique work on non-default branches must be reviewed and its destination decided before declaring the repository consolidated.
 
 ## Findings
@@ -12,7 +12,7 @@
 - It added `.github/workflows/pst-canonical.yml` and expanded `integrated/ps_t/test_canonical_engine.py` to cover regression vectors, deterministic trajectory, invalid-input rejection, state bounds and instance isolation.
 - [PR #2](https://github.com/hamidhayatijozani/HamidCognitionEngine/pull/2) was **merged** with merge commit `9da718d1ba8964a4e4ae3f0f5e3455c6c26cdecb`.
 - The `PST Canonical Contract` workflow on the exact PR head SHA `7debd089f23cd89fe22360a552c07ddefe3036ea` completed **success**. Its `Run canonical contract tests` step also completed success.
-- A separate push-triggered run on merge commit `9da718d1ba8964a4e4ae3f0f5e3455c6c26cdecb` was observed `in_progress`; do not claim post-merge validation complete until it finishes.
+- The separate push-triggered run on merge commit `9da718d1ba8964a4e4ae3f0f5e3455c6c26cdecb` completed **success**: [workflow run](https://github.com/hamidhayatijozani/HamidCognitionEngine/actions/runs/38196610755).
 - Branch `fix/pst-canonical-weights` is behind master by one commit, with no ahead-only commits reported.
 
 ### `hamidcognition-v0-max`
@@ -39,7 +39,7 @@ The RFC-0003 branch's API test changes remove dedicated DENY and SANDBOX asserti
 ## Archive gate update
 
 The original “archive ten repositories” proposal is not ready. In particular:
-1. `HamidCognitionEngine` has just gained a passing PR-head contract test gate, but its post-merge run still needs to finish.
+1. `HamidCognitionEngine` gained deterministic P/S/T contract tests and CI through PR #2; both PR-head and post-merge workflow runs passed.
 2. `hamidcognition-v0-max` has a 21-commit governance branch and other CI-related branches that need disposition.
 3. A branch being behind is not itself a problem; an ahead/diverged branch may contain unique work and must be inspected.
 4. Branch existence and a successful-looking commit message are not proof of CI execution.
