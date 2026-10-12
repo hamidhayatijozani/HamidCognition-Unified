@@ -32,6 +32,10 @@ HEAD values below were read from the default branch on 2026-10-12.
 | `hamidcognition-v0-max` | `main` | `7da846315ea56a6d1b187546b47f68ffe291c004` | HISTORICAL ARCHIVE CANDIDATE | Existing migration docs establish exact duplicate blobs for several files versus `hamidcognition-complete`; verify the remaining unique API, governance, workflow and Docker files before archive. |
 | `hamidcognition-complete` | `main` | `383037f85830f69a9dbd5f21f8d06526bc67d964` | HISTORICAL ARCHIVE CANDIDATE | Existing migration docs establish exact duplicates for several files versus `v0-max`, but unique mobile/creative/platform components remain to be checked. It is not safe to infer whole-repository equivalence from a few matching blobs. |
 
+### Additional archive blocker found after initial inventory
+
+`hamidcognition-complete` has a **draft, untagged release** named `W`, created 2025-12-27, with no release body: [draft release](https://github.com/hamidhayatijozani/hamidcognition-complete/releases/tag/untagged-370108c16429029ca3a5). Its intent and whether it should be retained or closed must be resolved before archiving that repository.
+
 ## Verified facts vs unknowns
 
 ### Verified from GitHub metadata/tree/README inspection
