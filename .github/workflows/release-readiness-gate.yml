@@ -18,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Require all release validation workflows on the same SHA
+        id: validate
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -48,6 +49,7 @@ jobs:
           if [ -z "$tagged" ]; then
             echo "RELEASE_READINESS_SKIP_NON_RELEASE_SHA"
             echo "validated_sha=$TARGET_SHA"
+            echo "validated_release=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           echo "Release candidate tag: $tagged"
@@ -78,6 +80,8 @@ jobs:
             if [ "$missing" -eq 0 ]; then
               echo "RELEASE_READINESS_PASS"
               echo "validated_sha=$TARGET_SHA"
+              printf "%s\n" "$TARGET_SHA" > validated-sha.txt
+              echo "validated_release=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
 
@@ -86,3 +90,12 @@ jobs:
 
           echo "RELEASE_READINESS_FAIL"
           exit 1
+
+      - name: Publish validated source identity
+        if: steps.validate.outputs.validated_release == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-readiness-validated-sha
+          path: validated-sha.txt
+          if-no-files-found: error
+          retention-days: 7
