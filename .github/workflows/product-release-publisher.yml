@@ -90,7 +90,7 @@ jobs:
             --manifest "$manifest_file" \
             --archive "$archive_file" \
             --checksum "$checksum_file" \
-            --expected-sha "$source_sha" \
+            --expected-sha "$readiness_sha" \
             --expected-version "$source_version" \
             --readiness-file validation/validated-sha.txt
 
