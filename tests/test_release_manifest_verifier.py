@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.verify_release_manifest import verify
+from scripts.verify_release_manifest import read_readiness_sha, verify
 
 
 SOURCE_SHA = "a" * 40
@@ -52,6 +52,17 @@ class ReleaseManifestVerifierTests(unittest.TestCase):
 
     def test_accepts_consistent_candidate(self) -> None:
         self.verify_candidate()
+
+    def test_rejects_missing_readiness_evidence_file(self) -> None:
+        with self.assertRaisesRegex(ValueError, "readiness evidence file is missing"):
+            read_readiness_sha(self.root / "missing-validated-sha.txt")
+
+    def test_rejects_malformed_readiness_evidence_file(self) -> None:
+        evidence = self.root / "validated-sha.txt"
+        evidence.write_text("not-a-git-sha\\n", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "full lowercase Git SHA"):
+            read_readiness_sha(evidence)
+
 
     def test_rejects_manifest_sha_mismatch(self) -> None:
         self.write_manifest(commit=OTHER_SHA)
