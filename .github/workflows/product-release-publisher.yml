@@ -15,19 +15,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download release candidate artifact
+        id: download
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_ID: ${{ github.event.workflow_run.id }}
+        shell: bash
         run: |
           set -euo pipefail
+          artifact_names="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/artifacts" --jq '.artifacts[].name')"
+          if ! grep -q '^action-gate-release-candidate-' <<< "$artifact_names"; then
+            echo "No release-candidate artifact exists; refusing to publish."
+            echo "validated=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           mkdir -p release
           gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --dir release
-          find release -maxdepth 3 -type f -print
+          manifest_file="$(find release -name '*.manifest.txt' -print -quit)"
+          tar_file="$(find release -name 'action-gate-*.tar' -print -quit)"
+          sha_file="$(find release -name 'action-gate-*.tar.sha256' -print -quit)"
+          test -f "$manifest_file" && test -f "$tar_file" && test -f "$sha_file"
+          echo "validated=true" >> "$GITHUB_OUTPUT"
 
       - name: Publish product release
+        if: steps.download.outputs.validated == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         shell: bash
         run: |
           set -euo pipefail
@@ -35,29 +47,55 @@ jobs:
           tar_file="$(find release -name 'action-gate-*.tar' -print -quit)"
           sha_file="$(find release -name 'action-gate-*.tar.sha256' -print -quit)"
           test -f "$manifest_file" && test -f "$tar_file" && test -f "$sha_file"
+
           version="$(awk -F= '$1=="version"{print $2}' "$manifest_file")"
+          source_sha="$(awk -F= '$1=="commit"{print $2}' "$manifest_file")"
+          archive="$(awk -F= '$1=="archive"{print $2}' "$manifest_file")"
           test -n "$version"
+          [[ "$source_sha" =~ ^[0-9a-f]{40}$ ]]
+          test "$archive" = "$(basename "$tar_file")"
+
+          artifact_dir="$(dirname "$manifest_file")"
+          (
+            cd "$artifact_dir"
+            sha256sum -c "$(basename "$sha_file")"
+          )
+
           tag="action-gate-v$version"
+          tag_json="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" 2>/dev/null || true)"
+          tag_sha=""
+          if [ -n "$tag_json" ]; then
+            tag_type="$(jq -r '.object.type' <<< "$tag_json")"
+            tag_sha="$(jq -r '.object.sha' <<< "$tag_json")"
+            if [ "$tag_type" = "tag" ]; then
+              tag_sha="$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$tag_sha" --jq '.object.sha')"
+            fi
+            if [ "$tag_sha" != "$source_sha" ]; then
+              echo "$tag already points to $tag_sha, but the artifact claims $source_sha."
+              echo "Refusing to publish or relabel a mismatched release."
+              exit 1
+            fi
+          fi
 
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            existing_target="$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json targetCommitish --jq '.targetCommitish')"
-            if [ "$existing_target" != "$HEAD_SHA" ]; then
-              echo "$tag already exists at $existing_target; validated revision $HEAD_SHA contains only release-independent CI fixes."
-              echo "The immutable versioned release remains bound to its original validated source revision."
-              exit 0
-            fi
-            echo "$tag already exists and is bound to the validated commit $HEAD_SHA; nothing to publish."
+            test "$tag_sha" = "$source_sha"
+            echo "$tag already exists at the exact artifact source SHA; nothing to publish."
             exit 0
           fi
 
           cat > /tmp/release-notes.md <<EOF
           HamidCognition Action Gate v$version
 
-          Verified source commit: $HEAD_SHA
+          Verified source commit: $source_sha
           Release-candidate workflow run: #${{ github.event.workflow_run.id }}
 
           The release was published by a dedicated write-scoped publisher workflow. The build/evidence workflow does not receive repository write permission.
           Commercial deployment remains subject to the customer acceptance procedure.
           EOF
 
-          gh release create "$tag"             --repo "$GITHUB_REPOSITORY"             --target "$HEAD_SHA"             --title "HamidCognition Action Gate v$version"             --notes-file /tmp/release-notes.md             "$tar_file" "$sha_file" "$manifest_file"
+          gh release create "$tag" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$source_sha" \
+            --title "HamidCognition Action Gate v$version" \
+            --notes-file /tmp/release-notes.md \
+            "$tar_file" "$sha_file" "$manifest_file"
