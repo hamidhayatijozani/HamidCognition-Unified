@@ -96,6 +96,11 @@ jobs:
 
           tag="action-gate-v$version"
           tag_json="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" 2>/dev/null || true)"
+          if [ -z "$tag_json" ]; then
+            echo "Readiness was successful but the exact release tag $tag is now missing."
+            echo "Refusing to recreate a mutable release reference during publication."
+            exit 1
+          fi
           tag_sha=""
           if [ -n "$tag_json" ]; then
             tag_type="$(jq -r '.object.type' <<< "$tag_json")"
