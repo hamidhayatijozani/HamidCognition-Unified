@@ -23,6 +23,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Install test dependency
+        run: python -m pip install --upgrade pip pytest
       - name: Run structural checks
         working-directory: experiments/EXP-001
         run: python test_exp001.py
