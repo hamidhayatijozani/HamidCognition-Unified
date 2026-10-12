@@ -23,6 +23,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Install test dependency
+        run: python -m pip install --upgrade pip pytest
       - name: Run structural checks
         working-directory: experiments/EXP-001
         run: python test_exp001.py
@@ -32,4 +34,6 @@ jobs:
           python replay.py > /tmp/replay.json
           grep '"identical_fingerprints": true' /tmp/replay.json
       - name: Run canonical weight regression
+        env:
+          PYTHONPATH: integrated/ps_t
         run: python -m pytest -q integrated/ps_t/test_canonical_engine.py
