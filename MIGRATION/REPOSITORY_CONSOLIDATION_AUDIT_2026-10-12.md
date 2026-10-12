@@ -13,7 +13,7 @@ The accessible owner inventory contains **14 repositories**, matching the report
 
 ## Repository inventory and preliminary disposition
 
-HEAD values below were read from the default branch on 2026-10-12.
+HEAD values below were read from the default branch on 2026-10-12 before the later merge of `HamidCognitionEngine` PR #2. Its current post-merge HEAD is `9da718d1ba8964a4e4ae3f0f5e3455c6c26cdecb`; see [the branch audit](PHASE_2_BRANCH_AUDIT_2026-10-12.md).
 
 | Repository | Default branch | Observed HEAD | Preliminary disposition | Rationale / open condition |
 |---|---|---|---|---|
