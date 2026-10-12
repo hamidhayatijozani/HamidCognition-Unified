@@ -31,6 +31,15 @@ def parse_manifest(path: Path) -> dict[str, str]:
     return values
 
 
+def read_readiness_sha(path: Path) -> str:
+    if not path.is_file():
+        raise ValueError("readiness evidence file is missing")
+    value = path.read_text(encoding="utf-8").strip()
+    if not SHA_RE.fullmatch(value):
+        raise ValueError("readiness evidence does not contain one full lowercase Git SHA")
+    return value
+
+
 def verify(manifest_path: Path, archive_path: Path, checksum_path: Path,
            expected_sha: str, expected_version: str, readiness_sha: str) -> None:
     manifest = parse_manifest(manifest_path)
@@ -85,11 +94,12 @@ def main() -> int:
     parser.add_argument("--checksum", type=Path, required=True)
     parser.add_argument("--expected-sha", required=True)
     parser.add_argument("--expected-version", required=True)
-    parser.add_argument("--readiness-sha", required=True)
+    parser.add_argument("--readiness-file", type=Path, required=True)
     args = parser.parse_args()
     try:
+        readiness_sha = read_readiness_sha(args.readiness_file)
         verify(args.manifest, args.archive, args.checksum,
-               args.expected_sha, args.expected_version, args.readiness_sha)
+               args.expected_sha, args.expected_version, readiness_sha)
     except (OSError, ValueError) as exc:
         print(f"RELEASE_ARTIFACT_REJECTED: {exc}", file=sys.stderr)
         return 1
