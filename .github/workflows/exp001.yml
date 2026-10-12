@@ -34,4 +34,6 @@ jobs:
           python replay.py > /tmp/replay.json
           grep '"identical_fingerprints": true' /tmp/replay.json
       - name: Run canonical weight regression
+        env:
+          PYTHONPATH: integrated/ps_t
         run: python -m pytest -q integrated/ps_t/test_canonical_engine.py
