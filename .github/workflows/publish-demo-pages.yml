@@ -1,4 +1,4 @@
-name: Publish Action Gate demo to GitHub Pages
+name: Validate Action Gate demo assets
 
 on:
   push:
@@ -10,34 +10,25 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
-# Keep this deployment compatible with web-app-pages.yml: both workflows
-# publish the same repository-root site so neither overwrites the other with
-# a demo-only index page.
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
+# Deliberately validation-only. web-app-pages.yml is the sole Pages deployer.
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  validate-demo:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload complete site
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: "."
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Validate demo file and release video links
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s demo-v0.4.2.html
+          grep -q '882e5530-c605-11f1-a7f9-3bbec7cadd5d.mp4' demo-v0.4.2.html
+          grep -q '6cdf0500-c604-11f1-a7f9-3bbec7cadd5d.mp4' demo-v0.4.2.html
+          for asset in \
+            "https://github.com/hamidhayatijozani/HamidCognition-Unified/releases/download/v0.4.2/882e5530-c605-11f1-a7f9-3bbec7cadd5d.mp4" \
+            "https://github.com/hamidhayatijozani/HamidCognition-Unified/releases/download/v0.4.2/6cdf0500-c604-11f1-a7f9-3bbec7cadd5d.mp4"
+          do
+            curl --fail --location --silent --show-error --output /dev/null --range 0-0 "$asset"
+          done
