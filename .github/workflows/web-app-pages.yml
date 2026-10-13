@@ -5,6 +5,7 @@ on:
     branches: ["main"]
     paths:
       - "index.html"
+      - "demo-v0.4.2.html"
       - ".github/workflows/web-app-pages.yml"
   workflow_dispatch:
 
@@ -13,6 +14,7 @@ permissions:
   pages: write
   id-token: write
 
+# This is the only workflow allowed to deploy the repository-root Pages site.
 concurrency:
   group: "pages"
   cancel-in-progress: true
