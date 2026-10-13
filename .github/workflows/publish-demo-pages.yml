@@ -13,8 +13,11 @@ permissions:
   pages: write
   id-token: write
 
+# Keep this deployment compatible with web-app-pages.yml: both workflows
+# publish the same repository-root site so neither overwrites the other with
+# a demo-only index page.
 concurrency:
-  group: github-pages
+  group: pages
   cancel-in-progress: true
 
 jobs:
@@ -30,17 +33,10 @@ jobs:
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Prepare static site
-        run: |
-          mkdir -p _site
-          cp demo-v0.4.2.html _site/index.html
-          cp demo-v0.4.2.html _site/demo-v0.4.2.html
-          touch _site/.nojekyll
-
-      - name: Upload Pages artifact
+      - name: Upload complete site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: "."
 
       - name: Deploy to GitHub Pages
         id: deployment
