@@ -114,8 +114,7 @@ def persist_evidence(record: dict[str, Any], jsonl_path: Path, db_path: Path) ->
     db_path.parent.mkdir(parents=True, exist_ok=True)
     encoded = json.dumps(record, sort_keys=True, ensure_ascii=False, allow_nan=False)
     with jsonl_path.open("a", encoding="utf-8") as stream:
-        stream.write(encoded + "
-")
+        stream.write(encoded + "\n")
     with sqlite3.connect(db_path) as conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS experiments (
