@@ -90,3 +90,21 @@ def test_reuse_is_rejected_when_nonce_registry_is_supplied():
             authority=authority, secret=SECRET, tenant_id="tenant-a",
             action=ACTION, policy=POLICY, now=1_001, used_nonces=used_nonces,
         )
+
+
+def test_authority_from_future_is_rejected():
+    authority = make_authority(now=2_000)
+    with pytest.raises(AuthorityError, match="expired_or_not_yet_valid"):
+        verify_authority(
+            authority=authority, secret=SECRET, tenant_id="tenant-a",
+            action=ACTION, policy=POLICY, now=1_999,
+        )
+
+
+def test_non_allow_decision_is_not_executable():
+    authority = make_authority(decision="ASK")
+    with pytest.raises(AuthorityError, match="decision_not_executable"):
+        verify_authority(
+            authority=authority, secret=SECRET, tenant_id="tenant-a",
+            action=ACTION, policy=POLICY, now=1_001,
+        )
