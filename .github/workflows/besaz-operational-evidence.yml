@@ -1,0 +1,65 @@
+name: BESAZ Operational Evidence Probe
+
+on:
+  push:
+    branches:
+      - feat/besaz-operational-evidence-v1
+    paths:
+      - "scripts/besaz_innovate.py"
+      - "src/besaz_operational_evidence.py"
+      - "tests/test_besaz_innovation_engine.py"
+      - ".github/workflows/besaz-operational-evidence.yml"
+  workflow_dispatch:
+    inputs:
+      symbol:
+        description: "Market symbol (Stooq format, e.g. AAPL or EURUSD)"
+        required: true
+        default: "AAPL"
+        type: string
+      start_date:
+        description: "Inclusive ISO start date"
+        required: true
+        default: "2023-01-01"
+        type: string
+      end_date:
+        description: "Inclusive ISO end date"
+        required: true
+        default: "2023-12-31"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  operational-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test dependency
+        run: python -m pip install --upgrade pip pytest
+      - name: Run unit tests
+        run: pytest -q tests/test_besaz_innovation_engine.py
+      - name: Fetch historical market data and compute benchmark metrics
+        env:
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          SYMBOL: ${{ inputs.symbol || 'AAPL' }}
+          START_DATE: ${{ inputs.start_date || '2023-01-01' }}
+          END_DATE: ${{ inputs.end_date || '2023-12-31' }}
+        run: |
+          set -euo pipefail
+          PYTHONPATH=. python scripts/besaz_innovate.py --data-source real --symbol "$SYMBOL" --start-date "$START_DATE" --end-date "$END_DATE"
+      - name: Upload operational evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: besaz-operational-evidence-${{ github.run_id }}
+          path: |
+            data/awareness/innovation-report.json
+            data/awareness/operational-experiments.jsonl
+            data/awareness/experiment_history.db
+          if-no-files-found: warn
+          retention-days: 30
