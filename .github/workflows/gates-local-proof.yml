@@ -14,7 +14,7 @@ jobs:
   gates-local:
     runs-on: ubuntu-latest
     env:
-      PYTHONPATH: .
+      PYTHONPATH: ${{ github.workspace }}
       ACTION_GATE_ENV: development
       ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
       ACTION_GATE_SIGNING_SECRET: ci-signing-secret
@@ -33,6 +33,11 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f action_gate/requirements.txt ]; then pip install -r action_gate/requirements.txt; fi
           if [ -f action_gate/requirements-mcp.txt ]; then pip install -r action_gate/requirements-mcp.txt; fi
+
+      - name: Diagnose governance import resolution
+        run: |
+          python -c "import governance; print('governance_file=', getattr(governance, '__file__', None)); print('governance_path=', list(getattr(governance, '__path__', [])))"
+          python -c "import governance.epistemic_evaluation, governance.observable_artifacts; print('governance_submodules=PASS')"
 
       - name: Execute canonical make gates-local
         run: |
