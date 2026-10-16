@@ -115,3 +115,77 @@ def test_sandbox_rejects_non_numeric_and_non_finite_scores():
     })
     assert bad_inf.outcome == "INCONCLUSIVE"
     assert bad_inf.next_action == "repair_fixture"
+
+
+def test_historical_ohlcv_parser_filters_dates_and_validates_rows():
+    from src.besaz_operational_evidence import parse_ohlcv_csv
+
+    csv_text = (
+        "Date,Open,High,Low,Close,Volume\n"
+        "2023-01-03,100,110,95,105,1000\n"
+        "2023-01-02,90,102,88,100,900\n"
+        "2024-01-02,105,112,104,110,1100\n"
+    )
+    rows = parse_ohlcv_csv(csv_text, "2023-01-01", "2023-12-31")
+    assert [row["date"] for row in rows] == ["2023-01-02", "2023-01-03"]
+    assert rows[0]["close"] == 100.0
+
+
+def test_historical_ohlcv_parser_rejects_invalid_prices():
+    import pytest
+    from src.besaz_operational_evidence import parse_ohlcv_csv
+
+    csv_text = "Date,Open,High,Low,Close,Volume\n2023-01-02,100,99,95,101,10\n2023-01-03,101,105,100,104,10\n"
+    with pytest.raises(ValueError, match="High is inconsistent"):
+        parse_ohlcv_csv(csv_text, "2023-01-01", "2023-12-31")
+
+
+def test_buy_hold_metrics_are_explicitly_not_predictive_edge():
+    from src.besaz_operational_evidence import calculate_buy_hold_metrics
+
+    rows = [
+        {"date": "2023-01-02", "close": 100.0},
+        {"date": "2023-01-03", "close": 110.0},
+        {"date": "2023-01-04", "close": 99.0},
+    ]
+    metrics = calculate_buy_hold_metrics(rows)
+    assert abs(metrics["total_return"] - (-0.01)) < 1e-9
+    assert abs(metrics["max_drawdown"] - 0.1) < 1e-9
+    assert metrics["predictive_edge"] == "NOT_TESTED"
+    assert metrics["live_execution"] == "NOT_TESTED"
+
+
+def test_operational_evidence_is_persisted_to_jsonl_and_sqlite(tmp_path):
+    import json
+    import sqlite3
+    from src.besaz_operational_evidence import persist_evidence
+
+    record = {
+        "run_id": "unit-test-run",
+        "timestamp": "2026-10-16T00:00:00+00:00",
+        "experiment_type": "HISTORICAL_MARKET_DATA_RESEARCH",
+        "symbol": "AAPL",
+        "start_date": "2023-01-01",
+        "end_date": "2023-12-31",
+        "result": "DATA_RECEIVED_METRICS_COMPUTED",
+    }
+    log_path = tmp_path / "nested" / "evidence.jsonl"
+    db_path = tmp_path / "nested" / "evidence.db"
+    persist_evidence(record, log_path, db_path)
+    assert json.loads(log_path.read_text(encoding="utf-8").splitlines()[0])["run_id"] == "unit-test-run"
+    with sqlite3.connect(db_path) as conn:
+        row = conn.execute("SELECT run_id, result FROM experiments").fetchone()
+    assert row == ("unit-test-run", "DATA_RECEIVED_METRICS_COMPUTED")
+
+
+def test_real_mode_never_silently_falls_back_to_synthetic(monkeypatch, tmp_path):
+    import pytest
+    import scripts.besaz_innovate as module
+
+    monkeypatch.setattr(module, "OUT", tmp_path / "report.json")
+    monkeypatch.setattr(module, "HISTORY_OUT", tmp_path / "history.json")
+    def fail_provider(*args, **kwargs):
+        raise RuntimeError("provider unavailable")
+    monkeypatch.setattr(module, "fetch_stooq_daily", fail_provider)
+    with pytest.raises(RuntimeError, match="provider unavailable"):
+        module.main(["--data-source", "real", "--symbol", "AAPL"])
