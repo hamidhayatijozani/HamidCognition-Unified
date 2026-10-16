@@ -149,8 +149,8 @@ def test_buy_hold_metrics_are_explicitly_not_predictive_edge():
         {"date": "2023-01-04", "close": 99.0},
     ]
     metrics = calculate_buy_hold_metrics(rows)
-    assert metrics["total_return"] == -0.01
-    assert metrics["max_drawdown"] == 0.1
+    assert abs(metrics["total_return"] - (-0.01)) < 1e-9
+    assert abs(metrics["max_drawdown"] - 0.1) < 1e-9
     assert metrics["predictive_edge"] == "NOT_TESTED"
     assert metrics["live_execution"] == "NOT_TESTED"
 
