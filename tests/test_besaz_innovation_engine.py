@@ -121,10 +121,10 @@ def test_historical_ohlcv_parser_filters_dates_and_validates_rows():
     from src.besaz_operational_evidence import parse_ohlcv_csv
 
     csv_text = (
-        "Date,Open,High,Low,Close,Volume\\n"
-        "2023-01-03,100,110,95,105,1000\\n"
-        "2023-01-02,90,102,88,100,900\\n"
-        "2024-01-02,105,112,104,110,1100\\n"
+        "Date,Open,High,Low,Close,Volume\n"
+        "2023-01-03,100,110,95,105,1000\n"
+        "2023-01-02,90,102,88,100,900\n"
+        "2024-01-02,105,112,104,110,1100\n"
     )
     rows = parse_ohlcv_csv(csv_text, "2023-01-01", "2023-12-31")
     assert [row["date"] for row in rows] == ["2023-01-02", "2023-01-03"]
@@ -135,7 +135,7 @@ def test_historical_ohlcv_parser_rejects_invalid_prices():
     import pytest
     from src.besaz_operational_evidence import parse_ohlcv_csv
 
-    csv_text = "Date,Open,High,Low,Close,Volume\\n2023-01-02,100,99,95,101,10\\n2023-01-03,101,105,100,104,10\\n"
+    csv_text = "Date,Open,High,Low,Close,Volume\n2023-01-02,100,99,95,101,10\n2023-01-03,101,105,100,104,10\n"
     with pytest.raises(ValueError, match="High is inconsistent"):
         parse_ohlcv_csv(csv_text, "2023-01-01", "2023-12-31")
 
