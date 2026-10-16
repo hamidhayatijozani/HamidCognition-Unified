@@ -5,7 +5,9 @@ on:
     branches:
       - feat/besaz-operational-evidence-v1
     paths:
-      - "scripts/besaz_innovate.py"\n      - "scripts/forex_data_hub.py"\n      - "tests/test_forex_data_hub.py"
+      - "scripts/besaz_innovate.py"
+      - "scripts/forex_data_hub.py"
+      - "tests/test_forex_data_hub.py"
       - "src/besaz_operational_evidence.py"
       - "tests/test_besaz_innovation_engine.py"
       - ".github/workflows/besaz-operational-evidence.yml"
