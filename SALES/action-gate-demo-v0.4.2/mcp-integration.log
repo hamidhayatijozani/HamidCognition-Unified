@@ -1,0 +1,19 @@
+INFO:     Started server process [2920]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:42626 - "POST /v1/action/evaluate HTTP/1.1" 200 OK
+127.0.0.1 - - [12/Oct/2026 06:20:43] "POST / HTTP/1.1" 200 -
+INFO:     127.0.0.1:42632 - "POST /v1/action/evaluate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42634 - "POST /v1/action/dec_94dd87e81de343469617bfa4190300dc/execution/reserve HTTP/1.1" 200 OK
+127.0.0.1 - - [12/Oct/2026 06:20:43] "POST / HTTP/1.1" 200 -
+INFO:     127.0.0.1:42644 - "POST /v1/action/dec_94dd87e81de343469617bfa4190300dc/execution HTTP/1.1" 200 OK
+127.0.0.1 - - [12/Oct/2026 06:20:43] "POST / HTTP/1.1" 200 -
+127.0.0.1 - - [12/Oct/2026 06:20:43] "POST / HTTP/1.1" 400 -
+127.0.0.1 - - [12/Oct/2026 06:20:43] "POST / HTTP/1.1" 403 -
+127.0.0.1 - - [12/Oct/2026 06:20:43] "POST / HTTP/1.1" 403 -
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [2920]
+REAL_MCP_ENFORCEMENT_INTEGRATION_PASS
