@@ -56,7 +56,9 @@ def fetch_stooq_daily(symbol: str, start_date: str, end_date: str, timeout: int 
     if not symbol or not all(c.isalnum() or c in ".-_" for c in symbol):
         raise ValueError("Invalid symbol")
     # Stooq US equities convention: AAPL -> aapl.us. Explicit suffixes are preserved.
-    upper_symbol = symbol.upper()\n    fx_symbols = {"EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "USDCHF", "NZDUSD"}\n    normalized = symbol.lower() if "." in symbol or upper_symbol in fx_symbols else f"{symbol.lower()}.us"
+    upper_symbol = symbol.upper()
+    fx_symbols = {"EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "USDCHF", "NZDUSD"}
+    normalized = symbol.lower() if "." in symbol or upper_symbol in fx_symbols else f"{symbol.lower()}.us"
     url = f"https://stooq.com/q/d/l/?s={normalized}&i=d"
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     with urllib.request.urlopen(request, timeout=timeout) as response:
@@ -112,7 +114,8 @@ def persist_evidence(record: dict[str, Any], jsonl_path: Path, db_path: Path) ->
     db_path.parent.mkdir(parents=True, exist_ok=True)
     encoded = json.dumps(record, sort_keys=True, ensure_ascii=False, allow_nan=False)
     with jsonl_path.open("a", encoding="utf-8") as stream:
-        stream.write(encoded + "\n")
+        stream.write(encoded + "
+")
     with sqlite3.connect(db_path) as conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS experiments (
