@@ -56,7 +56,7 @@ def fetch_stooq_daily(symbol: str, start_date: str, end_date: str, timeout: int 
     if not symbol or not all(c.isalnum() or c in ".-_" for c in symbol):
         raise ValueError("Invalid symbol")
     # Stooq US equities convention: AAPL -> aapl.us. Explicit suffixes are preserved.
-    normalized = symbol.lower() if "." in symbol else f"{symbol.lower()}.us"
+    upper_symbol = symbol.upper()\n    fx_symbols = {"EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "USDCHF", "NZDUSD"}\n    normalized = symbol.lower() if "." in symbol or upper_symbol in fx_symbols else f"{symbol.lower()}.us"
     url = f"https://stooq.com/q/d/l/?s={normalized}&i=d"
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     with urllib.request.urlopen(request, timeout=timeout) as response:
