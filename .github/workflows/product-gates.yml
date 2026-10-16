@@ -27,6 +27,15 @@ jobs:
       - name: Install ChatGPT MCP integration dependency
         working-directory: action_gate
         run: pip install -r requirements-mcp.txt
+      - name: Run focused execution-authority adversarial tests
+        working-directory: action_gate
+        env:
+          ACTION_GATE_ENV: development
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+        run: pytest -q test_security_authority_adversarial.py
+
       - name: Run product tests
         working-directory: action_gate
         env:
