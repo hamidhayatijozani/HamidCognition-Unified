@@ -156,7 +156,7 @@ def main(argv=None) -> None:
     parser.add_argument("--symbol", default="AAPL")
     parser.add_argument("--start-date", default="2023-01-01")
     parser.add_argument("--end-date", default="2023-12-31")
-    args = parser.parse_args(argv)
+    args = parser.parse_args([] if argv is None else argv)
 
     generated_at = int(time())
     run_id = os.environ.get("GITHUB_RUN_ID") or f"local-{generated_at}"
@@ -181,4 +181,4 @@ def main(argv=None) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    main(__import__("sys").argv[1:])
