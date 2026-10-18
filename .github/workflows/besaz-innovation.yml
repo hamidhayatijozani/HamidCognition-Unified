@@ -6,6 +6,8 @@ on:
     paths-ignore:
       - data/awareness/innovation-report.json
       - data/awareness/experiment-history.json
+  schedule:
+    - cron: "17 4 * * *"
   workflow_dispatch:
 
 permissions:
