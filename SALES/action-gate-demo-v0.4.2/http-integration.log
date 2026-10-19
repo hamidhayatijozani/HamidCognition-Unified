@@ -1,0 +1,28 @@
+INFO:     Started server process [2865]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:42508 - "POST /v1/action/evaluate HTTP/1.1" 200 OK
+127.0.0.1 - - [12/Oct/2026 06:20:40] "POST /execute HTTP/1.1" 200 -
+INFO:     127.0.0.1:42510 - "POST /v1/action/evaluate HTTP/1.1" 200 OK
+127.0.0.1 - - [12/Oct/2026 06:20:40] "POST /execute HTTP/1.1" 200 -
+INFO:     127.0.0.1:42518 - "GET /v1/evidence/dec_996881b4ce24441995fd430fadb9fc88?tenant_id=integration-tenant HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42534 - "POST /v1/action/dec_996881b4ce24441995fd430fadb9fc88/execution/reserve HTTP/1.1" 200 OK
+127.0.0.1 - - [12/Oct/2026 06:20:40] "POST /execute HTTP/1.1" 200 -
+INFO:     127.0.0.1:42550 - "POST /v1/action/dec_996881b4ce24441995fd430fadb9fc88/execution HTTP/1.1" 200 OK
+127.0.0.1 - - [12/Oct/2026 06:20:40] "POST /execute HTTP/1.1" 200 -
+INFO:     127.0.0.1:42566 - "GET /v1/evidence/dec_996881b4ce24441995fd430fadb9fc88?tenant_id=integration-tenant HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42578 - "GET /v1/evidence/dec_996881b4ce24441995fd430fadb9fc88?tenant_id=integration-tenant HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42590 - "POST /v1/action/dec_996881b4ce24441995fd430fadb9fc88/execution/reserve HTTP/1.1" 409 Conflict
+127.0.0.1 - - [12/Oct/2026 06:20:40] "POST /execute HTTP/1.1" 502 -
+INFO:     127.0.0.1:42596 - "GET /v1/evidence/dec_996881b4ce24441995fd430fadb9fc88?tenant_id=integration-tenant HTTP/1.1" 200 OK
+127.0.0.1 - - [12/Oct/2026 06:20:40] "POST /execute HTTP/1.1" 403 -
+INFO:     127.0.0.1:42598 - "GET /v1/evidence/dec_996881b4ce24441995fd430fadb9fc88?tenant_id=other-tenant HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:42614 - "GET /v1/evidence/fabricated?tenant_id=integration-tenant HTTP/1.1" 404 Not Found
+127.0.0.1 - - [12/Oct/2026 06:20:40] "POST /execute HTTP/1.1" 403 -
+127.0.0.1 - - [12/Oct/2026 06:20:40] "POST /execute HTTP/1.1" 403 -
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [2865]
+REAL_ENFORCEMENT_INTEGRATION_PASS
