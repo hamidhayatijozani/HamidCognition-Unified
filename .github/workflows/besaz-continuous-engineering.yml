@@ -74,14 +74,16 @@ jobs:
           RUN_ID: ${{ github.run_id }}
         run: |
           set -euo pipefail
+          if [ "${CODEX_OUTCOME}" != "success" ]; then
+            echo "Codex step failed; refusing to publish. Outcome: ${CODEX_OUTCOME}"
+            exit 1
+          fi
+
           branch="automation/besaz-agent-${RUN_ID}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          if [ -f codex-agent-report.md ]; then
-            git add codex-agent-report.md
-          fi
-          git add -u
+          git add -A
 
           if git diff --cached --quiet; then
             echo "No workspace changes to publish. Codex outcome: ${CODEX_OUTCOME}"
