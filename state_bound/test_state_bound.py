@@ -61,3 +61,64 @@ def test_unknown_cannot_issue_authority():
     assert issue_authority(action=action, subject="account-A", decision=decision,
                            nonce="unknown", issued_at_ns=0,
                            expires_at_ns=10**18) is None
+
+
+def test_context_drift_after_authorization_blocks_execution():
+    action = {"type": "transfer", "amount": 1000, "recipient": "account-B"}
+    initial_context = {"tenant": "tenant-A", "risk_tier": "low", "region": "EU"}
+    oracle = StateOracle(
+        {"steps": ["intent", "authorize"], "within_boundary": True},
+        {"source": "ta002-context-oracle-test", "context": initial_context},
+    )
+    authorized_world = oracle.latest().world
+    decision = Decision(
+        "ALLOW", "KNOWN", authorized_world.version,
+        authorized_world.trajectory_digest(), "context_bound",
+        context_digest=authorized_world.context_digest(),
+    )
+    authority = issue_authority(
+        action=action, subject="account-A", decision=decision, nonce="ta002-drift",
+        issued_at_ns=0, expires_at_ns=100,
+    )
+    assert authority is not None
+
+    oracle.update_context({"tenant": "tenant-A", "risk_tier": "blocked", "region": "EU"})
+    executed = []
+    result = oracle.execute_if_valid(
+        authority=authority, action=action, subject="account-A", now_ns=1,
+        verify=verify_authority, execute=lambda a, _world: executed.append(a),
+    )
+
+    assert result.status == "HOLD"
+    assert result.reason == "context_consistent_changed"
+    assert executed == []
+
+
+def test_unchanged_context_allows_valid_authority():
+    action = {"type": "transfer", "amount": 1000, "recipient": "account-B"}
+    context = {"tenant": "tenant-A", "risk_tier": "low", "region": "EU"}
+    oracle = StateOracle(
+        {"steps": ["intent", "authorize"], "within_boundary": True},
+        {"source": "ta002-context-oracle-test", "context": context},
+    )
+    authorized_world = oracle.latest().world
+    decision = Decision(
+        "ALLOW", "KNOWN", authorized_world.version,
+        authorized_world.trajectory_digest(), "context_bound",
+        context_digest=authorized_world.context_digest(),
+    )
+    authority = issue_authority(
+        action=action, subject="account-A", decision=decision, nonce="ta002-stable",
+        issued_at_ns=0, expires_at_ns=100,
+    )
+    assert authority is not None
+
+    executed = []
+    result = oracle.execute_if_valid(
+        authority=authority, action=action, subject="account-A", now_ns=1,
+        verify=verify_authority, execute=lambda a, _world: executed.append(a),
+    )
+
+    assert result.status == "VALID"
+    assert result.reason == "all_bound_invariants_hold"
+    assert executed == [action]
