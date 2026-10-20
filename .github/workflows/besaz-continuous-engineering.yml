@@ -1,0 +1,108 @@
+name: BESAZ Continuous Engineering Agent
+
+on:
+  schedule:
+    - cron: "34 10 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: besaz-continuous-engineering
+  cancel-in-progress: false
+
+jobs:
+  engineer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install baseline test runner
+        run: python -m pip install --upgrade pip pytest
+
+      - name: Run Codex engineering agent
+        id: codex
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          permission-profile: ":workspace"
+          safety-strategy: "drop-sudo"
+          output-file: codex-agent-report.md
+          prompt: |
+            You are the continuous engineering agent for ${{ github.repository }}.
+            Work only on the checked-out workspace. Do not access secrets, modify
+            workflow files, change repository settings, or attempt to merge anything.
+
+            Goal: make one small, evidence-backed engineering improvement to BESAZ
+            Action Gate traceability. Start by reading repository instructions and
+            current implementation. Prioritize verifying model_version, state_digest,
+            data_provenance_digest, execution_context_digest across request validation,
+            decision signing/verification, schemas, persistence, and replay.
+
+            Requirements:
+            - Inspect before editing; do not assume the requested fields are missing.
+            - Make the smallest coherent fix on the current working tree.
+            - Preserve compatibility with persisted records and existing clients.
+            - Add regression tests for tampering and backward compatibility.
+            - Run relevant tests, including tests/test_besaz_innovation_engine.py
+              and the closest Action Gate decision-authority tests that dependencies allow.
+            - Do not weaken security checks, skip tests, or claim tests passed unless
+              their command exited successfully.
+            - If the correct fix is unclear or tests cannot run, make no speculative
+              code changes; write the exact blocker and evidence to codex-agent-report.md.
+            - Never edit main directly. This workflow will publish changes only through a PR.
+            - Keep the report factual: changed files, test commands/results, remaining risks.
+
+      - name: Publish branch and pull request
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+          CODEX_OUTCOME: ${{ steps.codex.outcome }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          if [ "${CODEX_OUTCOME}" != "success" ]; then
+            echo "Codex step failed; refusing to publish. Outcome: ${CODEX_OUTCOME}"
+            exit 1
+          fi
+
+          branch="automation/besaz-agent-${RUN_ID}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No workspace changes to publish. Codex outcome: ${CODEX_OUTCOME}"
+            exit 0
+          fi
+
+          git checkout -b "$branch"
+          git commit -m "BESAZ agent: verified traceability improvement"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push origin "$branch"
+
+          if gh pr create \
+            --repo "$GITHUB_REPOSITORY" \
+            --base main \
+            --head "$branch" \
+            --title "BESAZ agent: verified traceability improvement" \
+            --body "Automated engineering proposal from workflow run ${RUN_ID}. Review the diff and `codex-agent-report.md`; verify CI before merging. Codex outcome: ${CODEX_OUTCOME}. No automatic merge is performed."; then
+            echo "Pull request created."
+          else
+            echo "PR creation failed; branch was pushed for inspection."
+            exit 1
+          fi
