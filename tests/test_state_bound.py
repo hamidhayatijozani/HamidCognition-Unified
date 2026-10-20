@@ -42,8 +42,8 @@ def test_context_drift_after_authorization_blocks_execution():
     authorized_world = oracle.latest().world
     decision = Decision(
         "ALLOW", "KNOWN", authorized_world.version,
-        authorized_world.world.trajectory_digest(), "context_bound",
-        context_digest=authorized_world.world.context_digest(),
+        authorized_world.trajectory_digest(), "context_bound",
+        context_digest=authorized_world.context_digest(),
     )
     authority = issue_authority(
         action=action, subject="A", decision=decision, nonce="ta002-drift",
@@ -73,8 +73,8 @@ def test_unchanged_context_allows_valid_authority():
     authorized_world = oracle.latest().world
     decision = Decision(
         "ALLOW", "KNOWN", authorized_world.version,
-        authorized_world.world.trajectory_digest(), "context_bound",
-        context_digest=authorized_world.world.context_digest(),
+        authorized_world.trajectory_digest(), "context_bound",
+        context_digest=authorized_world.context_digest(),
     )
     authority = issue_authority(
         action=action, subject="A", decision=decision, nonce="ta002-stable",
