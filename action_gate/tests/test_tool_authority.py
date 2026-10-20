@@ -8,6 +8,7 @@ from security_authority import issue_authority, AuthorityError
 
 def test_tool_accepts_only_gate_issued_authority(monkeypatch, tmp_path):
     monkeypatch.setenv("ACTION_GATE_AUTHORITY_SECRET", "authority-test-secret")
+    monkeypatch.setenv("ACTION_GATE_WORLD_REVALIDATION", "0")
     monkeypatch.setenv("TOOL_NONCE_DB", str(tmp_path / "tool-authority.db"))
     import tool_server
     importlib.reload(tool_server)
