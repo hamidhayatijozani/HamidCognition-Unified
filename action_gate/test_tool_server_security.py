@@ -46,12 +46,13 @@ def test_live_world_revalidation_fails_closed_when_gate_is_unreachable(monkeypat
 
     monkeypatch.setattr(tool_server.urllib.request, "urlopen", unavailable)
     payload = {"tenant_id": "tenant-a", "action": ACTION, "policy": POLICY}
+    token = mint()
     with pytest.raises(AuthorityError, match="world_revalidation_unavailable"):
-        tool_server.verify_execution_authority(mint(), "tenant-a", payload)
+        tool_server.verify_execution_authority(token, "tenant-a", payload)
 
     # Revalidation fails before nonce consumption, so a failed check cannot be
     # mistaken for an executed tool action.
-    assert tool_server._nonce_state(tool_server.Authority.from_token(mint()).nonce) == "not_claimed"
+    assert tool_server._nonce_state(tool_server.Authority.from_token(token).nonce) == "not_claimed"
 
 
 def test_tool_boundary_rejects_payload_tampering(monkeypatch, tmp_path):
