@@ -35,6 +35,25 @@ def test_tool_boundary_binds_action_and_policy(monkeypatch, tmp_path):
     tool_server.verify_execution_authority(mint(), "tenant-a", payload)
 
 
+
+def test_live_world_revalidation_fails_closed_when_gate_is_unreachable(monkeypatch, tmp_path):
+    setup(monkeypatch, tmp_path)
+    monkeypatch.setattr(tool_server, "WORLD_REVALIDATION_ENABLED", True)
+    monkeypatch.setattr(tool_server, "GATE_API_TOKEN", "test-api-token")
+
+    def unavailable(*args, **kwargs):
+        raise tool_server.urllib.error.URLError("simulated Gate outage")
+
+    monkeypatch.setattr(tool_server.urllib.request, "urlopen", unavailable)
+    payload = {"tenant_id": "tenant-a", "action": ACTION, "policy": POLICY}
+    with pytest.raises(AuthorityError, match="world_revalidation_unavailable"):
+        tool_server.verify_execution_authority(mint(), "tenant-a", payload)
+
+    # Revalidation fails before nonce consumption, so a failed check cannot be
+    # mistaken for an executed tool action.
+    assert tool_server._nonce_state(tool_server.Authority.from_token(mint()).nonce) == "not_claimed"
+
+
 def test_tool_boundary_rejects_payload_tampering(monkeypatch, tmp_path):
     setup(monkeypatch, tmp_path)
     tampered = {"tenant_id": "tenant-a", "action": {"action": "protected.execute", "target": "attacker"}, "policy": POLICY}
