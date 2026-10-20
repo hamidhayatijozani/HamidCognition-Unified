@@ -34,6 +34,7 @@ ACTION_GATE_API_TOKEN=$(openssl rand -hex 32)
 ACTION_GATE_SIGNING_SECRET=$(openssl rand -hex 48)
 ACTION_GATE_AUTHORITY_SECRET=$(openssl rand -hex 48)
 ACTION_GATE_APPROVAL_SECRET=$(openssl rand -hex 48)
+ACTION_GATE_STATE_ORACLE_SECRET=$(openssl rand -hex 48)
 ACTION_GATE_KEY_ID=hhj-action-gate-1
 ACTION_GATE_REQUIRE_SESSION_BINDING=1
 ACTION_GATE_RATE_LIMIT_PER_MINUTE=120
@@ -48,6 +49,13 @@ EOF
   chmod 600 "$ENV_FILE"
 else
   sed -i "s/^DOMAIN=.*/DOMAIN=$DOMAIN/" "$ENV_FILE"
+fi
+
+# Older production env files may predate this required secret. Add it without
+# rotating any existing credentials or printing the secret to logs.
+if ! grep -q '^ACTION_GATE_STATE_ORACLE_SECRET=' "$ENV_FILE"; then
+  printf 'ACTION_GATE_STATE_ORACLE_SECRET=%s\n' "$(openssl rand -hex 48)" >> "$ENV_FILE"
+  chmod 600 "$ENV_FILE"
 fi
 
 docker compose --env-file "$ENV_FILE" -f action_gate/docker-compose.production.yml config --quiet
