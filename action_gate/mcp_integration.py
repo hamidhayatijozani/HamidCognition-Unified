@@ -11,7 +11,7 @@ import urllib.request
 ROOT = os.path.dirname(__file__)
 TENANT = "mcp-tenant"
 env = os.environ.copy()
-env.update({"ACTION_GATE_DB": "/tmp/action-gate-mcp.db", "PYTHONPATH": ROOT, "ACTION_GATE_ENV": "development", "ACTION_GATE_SIGNING_SECRET": "mcp-signing-secret", "ACTION_GATE_AUTHORITY_SECRET": "ci-authority-secret", "ACTION_GATE_STATE_ORACLE_SECRET": "ci-state-oracle-secret", "ACTION_GATE_DEBUG_AUTHORITY": "1", "TOOL_NONCE_DB": "/tmp/action-gate-mcp-tool-authority.db"})
+env.update({"ACTION_GATE_API_TOKEN": os.environ.get("ACTION_GATE_API_TOKEN", "ci-test-token"), "ACTION_GATE_WORLD_REVALIDATION": "1", "ACTION_GATE_DB": "/tmp/action-gate-mcp.db", "PYTHONPATH": ROOT, "ACTION_GATE_ENV": "development", "ACTION_GATE_SIGNING_SECRET": "mcp-signing-secret", "ACTION_GATE_AUTHORITY_SECRET": "ci-authority-secret", "ACTION_GATE_STATE_ORACLE_SECRET": "ci-state-oracle-secret", "ACTION_GATE_DEBUG_AUTHORITY": "1", "TOOL_NONCE_DB": "/tmp/action-gate-mcp-tool-authority.db"})
 procs = [
     subprocess.Popen([sys.executable, "-m", "uvicorn", "app:app", "--host", "127.0.0.1", "--port", "8000"], cwd=ROOT, env=env),
     subprocess.Popen([sys.executable, "tool_server.py"], cwd=ROOT, env=env),
@@ -184,7 +184,8 @@ try:
     assert stale_decision["decision"] == "ALLOW"
     assert stale_decision["world_version"] == "wv-mcp-context-A"
 
-    commit_state("wv-mcp-context-B", {"risk_tier": "blocked"})
+    # Reserve while world A is still current, then mutate the world before
+    # the protected tool sees the otherwise valid signed authority.
     reserve_req = urllib.request.Request(
         f"http://127.0.0.1:8000/v1/action/{stale_decision['decision_id']}/execution/reserve",
         data=json.dumps({
@@ -200,9 +201,37 @@ try:
             "Authorization": f"Bearer {os.environ.get('ACTION_GATE_API_TOKEN', 'ci-test-token')}",
         },
     )
+    with urllib.request.urlopen(reserve_req) as response:
+        reserved_stale = json.loads(response.read())
+    assert reserved_stale["execution"]["status"] == "RESERVED"
+
+    commit_state("wv-mcp-context-B", {"risk_tier": "blocked"})
+
+    # The signed authority was valid when reserved, but must now fail at the
+    # protected tool boundary after the world changes.
+    stale_tool_headers = {
+        "Content-Type": "application/json",
+        "X-HCJ-Execution-Authority": reserved_stale["execution_authority"],
+        "X-HCJ-Action-Hash": stale_decision["action_hash"],
+        "X-HCJ-Policy-Hash": stale_decision["policy_hash"],
+        "X-Tenant-ID": TENANT,
+    }
+    try:
+        urllib.request.urlopen(urllib.request.Request(
+            "http://127.0.0.1:9000",
+            data=b"{}",
+            headers=stale_tool_headers,
+        ))
+        raise AssertionError("stale signed authority unexpectedly reached protected tool")
+    except urllib.error.HTTPError as e:
+        body = json.loads(e.read())
+        assert e.code == 403
+        assert body["diagnostic"] == "execution_world_state_changed"
+
+    # Re-reserving the original decision after drift must also fail closed.
     try:
         urllib.request.urlopen(reserve_req)
-        raise AssertionError("stale authorization unexpectedly reserved for execution")
+        raise AssertionError("stale authorization unexpectedly reserved after drift")
     except urllib.error.HTTPError as e:
         body = json.loads(e.read())
         assert e.code == 409
