@@ -45,6 +45,7 @@ def test_live_world_revalidation_fails_closed_when_gate_is_unreachable(monkeypat
         raise tool_server.urllib.error.URLError("simulated Gate outage")
 
     monkeypatch.setattr(tool_server.urllib.request, "urlopen", unavailable)
+    monkeypatch.setattr(tool_server, "_claim_nonce", lambda *args: pytest.fail("nonce was claimed despite unavailable Gate"))
     payload = {"tenant_id": "tenant-a", "action": ACTION, "policy": POLICY}
     token = mint()
     with pytest.raises(AuthorityError, match="world_revalidation_unavailable"):
