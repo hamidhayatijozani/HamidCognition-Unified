@@ -41,6 +41,7 @@ jobs:
           ACTION_GATE_SIGNING_SECRET: ci-signing-secret
           ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
           ACTION_GATE_APPROVAL_SECRET: ci-approval-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
           MCP_BEARER_TOKEN: ci-mcp-token
           DOMAIN: localhost
         run: docker compose -f docker-compose.production.yml config --quiet
