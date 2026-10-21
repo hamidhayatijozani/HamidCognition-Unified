@@ -26,6 +26,31 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Validate deployment domain
+        env:
+          DOMAIN: ${{ inputs.domain }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          valid_dns_name() {
+            local candidate="$1"
+            [[ ${#candidate} -le 253 ]] &&
+              [[ "$candidate" =~ ^([A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)(\.([A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?))*$ ]]
+          }
+
+          # Regression checks: shell metacharacters and command substitutions must fail.
+          for candidate in 'example.com;id' '$(id).example.com' 'example.com$()' 'example.com|id' 'example.com value'; do
+            if valid_dns_name "$candidate"; then
+              echo "::error::Unsafe domain unexpectedly accepted: $candidate"
+              exit 1
+            fi
+          done
+
+          if ! valid_dns_name "$DOMAIN"; then
+            echo "::error::Input must be a DNS hostname containing only valid hostname labels."
+            exit 1
+          fi
+
       - name: Install SSH client
         run: sudo apt-get update && sudo apt-get install -y openssh-client
 
@@ -52,7 +77,8 @@ jobs:
         run: |
           set -euo pipefail
           scp -q scripts/deploy-production.sh "$DEPLOY_USER@$DEPLOY_HOST:/tmp/hamidcognition-deploy.sh"
-          ssh "$DEPLOY_USER@$DEPLOY_HOST"             "chmod 700 /tmp/hamidcognition-deploy.sh && DOMAIN='$DOMAIN' REPO='https://github.com/hamidhayatijozani/HamidCognition-Unified.git' /tmp/hamidcognition-deploy.sh"
+          # DOMAIN was restricted to DNS hostname characters before it reaches this command.
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "chmod 700 /tmp/hamidcognition-deploy.sh && DOMAIN='$DOMAIN' REPO='https://github.com/hamidhayatijozani/HamidCognition-Unified.git' /tmp/hamidcognition-deploy.sh"
           rm -f /tmp/hamidcognition-deploy.sh
 
       - name: Verify public endpoints
