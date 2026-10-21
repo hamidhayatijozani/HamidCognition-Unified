@@ -1,0 +1,33 @@
+name: KIRGANDE VOID_KEY Reference Tests
+
+on:
+  pull_request:
+    paths:
+      - "kirgande/**"
+      - "tests/test_void_key.py"
+      - ".github/workflows/kirgande-void-key.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "kirgande/**"
+      - "tests/test_void_key.py"
+      - ".github/workflows/kirgande-void-key.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reference-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run dependency-free unit tests
+        run: python -m unittest discover -s tests -p "test_void_key.py" -v
