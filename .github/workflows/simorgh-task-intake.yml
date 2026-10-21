@@ -1,0 +1,88 @@
+name: SIMORGH Task Intake
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  validate-task:
+    if: github.event.label.name == 'simorgh:task'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Validate issue JSON contract
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const label = context.payload.label?.name;
+            const body = issue.body || "";
+            const fail = async (reason) => {
+              core.setFailed(reason);
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: issue.number,
+                body: `SIMORGH TASK INTAKE: **FAIL**\n\n${reason}\n\nExpected one JSON object with fields: ` + "`task`, `repo`, `target`, `acceptance`."
+              });
+            };
+
+            if (label !== "simorgh:task") {
+              core.notice("Issue does not carry the SIMORGH task label.");
+              return;
+            }
+
+            let task;
+            try {
+              const fenced = body.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+              task = JSON.parse(fenced ? fenced[1] : body);
+            } catch {
+              await fail("Issue body must contain a valid JSON object (optionally inside one JSON code fence).");
+              return;
+            }
+
+            const keys = Object.keys(task || {}).sort();
+            const expected = ["acceptance", "repo", "target", "task"];
+            if (JSON.stringify(keys) !== JSON.stringify(expected)) {
+              await fail("Required keys must be exactly: task, repo, target, acceptance. Unknown keys are rejected.");
+              return;
+            }
+            if (typeof task.task !== "string" || task.task.trim().length < 8 || task.task.length > 500) {
+              await fail("task must be a string of 8–500 characters.");
+              return;
+            }
+            if (typeof task.repo !== "string" || !/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(task.repo)) {
+              await fail("repo must use owner/repository format.");
+              return;
+            }
+            if (typeof task.target !== "string" || task.target.length < 1 || task.target.length > 240 ||
+                task.target.startsWith("/") || task.target.split("/").includes("..") ||
+                !/^[A-Za-z0-9_./-]+$/.test(task.target)) {
+              await fail("target must be a safe relative repository path; absolute paths and '..' are rejected.");
+              return;
+            }
+            if (!Array.isArray(task.acceptance) || task.acceptance.length < 1 || task.acceptance.length > 12 ||
+                task.acceptance.some(x => typeof x !== "string" || x.trim().length < 3 || x.length > 300)) {
+              await fail("acceptance must contain 1–12 strings, each 3–300 characters.");
+              return;
+            }
+
+            const receipt = {
+              issue: issue.number,
+              task: task.task,
+              repo: task.repo,
+              target: task.target,
+              acceptance_criteria: task.acceptance.length,
+              intake_only: true
+            };
+            core.notice("SIMORGH task contract valid. No code execution was performed.");
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: issue.number,
+              body: "SIMORGH TASK INTAKE: **PASS**\n\nValidated task receipt:\n```json\n" +
+                JSON.stringify(receipt, null, 2) +
+                "\n```\n\n**Boundary:** this workflow validates the request only. It does not generate code, run tests, push commits, create a PR, or deploy."
+            });

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/hamidhayatijozani/HamidCognition-Unified/agent/task.schema.json",
+  "title": "SIMORGH Agent Task",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task", "repo", "target", "acceptance"],
+  "properties": {
+    "task": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 500
+    },
+    "repo": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+    },
+    "target": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240,
+      "pattern": "^(?!/)(?!.*(?:^|/)\.\.(?:/|$))[A-Za-z0-9_./-]+$"
+    },
+    "acceptance": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 300
+      }
+    }
+  }
+}
