@@ -75,8 +75,9 @@ def calculate_drs(
 ) -> float:
     """Calculate normalized DRS candidate score; higher means more risk.
 
-    The four submitted weights are normalized by their sum (1.10).
-    Component definitions and thresholds require separate validation.
+    The four baseline weights sum to 1.0, so the weighted score is already
+    normalized to [0, 1]. Component definitions and thresholds require
+    separate validation.
     """
     vals = {
         "impact": _unit("impact", impact),
@@ -89,7 +90,7 @@ def calculate_drs(
         + 0.25 * vals["authorization_risk"]
         + 0.25 * vals["replay_risk"]
         + 0.20 * vals["uncertainty"]
-    ) / 1.10
+    )
     weight = _unit("chaos_weight", chaos_weight)
     if weight == 0.0:
         return baseline
