@@ -1,0 +1,112 @@
+name: SIMORGH bounded coding runner
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: read
+
+concurrency:
+  group: simorgh-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  bounded-task:
+    if: github.event.label.name == 'simorgh:task'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Validate and generate a constrained patch
+        id: patch
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
+          test -n "${OPENAI_API_KEY:-}" || { echo "OPENAI_API_KEY secret is missing"; exit 1; }
+          python - <<'PY'
+          import json, os, pathlib, re, urllib.request
+          issue_title = os.environ.get("ISSUE_TITLE", "")
+          issue_body = os.environ.get("ISSUE_BODY", "")
+          number = os.environ["ISSUE_NUMBER"]
+          allowed_title = "[SIMORGH-TASK-0001] Implement a real isolated GitHub agent runner"
+          if int(number) != 204 or issue_title != allowed_title:
+              raise SystemExit("Task is not in the first explicitly allowlisted task.")
+          # Do not pass arbitrary issue instructions to a shell. The model is given a
+          # fixed engineering objective and a bounded set of source files.
+          allowed = ["action_gate/void_key.py", "tests/test_void_key.py"]
+          contents = {}
+          for name in allowed:
+              p = pathlib.Path(name)
+              if p.is_file():
+                  contents[name] = p.read_text(encoding="utf-8")
+          if not contents:
+              raise SystemExit("None of the allowlisted files exist; refusing to guess paths.")
+          prompt = {
+            "task": "Investigate the DRS normalization failure: calculate_drs(1,1,1,1) returns 0.9090909090909091 but the test expects 1.0. Determine intended behavior from the checked-in implementation/tests. Return a minimal unified diff only if the canonical behavior is clear. Never weaken/remove a test merely to make CI green. If ambiguous, return NO_PATCH.",
+            "allowed_paths": allowed,
+            "source_files": contents,
+            "format": "Unified diff only, paths must be within allowed_paths; otherwise exactly NO_PATCH."
+          }
+          req = urllib.request.Request(
+            "https://api.openai.com/v1/responses",
+            data=json.dumps({"model":"gpt-4.1-mini","input":json.dumps(prompt)}).encode(),
+            headers={"Authorization":"Bearer "+os.environ["OPENAI_API_KEY"],"Content-Type":"application/json"},
+            method="POST")
+          with urllib.request.urlopen(req, timeout=90) as response:
+              result = json.load(response)
+          text = ""
+          for item in result.get("output", []):
+              for part in item.get("content", []):
+                  if part.get("type") == "output_text":
+                      text += part.get("text", "")
+          text = text.strip()
+          if text == "NO_PATCH":
+              raise SystemExit("Model could not establish a safe canonical fix; no patch created.")
+          if not text.startswith("--- ") or "\n+++ " not in text:
+              raise SystemExit("Model output was not a unified diff; refusing to apply.")
+          paths = re.findall(r"^(?:\+\+\+|---) (?:a/|b/)?([^\t\n]+)", text, re.M)
+          if not paths or any(p not in allowed for p in paths):
+              raise SystemExit("Patch contains an unapproved path; refusing to apply.")
+          pathlib.Path("/tmp/simorgh.patch").write_text(text+"\n", encoding="utf-8")
+          print("Constrained patch generated; source paths validated.")
+          PY
+
+      - name: Apply patch and run fixed test
+        id: test
+        run: |
+          set -euo pipefail
+          git apply --check /tmp/simorgh.patch
+          git apply /tmp/simorgh.patch
+          python -m pip install -q pytest
+          python -m pytest -q tests/test_void_key.py
+
+      - name: Create review branch and pull request
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
+          branch="simorgh/task-${ISSUE_NUMBER}-drs-fix"
+          git config user.name "simorgh-agent"
+          git config user.email "simorgh-agent@users.noreply.github.com"
+          git switch -c "$branch"
+          git add action_gate/void_key.py tests/test_void_key.py
+          if git diff --cached --quiet; then
+            echo "No reviewed changes to propose; refusing empty PR."
+            exit 1
+          fi
+          git commit -m "Investigate and fix DRS normalization contract"
+          git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" push origin "$branch"
+          gh pr create --title "SIMORGH: investigate DRS normalization failure" --body "Automated bounded patch for issue #${ISSUE_NUMBER}. Targeted test passed in the runner. Review the diff and CI before merging; no auto-merge." --head "$branch" --base "${GITHUB_REF_NAME}"
