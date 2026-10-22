@@ -44,7 +44,7 @@ try:
     snapshot_request = urllib.request.Request(
         "http://127.0.0.1:8000/v1/state/commit",
         data=json.dumps({**snapshot_payload, "oracle_signature": snapshot_signature}).encode(),
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": "application/json", "Authorization": f"Bearer {env.get('ACTION_GATE_API_TOKEN', 'ci-test-token')}"},
         method="POST",
     )
     with urllib.request.urlopen(snapshot_request, timeout=5) as response:
