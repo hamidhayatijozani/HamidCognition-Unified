@@ -25,6 +25,7 @@ def mint(decision="ALLOW", now=None):
 
 def setup(monkeypatch, tmp_path):
     monkeypatch.setattr(tool_server, "AUTHORITY_SECRET", SECRET.decode())
+    monkeypatch.setattr(tool_server, "WORLD_REVALIDATION_ENABLED", False)
     monkeypatch.setattr(tool_server, "TOOL_NONCE_DB", str(tmp_path / "nonce.db"))
 
 
@@ -32,6 +33,24 @@ def test_tool_boundary_binds_action_and_policy(monkeypatch, tmp_path):
     setup(monkeypatch, tmp_path)
     payload = {"tenant_id": "tenant-a", "action": ACTION, "policy": POLICY, "parameters": {"x": 1}}
     tool_server.verify_execution_authority(mint(), "tenant-a", payload)
+
+
+
+def test_live_world_revalidation_fails_closed_when_gate_is_unreachable(monkeypatch, tmp_path):
+    setup(monkeypatch, tmp_path)
+    monkeypatch.setattr(tool_server, "WORLD_REVALIDATION_ENABLED", True)
+    monkeypatch.setattr(tool_server, "GATE_API_TOKEN", "test-api-token")
+
+    def unavailable(*args, **kwargs):
+        raise tool_server.urllib.error.URLError("simulated Gate outage")
+
+    monkeypatch.setattr(tool_server.urllib.request, "urlopen", unavailable)
+    monkeypatch.setattr(tool_server, "_claim_nonce", lambda *args: pytest.fail("nonce was claimed despite unavailable Gate"))
+    payload = {"tenant_id": "tenant-a", "action": ACTION, "policy": POLICY}
+    token = mint()
+    with pytest.raises(AuthorityError, match="world_revalidation_unavailable"):
+        tool_server.verify_execution_authority(token, "tenant-a", payload)
+
 
 
 def test_tool_boundary_rejects_payload_tampering(monkeypatch, tmp_path):

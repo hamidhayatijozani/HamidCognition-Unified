@@ -5,6 +5,7 @@ on:
     paths:
       - "state_bound/**"
       - "tests/test_ta002_context_drift.py"
+      - "tests/test_state_bound.py"
       - ".github/workflows/state-bound-ta002.yml"
   workflow_dispatch:
 

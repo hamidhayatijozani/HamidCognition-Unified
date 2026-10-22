@@ -43,6 +43,16 @@ The workflow never accepts an application API token, signing secret, database pa
 
 Do not expose PostgreSQL or internal Action Gate ports publicly. Only 80/443 should be reachable from the internet.
 
+## Live execution-world revalidation
+
+The protected tool container must reach the internal Action Gate API and validate the decision's recorded world version against the current state immediately before accepting a signed execution authority. The production Compose service therefore sets:
+
+- `ACTION_GATE_URL=http://action-gate:8000`
+- `ACTION_GATE_API_TOKEN` from the host's production environment
+- `ACTION_GATE_WORLD_REVALIDATION=1`
+
+If the Gate is unavailable, evidence cannot be read, or the current world differs from the decision's recorded world, the protected tool fails closed. This narrows the authorization-to-execution race; it is not a claim of atomicity with an external side effect. A tool that supports native conditional execution should also bind the side effect to the expected resource version.
+
 ## Current truth
 
 Creating this workflow does not mean a public deployment already exists. A real deployment requires an actual host, DNS and the three SSH secrets above. Until the workflow succeeds against that infrastructure, the product is not described as publicly deployed.
