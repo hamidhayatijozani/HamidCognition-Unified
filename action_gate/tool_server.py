@@ -18,6 +18,20 @@ AUTHORITY_SECRET = os.getenv("ACTION_GATE_AUTHORITY_SECRET")
 TOOL_NONCE_DB = os.getenv("TOOL_NONCE_DB", "/data/tool_authority.db")
 DEBUG_AUTHORITY = os.getenv("ACTION_GATE_DEBUG_AUTHORITY", "").lower() in {"1", "true", "yes"}
 GATE_URL = os.getenv("ACTION_GATE_URL", "http://127.0.0.1:8000").rstrip("/")
+
+
+def _validated_gate_url(path: str) -> str:
+    """Build a same-origin Gate URL; reject malformed or authority-changing paths."""
+    base = urllib.parse.urlsplit(GATE_URL)
+    if (base.scheme not in {"http", "https"} or not base.hostname or base.username or base.password
+            or base.query or base.fragment):
+        raise AuthorityError("world_revalidation_invalid_url")
+    if not path.startswith("/") or path.startswith("//") or "\\" in path:
+        raise AuthorityError("world_revalidation_invalid_path")
+    target = urllib.parse.urlsplit(path)
+    if target.scheme or target.netloc or target.fragment:
+        raise AuthorityError("world_revalidation_invalid_path")
+    return urllib.parse.urlunsplit((base.scheme, base.netloc, base.path.rstrip("/") + path, target.query, ""))
 GATE_API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
 WORLD_REVALIDATION_ENABLED = os.getenv("ACTION_GATE_WORLD_REVALIDATION", "1" if GATE_API_TOKEN else "0").lower() in {"1", "true", "yes"}
 
@@ -59,16 +73,17 @@ def _claim_nonce(nonce: str, decision_id: str, expires_at: int) -> None:
 def _verify_live_world_binding(authority: Authority, tenant_id: str) -> None:
     """Fail closed if the decision's world changed after reservation but before tool execution."""
     if not WORLD_REVALIDATION_ENABLED:
-        return
+        raise AuthorityError("world_revalidation_not_configured")
     if not GATE_API_TOKEN:
         raise AuthorityError("world_revalidation_not_configured")
 
     def get_gate_json(path: str) -> dict:
-        req = urllib.request.Request(
-            GATE_URL + path,
-            headers={"Authorization": f"Bearer {GATE_API_TOKEN}"},
-        )
         try:
+            endpoint = _validated_gate_url(path)
+            req = urllib.request.Request(
+                endpoint,
+                headers={"Authorization": f"Bearer {GATE_API_TOKEN}"},
+            )
             with urllib.request.urlopen(req, timeout=3) as response:
                 value = json.loads(response.read())
         except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
@@ -90,9 +105,8 @@ def _verify_live_world_binding(authority: Authority, tenant_id: str) -> None:
         raise AuthorityError("world_revalidation_authority_mismatch")
 
     issued_world = record.get("world_version")
-    if issued_world is None:
-        # Legacy decisions without a bound world cannot claim world-drift protection.
-        return
+    if not isinstance(issued_world, (str, int)) or isinstance(issued_world, bool) or str(issued_world) == "":
+        raise AuthorityError("world_version_missing")
     current = get_gate_json("/v1/state/current")
     if current.get("world_version") != issued_world:
         raise AuthorityError("execution_world_state_changed")

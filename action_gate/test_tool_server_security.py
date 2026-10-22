@@ -23,9 +23,14 @@ def mint(decision="ALLOW", now=None):
     ).token()
 
 
+_verify_live_world_binding = tool_server._verify_live_world_binding
+
+
 def setup(monkeypatch, tmp_path):
     monkeypatch.setattr(tool_server, "AUTHORITY_SECRET", SECRET.decode())
     monkeypatch.setattr(tool_server, "WORLD_REVALIDATION_ENABLED", False)
+    # Isolate token/nonce unit tests; dedicated tests exercise the real revalidation path.
+    monkeypatch.setattr(tool_server, "_verify_live_world_binding", lambda authority, tenant_id: None)
     monkeypatch.setattr(tool_server, "TOOL_NONCE_DB", str(tmp_path / "nonce.db"))
 
 
@@ -38,6 +43,7 @@ def test_tool_boundary_binds_action_and_policy(monkeypatch, tmp_path):
 
 def test_live_world_revalidation_fails_closed_when_gate_is_unreachable(monkeypatch, tmp_path):
     setup(monkeypatch, tmp_path)
+    monkeypatch.setattr(tool_server, "_verify_live_world_binding", _verify_live_world_binding)
     monkeypatch.setattr(tool_server, "WORLD_REVALIDATION_ENABLED", True)
     monkeypatch.setattr(tool_server, "GATE_API_TOKEN", "test-api-token")
 
@@ -126,3 +132,50 @@ def test_consumed_nonce_survives_database_reopen(monkeypatch, tmp_path):
 
     with pytest.raises(AuthorityError, match="nonce_reuse"):
         tool_server.verify_execution_authority(token, "tenant-a", payload)
+
+
+def test_world_revalidation_disabled_fails_closed(monkeypatch):
+    monkeypatch.setattr(tool_server, "WORLD_REVALIDATION_ENABLED", False)
+    authority = issue_authority(secret=SECRET, decision_id="d", tenant_id="tenant-a", action=ACTION, policy=POLICY, decision="ALLOW", ttl_seconds=60)
+    with pytest.raises(AuthorityError, match="world_revalidation_not_configured"):
+        tool_server._verify_live_world_binding(authority, "tenant-a")
+
+
+def test_missing_world_version_fails_closed(monkeypatch):
+    import json
+
+    class Response:
+        def __init__(self, value):
+            self.value = value
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            return False
+        def read(self):
+            return json.dumps(self.value).encode()
+
+    monkeypatch.setattr(tool_server, "WORLD_REVALIDATION_ENABLED", True)
+    monkeypatch.setattr(tool_server, "GATE_API_TOKEN", "test-api-token")
+    authority = issue_authority(secret=SECRET, decision_id="d", tenant_id="tenant-a", action=ACTION, policy=POLICY, decision="ALLOW", ttl_seconds=60)
+    monkeypatch.setattr(tool_server.urllib.request, "urlopen", lambda *args, **kwargs: Response({
+        "tenant_id": "tenant-a", "decision": "ALLOW", "nonce": authority.nonce, "decision_id": "d"
+    }))
+    with pytest.raises(AuthorityError, match="world_version_missing"):
+        tool_server._verify_live_world_binding(authority, "tenant-a")
+
+
+def test_gate_url_rejects_authority_override(monkeypatch):
+    monkeypatch.setattr(tool_server, "GATE_URL", "http://gate.internal:8000")
+    with pytest.raises(AuthorityError, match="world_revalidation_invalid_path"):
+        tool_server._validated_gate_url("//attacker.example/collect")
+
+
+def test_gate_url_rejects_non_http_scheme(monkeypatch):
+    monkeypatch.setattr(tool_server, "GATE_URL", "file:///etc")
+    with pytest.raises(AuthorityError, match="world_revalidation_invalid_url"):
+        tool_server._validated_gate_url("/v1/state/current")
+
+
+def test_gate_url_preserves_configured_origin(monkeypatch):
+    monkeypatch.setattr(tool_server, "GATE_URL", "http://gate.internal:8000/base")
+    assert tool_server._validated_gate_url("/v1/state/current") == "http://gate.internal:8000/base/v1/state/current"

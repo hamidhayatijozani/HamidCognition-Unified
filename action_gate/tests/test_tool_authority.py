@@ -29,7 +29,9 @@ def test_tool_accepts_only_gate_issued_authority(monkeypatch, tmp_path):
     )
 
     payload = {"tenant_id": "tenant-a", "action": action, "policy": policy}
-    tool_server.verify_execution_authority(authority.token(), "tenant-a", payload)
+    # Disabled live-world revalidation must reject execution, even for a valid signed token.
+    with pytest.raises(AuthorityError, match="world_revalidation_not_configured"):
+        tool_server.verify_execution_authority(authority.token(), "tenant-a", payload)
 
     with pytest.raises(AuthorityError, match="direct_tool_access_rejected"):
         tool_server.verify_execution_authority(None, "tenant-a", payload)
