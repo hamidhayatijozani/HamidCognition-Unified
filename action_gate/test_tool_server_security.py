@@ -119,3 +119,30 @@ def test_missing_world_version_fails_closed(monkeypatch):
     monkeypatch.setattr(tool_server.urllib.request, "urlopen", lambda *args, **kwargs: Response({"tenant_id": "tenant-a", "decision": "ALLOW", "nonce": authority.nonce, "decision_id": "d"}))
     with pytest.raises(AuthorityError, match="world_version_missing"):
         tool_server._verify_live_world_binding(authority, "tenant-a")
+
+
+def test_gate_url_rejects_authority_override(monkeypatch):
+    monkeypatch.setattr(tool_server, "GATE_URL", "http://gate.internal:8000")
+    with pytest.raises(AuthorityError, match="world_revalidation_invalid_path"):
+        tool_server._validated_gate_url("//attacker.example/collect")
+
+
+def test_gate_url_rejects_non_http_scheme(monkeypatch):
+    monkeypatch.setattr(tool_server, "GATE_URL", "file:///etc")
+    with pytest.raises(AuthorityError, match="world_revalidation_invalid_url"):
+        tool_server._validated_gate_url("/v1/state/current")
+
+
+def test_gate_url_rejects_dot_segment_traversal(monkeypatch):
+    monkeypatch.setattr(tool_server, "GATE_URL", "https://gate.internal/base")
+    with pytest.raises(AuthorityError, match="world_revalidation_invalid_path"):
+        tool_server._validated_gate_url("/v1/../admin")
+    with pytest.raises(AuthorityError, match="world_revalidation_invalid_path"):
+        tool_server._validated_gate_url("/v1/%2e%2e/admin")
+
+
+def test_gate_url_preserves_configured_origin_and_query(monkeypatch):
+    monkeypatch.setattr(tool_server, "GATE_URL", "https://gate.internal:8443/base")
+    assert tool_server._validated_gate_url("/v1/evidence/abc?tenant_id=tenant-a") == (
+        "https://gate.internal:8443/base/v1/evidence/abc?tenant_id=tenant-a"
+    )
