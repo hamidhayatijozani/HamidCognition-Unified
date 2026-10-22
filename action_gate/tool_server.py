@@ -5,6 +5,9 @@ import os
 import sqlite3
 import sys
 import time
+import urllib.error
+import urllib.parse
+import urllib.request
 
 try:
     from .security_authority import Authority, AuthorityError, canonical_digest, verify_authority_envelope
@@ -14,6 +17,9 @@ except ImportError:  # pragma: no cover - direct script execution
 AUTHORITY_SECRET = os.getenv("ACTION_GATE_AUTHORITY_SECRET")
 TOOL_NONCE_DB = os.getenv("TOOL_NONCE_DB", "/data/tool_authority.db")
 DEBUG_AUTHORITY = os.getenv("ACTION_GATE_DEBUG_AUTHORITY", "").lower() in {"1", "true", "yes"}
+GATE_URL = os.getenv("ACTION_GATE_URL", "http://127.0.0.1:8000").rstrip("/")
+GATE_API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
+WORLD_REVALIDATION_ENABLED = os.getenv("ACTION_GATE_WORLD_REVALIDATION", "1" if GATE_API_TOKEN else "0").lower() in {"1", "true", "yes"}
 
 def _fingerprint(value: str | None) -> str | None:
     if value is None:
@@ -50,6 +56,48 @@ def _claim_nonce(nonce: str, decision_id: str, expires_at: int) -> None:
     finally:
         con.close()
 
+def _verify_live_world_binding(authority: Authority, tenant_id: str) -> None:
+    """Fail closed unless the signed decision is bound to the current execution world."""
+    if not WORLD_REVALIDATION_ENABLED:
+        raise AuthorityError("world_revalidation_not_configured")
+    if not GATE_API_TOKEN:
+        raise AuthorityError("world_revalidation_not_configured")
+
+    def get_gate_json(path: str) -> dict:
+        req = urllib.request.Request(
+            GATE_URL + path,
+            headers={"Authorization": f"Bearer {GATE_API_TOKEN}"},
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=3) as response:
+                value = json.loads(response.read())
+        except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
+            raise AuthorityError("world_revalidation_unavailable") from exc
+        if not isinstance(value, dict):
+            raise AuthorityError("world_revalidation_invalid_response")
+        return value
+
+    evidence_path = (
+        "/v1/evidence/"
+        + urllib.parse.quote(authority.decision_id, safe="")
+        + "?tenant_id="
+        + urllib.parse.quote(tenant_id, safe="")
+    )
+    record = get_gate_json(evidence_path)
+    if record.get("tenant_id") != tenant_id or record.get("decision") != "ALLOW":
+        raise AuthorityError("world_revalidation_evidence_mismatch")
+    if record.get("nonce") != authority.nonce or record.get("decision_id") != authority.decision_id:
+        raise AuthorityError("world_revalidation_authority_mismatch")
+
+    issued_world = record.get("world_version")
+    if not isinstance(issued_world, (str, int)) or isinstance(issued_world, bool) or str(issued_world) == "":
+        raise AuthorityError("world_version_missing")
+    current = get_gate_json("/v1/state/current")
+    current_world = current.get("world_version")
+    if current_world is None or current_world != issued_world:
+        raise AuthorityError("execution_world_state_changed")
+
+
 def verify_execution_authority(token: str | None, tenant_id: str | None, payload: dict, action_digest: str | None = None, policy_digest: str | None = None) -> None:
     if not AUTHORITY_SECRET:
         raise AuthorityError("tool_authority_verification_not_configured")
@@ -76,6 +124,7 @@ def verify_execution_authority(token: str | None, tenant_id: str | None, payload
         raise AuthorityError("policy_binding_mismatch")
     if "tenant_id" in payload and payload.get("tenant_id") != tenant_id:
         raise AuthorityError("tenant_mismatch")
+    _verify_live_world_binding(authority, tenant_id)
     _claim_nonce(authority.nonce, authority.decision_id, authority.expires_at)
 
 class Tool(BaseHTTPRequestHandler):
