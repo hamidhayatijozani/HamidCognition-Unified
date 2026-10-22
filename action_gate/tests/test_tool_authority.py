@@ -11,6 +11,8 @@ def test_tool_accepts_only_gate_issued_authority(monkeypatch, tmp_path):
     monkeypatch.setenv("TOOL_NONCE_DB", str(tmp_path / "tool-authority.db"))
     import tool_server
     importlib.reload(tool_server)
+    # These tests isolate token-envelope validation; live world binding is covered separately.
+    monkeypatch.setattr(tool_server, "_verify_live_world_binding", lambda authority, tenant_id: None)
 
     action = {"tenant_id": "tenant-a", "actor_id": "actor-a", "session_id": "session-a", "action": "read_public_file", "target": "/public/info.txt", "parameters": {}}
     policy = {"policy_version": "test-policy", "rules": ["allow-read"]}
