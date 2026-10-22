@@ -18,6 +18,36 @@ AUTHORITY_SECRET = os.getenv("ACTION_GATE_AUTHORITY_SECRET")
 TOOL_NONCE_DB = os.getenv("TOOL_NONCE_DB", "/data/tool_authority.db")
 DEBUG_AUTHORITY = os.getenv("ACTION_GATE_DEBUG_AUTHORITY", "").lower() in {"1", "true", "yes"}
 GATE_URL = os.getenv("ACTION_GATE_URL", "http://127.0.0.1:8000").rstrip("/")
+
+def _validated_gate_url(path: str) -> str:
+    """Build a same-origin Gate URL; reject malformed or authority-changing paths."""
+    base = urllib.parse.urlsplit(GATE_URL)
+    if (
+        base.scheme not in {"http", "https"}
+        or not base.hostname
+        or base.username
+        or base.password
+        or base.query
+        or base.fragment
+    ):
+        raise AuthorityError("world_revalidation_invalid_url")
+
+    if not isinstance(path, str) or not path.startswith("/") or path.startswith("//") or chr(92) in path:
+        raise AuthorityError("world_revalidation_invalid_path")
+    target = urllib.parse.urlsplit(path)
+    decoded_path = urllib.parse.unquote(target.path)
+    if (
+        target.scheme
+        or target.netloc
+        or target.fragment
+        or not decoded_path.startswith("/")
+        or any(part in {".", ".."} for part in decoded_path.split("/"))
+        or chr(92) in decoded_path
+    ):
+        raise AuthorityError("world_revalidation_invalid_path")
+
+    joined_path = base.path.rstrip("/") + target.path
+    return urllib.parse.urlunsplit((base.scheme, base.netloc, joined_path, target.query, ""))
 GATE_API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
 WORLD_REVALIDATION_ENABLED = os.getenv("ACTION_GATE_WORLD_REVALIDATION", "1" if GATE_API_TOKEN else "0").lower() in {"1", "true", "yes"}
 
@@ -64,8 +94,9 @@ def _verify_live_world_binding(authority: Authority, tenant_id: str) -> None:
         raise AuthorityError("world_revalidation_not_configured")
 
     def get_gate_json(path: str) -> dict:
+        endpoint = _validated_gate_url(path)
         req = urllib.request.Request(
-            GATE_URL + path,
+            endpoint,
             headers={"Authorization": f"Bearer {GATE_API_TOKEN}"},
         )
         try:
