@@ -1,4 +1,6 @@
 import json
+import hashlib
+import hmac
 import os
 import subprocess
 import sys
@@ -11,7 +13,7 @@ TENANT = "integration-tenant"
 OTHER_TENANT = "other-tenant"
 API_TOKEN = os.environ.get("ACTION_GATE_API_TOKEN", "ci-test-token")
 env = os.environ.copy()
-env.update({"ACTION_GATE_DB": "/tmp/action-gate-integration.db", "PYTHONPATH": ROOT, "ACTION_GATE_ENV": "development", "ACTION_GATE_SIGNING_SECRET": "dev-signing-secret", "ACTION_GATE_API_TOKEN": API_TOKEN, "ACTION_GATE_AUTHORITY_SECRET": "ci-authority-secret", "TOOL_NONCE_DB": "/tmp/action-gate-tool-authority.db"})
+env.update({"ACTION_GATE_DB": "/tmp/action-gate-integration.db", "PYTHONPATH": ROOT, "ACTION_GATE_ENV": "development", "ACTION_GATE_SIGNING_SECRET": "dev-signing-secret", "ACTION_GATE_API_TOKEN": API_TOKEN, "ACTION_GATE_AUTHORITY_SECRET": "ci-authority-secret", "ACTION_GATE_STATE_ORACLE_SECRET": "ci-state-oracle-secret", "TOOL_NONCE_DB": "/tmp/action-gate-tool-authority.db"})
 procs = [
     subprocess.Popen([sys.executable, "-m", "uvicorn", "app:app", "--host", "127.0.0.1", "--port", "8000"], cwd=ROOT, env=env),
     subprocess.Popen([sys.executable, "tool_server.py"], cwd=ROOT, env=env),
@@ -37,6 +39,12 @@ try:
             return e.code, json.loads(e.read())
 
     gate_headers = {"Authorization": f"Bearer {API_TOKEN}"}
+    snapshot_payload = {"world_version": "ci-world-v1", "snapshot": {"environment": "ci", "revision": "integration-test"}}
+    canonical_snapshot = json.dumps(snapshot_payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    snapshot_signature = hmac.new(b"ci-state-oracle-secret", canonical_snapshot.encode(), hashlib.sha256).hexdigest()
+    status, committed = post("http://127.0.0.1:8000/v1/state/commit", {**snapshot_payload, "oracle_signature": snapshot_signature}, gate_headers)
+    assert status == 200 and committed["world_version"] == "ci-world-v1"
+
     common = {"X-Agent-ID": "demo", "X-Actor-ID": "actor-1", "X-Tenant-ID": TENANT, "X-Session-ID": "session-1"}
     blocked_headers = {**common, "X-Action": "delete_file", "X-Action-Target": "/production/data.db"}
     status, blocked = post("http://127.0.0.1:8080/execute", {"x": 1}, blocked_headers)
