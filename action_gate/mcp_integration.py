@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import hashlib
+import hmac
 import os
 import subprocess
 import sys
@@ -11,7 +13,7 @@ import urllib.request
 ROOT = os.path.dirname(__file__)
 TENANT = "mcp-tenant"
 env = os.environ.copy()
-env.update({"ACTION_GATE_DB": "/tmp/action-gate-mcp.db", "PYTHONPATH": ROOT, "ACTION_GATE_ENV": "development", "ACTION_GATE_SIGNING_SECRET": "mcp-signing-secret", "ACTION_GATE_AUTHORITY_SECRET": "ci-authority-secret", "ACTION_GATE_DEBUG_AUTHORITY": "1", "TOOL_NONCE_DB": "/tmp/action-gate-mcp-tool-authority.db"})
+env.update({"ACTION_GATE_DB": "/tmp/action-gate-mcp.db", "PYTHONPATH": ROOT, "ACTION_GATE_ENV": "development", "ACTION_GATE_SIGNING_SECRET": "mcp-signing-secret", "ACTION_GATE_AUTHORITY_SECRET": "ci-authority-secret", "ACTION_GATE_STATE_ORACLE_SECRET": "ci-state-oracle-secret", "ACTION_GATE_DEBUG_AUTHORITY": "1", "TOOL_NONCE_DB": "/tmp/action-gate-mcp-tool-authority.db"})
 procs = [
     subprocess.Popen([sys.executable, "-m", "uvicorn", "app:app", "--host", "127.0.0.1", "--port", "8000"], cwd=ROOT, env=env),
     subprocess.Popen([sys.executable, "tool_server.py"], cwd=ROOT, env=env),
@@ -35,6 +37,19 @@ try:
     wait_for_port("127.0.0.1", 8000, "Action Gate")
     wait_for_port("127.0.0.1", 9000, "Tool server")
     wait_for_port("127.0.0.1", 8081, "MCP enforcement proxy")
+
+    snapshot_payload = {"world_version": "ci-world-mcp-v1", "snapshot": {"environment": "ci", "revision": "mcp-integration-test"}}
+    canonical_snapshot = json.dumps(snapshot_payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    snapshot_signature = hmac.new(b"ci-state-oracle-secret", canonical_snapshot.encode(), hashlib.sha256).hexdigest()
+    snapshot_request = urllib.request.Request(
+        "http://127.0.0.1:8000/v1/state/commit",
+        data=json.dumps({**snapshot_payload, "oracle_signature": snapshot_signature}).encode(),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(snapshot_request, timeout=5) as response:
+        committed = json.loads(response.read())
+    assert committed["world_version"] == "ci-world-mcp-v1"
 
     def reserve_execution(decision_id, tenant_id, actor_id, session_id, action_hash_value, nonce):
         req = urllib.request.Request(
