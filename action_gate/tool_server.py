@@ -59,7 +59,7 @@ def _claim_nonce(nonce: str, decision_id: str, expires_at: int) -> None:
 def _verify_live_world_binding(authority: Authority, tenant_id: str) -> None:
     """Fail closed if the decision's world changed after reservation but before tool execution."""
     if not WORLD_REVALIDATION_ENABLED:
-        return
+        raise AuthorityError("world_revalidation_not_configured")
     if not GATE_API_TOKEN:
         raise AuthorityError("world_revalidation_not_configured")
 
@@ -90,9 +90,8 @@ def _verify_live_world_binding(authority: Authority, tenant_id: str) -> None:
         raise AuthorityError("world_revalidation_authority_mismatch")
 
     issued_world = record.get("world_version")
-    if issued_world is None:
-        # Legacy decisions without a bound world cannot claim world-drift protection.
-        return
+    if not isinstance(issued_world, (str, int)) or isinstance(issued_world, bool) or str(issued_world) == "":
+        raise AuthorityError("world_version_missing")
     current = get_gate_json("/v1/state/current")
     if current.get("world_version") != issued_world:
         raise AuthorityError("execution_world_state_changed")
