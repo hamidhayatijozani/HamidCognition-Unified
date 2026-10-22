@@ -156,9 +156,9 @@ def test_missing_world_version_fails_closed(monkeypatch):
 
     monkeypatch.setattr(tool_server, "WORLD_REVALIDATION_ENABLED", True)
     monkeypatch.setattr(tool_server, "GATE_API_TOKEN", "test-api-token")
-    monkeypatch.setattr(tool_server.urllib.request, "urlopen", lambda *args, **kwargs: Response({
-        "tenant_id": "tenant-a", "decision": "ALLOW", "nonce": "n", "decision_id": "d"
-    }))
     authority = issue_authority(secret=SECRET, decision_id="d", tenant_id="tenant-a", action=ACTION, policy=POLICY, decision="ALLOW", ttl_seconds=60)
+    monkeypatch.setattr(tool_server.urllib.request, "urlopen", lambda *args, **kwargs: Response({
+        "tenant_id": "tenant-a", "decision": "ALLOW", "nonce": authority.nonce, "decision_id": "d"
+    }))
     with pytest.raises(AuthorityError, match="world_version_missing"):
         tool_server._verify_live_world_binding(authority, "tenant-a")
