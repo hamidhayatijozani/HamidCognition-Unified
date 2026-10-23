@@ -33,7 +33,7 @@ _INTERNAL_NETWORKS = tuple(ipaddress.ip_network(value) for value in (
 def _is_blocked_ip(ip: ipaddress._BaseAddress) -> bool:
     if isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped:
         ip = ip.ipv4_mapped
-    return any(ip in network for network in _BLOCKED)
+    return (not ip.is_global) or any(ip in network for network in _BLOCKED)
 
 
 def _resolve_all(host: str, port: int) -> tuple[ipaddress._BaseAddress, ...]:
