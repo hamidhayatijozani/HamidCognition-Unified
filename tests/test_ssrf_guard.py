@@ -55,3 +55,23 @@ def test_require_safe_url_is_a_hard_failure(monkeypatch):
         pass
     else:
         raise AssertionError("unsafe URL was not rejected")
+
+
+
+def test_internal_allowlisted_host_rejects_public_resolution(monkeypatch):
+    monkeypatch.setattr(
+        ssrf_guard, "_resolve_all",
+        lambda host, port: (ipaddress.ip_address("8.8.8.8"),),
+    )
+    assert not ssrf_guard.is_safe_url("http://action-gate:8000/health")
+
+
+def test_internal_allowlisted_host_rejects_mixed_trust_zone(monkeypatch):
+    monkeypatch.setattr(
+        ssrf_guard, "_resolve_all",
+        lambda host, port: (
+            ipaddress.ip_address("172.20.0.5"),
+            ipaddress.ip_address("169.254.169.254"),
+        ),
+    )
+    assert not ssrf_guard.is_safe_url("http://tool:9000/call")
