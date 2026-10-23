@@ -1,9 +1,8 @@
 """Outbound URL validation for the enforcement proxy.
 
-The proxy does not accept arbitrary destination URLs. GATE_URL and TOOL_URL are
-deployment configuration, while request paths are appended to those fixed
-origins. This module makes that boundary explicit for static analysis and
-runtime defense-in-depth.
+Only explicitly configured origins are accepted. Internal service names are
+allowed only when every resolved address belongs to an expected private/local
+range; arbitrary public hosts resolving to private addresses are rejected.
 """
 from __future__ import annotations
 
@@ -12,44 +11,23 @@ import os
 import socket
 from urllib.parse import urlparse
 
-_DEFAULT_ALLOWED_HOSTS = frozenset({
-    "127.0.0.1",
-    "localhost",
-    "action-gate",
-    "tool",
-})
-
+_DEFAULT_ALLOWED_HOSTS = frozenset({"127.0.0.1", "localhost", "action-gate", "tool"})
 _env_hosts = os.environ.get("ENFORCEMENT_ALLOWED_HOSTS")
 ALLOWED_HOSTS = frozenset(
     h.strip().lower().rstrip(".")
     for h in (_env_hosts.split(",") if _env_hosts else _DEFAULT_ALLOWED_HOSTS)
     if h.strip()
 )
-
-_BLOCKED = tuple(
-    ipaddress.ip_network(value)
-    for value in (
-        "0.0.0.0/8",
-        "10.0.0.0/8",
-        "100.64.0.0/10",
-        "127.0.0.0/8",
-        "169.254.0.0/16",
-        "172.16.0.0/12",
-        "192.0.0.0/24",
-        "192.168.0.0/16",
-        "198.18.0.0/15",
-        "224.0.0.0/4",
-        "240.0.0.0/4",
-        "::1/128",
-        "fc00::/7",
-        "fe80::/10",
-    )
-)
-
-# These names are internal Docker service identities in the production
-# compose file. Private addresses are therefore expected for these exact
-# identities, but never for an arbitrary host supplied at runtime.
+_BLOCKED = tuple(ipaddress.ip_network(value) for value in (
+    "0.0.0.0/8", "100.64.0.0/10", "169.254.0.0/16",
+    "192.0.0.0/24", "198.18.0.0/15", "224.0.0.0/4", "240.0.0.0/4",
+    "::/128", "::1/128", "fc00::/7", "fe80::/10", "ff00::/8",
+))
 _INTERNAL_HOSTS = frozenset({"127.0.0.1", "localhost", "action-gate", "tool"})
+_INTERNAL_NETWORKS = tuple(ipaddress.ip_network(value) for value in (
+    "127.0.0.0/8", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16",
+    "::1/128", "fc00::/7", "fe80::/10",
+))
 
 
 def _is_blocked_ip(ip: ipaddress._BaseAddress) -> bool:
@@ -60,50 +38,32 @@ def _is_blocked_ip(ip: ipaddress._BaseAddress) -> bool:
 
 def _resolve_all(host: str, port: int) -> tuple[ipaddress._BaseAddress, ...]:
     infos = socket.getaddrinfo(host, port, type=socket.SOCK_STREAM)
-    addresses = []
-    for _family, _socktype, _proto, _canonname, sockaddr in infos:
-        addresses.append(ipaddress.ip_address(sockaddr[0]))
-    return tuple(addresses)
+    return tuple(ipaddress.ip_address(info[4][0]) for info in infos)
 
 
 def is_safe_url(url: str) -> bool:
-    """Return True only for an explicitly configured, syntactically valid origin.
-
-    For exact internal service identities, private addresses are allowed because
-    they are the intended Docker-network destinations. Any other host must
-    resolve only to public addresses.
-    """
     try:
         parsed = urlparse(url)
-    except ValueError:
-        return False
-
-    if parsed.scheme not in ("http", "https") or not parsed.hostname:
-        return False
-    if parsed.username or parsed.password:
-        return False
-
-    host = parsed.hostname.lower().rstrip(".")
-    if host not in ALLOWED_HOSTS:
-        return False
-
-    try:
+        if parsed.scheme not in ("http", "https") or not parsed.hostname:
+            return False
+        if parsed.username or parsed.password:
+            return False
+        host = parsed.hostname.lower().rstrip(".")
+        if host not in ALLOWED_HOSTS:
+            return False
         port = parsed.port or (443 if parsed.scheme == "https" else 80)
         addresses = _resolve_all(host, port)
-    except (OSError, ValueError):
+    except (OSError, ValueError, UnicodeError):
         return False
-
     if not addresses:
         return False
-
+    # Do not let an allowlisted hostname resolve to a different trust zone.
     if host in _INTERNAL_HOSTS:
-        return True
-
+        return all(any(ip in network for network in _INTERNAL_NETWORKS) for ip in addresses)
     return all(not _is_blocked_ip(ip) for ip in addresses)
 
 
 def require_safe_url(url: str) -> str:
-    """CodeQL-friendly sanitizer: reject unsafe outbound destinations."""
     if not is_safe_url(url):
         raise ValueError(f"Blocked outbound URL: {url!r}")
     return url
