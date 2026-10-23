@@ -49,7 +49,7 @@ def _validated_gate_url(path: str) -> str:
     joined_path = base.path.rstrip("/") + target.path
     return urllib.parse.urlunsplit((base.scheme, base.netloc, joined_path, target.query, ""))
 GATE_API_TOKEN = os.getenv("ACTION_GATE_API_TOKEN")
-WORLD_REVALIDATION_ENABLED = os.getenv("ACTION_GATE_WORLD_REVALIDATION", "1" if GATE_API_TOKEN else "0").lower() in {"1", "true", "yes"}
+WORLD_REVALIDATION_ENABLED = os.getenv("ACTION_GATE_WORLD_REVALIDATION", "0").lower() in {"1", "true", "yes"}
 
 def _fingerprint(value: str | None) -> str | None:
     if value is None:
