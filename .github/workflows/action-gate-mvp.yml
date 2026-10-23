@@ -39,3 +39,4 @@ jobs:
       - run: python mcp_integration.py
         env:
           ACTION_GATE_API_TOKEN: ci-test-token
+          ACTION_GATE_WORLD_REVALIDATION: '1'
