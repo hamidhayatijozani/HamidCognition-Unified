@@ -55,3 +55,32 @@ def test_require_safe_url_is_a_hard_failure(monkeypatch):
         pass
     else:
         raise AssertionError("unsafe URL was not rejected")
+
+
+
+def test_blocks_private_addresses_for_non_internal_hosts(monkeypatch):
+    monkeypatch.setattr(
+        ssrf_guard,
+        "ALLOWED_HOSTS",
+        frozenset({"public.example"}),
+    )
+    monkeypatch.setattr(
+        ssrf_guard,
+        "_resolve_all",
+        lambda host, port: (ipaddress.ip_address("10.0.0.1"),),
+    )
+    assert not ssrf_guard.is_safe_url("https://public.example/")
+
+
+def test_blocks_ipv4_mapped_loopback_through_url_validation(monkeypatch):
+    monkeypatch.setattr(
+        ssrf_guard,
+        "ALLOWED_HOSTS",
+        frozenset({"public.example"}),
+    )
+    monkeypatch.setattr(
+        ssrf_guard,
+        "_resolve_all",
+        lambda host, port: (ipaddress.ip_address("::ffff:127.0.0.1"),),
+    )
+    assert not ssrf_guard.is_safe_url("https://public.example/")
