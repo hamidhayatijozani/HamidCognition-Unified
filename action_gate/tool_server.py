@@ -60,8 +60,11 @@ def _nonce_state(nonce: str | None) -> str:
     if not nonce:
         return "missing"
     try:
+        os.makedirs(os.path.dirname(TOOL_NONCE_DB) or ".", exist_ok=True)
         con = sqlite3.connect(TOOL_NONCE_DB, timeout=2)
         try:
+            con.execute("PRAGMA busy_timeout=2000")
+            con.execute("CREATE TABLE IF NOT EXISTS used_authorities (nonce TEXT PRIMARY KEY, decision_id TEXT NOT NULL, expires_at INTEGER NOT NULL, used_at INTEGER NOT NULL)")
             row = con.execute("SELECT decision_id, expires_at FROM used_authorities WHERE nonce = ?", (nonce,)).fetchone()
         finally:
             con.close()
