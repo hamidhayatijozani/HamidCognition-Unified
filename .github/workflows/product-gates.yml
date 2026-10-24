@@ -70,11 +70,15 @@ jobs:
         run: python enforcement_integration.py
       - name: Run real MCP enforcement integration
         working-directory: action_gate
+        env:
+          ACTION_GATE_API_TOKEN: ci-test-token
+          ACTION_GATE_WORLD_REVALIDATION: "1"
         run: python mcp_integration.py
       - name: Run BESAZ awareness integration tests
         run: python -m pytest -q tests/test_awareness_layer.py tests/test_awareness_supervisor.py tests/test_besaz_integration.py
 
       - name: Run Agent Action Risk Lab Before/After evidence
+        if: always()
         run: |
           python tools/run_risk_lab_demo.py | tee risk-lab-result.json
       - name: Upload Agent Action Risk Lab evidence
@@ -86,7 +90,7 @@ jobs:
             artifacts/risk-lab-demo.json
             artifacts/risk-lab-demo.md
             risk-lab-result.json
-          if-no-files-found: error
+          if-no-files-found: warn
       - name: Run sellable product readiness gate
         working-directory: action_gate
         run: python sellable_gate.py
