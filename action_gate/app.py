@@ -548,8 +548,6 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
     return {k: record[k] for k in ("decision", "decision_id", "request_id", "tenant_id", "actor_id", "session_id", "risk_assessment", "policy_checks", "evidence", "trace_id", "created_at", "expires_at", "nonce", "action_hash", "policy_version", "policy_hash", "decision_signature", "evidence_hash", "world_version")} | {"reason": policy_checks[0]["reason"]}
 
 
-
-
 from self_audit import Evidence as SelfAuditEvidence, SelfAuditRequest, audit as self_audit
 
 
@@ -672,8 +670,6 @@ def execution_reserve(decision_id: str, outcome: ExecutionOutcome, authorization
     authority_secret = os.getenv("ACTION_GATE_AUTHORITY_SECRET") or current_secret()
     if not authority_secret:
         raise HTTPException(503, "execution_authority_not_configured")
-    if not authority_secret:
-        raise HTTPException(503, "execution_authority_not_configured")
     remaining_ttl = max(1, int((datetime.fromisoformat(record["expires_at"]) - datetime.now(timezone.utc)).total_seconds()))
     authority = issue_authority(
         secret=authority_secret.encode(),
@@ -785,7 +781,7 @@ def replay(decision_id: str, tenant_id: str, authorization: str | None = Header(
         if legacy_signal_data is not None:
             stored_signal = PreExecutionSignal.model_validate(legacy_signal_data)
     else:
-        raise HTTPException(500, "unsupported_decision_schema_version")
+        raise HTTPException(422, f"unsupported_decision_schema_version: {schema_version!r}")
     req = ActionRequest.model_validate(raw_request)
     policy_hash_match = digest(snapshot) == record["policy_hash"]
     replay_evidence_status, replay_evidence, replay_contradictions = evidence_gate(record.get("evidence", []))
