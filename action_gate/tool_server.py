@@ -62,6 +62,12 @@ def _nonce_state(nonce: str | None) -> str:
     try:
         con = sqlite3.connect(TOOL_NONCE_DB, timeout=2)
         try:
+            # The diagnostic may run on the first rejected request, before any
+            # successful authority claim has initialized this table.
+            con.execute(
+                "CREATE TABLE IF NOT EXISTS used_authorities "
+                "(nonce TEXT PRIMARY KEY, decision_id TEXT NOT NULL, expires_at INTEGER NOT NULL, used_at INTEGER NOT NULL)"
+            )
             row = con.execute("SELECT decision_id, expires_at FROM used_authorities WHERE nonce = ?", (nonce,)).fetchone()
         finally:
             con.close()
