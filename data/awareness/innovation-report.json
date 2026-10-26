@@ -2,7 +2,7 @@
   "project": "BESAZ",
   "mode": "INNOVATION_SANDBOX",
   "authority": "NONE",
-  "generated_at_unix": 1793016555,
+  "generated_at_unix": 1793027167,
   "execution_scope": "DETERMINISTIC_SYNTHETIC_SMOKE_TESTS",
   "architecture_component_count": 15,
   "candidate_count": 8,
@@ -247,5 +247,5 @@
     "failure must remain visible",
     "promotion requires explicit verification and approval"
   ],
-  "run_id": "40320295813"
+  "run_id": "40345942835"
 }
