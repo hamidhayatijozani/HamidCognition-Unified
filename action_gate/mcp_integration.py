@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import json
-import hashlib
-import hmac
 import os
 import subprocess
 import sys
@@ -13,7 +11,7 @@ import urllib.request
 ROOT = os.path.dirname(__file__)
 TENANT = "mcp-tenant"
 env = os.environ.copy()
-env.update({"ACTION_GATE_DB": "/tmp/action-gate-mcp.db", "PYTHONPATH": ROOT, "ACTION_GATE_ENV": "development", "ACTION_GATE_SIGNING_SECRET": "mcp-signing-secret", "ACTION_GATE_AUTHORITY_SECRET": "ci-authority-secret", "ACTION_GATE_STATE_ORACLE_SECRET": "ci-state-oracle-secret", "ACTION_GATE_DEBUG_AUTHORITY": "1", "TOOL_NONCE_DB": "/tmp/action-gate-mcp-tool-authority.db"})
+env.update({"ACTION_GATE_API_TOKEN": os.environ.get("ACTION_GATE_API_TOKEN", "ci-test-token"), "ACTION_GATE_WORLD_REVALIDATION": "1", "ACTION_GATE_DB": "/tmp/action-gate-mcp.db", "PYTHONPATH": ROOT, "ACTION_GATE_ENV": "development", "ACTION_GATE_SIGNING_SECRET": "mcp-signing-secret", "ACTION_GATE_AUTHORITY_SECRET": "ci-authority-secret", "ACTION_GATE_STATE_ORACLE_SECRET": "ci-state-oracle-secret", "ACTION_GATE_DEBUG_AUTHORITY": "1", "TOOL_NONCE_DB": "/tmp/action-gate-mcp-tool-authority.db"})
 procs = [
     subprocess.Popen([sys.executable, "-m", "uvicorn", "app:app", "--host", "127.0.0.1", "--port", "8000"], cwd=ROOT, env=env),
     subprocess.Popen([sys.executable, "tool_server.py"], cwd=ROOT, env=env),
@@ -37,19 +35,6 @@ try:
     wait_for_port("127.0.0.1", 8000, "Action Gate")
     wait_for_port("127.0.0.1", 9000, "Tool server")
     wait_for_port("127.0.0.1", 8081, "MCP enforcement proxy")
-
-    snapshot_payload = {"world_version": "ci-world-mcp-v1", "snapshot": {"environment": "ci", "revision": "mcp-integration-test"}}
-    canonical_snapshot = json.dumps(snapshot_payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-    snapshot_signature = hmac.new(b"ci-state-oracle-secret", canonical_snapshot.encode(), hashlib.sha256).hexdigest()
-    snapshot_request = urllib.request.Request(
-        "http://127.0.0.1:8000/v1/state/commit",
-        data=json.dumps({**snapshot_payload, "oracle_signature": snapshot_signature}).encode(),
-        headers={"Content-Type": "application/json", "Authorization": f"Bearer {env.get('ACTION_GATE_API_TOKEN', 'ci-test-token')}"},
-        method="POST",
-    )
-    with urllib.request.urlopen(snapshot_request, timeout=5) as response:
-        committed = json.loads(response.read())
-    assert committed["world_version"] == "ci-world-mcp-v1"
 
     def reserve_execution(decision_id, tenant_id, actor_id, session_id, action_hash_value, nonce):
         req = urllib.request.Request(
@@ -153,6 +138,118 @@ try:
         raise AssertionError("direct tool bypass unexpectedly succeeded")
     except urllib.error.HTTPError as e:
         assert e.code == 403
+
+    # Reproduce the authorization-to-execution race over the real Gate HTTP API
+    # and verify that the MCP tool boundary cannot be reached with stale authority.
+    import hashlib
+    import hmac
+
+    state_secret = "ci-state-oracle-secret"
+
+    def commit_state(world_version, snapshot):
+        payload = {"world_version": world_version, "snapshot": snapshot}
+        canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        signature = hmac.new(state_secret.encode(), canonical.encode(), hashlib.sha256).hexdigest()
+        req = urllib.request.Request(
+            "http://127.0.0.1:8000/v1/state/commit",
+            data=json.dumps({**payload, "oracle_signature": signature}).encode(),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {os.environ.get('ACTION_GATE_API_TOKEN', 'ci-test-token')}",
+            },
+        )
+        with urllib.request.urlopen(req) as response:
+            return json.loads(response.read())
+
+    commit_state("wv-mcp-context-A", {"risk_tier": "low"})
+    stale_req = urllib.request.Request(
+        "http://127.0.0.1:8000/v1/action/evaluate",
+        data=json.dumps({
+            "agent_id": "mcp-context-race",
+            "actor_id": "actor-mcp",
+            "session_id": "session-context-race",
+            "tenant_id": TENANT,
+            "action": "read_public_file",
+            "target": "/public/context-race.txt",
+            "parameters": {"target": "/public/context-race.txt"},
+            "context": {"risk_tier": "low"},
+        }).encode(),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {os.environ.get('ACTION_GATE_API_TOKEN', 'ci-test-token')}",
+        },
+    )
+    with urllib.request.urlopen(stale_req) as response:
+        stale_decision = json.loads(response.read())
+    assert stale_decision["decision"] == "ALLOW"
+    assert stale_decision["world_version"] == "wv-mcp-context-A"
+
+    # Reserve while world A is still current, then mutate the world before
+    # the protected tool sees the otherwise valid signed authority.
+    reserve_req = urllib.request.Request(
+        f"http://127.0.0.1:8000/v1/action/{stale_decision['decision_id']}/execution/reserve",
+        data=json.dumps({
+            "tenant_id": TENANT,
+            "actor_id": "actor-mcp",
+            "session_id": "session-context-race",
+            "action_hash": stale_decision["action_hash"],
+            "nonce": stale_decision["nonce"],
+            "world_version": "wv-mcp-context-A",
+        }).encode(),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {os.environ.get('ACTION_GATE_API_TOKEN', 'ci-test-token')}",
+        },
+    )
+    with urllib.request.urlopen(reserve_req) as response:
+        reserved_stale = json.loads(response.read())
+    assert reserved_stale["execution"]["status"] == "RESERVED"
+
+    commit_state("wv-mcp-context-B", {"risk_tier": "blocked"})
+
+    # The signed authority was valid when reserved, but must now fail at the
+    # protected tool boundary after the world changes.
+    stale_tool_headers = {
+        "Content-Type": "application/json",
+        "X-HCJ-Execution-Authority": reserved_stale["execution_authority"],
+        "X-HCJ-Action-Hash": stale_decision["action_hash"],
+        "X-HCJ-Policy-Hash": stale_decision["policy_hash"],
+        "X-Tenant-ID": TENANT,
+    }
+    try:
+        urllib.request.urlopen(urllib.request.Request(
+            "http://127.0.0.1:9000",
+            data=b"{}",
+            headers=stale_tool_headers,
+        ))
+        raise AssertionError("stale signed authority unexpectedly reached protected tool")
+    except urllib.error.HTTPError as e:
+        body = json.loads(e.read())
+        assert e.code == 403
+        assert body["diagnostic"] == "execution_world_state_changed"
+
+    # Re-reserving the original decision after drift must also fail closed.
+    try:
+        urllib.request.urlopen(reserve_req)
+        raise AssertionError("stale authorization unexpectedly reserved after drift")
+    except urllib.error.HTTPError as e:
+        body = json.loads(e.read())
+        assert e.code == 409
+        assert body["detail"] == "execution_world_state_changed"
+
+    # Even at the MCP tool endpoint, no authority means no execution.
+    try:
+        urllib.request.urlopen(urllib.request.Request(
+            "http://127.0.0.1:9000",
+            data=json.dumps({"target": "/public/context-race.txt"}).encode(),
+            headers={"Content-Type": "application/json", "X-Tenant-ID": TENANT},
+        ))
+        raise AssertionError("MCP tool endpoint accepted request without fresh authority")
+    except urllib.error.HTTPError as e:
+        assert e.code == 403
+
+    print("MCP_CONTEXT_DRIFT_HTTP_GATE_PASS")
+
     print("REAL_MCP_ENFORCEMENT_INTEGRATION_PASS")
 finally:
     for p in procs:
