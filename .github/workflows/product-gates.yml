@@ -81,6 +81,9 @@ jobs:
 
       - name: Run Agent Action Risk Lab Before/After evidence
         if: always()
+        env:
+          ACTION_GATE_WORLD_REVALIDATION: "1"
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
         run: |
           set -o pipefail
           python tools/run_risk_lab_demo.py | tee risk-lab-result.json
