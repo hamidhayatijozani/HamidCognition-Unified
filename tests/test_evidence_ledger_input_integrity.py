@@ -4,13 +4,16 @@ from action_gate.evidence_ledger import EvidenceLedger
 
 
 class EvidenceLedgerInputIntegrityTests(unittest.TestCase):
-    def test_nested_caller_mutation_does_not_change_appended_evidence(self):
+    def test_nested_caller_and_returned_event_mutation_do_not_change_evidence(self):
         ledger = EvidenceLedger()
         payload = {"context": {"labels": ["approved"]}}
-        event = ledger.append("evt-1", "decision", "trace-1", payload)
-        original_hash = event.event_hash
+        returned_event = ledger.append("evt-1", "decision", "trace-1", payload)
+        original_hash = returned_event.event_hash
 
-        payload["context"]["labels"].append("tampered")
+        payload["context"]["labels"].append("caller-tampered")
+        returned_event.payload["context"]["labels"].append("return-value-tampered")
+        observed_event = ledger.events()[0]
+        observed_event.payload["context"]["labels"].append("events-view-tampered")
 
         self.assertEqual(ledger.events()[0].payload["context"]["labels"], ["approved"])
         self.assertEqual(ledger.events()[0].event_hash, original_hash)
