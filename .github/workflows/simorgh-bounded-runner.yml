@@ -44,7 +44,7 @@ jobs:
               raise SystemExit("Task is not in the first explicitly allowlisted task.")
           # Do not pass arbitrary issue instructions to a shell. The model is given a
           # fixed engineering objective and a bounded set of source files.
-          allowed = ["action_gate/void_key.py", "tests/test_void_key.py"]
+          allowed = ["kirgande/void_key.py", "tests/test_void_key.py"]
           contents = {}
           for name in allowed:
               p = pathlib.Path(name)
@@ -102,7 +102,7 @@ jobs:
           git config user.name "simorgh-agent"
           git config user.email "simorgh-agent@users.noreply.github.com"
           git switch -c "$branch"
-          git add action_gate/void_key.py tests/test_void_key.py
+          git add kirgande/void_key.py tests/test_void_key.py
           if git diff --cached --quiet; then
             echo "No reviewed changes to propose; refusing empty PR."
             exit 1
