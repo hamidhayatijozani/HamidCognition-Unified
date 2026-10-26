@@ -68,6 +68,22 @@ try:
         except urllib.error.HTTPError as e:
             return e.code, json.loads(e.read())
 
+    # Live world revalidation requires a signed current-world snapshot before any ALLOW.
+    import hashlib
+    import hmac
+
+    initial_state_secret = "ci-state-oracle-secret"
+    initial_state = {"world_version": "wv-mcp-initial", "snapshot": {"source": "mcp-integration", "status": "ready"}}
+    initial_canonical = json.dumps(initial_state, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    initial_signature = hmac.new(initial_state_secret.encode(), initial_canonical.encode(), hashlib.sha256).hexdigest()
+    initial_req = urllib.request.Request(
+        "http://127.0.0.1:8000/v1/state/commit",
+        data=json.dumps({**initial_state, "oracle_signature": initial_signature}).encode(),
+        headers={"Content-Type": "application/json", "Authorization": f"Bearer {os.environ.get('ACTION_GATE_API_TOKEN', 'ci-test-token')}"},
+    )
+    with urllib.request.urlopen(initial_req) as response:
+        assert response.status == 200
+
     status, denied = call({"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": "delete_file", "arguments": {"target": "/production/data.db"}}})
     assert status == 200
     assert denied["result"]["blocked_by_action_gate"] is True
