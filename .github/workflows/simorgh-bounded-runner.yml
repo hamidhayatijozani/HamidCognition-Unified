@@ -52,6 +52,23 @@ jobs:
                   contents[name] = p.read_text(encoding="utf-8")
           if not contents:
               raise SystemExit("None of the allowlisted files exist; refusing to guess paths.")
+          # First verify whether the reported defect still exists on the checked-out
+          # revision. Do not spend API budget or fail the task when the fix is already present.
+          import subprocess, sys
+          subprocess.run([sys.executable, "-m", "pip", "install", "-q", "pytest"], check=True)
+          baseline = subprocess.run(
+              [sys.executable, "-m", "pytest", "-q", "tests/test_void_key.py"],
+              capture_output=True, text=True,
+          )
+          if baseline.returncode == 0:
+              print("Baseline targeted tests pass; no patch is necessary.")
+              with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+                  output.write("needs_patch=false\\n")
+              raise SystemExit(0)
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write("needs_patch=true\\n")
+          print(baseline.stdout)
+          print(baseline.stderr)
           prompt = {
             "task": "Investigate the DRS normalization failure: calculate_drs(1,1,1,1) returns 0.9090909090909091 but the test expects 1.0. Determine intended behavior from the checked-in implementation/tests. Return a minimal unified diff only if the canonical behavior is clear. Never weaken/remove a test merely to make CI green. If ambiguous, return NO_PATCH.",
             "allowed_paths": allowed,
@@ -84,6 +101,7 @@ jobs:
 
       - name: Apply patch and run fixed test
         id: test
+        if: steps.patch.outputs.needs_patch == 'true'
         run: |
           set -euo pipefail
           git apply --check /tmp/simorgh.patch
@@ -92,7 +110,7 @@ jobs:
           python -m pytest -q tests/test_void_key.py
 
       - name: Create review branch and pull request
-        if: success()
+        if: success() && steps.patch.outputs.needs_patch == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
