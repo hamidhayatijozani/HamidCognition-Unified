@@ -41,23 +41,34 @@ class EvidenceLedger:
         )
         return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
+    @staticmethod
+    def _copy_event(event: LedgerEvent) -> LedgerEvent:
+        return LedgerEvent(
+            event.event_id,
+            event.event_type,
+            event.trace_id,
+            copy.deepcopy(event.payload),
+            event.previous_hash,
+            event.event_hash,
+        )
+
     def append(self, event_id: str, event_type: str, trace_id: str, payload: dict[str, Any]) -> LedgerEvent:
         if not isinstance(event_id, str) or not event_id:
             raise ValueError("event_id_must_be_non_empty_string")
         if event_id in self._event_ids:
             raise ValueError("duplicate_event_id")
-        # Snapshot nested caller-owned values before hashing. A shallow dict copy
-        # lets post-append mutations silently change the evidence being verified.
+        # Snapshot nested caller-owned values before hashing. The returned event
+        # is also a copy so callers cannot mutate the ledger through its payload.
         payload_snapshot = copy.deepcopy(payload)
         previous_hash = self._events[-1].event_hash if self._events else "GENESIS"
         event_hash = self._hash(event_id, event_type, trace_id, payload_snapshot, previous_hash)
         event = LedgerEvent(event_id, event_type, trace_id, payload_snapshot, previous_hash, event_hash)
         self._events.append(event)
         self._event_ids.add(event_id)
-        return event
+        return self._copy_event(event)
 
     def events(self) -> tuple[LedgerEvent, ...]:
-        return tuple(self._events)
+        return tuple(self._copy_event(event) for event in self._events)
 
     def verify_chain(self) -> bool:
         previous = "GENESIS"
