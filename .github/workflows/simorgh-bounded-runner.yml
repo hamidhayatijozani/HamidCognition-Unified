@@ -63,10 +63,10 @@ jobs:
           if baseline.returncode == 0:
               print("Baseline targeted tests pass; no patch is necessary.")
               with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
-                  output.write("needs_patch=false\\n")
+                  output.write("needs_patch=false\n")
               raise SystemExit(0)
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
-              output.write("needs_patch=true\\n")
+              output.write("needs_patch=true\n")
           print(baseline.stdout)
           print(baseline.stderr)
           prompt = {
