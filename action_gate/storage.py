@@ -47,8 +47,8 @@ def init_db() -> None:
             # Enforce append-only audit history in PostgreSQL as well as SQLite.
             con.execute(
                 "CREATE OR REPLACE FUNCTION action_gate_prevent_audit_mutation() "
-                "RETURNS trigger LANGUAGE plpgsql AS $ "
-                "BEGIN RAISE EXCEPTION 'audit_events_are_append_only'; END; $"
+                "RETURNS trigger LANGUAGE plpgsql AS $function$ "
+                "BEGIN RAISE EXCEPTION 'audit_events_are_append_only'; END; $function$"
             )
             con.execute("DROP TRIGGER IF EXISTS audit_events_no_update ON audit_events")
             con.execute("DROP TRIGGER IF EXISTS audit_events_no_delete ON audit_events")
