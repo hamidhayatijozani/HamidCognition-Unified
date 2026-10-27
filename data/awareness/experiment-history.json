@@ -2694,6 +2694,77 @@
           "evidence_scope": "SYNTHETIC_ONLY"
         }
       ]
+    },
+    {
+      "run_id": "40483831018",
+      "generated_at_unix": 1793094628,
+      "execution_scope": "DETERMINISTIC_SYNTHETIC_SMOKE_TESTS",
+      "experiments": [
+        {
+          "candidate_id": "IN-399e1e5a981d18c9",
+          "outcome": "PASS",
+          "metrics": {
+            "baseline_score": 0.5,
+            "variant_score": 0.75,
+            "delta": 0.25
+          },
+          "observations": [
+            "score_delta=0.25"
+          ],
+          "failures": [],
+          "repeatable": true,
+          "evidence": [
+            "synthetic-fixture:improvement"
+          ],
+          "next_action": "retain_candidate",
+          "fixture_name": "synthetic_improvement",
+          "evidence_scope": "SYNTHETIC_ONLY"
+        },
+        {
+          "candidate_id": "IN-399e1e5a981d18c9",
+          "outcome": "FAIL",
+          "metrics": {
+            "baseline_score": 0.8,
+            "variant_score": 0.7,
+            "delta": -0.1
+          },
+          "observations": [
+            "score_delta=-0.1"
+          ],
+          "failures": [
+            "variant did not improve baseline: -0.1"
+          ],
+          "repeatable": true,
+          "evidence": [
+            "synthetic-fixture:regression"
+          ],
+          "next_action": "revise_or_reject",
+          "fixture_name": "synthetic_regression",
+          "evidence_scope": "SYNTHETIC_ONLY"
+        },
+        {
+          "candidate_id": "IN-399e1e5a981d18c9",
+          "outcome": "INCONCLUSIVE",
+          "metrics": {
+            "baseline_score": 0.7,
+            "variant_score": 0.7,
+            "delta": 0.0
+          },
+          "observations": [
+            "score_delta=0.0"
+          ],
+          "failures": [
+            "variant did not improve baseline: 0.0"
+          ],
+          "repeatable": false,
+          "evidence": [
+            "synthetic-fixture:no-change"
+          ],
+          "next_action": "revise_or_reject",
+          "fixture_name": "synthetic_no_change",
+          "evidence_scope": "SYNTHETIC_ONLY"
+        }
+      ]
     }
   ]
 }
