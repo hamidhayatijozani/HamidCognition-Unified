@@ -37,3 +37,42 @@ def test_production_compose_uses_postgres_and_tls():
     assert "ACTION_GATE_DATABASE_URL: postgresql://" in compose
     assert '"443:443"' in compose
     assert "reverse_proxy enforcement:8080" in caddy
+
+
+def test_postgres_audit_mutation_triggers_are_installed_when_configured():
+    """Regression check for PostgreSQL append-only audit protection.
+
+    This is read-only: it inspects trigger metadata and does not alter audit rows.
+    """
+    import pytest
+
+    database_url = os.getenv("ACTION_GATE_DATABASE_URL", "")
+    if not database_url.startswith(("postgresql://", "postgres://")):
+        pytest.skip("requires the PostgreSQL integration environment")
+
+    import storage
+
+    # A prior SQLite test may already have imported the module with no database URL.
+    storage.DATABASE_URL = database_url
+    con = storage.connect()
+    try:
+        table = con.execute("SELECT to_regclass('audit_events')").fetchone()
+        assert table and table[0] == "audit_events", "PostgreSQL audit_events table is missing"
+
+        triggers = {
+            row[0]
+            for row in con.execute(
+                "SELECT tgname FROM pg_trigger "
+                "WHERE tgrelid = 'audit_events'::regclass AND NOT tgisinternal"
+            ).fetchall()
+        }
+        assert {"audit_events_no_update", "audit_events_no_delete"} <= triggers
+
+        definition = con.execute(
+            "SELECT pg_get_functiondef("
+            "'action_gate_prevent_audit_mutation()'::regprocedure)"
+        ).fetchone()
+        assert definition and "audit_events_are_append_only" in definition[0]
+    finally:
+        con.close()
+
