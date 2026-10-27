@@ -1,6 +1,10 @@
 name: Deploy HamidCognition Production
 
 on:
+  pull_request:
+    paths:
+      - ".github/workflows/deploy-production.yml"
+      - "scripts/validate_deploy_domain.py"
   workflow_dispatch:
     inputs:
       domain:
@@ -16,7 +20,15 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  validate-domain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Exercise hostname validator against valid and adversarial inputs
+        run: python3 scripts/validate_deploy_domain.py --self-test
+
   deploy:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 30
@@ -25,6 +37,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+
+      - name: Validate deployment domain before any SSH operation
+        env:
+          DOMAIN: ${{ inputs.domain }}
+        run: python3 scripts/validate_deploy_domain.py "$DOMAIN"
 
       - name: Install SSH client
         run: sudo apt-get update && sudo apt-get install -y openssh-client
