@@ -52,22 +52,22 @@ headers = {"Content-Type": "application/json", "X-Agent-ID": "compose-agent", "X
 # Phase 1: evaluate only. The proxy deliberately does not execute the tool without a bound decision id.
 out = post(ENFORCEMENT + "/execute", payload["parameters"], headers)
 print("E2E_ENFORCEMENT_EVALUATE_RESPONSE", json.dumps(redact_for_log(out), sort_keys=True))
-assert out["enforced"] is True, out
+assert out["enforced"] is True, redact_for_log(out)
 did = out["decision"]["decision_id"]
 pre = get(BASE + "/v1/evidence/" + did + "?tenant_id=" + TENANT)
 print("E2E_PRE_EXECUTION_EVIDENCE", json.dumps(redact_for_log(pre), sort_keys=True))
-assert pre.get("execution") is None, pre
+assert pre.get("execution") is None, redact_for_log(pre)
 
 # Phase 2: bind the exact decision to the exact action and execute it through the enforcement boundary.
 execute_headers = {**headers, "X-HCJ-Decision-ID": did}
 executed = post(ENFORCEMENT + "/execute", payload["parameters"], execute_headers)
 print("E2E_ENFORCEMENT_EXECUTION_RESPONSE", json.dumps(redact_for_log(executed), sort_keys=True))
-assert executed.get("tool_executed") is True, executed
+assert executed.get("tool_executed") is True, redact_for_log(executed)
 
 evidence = get(BASE + "/v1/evidence/" + did + "?tenant_id=" + TENANT)
 print("E2E_POST_EXECUTION_EVIDENCE", json.dumps(redact_for_log(evidence), sort_keys=True))
-assert evidence.get("execution") is not None, evidence
-assert evidence["execution"].get("status") == "EXECUTED", evidence
-assert evidence["tenant_id"] == TENANT, evidence
-assert evidence["outcome"].get("tool_response", {}).get("tool_executed") is True, evidence
+assert evidence.get("execution") is not None, redact_for_log(evidence)
+assert evidence["execution"].get("status") == "EXECUTED", redact_for_log(evidence)
+assert evidence["tenant_id"] == TENANT, redact_for_log(evidence)
+assert evidence["outcome"].get("tool_response", {}).get("tool_executed") is True, redact_for_log(evidence)
 print("REAL_POSTGRES_E2E_SMOKE_PASS")
