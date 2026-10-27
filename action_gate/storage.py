@@ -142,7 +142,7 @@ def save_record(record: dict[str, Any], event_type: str, digest_fn, canonical_fn
         else:
             con.execute("INSERT INTO audit_events VALUES (?,?,?,?,?,?,?)", (event_id, record["decision_id"], event_type, canonical_fn(event), previous_hash, event_hash, timestamp))
             con.execute("INSERT INTO record_versions VALUES (?,?,?,?,?,?)", (version_id, record["decision_id"], version, event_type, canonical_fn(record), timestamp))
-            con.execute("INSERT OR REPLACE INTO records VALUES (?,?,?)", (record["decision_id"], record["trace_id"], canonical_fn(record)))
+            con.execute("INSERT INTO records VALUES (?,?,?) ON CONFLICT(decision_id) DO UPDATE SET trace_id=excluded.trace_id, record=excluded.record", (record["decision_id"], record["trace_id"], canonical_fn(record)))
         con.commit()
     except Exception:
         con.rollback()
