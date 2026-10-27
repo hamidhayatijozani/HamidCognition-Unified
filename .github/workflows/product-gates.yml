@@ -228,7 +228,7 @@ jobs:
           ORDER BY tgname;
           SQL
           )"
-          printf '%s\\n' "$trigger_names"
+          printf '%s\n' "$trigger_names"
           grep -qx 'audit_events_no_delete' <<< "$trigger_names"
           grep -qx 'audit_events_no_update' <<< "$trigger_names"
           function_definition="$(docker compose -f docker-compose.production.yml exec -T postgres sh -lc 'PGPASSWORD="$POSTGRES_PASSWORD" psql -h 127.0.0.1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 -At' <<'SQL'
