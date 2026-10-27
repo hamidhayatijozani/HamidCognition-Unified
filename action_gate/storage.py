@@ -205,7 +205,7 @@ def finalize_execution(record: dict[str, Any], nonce: str, consumed_at: str, dig
         if current.get("nonce") != nonce or current.get("consumed_at") is not None or current.get("execution_started_at") is None:
             con.rollback()
             return None
-        finalized = dict(record)
+        finalized = dict(current)
         finalized["execution"] = {"timestamp": consumed_at, "status": "EXECUTED", "action_hash": current["action_hash"], "nonce": nonce}
         finalized["outcome"] = outcome
         finalized["consumed_at"] = consumed_at
