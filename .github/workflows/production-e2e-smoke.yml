@@ -1,6 +1,7 @@
 name: Action Gate Production E2E Smoke
 on:
   workflow_dispatch:
+  pull_request:
   push:
     branches: [main]
 permissions:
@@ -64,7 +65,52 @@ jobs:
           ACTION_GATE_APPROVAL_SECRET: ci-only-approval-secret-not-for-production
           MCP_BEARER_TOKEN: ci-mcp-bearer-token
           DOMAIN: localhost
-        run: docker compose --env-file .env.ci -f docker-compose.production.yml exec -T action-gate python production_e2e_smoke.py
+        id: e2e
+        run: |
+          set -euo pipefail
+          output="$(docker compose --env-file .env.ci -f docker-compose.production.yml exec -T action-gate python production_e2e_smoke.py 2>&1 | tee /tmp/action-gate-e2e.log)"
+          decision_id="$(printf '%s\n' "$output" | sed -n 's/^E2E_DECISION_ID=//p' | tail -n 1)"
+          test -n "$decision_id" || { echo "E2E did not emit a decision id"; exit 1; }
+          echo "decision_id=$decision_id" >> "$GITHUB_OUTPUT"
+      - name: Restart Gate and verify PostgreSQL evidence persistence
+        working-directory: action_gate
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+          ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
+          ACTION_GATE_APPROVAL_SECRET: ci-only-approval-secret-not-for-production
+          MCP_BEARER_TOKEN: ci-mcp-bearer-token
+          DOMAIN: localhost
+          DECISION_ID: ${{ steps.e2e.outputs.decision_id }}
+        run: |
+          set -euo pipefail
+          docker compose --env-file .env.ci -f docker-compose.production.yml restart action-gate
+          ready=false
+          for attempt in $(seq 1 30); do
+            if docker compose --env-file .env.ci -f docker-compose.production.yml exec -T action-gate python -c "import json,urllib.request; d=json.load(urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)); assert d['status']=='ok' and d['storage']['backend']=='postgresql'"; then
+              ready=true
+              break
+            fi
+            sleep 2
+          done
+          test "$ready" = true || { echo "Action Gate did not recover with PostgreSQL after restart"; exit 1; }
+          docker compose --env-file .env.ci -f docker-compose.production.yml exec -T -e DECISION_ID="$DECISION_ID" -e ACTION_GATE_API_TOKEN="$ACTION_GATE_API_TOKEN" action-gate python - <<'PY'
+          import json, os, urllib.parse, urllib.request
+          decision_id = os.environ["DECISION_ID"]
+          tenant_id = "compose-tenant"
+          url = "http://127.0.0.1:8000/v1/evidence/" + urllib.parse.quote(decision_id, safe="") + "?tenant_id=" + urllib.parse.quote(tenant_id, safe="")
+          req = urllib.request.Request(url, headers={"Authorization": "Bearer " + os.environ["ACTION_GATE_API_TOKEN"]})
+          with urllib.request.urlopen(req, timeout=10) as response:
+              evidence = json.load(response)
+          assert evidence.get("decision_id") == decision_id, evidence
+          assert evidence.get("tenant_id") == tenant_id, evidence
+          assert evidence.get("execution", {}).get("status") == "EXECUTED", evidence
+          assert evidence.get("outcome", {}).get("tool_response", {}).get("tool_executed") is True, evidence
+          print("POSTGRES_RESTART_PERSISTENCE_PASS", json.dumps({"decision_id": decision_id, "execution_status": evidence["execution"]["status"], "tool_executed": True}, sort_keys=True))
+          PY
       - name: Dump container logs on failure
         if: failure()
         working-directory: action_gate

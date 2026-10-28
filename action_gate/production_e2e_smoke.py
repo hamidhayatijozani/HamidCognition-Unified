@@ -54,6 +54,7 @@ out = post(ENFORCEMENT + "/execute", payload["parameters"], headers)
 print("E2E_ENFORCEMENT_EVALUATE_RESPONSE", json.dumps(redact_for_log(out), sort_keys=True))
 assert out["enforced"] is True, redact_for_log(out)
 did = out["decision"]["decision_id"]
+print("E2E_DECISION_ID=" + did, flush=True)
 pre = get(BASE + "/v1/evidence/" + did + "?tenant_id=" + TENANT)
 print("E2E_PRE_EXECUTION_EVIDENCE", json.dumps(redact_for_log(pre), sort_keys=True))
 assert pre.get("execution") is None, redact_for_log(pre)
