@@ -25,6 +25,83 @@ def connect():
     return con
 
 
+def _ensure_postgres_audit_sequence(con) -> None:
+    """Add a durable insertion-order key, reconstructing the legacy hash chain first.
+
+    If existing rows do not form one unambiguous chain from GENESIS, abort startup
+    rather than silently blessing an ambiguous order.
+    """
+    present = con.execute(
+        "SELECT 1 FROM information_schema.columns "
+        "WHERE table_schema=current_schema() AND table_name='audit_events' "
+        "AND column_name='sequence_id'"
+    ).fetchone()
+    if present:
+        return
+
+    # The migration must backfill immutable legacy rows before the guards are
+    # recreated below. All DDL/data changes remain in this transaction.
+    con.execute("DROP TRIGGER IF EXISTS audit_events_no_update ON audit_events")
+    con.execute("DROP TRIGGER IF EXISTS audit_events_no_delete ON audit_events")
+    con.execute("ALTER TABLE audit_events ADD COLUMN sequence_id BIGINT")
+
+    rows = con.execute(
+        "SELECT event_id, previous_hash, event_hash FROM audit_events"
+    ).fetchall()
+    by_previous: dict[str, list[tuple[str, str, str]]] = {}
+    for row in rows:
+        by_previous.setdefault(row[1], []).append(row)
+
+    ordered: list[tuple[str, str, str]] = []
+    previous_hash = "GENESIS"
+    while previous_hash in by_previous:
+        candidates = by_previous.pop(previous_hash)
+        if len(candidates) != 1:
+            raise RuntimeError("audit_chain_legacy_fork_detected")
+        row = candidates[0]
+        ordered.append(row)
+        previous_hash = row[2]
+
+    if by_previous or len(ordered) != len(rows):
+        raise RuntimeError("audit_chain_legacy_disconnected_or_forked")
+
+    for sequence_id, row in enumerate(ordered, start=1):
+        con.execute(
+            "UPDATE audit_events SET sequence_id=%s WHERE event_id=%s",
+            (sequence_id, row[0]),
+        )
+
+    con.execute("CREATE SEQUENCE IF NOT EXISTS action_gate_audit_sequence_id_seq")
+    con.execute(
+        "SELECT setval('action_gate_audit_sequence_id_seq', "
+        "COALESCE(MAX(sequence_id), 1), COALESCE(MAX(sequence_id), 0) > 0) "
+        "FROM audit_events"
+    )
+    con.execute(
+        "ALTER TABLE audit_events ALTER COLUMN sequence_id "
+        "SET DEFAULT nextval('action_gate_audit_sequence_id_seq')"
+    )
+    con.execute(
+        "ALTER SEQUENCE action_gate_audit_sequence_id_seq "
+        "OWNED BY audit_events.sequence_id"
+    )
+    con.execute("ALTER TABLE audit_events ALTER COLUMN sequence_id SET NOT NULL")
+    con.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS audit_events_sequence_id_uidx "
+        "ON audit_events(sequence_id)"
+    )
+
+
+def _latest_audit_hash(con):
+    if backend() == "postgresql":
+        return con.execute(
+            "SELECT event_hash FROM audit_events ORDER BY sequence_id DESC LIMIT 1"
+        ).fetchone()
+    return con.execute(
+        "SELECT event_hash FROM audit_events ORDER BY rowid DESC LIMIT 1"
+    ).fetchone()
+
+
 def init_db() -> None:
     con = connect()
     try:
@@ -38,7 +115,8 @@ def init_db() -> None:
         con.execute("CREATE TABLE IF NOT EXISTS authority_nonces (nonce TEXT PRIMARY KEY, decision_id TEXT NOT NULL, consumed_at TEXT NOT NULL)")
         con.execute("CREATE TABLE IF NOT EXISTS execution_reconciliations (reconciliation_id TEXT PRIMARY KEY, decision_id TEXT NOT NULL UNIQUE, tenant_id TEXT NOT NULL, nonce TEXT NOT NULL, resolution TEXT NOT NULL, outcome TEXT NOT NULL, created_at TEXT NOT NULL, resolved_at TEXT NOT NULL)")
         con.execute("CREATE TABLE IF NOT EXISTS state_snapshots (snapshot_id TEXT PRIMARY KEY, world_version TEXT UNIQUE NOT NULL, snapshot_hash TEXT NOT NULL, snapshot TEXT NOT NULL, committed_at TEXT NOT NULL)")
-        con.commit()
+        if backend() == "postgresql":
+            _ensure_postgres_audit_sequence(con)
         if backend() == "sqlite":
             con.execute("CREATE TRIGGER IF NOT EXISTS audit_events_no_update BEFORE UPDATE ON audit_events BEGIN SELECT RAISE(ABORT, 'audit_events_are_append_only'); END")
             con.execute("CREATE TRIGGER IF NOT EXISTS audit_events_no_delete BEFORE DELETE ON audit_events BEGIN SELECT RAISE(ABORT, 'audit_events_are_append_only'); END")
@@ -140,11 +218,11 @@ def save_record(record: dict[str, Any], event_type: str, digest_fn, canonical_fn
             con.execute("SELECT pg_advisory_xact_lock(%s)", (2147483000,))
             con.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", (record["decision_id"],))
             current = con.execute("SELECT COALESCE(MAX(version), 0) FROM record_versions WHERE decision_id=%s", (record["decision_id"],)).fetchone()[0]
-            previous = con.execute("SELECT event_hash FROM audit_events ORDER BY created_at DESC, event_id DESC LIMIT 1").fetchone()
+            previous = _latest_audit_hash(con)
         else:
             con.execute("BEGIN IMMEDIATE")
             current = con.execute("SELECT COALESCE(MAX(version), 0) FROM record_versions WHERE decision_id=?", (record["decision_id"],)).fetchone()[0]
-            previous = con.execute("SELECT event_hash FROM audit_events ORDER BY rowid DESC LIMIT 1").fetchone()
+            previous = _latest_audit_hash(con)
         version = current + 1
         previous_hash = previous[0] if previous else "GENESIS"
         event = {"decision": record["decision"], "tenant_id": record["tenant_id"], "action_hash": record["action_hash"], "version": version}
@@ -154,7 +232,7 @@ def save_record(record: dict[str, Any], event_type: str, digest_fn, canonical_fn
         version_id = f"ver_{uuid.uuid4().hex}"
         timestamp = now_fn()
         if backend() == "postgresql":
-            con.execute("INSERT INTO audit_events VALUES (%s,%s,%s,%s,%s,%s,%s)", (event_id, record["decision_id"], event_type, canonical_fn(event), previous_hash, event_hash, timestamp))
+            con.execute("INSERT INTO audit_events (event_id, decision_id, event_type, event, previous_hash, event_hash, created_at) VALUES (%s,%s,%s,%s,%s,%s,%s)", (event_id, record["decision_id"], event_type, canonical_fn(event), previous_hash, event_hash, timestamp))
             con.execute("INSERT INTO record_versions VALUES (%s,%s,%s,%s,%s,%s)", (version_id, record["decision_id"], version, event_type, canonical_fn(record), timestamp))
             con.execute("INSERT INTO records VALUES (%s,%s,%s) ON CONFLICT (decision_id) DO UPDATE SET trace_id=EXCLUDED.trace_id, record=EXCLUDED.record", (record["decision_id"], record["trace_id"], canonical_fn(record)))
         else:
@@ -231,9 +309,7 @@ def finalize_execution(record: dict[str, Any], nonce: str, consumed_at: str, dig
             "SELECT COALESCE(MAX(version), 0) FROM record_versions WHERE decision_id=" + ("%s" if backend() == "postgresql" else "?"),
             (decision_id,),
         ).fetchone()[0]
-        previous = con.execute(
-            "SELECT event_hash FROM audit_events ORDER BY created_at DESC, event_id DESC LIMIT 1"
-        ).fetchone()
+        previous = _latest_audit_hash(con)
         version = current_version + 1
         previous_hash = previous[0] if previous else "GENESIS"
         event = {"decision": finalized["decision"], "tenant_id": finalized["tenant_id"], "action_hash": finalized["action_hash"], "version": version}
@@ -305,7 +381,7 @@ def reconcile_execution(record: dict[str, Any], nonce: str, resolved_at: str, re
             "SELECT COALESCE(MAX(version), 0) FROM record_versions WHERE decision_id=" + ("%s" if backend() == "postgresql" else "?"),
             (decision_id,),
         ).fetchone()[0]
-        previous = con.execute("SELECT event_hash FROM audit_events ORDER BY created_at DESC, event_id DESC LIMIT 1").fetchone()
+        previous = _latest_audit_hash(con)
         version = current_version + 1
         previous_hash = previous[0] if previous else "GENESIS"
         event = {"decision": finalized["decision"], "tenant_id": finalized["tenant_id"], "action_hash": finalized["action_hash"], "version": version, "resolution": resolution}
