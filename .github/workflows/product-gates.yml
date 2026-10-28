@@ -301,6 +301,50 @@ jobs:
           assert rows[0][1] == expected_previous, rows
           assert rows[1][1] == rows[0][2], rows
           print("POSTGRES_AUDIT_SEQUENCE_TIED_TIMESTAMP_PASS")
+
+          # Exercise the upgrade path against a legacy table with rows inserted
+          # out of chain order. A migration must follow previous_hash, not row order.
+          schema = "ag_legacy_migration_" + uuid.uuid4().hex
+          con = storage.connect()
+          try:
+              con.execute(f'CREATE SCHEMA "{schema}"')
+              con.execute(f'SET search_path TO "{schema}", public')
+              con.execute(
+                  "CREATE TABLE audit_events (event_id TEXT PRIMARY KEY, decision_id TEXT, "
+                  "event_type TEXT NOT NULL, event TEXT NOT NULL, previous_hash TEXT NOT NULL, "
+                  "event_hash TEXT NOT NULL, created_at TEXT NOT NULL)"
+              )
+              con.execute(
+                  "INSERT INTO audit_events VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                  ("evt-b", "d-b", "TEST", "{}", "hash-a", "hash-b", stamp),
+              )
+              con.execute(
+                  "INSERT INTO audit_events VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                  ("evt-a", "d-a", "TEST", "{}", "GENESIS", "hash-a", stamp),
+              )
+              storage._ensure_postgres_audit_sequence(con)
+              migrated = con.execute(
+                  "SELECT event_id, sequence_id FROM audit_events ORDER BY sequence_id"
+              ).fetchall()
+              assert migrated == [("evt-a", 1), ("evt-b", 2)], migrated
+              con.execute(
+                  "INSERT INTO audit_events (event_id, decision_id, event_type, event, previous_hash, event_hash, created_at) "
+                  "VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                  ("evt-c", "d-c", "TEST", "{}", "hash-b", "hash-c", stamp),
+              )
+              next_sequence = con.execute(
+                  "SELECT sequence_id FROM audit_events WHERE event_id='evt-c'"
+              ).fetchone()[0]
+              assert next_sequence == 3, next_sequence
+              con.execute("SET search_path TO public")
+              con.execute(f'DROP SCHEMA "{schema}" CASCADE')
+              con.commit()
+          except Exception:
+              con.rollback()
+              raise
+          finally:
+              con.close()
+          print("POSTGRES_LEGACY_AUDIT_SEQUENCE_MIGRATION_PASS")
           PY
 
       - name: Initialize production State Oracle
