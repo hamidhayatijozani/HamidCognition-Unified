@@ -39,6 +39,66 @@ def test_production_compose_uses_postgres_and_tls():
     assert "reverse_proxy enforcement:8080" in caddy
 
 
+def test_postgres_audit_chain_sequence_is_monotonic_for_equal_timestamps():
+    """Exercise the production PostgreSQL chain ordering under a tied timestamp."""
+    import hashlib
+    import uuid
+    import pytest
+
+    database_url = os.getenv("ACTION_GATE_DATABASE_URL", "")
+    if not database_url.startswith(("postgresql://", "postgres://")):
+        pytest.skip("requires the PostgreSQL integration environment")
+
+    import storage
+
+    storage.DATABASE_URL = database_url
+    storage.init_db()
+    prefix = "audit-sequence-" + uuid.uuid4().hex
+    stamp = "2026-10-28T00:00:00+00:00"
+
+    def canonical(value):
+        return json.dumps(
+            value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False
+        )
+
+    def digest(value):
+        return hashlib.sha256(canonical(value).encode("utf-8")).hexdigest()
+
+    con = storage.connect()
+    try:
+        previous = con.execute(
+            "SELECT event_hash FROM audit_events ORDER BY sequence_id DESC LIMIT 1"
+        ).fetchone()
+        expected_previous = previous[0] if previous else "GENESIS"
+    finally:
+        con.close()
+
+    ids = [prefix + "-a", prefix + "-b"]
+    for decision_id in ids:
+        record = {
+            "decision_id": decision_id,
+            "trace_id": decision_id,
+            "tenant_id": "integration-test",
+            "decision": "ALLOW",
+            "action_hash": digest({"decision_id": decision_id}),
+        }
+        storage.save_record(record, "AUDIT_SEQUENCE_TEST", digest, canonical, lambda: stamp)
+
+    con = storage.connect()
+    try:
+        rows = con.execute(
+            "SELECT decision_id, previous_hash, event_hash FROM audit_events "
+            "WHERE decision_id IN (%s, %s) ORDER BY sequence_id ASC",
+            (ids[0], ids[1]),
+        ).fetchall()
+    finally:
+        con.close()
+
+    assert [row[0] for row in rows] == ids
+    assert rows[0][1] == expected_previous
+    assert rows[1][1] == rows[0][2]
+
+
 def test_postgres_audit_mutation_triggers_are_installed_when_configured():
     """Regression check for PostgreSQL append-only audit protection.
 
