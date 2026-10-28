@@ -134,8 +134,21 @@ def _verify_live_world_binding(authority: Authority, tenant_id: str, payload: di
         request_record = record.get("request")
         if not isinstance(request_record, dict):
             raise AuthorityError("world_revalidation_evidence_mismatch")
+        # MCP forwards a JSON-RPC envelope to the protected tool; bind both
+        # the selected tool and its arguments to the original Gate request.
+        if payload.get("jsonrpc") == "2.0" and payload.get("method") == "tools/call":
+            call_params = payload.get("params")
+            if not isinstance(call_params, dict) or call_params.get("name") != request_record.get("action"):
+                raise AuthorityError("action_binding_mismatch")
+            actual_parameters = call_params.get("arguments")
+            if not isinstance(actual_parameters, dict):
+                raise AuthorityError("action_parameters_mismatch")
+            if actual_parameters.get("target") != request_record.get("target"):
+                raise AuthorityError("action_parameters_mismatch")
+        else:
+            actual_parameters = payload
         expected_parameters = request_record.get("parameters", {})
-        if not isinstance(expected_parameters, dict) or expected_parameters != payload:
+        if not isinstance(expected_parameters, dict) or expected_parameters != actual_parameters:
             raise AuthorityError("action_parameters_mismatch")
 
     issued_world = record.get("world_version")
