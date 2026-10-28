@@ -89,7 +89,7 @@ def _claim_nonce(nonce: str, decision_id: str, expires_at: int) -> None:
     finally:
         con.close()
 
-def _verify_live_world_binding(authority: Authority, tenant_id: str, payload: dict, action_digest: str | None, policy_digest: str | None) -> None:
+def _verify_live_world_binding(authority: Authority, tenant_id: str, payload: dict | None = None, action_digest: str | None = None, policy_digest: str | None = None) -> None:
     """Fail closed unless the signed decision is bound to the current execution world."""
     if not WORLD_REVALIDATION_ENABLED:
         raise AuthorityError("world_revalidation_not_configured")
@@ -126,16 +126,17 @@ def _verify_live_world_binding(authority: Authority, tenant_id: str, payload: di
     # Bind the actual tool payload to the Gate's persisted, signed decision.
     # The digest header alone is not sufficient: a caller could otherwise keep
     # the original digest while substituting different tool arguments.
-    if record.get("action_hash") != authority.action_digest or record.get("action_hash") != action_digest:
-        raise AuthorityError("action_binding_mismatch")
-    if record.get("policy_hash") != policy_digest:
-        raise AuthorityError("policy_binding_mismatch")
-    request_record = record.get("request")
-    if not isinstance(request_record, dict):
-        raise AuthorityError("world_revalidation_evidence_mismatch")
-    expected_parameters = request_record.get("parameters", {})
-    if not isinstance(expected_parameters, dict) or expected_parameters != payload:
-        raise AuthorityError("action_parameters_mismatch")
+    if payload is not None:
+        if record.get("action_hash") != authority.action_digest or record.get("action_hash") != action_digest:
+            raise AuthorityError("action_binding_mismatch")
+        if record.get("policy_hash") != policy_digest:
+            raise AuthorityError("policy_binding_mismatch")
+        request_record = record.get("request")
+        if not isinstance(request_record, dict):
+            raise AuthorityError("world_revalidation_evidence_mismatch")
+        expected_parameters = request_record.get("parameters", {})
+        if not isinstance(expected_parameters, dict) or expected_parameters != payload:
+            raise AuthorityError("action_parameters_mismatch")
 
     issued_world = record.get("world_version")
     if not isinstance(issued_world, (str, int)) or isinstance(issued_world, bool) or str(issued_world) == "":
@@ -172,7 +173,7 @@ def verify_execution_authority(token: str | None, tenant_id: str | None, payload
         raise AuthorityError("policy_binding_mismatch")
     if "tenant_id" in payload and payload.get("tenant_id") != tenant_id:
         raise AuthorityError("tenant_mismatch")
-    _verify_live_world_binding(authority, tenant_id, payload, action_digest, policy_digest)
+    _verify_live_world_binding(authority, tenant_id, payload, bound_action_digest, bound_policy_digest)
     _claim_nonce(authority.nonce, authority.decision_id, authority.expires_at)
 
 class Tool(BaseHTTPRequestHandler):
