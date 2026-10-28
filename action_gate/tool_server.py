@@ -145,7 +145,19 @@ def _verify_live_world_binding(authority: Authority, tenant_id: str, payload: di
                 raise AuthorityError("action_parameters_mismatch")
             if actual_parameters.get("target") != request_record.get("target"):
                 raise AuthorityError("action_parameters_mismatch")
+        elif (
+            payload.get("tenant_id") == tenant_id
+            and isinstance(payload.get("action"), str)
+            and isinstance(payload.get("target"), str)
+            and isinstance(payload.get("parameters"), dict)
+        ):
+            # The authenticated MCP server uses a small signed execution
+            # envelope rather than forwarding its JSON-RPC message directly.
+            if payload["action"] != request_record.get("action") or payload["target"] != request_record.get("target"):
+                raise AuthorityError("action_binding_mismatch")
+            actual_parameters = payload["parameters"]
         else:
+            # HTTP enforcement forwards the original tool arguments as the body.
             actual_parameters = payload
         expected_parameters = request_record.get("parameters", {})
         if not isinstance(expected_parameters, dict) or expected_parameters != actual_parameters:
