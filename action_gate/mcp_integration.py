@@ -261,7 +261,7 @@ try:
     try:
         urllib.request.urlopen(urllib.request.Request(
             "http://127.0.0.1:9000",
-            data=b"{}",
+            data=json.dumps({"target": "/public/context-race.txt"}).encode(),
             headers=stale_tool_headers,
         ))
         raise AssertionError("stale signed authority unexpectedly reached protected tool")
