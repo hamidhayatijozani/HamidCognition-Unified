@@ -322,7 +322,7 @@ def finalize_execution(record: dict[str, Any], nonce: str, consumed_at: str, dig
         event_json = canonical_fn(event)
         record_json = canonical_fn(finalized)
         if backend() == "postgresql":
-            con.execute("INSERT INTO audit_events VALUES (%s,%s,%s,%s,%s,%s,%s)", (event_id, decision_id, "EXECUTION_RECORDED", event_json, previous_hash, event_hash, timestamp))
+            con.execute("INSERT INTO audit_events (event_id, decision_id, event_type, event, previous_hash, event_hash, created_at) VALUES (%s,%s,%s,%s,%s,%s,%s)", (event_id, decision_id, "EXECUTION_RECORDED", event_json, previous_hash, event_hash, timestamp))
             con.execute("INSERT INTO record_versions VALUES (%s,%s,%s,%s,%s,%s)", (version_id, decision_id, version, "EXECUTION_RECORDED", record_json, timestamp))
             updated = con.execute(
                 "UPDATE records SET trace_id=%s, record=%s WHERE decision_id=%s AND (record::jsonb->>'nonce')=%s AND (record::jsonb->>'consumed_at') IS NULL AND (record::jsonb->>'execution_started_at') IS NOT NULL RETURNING decision_id",
@@ -397,7 +397,7 @@ def reconcile_execution(record: dict[str, Any], nonce: str, resolved_at: str, re
         outcome_json = canonical_fn(outcome)
         if backend() == "postgresql":
             con.execute("INSERT INTO execution_reconciliations VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (reconciliation_id, decision_id, finalized["tenant_id"], nonce, resolution, outcome_json, timestamp, resolved_at))
-            con.execute("INSERT INTO audit_events VALUES (%s,%s,%s,%s,%s,%s,%s)", (event_id, decision_id, "EXECUTION_RECONCILED", event_json, previous_hash, event_hash, timestamp))
+            con.execute("INSERT INTO audit_events (event_id, decision_id, event_type, event, previous_hash, event_hash, created_at) VALUES (%s,%s,%s,%s,%s,%s,%s)", (event_id, decision_id, "EXECUTION_RECONCILED", event_json, previous_hash, event_hash, timestamp))
             con.execute("INSERT INTO record_versions VALUES (%s,%s,%s,%s,%s,%s)", (version_id, decision_id, version, "EXECUTION_RECONCILED", record_json, timestamp))
             updated = con.execute("UPDATE records SET trace_id=%s, record=%s WHERE decision_id=%s AND (record::jsonb->>'nonce')=%s AND (record::jsonb->>'consumed_at') IS NULL AND (record::jsonb->>'execution_started_at') IS NOT NULL AND (record::jsonb->'reconciliation') IS NULL RETURNING decision_id", (finalized["trace_id"], record_json, decision_id, nonce)).fetchone()
         else:
