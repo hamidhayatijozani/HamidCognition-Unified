@@ -130,6 +130,32 @@ try:
         assert e.code == 403
         assert body["diagnostic"] == "policy_binding_mismatch"
 
+    # A signed authority must not permit changing the tool payload while keeping
+    # the original action digest. The failed mutation must not consume the nonce.
+    bound_headers = {**wrong_policy_headers, "X-HCJ-Policy-Hash": gate["policy_hash"]}
+    altered_payload = json.dumps({"target": "/production/data.db"}).encode()
+    try:
+        urllib.request.urlopen(urllib.request.Request(
+            "http://127.0.0.1:9000",
+            data=altered_payload,
+            headers=bound_headers,
+        ))
+        raise AssertionError("modified tool payload unexpectedly executed")
+    except urllib.error.HTTPError as e:
+        body = json.loads(e.read())
+        assert e.code == 403
+        assert body["diagnostic"] == "action_parameters_mismatch"
+
+    # The original payload remains executable once, proving rejection did not
+    # burn the authority nonce before all bindings were checked.
+    with urllib.request.urlopen(urllib.request.Request(
+        "http://127.0.0.1:9000",
+        data=json.dumps({"target": "/public/policy-check.txt"}).encode(),
+        headers=bound_headers,
+    )) as response:
+        assert response.status == 200
+        assert json.loads(response.read())["tool_executed"] is True
+
     # MCP must reject unsupported methods before any tool execution path is reached.
     status, unsupported = call({"jsonrpc": "2.0", "id": 3, "method": "resources/read", "params": {"uri": "file:///public/info.txt"}})
     assert status == 400
@@ -235,7 +261,7 @@ try:
     try:
         urllib.request.urlopen(urllib.request.Request(
             "http://127.0.0.1:9000",
-            data=b"{}",
+            data=json.dumps({"target": "/public/context-race.txt"}).encode(),
             headers=stale_tool_headers,
         ))
         raise AssertionError("stale signed authority unexpectedly reached protected tool")

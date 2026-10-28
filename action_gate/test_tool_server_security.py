@@ -16,7 +16,7 @@ def mint(decision="ALLOW", now=None):
 
 def setup(monkeypatch, tmp_path):
     monkeypatch.setattr(tool_server, "AUTHORITY_SECRET", SECRET.decode())
-    monkeypatch.setattr(tool_server, "_verify_live_world_binding", lambda authority, tenant_id: None)
+    monkeypatch.setattr(tool_server, "_verify_live_world_binding", lambda authority, tenant_id, *args: None)
     monkeypatch.setattr(tool_server, "TOOL_NONCE_DB", str(tmp_path / "nonce.db"))
 
 

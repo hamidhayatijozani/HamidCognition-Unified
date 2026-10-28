@@ -89,7 +89,7 @@ def _claim_nonce(nonce: str, decision_id: str, expires_at: int) -> None:
     finally:
         con.close()
 
-def _verify_live_world_binding(authority: Authority, tenant_id: str) -> None:
+def _verify_live_world_binding(authority: Authority, tenant_id: str, payload: dict | None = None, action_digest: str | None = None, policy_digest: str | None = None) -> None:
     """Fail closed unless the signed decision is bound to the current execution world."""
     if not WORLD_REVALIDATION_ENABLED:
         raise AuthorityError("world_revalidation_not_configured")
@@ -122,6 +122,46 @@ def _verify_live_world_binding(authority: Authority, tenant_id: str) -> None:
         raise AuthorityError("world_revalidation_evidence_mismatch")
     if record.get("nonce") != authority.nonce or record.get("decision_id") != authority.decision_id:
         raise AuthorityError("world_revalidation_authority_mismatch")
+
+    # Bind the actual tool payload to the Gate's persisted, signed decision.
+    # The digest header alone is not sufficient: a caller could otherwise keep
+    # the original digest while substituting different tool arguments.
+    if payload is not None:
+        if record.get("action_hash") != authority.action_digest or record.get("action_hash") != action_digest:
+            raise AuthorityError("action_binding_mismatch")
+        if record.get("policy_hash") != policy_digest:
+            raise AuthorityError("policy_binding_mismatch")
+        request_record = record.get("request")
+        if not isinstance(request_record, dict):
+            raise AuthorityError("world_revalidation_evidence_mismatch")
+        # MCP forwards a JSON-RPC envelope to the protected tool; bind both
+        # the selected tool and its arguments to the original Gate request.
+        if payload.get("jsonrpc") == "2.0" and payload.get("method") == "tools/call":
+            call_params = payload.get("params")
+            if not isinstance(call_params, dict) or call_params.get("name") != request_record.get("action"):
+                raise AuthorityError("action_binding_mismatch")
+            actual_parameters = call_params.get("arguments")
+            if not isinstance(actual_parameters, dict):
+                raise AuthorityError("action_parameters_mismatch")
+            if actual_parameters.get("target") != request_record.get("target"):
+                raise AuthorityError("action_parameters_mismatch")
+        elif (
+            payload.get("tenant_id") == tenant_id
+            and isinstance(payload.get("action"), str)
+            and isinstance(payload.get("target"), str)
+            and isinstance(payload.get("parameters"), dict)
+        ):
+            # The authenticated MCP server uses a small signed execution
+            # envelope rather than forwarding its JSON-RPC message directly.
+            if payload["action"] != request_record.get("action") or payload["target"] != request_record.get("target"):
+                raise AuthorityError("action_binding_mismatch")
+            actual_parameters = payload["parameters"]
+        else:
+            # HTTP enforcement forwards the original tool arguments as the body.
+            actual_parameters = payload
+        expected_parameters = request_record.get("parameters", {})
+        if not isinstance(expected_parameters, dict) or expected_parameters != actual_parameters:
+            raise AuthorityError("action_parameters_mismatch")
 
     issued_world = record.get("world_version")
     if not isinstance(issued_world, (str, int)) or isinstance(issued_world, bool) or str(issued_world) == "":
@@ -158,7 +198,7 @@ def verify_execution_authority(token: str | None, tenant_id: str | None, payload
         raise AuthorityError("policy_binding_mismatch")
     if "tenant_id" in payload and payload.get("tenant_id") != tenant_id:
         raise AuthorityError("tenant_mismatch")
-    _verify_live_world_binding(authority, tenant_id)
+    _verify_live_world_binding(authority, tenant_id, payload, bound_action_digest, bound_policy_digest)
     _claim_nonce(authority.nonce, authority.decision_id, authority.expires_at)
 
 class Tool(BaseHTTPRequestHandler):
