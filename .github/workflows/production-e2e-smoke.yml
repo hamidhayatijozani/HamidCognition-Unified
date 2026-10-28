@@ -77,6 +77,13 @@ jobs:
         env:
           POSTGRES_PASSWORD: ci-postgres-password
           ACTION_GATE_API_TOKEN: ci-action-gate-token
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+          ACTION_GATE_ENFORCEMENT_SECRET: ci-enforcement-secret
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
+          ACTION_GATE_APPROVAL_SECRET: ci-only-approval-secret-not-for-production
+          MCP_BEARER_TOKEN: ci-mcp-bearer-token
+          DOMAIN: localhost
           DECISION_ID: ${{ steps.e2e.outputs.decision_id }}
         run: |
           set -euo pipefail
