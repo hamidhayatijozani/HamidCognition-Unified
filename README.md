@@ -26,11 +26,19 @@ AI agents increasingly have the ability to call APIs, MCP tools, databases, clou
 - Gate-issued execution authority
 - single-use nonce and replay protection
 - HTTP and MCP enforcement
-- fail-closed evidence handling
+- evidence handling with explicit decision records
 - persistent PostgreSQL operation
 - audit and replay evidence
 - protected-tool acceptance tests
 - self-hosted, managed and enterprise delivery
+
+## Reproduce
+
+Tests run against local fixtures — no production database or live tools required.
+
+## Status
+
+Concurrent nonce uniqueness hardening merged in PR #233; the PR's PostgreSQL contention workflow passed.
 
 ## Commercial release state
 
@@ -53,6 +61,11 @@ See SALES/ONE_PAGER.md, SALES/ICP_AND_POSITIONING.md, SALES/PILOT_OFFER.md, SALE
 ## Product boundary
 
 Action Gate is a pre-execution authorization and evidence boundary. It does not claim universal AI safety, universal policy correctness, regulatory certification, downstream correctness, or guaranteed business outcomes.
+
+## Coverage boundaries
+- In scope: tool-call binding, single-use authority, evidence persistence, tenant isolation
+- Out of scope: model alignment, prompt-injection defense, rate limiting, cost governance
+- Not production-hardened: no SLA, no load testing claims
 
 ## Delivery models
 
