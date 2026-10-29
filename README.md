@@ -91,3 +91,7 @@ Public repository visibility does not by itself grant an open-source license or 
 ## Citation
 
 For the integrated project, cite **Hamid Hayati Jozani — HamidCognition-Unified** and include the exact release or commit when reproducibility matters.
+
+## Last validated published release
+
+The last validated published commercial release is **v1.1.1**, published as the immutable GitHub release `action-gate-v1.1.1` at source commit `e9ea7565f4ddea91f5c45104237bd20564c80894`.
