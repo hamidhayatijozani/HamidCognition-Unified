@@ -34,7 +34,7 @@ AI agents can call APIs, MCP tools, databases, cloud systems and other privilege
 
 - v0.4.2: 80 tests, HTTP + MCP enforcement integration pass (local).
 - PostgreSQL evidence persistence across restart: PR #232.
-- Concurrent nonce uniqueness: hardening in PR #233.
+- Concurrent nonce uniqueness: PostgreSQL contention check merged in PR #233.
 
 These statements describe the named test and change evidence only. They do not establish customer acceptance, a customer deployment, or revenue.
 
