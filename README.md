@@ -26,7 +26,7 @@ AI agents increasingly have the ability to call APIs, MCP tools, databases, clou
 - Gate-issued execution authority
 - single-use nonce and replay protection
 - HTTP and MCP enforcement
-- evidence handling with explicit decision records
+- fail-closed evidence handling
 - persistent PostgreSQL operation
 - audit and replay evidence
 - protected-tool acceptance tests
