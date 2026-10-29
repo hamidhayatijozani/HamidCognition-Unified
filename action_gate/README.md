@@ -14,7 +14,7 @@ Runtime decisions: `ALLOW`, `DENY`, `ASK`, `SANDBOX`. `DEFER` remains outside th
 
 ## Enforced controls
 
-- production authentication is fail-closed when configuration is missing
+- production authentication rejects requests when required configuration is missing
 - tenant-bound evidence access and cross-tenant denial
 - immutable policy snapshot plus policy hash inside each decision record
 - action hash bound to tenant, actor, action, target and parameters
@@ -112,6 +112,14 @@ Caddy terminates HTTPS and obtains certificates for the configured domain. Postg
 
 Do not commit production secrets. For rotation, configure `ACTION_GATE_SIGNING_KEYS` as a JSON object of key IDs to secrets and set `ACTION_GATE_KEY_ID` to the active key. Existing decisions remain verifiable while their key remains configured.
 
+## Reproduce
+
+Tests run against local fixtures — no production database or live tools required.
+
+## Status
+
+Concurrent nonce uniqueness hardening merged in PR #233; the PostgreSQL contention workflow passed on that PR's head commit.
+
 ## Integration tests
 
 ```bash
@@ -121,6 +129,11 @@ pytest -q
 ```
 
 The integration gates exercise real processes rather than mocks. They cover denied actions, allowed execution, exact action binding, forged decisions, one-time nonce replay and direct-tool bypass rejection. `test_production_storage.py` verifies the storage abstraction and production deployment configuration.
+
+## Coverage boundaries
+- In scope: tool-call binding, single-use authority, evidence persistence, tenant isolation
+- Out of scope: model alignment, prompt-injection defense, rate limiting, cost governance
+- Not production-hardened: no SLA, no load testing claims
 
 ## Current product boundary
 
