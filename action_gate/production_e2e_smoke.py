@@ -3,7 +3,10 @@ import socket
 import time
 import urllib.request
 import urllib.error
+import uuid
+from concurrent.futures import ThreadPoolExecutor
 
+import storage
 from log_redaction import redact_for_log
 
 TOKEN = "ci-action-gate-token"
@@ -45,6 +48,58 @@ except urllib.error.HTTPError as exc:
 
 health = get(BASE + "/health")
 assert health["status"] == "ok" and health["storage"]["backend"] == "postgresql", health
+assert storage.backend() == "postgresql", "nonce_race_requires_real_postgresql"
+
+# Exercise the actual PostgreSQL conditional UPDATE under contention. A successful
+# claim must be unique even when many requests race across independent connections.
+race_id = "ci-nonce-race-" + uuid.uuid4().hex
+race_nonce = "nonce-" + uuid.uuid4().hex
+race_record = {
+    "decision_id": race_id,
+    "trace_id": race_id,
+    "nonce": race_nonce,
+    "consumed_at": None,
+}
+con = storage.connect()
+try:
+    con.execute(
+        "INSERT INTO records(decision_id, trace_id, record) VALUES (%s, %s, %s)",
+        (race_id, race_id, json.dumps(race_record, separators=(",", ":"))),
+    )
+    con.commit()
+finally:
+    con.close()
+
+try:
+    with ThreadPoolExecutor(max_workers=16) as pool:
+        claims = list(pool.map(
+            lambda i: storage.consume_nonce(
+                race_id, race_nonce, f"2026-10-29T00:00:{i:02d}+00:00"
+            ),
+            range(16),
+        ))
+    assert claims.count(True) == 1, {"successful_claims": claims.count(True), "claims": claims}
+    assert claims.count(False) == 15, {"rejected_claims": claims.count(False), "claims": claims}
+    con = storage.connect()
+    try:
+        row = con.execute(
+            "SELECT record::jsonb->>'consumed_at' FROM records WHERE decision_id=%s",
+            (race_id,),
+        ).fetchone()
+    finally:
+        con.close()
+    assert row and row[0], "nonce_claim_was_not_persisted"
+    print("POSTGRES_NONCE_CONCURRENCY_PASS", json.dumps({
+        "workers": len(claims), "successful_claims": claims.count(True),
+        "rejected_claims": claims.count(False), "persisted": True,
+    }, sort_keys=True))
+finally:
+    con = storage.connect()
+    try:
+        con.execute("DELETE FROM records WHERE decision_id=%s", (race_id,))
+        con.commit()
+    finally:
+        con.close()
 
 payload = {"tenant_id": TENANT, "agent_id": "compose-agent", "actor_id": "compose-actor", "session_id": "compose-session", "action": "read_public_file", "target": "/public/info.txt", "parameters": {}}
 headers = {"Content-Type": "application/json", "X-Agent-ID": "compose-agent", "X-Actor-ID": "compose-actor", "X-Session-ID": "compose-session", "X-Tenant-ID": TENANT, "X-Action": "read_public_file", "X-Action-Target": "/public/info.txt"}
