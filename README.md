@@ -30,6 +30,14 @@ AI agents can call APIs, MCP tools, databases, cloud systems and other privilege
 - protected-tool acceptance tests
 - self-hosted, managed and enterprise delivery
 
+## Commercial release state
+
+The current published product version is **HamidCognition Action Gate v1.1.1**, sourced from `action_gate/VERSION`.
+
+The latest published release is **v1.1.1**, published as GitHub release `action-gate-v1.1.1`.
+
+See `PRODUCT/CURRENT_COMMERCIAL_RELEASE.md` for release-control details.
+
 ## Status
 
 - v0.4.2: 80 tests, HTTP + MCP enforcement integration pass (local).
