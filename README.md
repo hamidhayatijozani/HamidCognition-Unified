@@ -4,17 +4,17 @@
 
 The current architecture is being unified under BESAZ as the project-level coordination system.
 
-**Runtime authorization and execution governance for AI agents.**
+**Execution gate for AI agents: every tool call bound to a decision, single-use authority nonce, evidence trail.**
 
-HamidCognition Action Gate is a deployable control boundary between an AI agent and protected tools:
+HamidCognition Action Gate is a control boundary between an AI agent and protected tools:
 
 **Agent → Action Gate → Protected Tool**
 
-It evaluates an action before execution, binds authorization to the relevant tenant/actor/session/action context, records evidence, and allows the protected tool to execute only through the governed path.
+It evaluates an action before execution, binds authorization to the relevant tenant/actor/session/action context, records evidence, and permits the protected tool to execute only through the governed path.
 
 ## Why it exists
 
-AI agents increasingly have the ability to call APIs, MCP tools, databases, cloud systems and other privileged services. Action Gate addresses one narrow engineering question:
+AI agents can call APIs, MCP tools, databases, cloud systems and other privileged services. Action Gate addresses a narrow engineering question:
 
 > Can the protected tool independently verify that this exact agent action is authorized, current, correctly bound, and not being replayed?
 
@@ -26,29 +26,34 @@ AI agents increasingly have the ability to call APIs, MCP tools, databases, clou
 - Gate-issued execution authority
 - single-use nonce and replay protection
 - HTTP and MCP enforcement
-- fail-closed evidence handling
-- persistent PostgreSQL operation
-- audit and replay evidence
+- persistent evidence and replay records
 - protected-tool acceptance tests
 - self-hosted, managed and enterprise delivery
 
-## Commercial release state
+## Status
 
-The current published product version is **HamidCognition Action Gate v1.1.1**, sourced from `action_gate/VERSION`.
+- v0.4.2: 80 tests, HTTP + MCP enforcement integration pass (local).
+- PostgreSQL evidence persistence across restart: PR #232.
+- Concurrent nonce uniqueness: hardening in PR #233.
 
-The latest same-SHA validated and published release is **v1.1.1**, published as GitHub release `action-gate-v1.1.1`.
+These statements describe the named test and change evidence only. They do not establish customer acceptance, a customer deployment, or revenue.
 
-The mutable main branch is not itself a customer release. v1.1.1 has passed the same-SHA product/security/Clean-Room/production-E2E/release-readiness chain and has a published reproducible artifact. Customer acceptance, licensing, payment and deployment evidence remain separate commercial records.
+## Reproduce
 
-See PRODUCT/CURRENT_COMMERCIAL_RELEASE.md for the release-control state.
+Tests run against local fixtures — no production database or live tools required.
+
+For the local demo, Python 3.11+ and a terminal are required. See the `action_gate/` directory for runtime and integration-test instructions.
+
+## Coverage boundaries
+- In scope: tool-call binding, single-use authority, evidence persistence, tenant isolation
+- Out of scope: model alignment, prompt-injection defense, rate limiting, cost governance
+- Not production-hardened: no SLA, no load testing claims
 
 ## Commercial entry point
 
-The practical purchase path is a **one-tool proof-of-value pilot**.
+The proposed purchase path is a one-tool proof-of-value pilot. Protect one high-impact agent tool or MCP server, run the agreed acceptance suite against the customer's deployment, and deliver reproducible evidence.
 
-Protect one high-impact agent tool or MCP server, run the acceptance suite against the customer's deployment, and deliver reproducible evidence.
-
-See SALES/ONE_PAGER.md, SALES/ICP_AND_POSITIONING.md, SALES/PILOT_OFFER.md, SALES/DEMO_SCRIPT.md, SALES/OUTBOUND_EMAILS.md, and SALES/OBJECTIONS.md.
+See `SALES/ONE_PAGER.md`, `SALES/ICP_AND_POSITIONING.md`, `SALES/PILOT_OFFER.md`, `SALES/DEMO_SCRIPT.md`, `SALES/OUTBOUND_EMAILS.md`, and `SALES/OBJECTIONS.md`.
 
 ## Product boundary
 
@@ -72,7 +77,7 @@ Those research lines are not automatically commercial product claims. The Action
 
 The repository includes a Semantic Document Synchronization Layer (SDS). It listens to declared code, release, and evidence signals and keeps deterministic product metadata synchronized. Semantic, commercial, legal, and payment claims are not silently rewritten: they are flagged for revalidation instead.
 
-See PRODUCT/DOCUMENT_SYNCHRONIZATION.md and PRODUCT/DOCUMENT_DEPENDENCY_MAP.yaml.
+See `PRODUCT/DOCUMENT_SYNCHRONIZATION.md` and `PRODUCT/DOCUMENT_DEPENDENCY_MAP.yaml`.
 
 ## Evidence and provenance
 
