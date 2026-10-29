@@ -14,7 +14,7 @@ Runtime decisions: `ALLOW`, `DENY`, `ASK`, `SANDBOX`. `DEFER` remains outside th
 
 ## Enforced controls
 
-- production authentication rejects requests when required configuration is missing
+- production authentication is fail-closed when configuration is missing
 - tenant-bound evidence access and cross-tenant denial
 - immutable policy snapshot plus policy hash inside each decision record
 - action hash bound to tenant, actor, action, target and parameters
