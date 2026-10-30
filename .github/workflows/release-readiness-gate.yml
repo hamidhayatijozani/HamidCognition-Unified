@@ -17,10 +17,12 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout exact Product Gates source SHA
+      - name: Checkout workflow-control commit for the tag classifier
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          # The classifier belongs to the workflow-control revision. The
+          # Product Gates source SHA is still read separately from the event.
+          ref: ${{ github.sha }}
           persist-credentials: false
 
       - name: Require all release validation workflows on the same SHA
@@ -42,7 +44,8 @@ jobs:
             exit 1
           fi
 
-          echo "Release readiness target SHA: $TARGET_SHA"
+          echo "Workflow control SHA: $GITHUB_SHA"
+          echo "Product Gates source SHA: $TARGET_SHA"
 
           # Derive the version from the exact source commit, then resolve only
           # that version's tag. Do not scan a truncated/paginated tag list.
