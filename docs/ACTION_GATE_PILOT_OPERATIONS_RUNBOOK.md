@@ -22,6 +22,9 @@ Required values from the production Compose contract:
 - `ACTION_GATE_STATE_ORACLE_SECRET`
 - `ACTION_GATE_APPROVAL_SECRET`
 - `MCP_BEARER_TOKEN`
+- `DOMAIN`
+
+For the ChatGPT MCP surface, replace the template's `MCP_ISSUER_URL` and `MCP_RESOURCE_URL` example values with the customer's real issuer and externally reachable resource URL. `DOMAIN` must match the TLS edge hostname.
 
 Use unique, high-entropy values for every secret. Do not reuse one secret across roles. Restrict file permissions (`chmod 600 action_gate/.env.production`). Configure optional values only after reviewing the Compose file and the intended pilot policy. Do not paste secrets into CI logs, issues, chat, or screenshots.
 
