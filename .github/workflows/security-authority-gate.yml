@@ -1,6 +1,10 @@
 name: Action Gate Security Authority Gate
 
 on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -19,4 +23,7 @@ jobs:
         working-directory: action_gate
         run: python -m pip install --disable-pip-version-check -r requirements.txt
       - name: Run authority invariants
-        run: python -m pytest -q action_gate/tests/test_security_authority.py
+        working-directory: action_gate
+        env:
+          PYTHONPATH: ..
+        run: python -m pytest -q tests/test_security_authority.py

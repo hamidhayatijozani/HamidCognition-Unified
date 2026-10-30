@@ -113,6 +113,9 @@ jobs:
             "Product Verification"
             "Security History Secret Scan"
             "Action Gate MVP"
+            "Canonical Gates"
+            "Canonical gates-local proof"
+            "Evidence Chain Integrity"
           )
 
           for attempt in $(seq 1 180); do
