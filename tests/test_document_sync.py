@@ -27,6 +27,17 @@ class DocumentSyncTests(unittest.TestCase):
         self.assertFalse(state["missing_sources"])
         self.assertFalse(state["stale_documents"])
 
+    def test_readme_published_release_identity_matches_canonical_record(self):
+        spec = importlib.util.spec_from_file_location("document_sync_under_test", SCRIPT)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        release = json.loads((ROOT / "PRODUCT/COMMERCIAL_RELEASE.json").read_text(encoding="utf-8"))
+        observed = module.documented_identity(ROOT / "README.md")
+
+        self.assertEqual(observed.get("release_version"), release["version"])
+        self.assertEqual(observed.get("release_tag"), release["release_tag"])
+
     def test_structured_release_identity(self):
         release = json.loads((ROOT / "PRODUCT/COMMERCIAL_RELEASE.json").read_text())
         self.assertEqual(release["version"], "1" + ".1" + ".1")
