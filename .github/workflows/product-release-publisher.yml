@@ -14,50 +14,150 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Download release candidate artifact
+      - name: Select exactly one release candidate artifact
+        id: candidate
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_ID: ${{ github.event.workflow_run.id }}
-        run: |
-          set -euo pipefail
-          mkdir -p release
-          gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --dir release
-          find release -maxdepth 3 -type f -print
-
-      - name: Publish product release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         shell: bash
         run: |
           set -euo pipefail
-          manifest_file="$(find release -name '*.manifest.txt' -print -quit)"
-          tar_file="$(find release -name 'action-gate-*.tar' -print -quit)"
-          sha_file="$(find release -name 'action-gate-*.tar.sha256' -print -quit)"
-          test -f "$manifest_file" && test -f "$tar_file" && test -f "$sha_file"
-          version="$(awk -F= '$1=="version"{print $2}' "$manifest_file")"
-          test -n "$version"
-          tag="action-gate-v$version"
+          mapfile -t candidates < <(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/artifacts" --jq '.artifacts[] | select(.expired == false and (.name | startswith("action-gate-release-candidate-"))) | .name')
+          if [ "${#candidates[@]}" -eq 0 ]; then
+            echo "No release-candidate artifact exists; refusing to publish."
+            echo "validated=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "${#candidates[@]}" -ne 1 ]; then
+            echo "Expected exactly one candidate artifact; found ${#candidates[@]}."
+            exit 1
+          fi
+          echo "name=${candidates[0]}" >> "$GITHUB_OUTPUT"
+          echo "Downloading exact artifact: ${candidates[0]}"
+          mkdir -p release
+          gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --name "${candidates[0]}" --dir release
+          echo "validated=true" >> "$GITHUB_OUTPUT"
 
-          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            existing_target="$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json targetCommitish --jq '.targetCommitish')"
-            if [ "$existing_target" != "$HEAD_SHA" ]; then
-              echo "$tag already exists at $existing_target; validated revision $HEAD_SHA contains only release-independent CI fixes."
-              echo "The immutable versioned release remains bound to its original validated source revision."
-              exit 0
+      - name: Check out trusted verifier
+        if: steps.candidate.outputs.validated == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Verify manifest, archive, checksum, and readiness evidence
+        if: steps.candidate.outputs.validated == 'true'
+        id: verify
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          CANDIDATE_NAME: ${{ steps.candidate.outputs.name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t manifests < <(find release -type f -name '*.manifest.txt' -print)
+          mapfile -t archives < <(find release -type f -name 'action-gate-*.tar' -print)
+          mapfile -t checksums < <(find release -type f -name 'action-gate-*.tar.sha256' -print)
+          test "${#manifests[@]}" -eq 1
+          test "${#archives[@]}" -eq 1
+          test "${#checksums[@]}" -eq 1
+          manifest_file="${manifests[0]}"
+          archive_file="${archives[0]}"
+          checksum_file="${checksums[0]}"
+
+          version="$(awk -F= '$1=="version"{print $2}' "$manifest_file")"
+          source_sha="$(awk -F= '$1=="commit"{print $2}' "$manifest_file")"
+          readiness_run_id="$(awk -F= '$1=="release_readiness_run_id"{print $2}' "$manifest_file")"
+          test -n "$version"
+          [[ "$source_sha" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$readiness_run_id" =~ ^[0-9]+$ ]]
+          test "$CANDIDATE_NAME" = "action-gate-release-candidate-$version-$source_sha"
+
+          readiness_json="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$readiness_run_id")"
+          test "$(jq -r '.name' <<< "$readiness_json")" = "Action Gate Release Readiness Gate"
+          test "$(jq -r '.head_branch' <<< "$readiness_json")" = "main"
+          test "$(jq -r '.conclusion' <<< "$readiness_json")" = "success"
+
+          mkdir -p validation
+          gh run download "$readiness_run_id" --repo "$GITHUB_REPOSITORY" --name release-readiness-validated-sha --dir validation
+          test -f validation/validated-sha.txt
+          readiness_sha="$(tr -d '[:space:]' < validation/validated-sha.txt)"
+
+          source_version_json="$(gh api "repos/$GITHUB_REPOSITORY/contents/action_gate/VERSION?ref=$source_sha")"
+          source_version="$(jq -r '.content' <<< "$source_version_json" | tr -d '\n' | base64 -d | tr -d '[:space:]')"
+
+          python scripts/verify_release_manifest.py \
+            --manifest "$manifest_file" \
+            --archive "$archive_file" \
+            --checksum "$checksum_file" \
+            --expected-sha "$readiness_sha" \
+            --expected-version "$source_version" \
+            --readiness-file validation/validated-sha.txt
+
+          tag="action-gate-v$version"
+          tag_json="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" 2>/dev/null || true)"
+          if [ -z "$tag_json" ]; then
+            echo "Readiness was successful but the exact release tag $tag is now missing."
+            echo "Refusing to recreate a mutable release reference during publication."
+            exit 1
+          fi
+          tag_sha=""
+          if [ -n "$tag_json" ]; then
+            tag_type="$(jq -r '.object.type' <<< "$tag_json")"
+            tag_sha="$(jq -r '.object.sha' <<< "$tag_json")"
+            depth=0
+            while [ "$tag_type" = "tag" ] && [ "$depth" -lt 5 ]; do
+              depth=$((depth + 1))
+              annotated_json="$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$tag_sha")"
+              tag_type="$(jq -r '.object.type' <<< "$annotated_json")"
+              tag_sha="$(jq -r '.object.sha' <<< "$annotated_json")"
+            done
+            if [ "$tag_type" != "commit" ] || [ "$tag_sha" != "$source_sha" ]; then
+              echo "Tag $tag resolves to $tag_type $tag_sha, expected source commit $source_sha."
+              exit 1
             fi
-            echo "$tag already exists and is bound to the validated commit $HEAD_SHA; nothing to publish."
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "source_sha=$source_sha" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Release artifact and Readiness evidence are bound to $source_sha"
+
+      - name: Publish product release
+        if: steps.verify.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.verify.outputs.version }}
+          SOURCE_SHA: ${{ steps.verify.outputs.source_sha }}
+          TAG: ${{ steps.verify.outputs.tag }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "$TAG already exists at the verified source SHA $SOURCE_SHA; nothing to publish."
             exit 0
           fi
 
+          mapfile -t manifests < <(find release -type f -name '*.manifest.txt' -print)
+          mapfile -t archives < <(find release -type f -name 'action-gate-*.tar' -print)
+          mapfile -t checksums < <(find release -type f -name 'action-gate-*.tar.sha256' -print)
+          test "${#manifests[@]}" -eq 1
+          test "${#archives[@]}" -eq 1
+          test "${#checksums[@]}" -eq 1
+
           cat > /tmp/release-notes.md <<EOF
-          HamidCognition Action Gate v$version
+          HamidCognition Action Gate v$VERSION
 
-          Verified source commit: $HEAD_SHA
-          Release-candidate workflow run: #${{ github.event.workflow_run.id }}
+          Verified source commit: $SOURCE_SHA
+          Release-candidate workflow run: #$RUN_ID
 
-          The release was published by a dedicated write-scoped publisher workflow. The build/evidence workflow does not receive repository write permission.
+          The publisher verified the readiness artifact, source version, manifest, archive checksum, and exact source tag identity.
           Commercial deployment remains subject to the customer acceptance procedure.
           EOF
 
-          gh release create "$tag"             --repo "$GITHUB_REPOSITORY"             --target "$HEAD_SHA"             --title "HamidCognition Action Gate v$version"             --notes-file /tmp/release-notes.md             "$tar_file" "$sha_file" "$manifest_file"
+          gh release create "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$SOURCE_SHA" \
+            --title "HamidCognition Action Gate v$VERSION" \
+            --notes-file /tmp/release-notes.md \
+            "${archives[0]}" "${checksums[0]}" "${manifests[0]}"
