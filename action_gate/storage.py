@@ -21,6 +21,9 @@ def connect():
         return psycopg.connect(DATABASE_URL)
     con = sqlite3.connect(SQLITE_PATH, timeout=10.0)
     con.execute("PRAGMA busy_timeout=10000")
+    # SQLite REPLACE performs an implicit DELETE. Recursive triggers are
+    # required so audit_events_no_delete also blocks INSERT OR REPLACE.
+    con.execute("PRAGMA recursive_triggers=ON")
     con.execute("PRAGMA journal_mode=WAL")
     return con
 

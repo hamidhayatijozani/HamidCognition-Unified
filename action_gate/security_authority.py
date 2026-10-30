@@ -13,7 +13,7 @@ from typing import Any, Mapping
 
 
 def canonical_json(value: Mapping[str, Any]) -> str:
-    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False)
 
 
 def canonical_digest(value: Mapping[str, Any]) -> str:
@@ -103,6 +103,7 @@ def verify_authority(*, authority: Authority, secret: bytes,
                      tenant_id: str, action: Mapping[str, Any] | None = None,
                      policy: Mapping[str, Any] | None = None, now: int | None = None,
                      used_nonces: set[str] | None = None) -> None:
+    """Verify an authority envelope; nonce consumption belongs to atomic storage."""
     current = int(time.time()) if now is None else int(now)
     expected = hmac.new(secret, canonical_json(authority.payload()).encode(), hashlib.sha256).hexdigest()
     if not hmac.compare_digest(expected, authority.signature):
@@ -118,6 +119,7 @@ def verify_authority(*, authority: Authority, secret: bytes,
     if authority.decision != "ALLOW":
         raise AuthorityError("decision_not_executable")
     if used_nonces is not None:
-        if authority.nonce in used_nonces:
-            raise AuthorityError("nonce_reuse")
-        used_nonces.add(authority.nonce)
+        # A plain Python set is neither process-safe nor durable. Reject it
+        # rather than presenting check-then-add as replay protection. Production
+        # callers must consume the nonce through an atomic storage registry.
+        raise AuthorityError("non_atomic_nonce_registry_unsupported")

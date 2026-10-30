@@ -78,17 +78,12 @@ def test_signature_tampering_is_rejected():
         )
 
 
-def test_reuse_is_rejected_when_nonce_registry_is_supplied():
+def test_plain_set_nonce_registry_is_rejected_as_non_atomic():
     authority = make_authority()
-    used_nonces = set()
-    verify_authority(
-        authority=authority, secret=SECRET, tenant_id="tenant-a",
-        action=ACTION, policy=POLICY, now=1_001, used_nonces=used_nonces,
-    )
-    with pytest.raises(AuthorityError, match="nonce_reuse"):
+    with pytest.raises(AuthorityError, match="non_atomic_nonce_registry_unsupported"):
         verify_authority(
             authority=authority, secret=SECRET, tenant_id="tenant-a",
-            action=ACTION, policy=POLICY, now=1_001, used_nonces=used_nonces,
+            action=ACTION, policy=POLICY, now=1_001, used_nonces=set(),
         )
 
 

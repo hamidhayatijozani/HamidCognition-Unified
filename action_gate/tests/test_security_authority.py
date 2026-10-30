@@ -2,6 +2,7 @@ import pytest
 
 from action_gate.security_authority import (
     AuthorityError,
+    canonical_digest,
     issue_authority,
     verify_authority,
 )
@@ -29,7 +30,7 @@ def make(**kwargs):
 def test_valid_authority_is_accepted():
     verify_authority(
         authority=make(), secret=SECRET, tenant_id="tenant-a",
-        action=ACTION, policy=POLICY, now=1001, used_nonces=set()
+        action=ACTION, policy=POLICY, now=1001
     )
 
 
@@ -58,14 +59,16 @@ def test_expired_authority_is_denied():
                          tenant_id="tenant-a", action=ACTION, policy=POLICY, now=1005)
 
 
-def test_nonce_reuse_is_denied():
-    used = set()
-    a = make()
-    verify_authority(authority=a, secret=SECRET, tenant_id="tenant-a",
-                     action=ACTION, policy=POLICY, now=1001, used_nonces=used)
-    with pytest.raises(AuthorityError, match="nonce_reuse"):
-        verify_authority(authority=a, secret=SECRET, tenant_id="tenant-a",
-                         action=ACTION, policy=POLICY, now=1002, used_nonces=used)
+def test_non_atomic_in_memory_nonce_registry_is_rejected():
+    with pytest.raises(AuthorityError, match="non_atomic_nonce_registry_unsupported"):
+        verify_authority(authority=make(), secret=SECRET, tenant_id="tenant-a",
+                         action=ACTION, policy=POLICY, now=1001, used_nonces=set())
+
+
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf")])
+def test_non_finite_numbers_are_rejected_by_canonical_digest(value):
+    with pytest.raises(ValueError):
+        canonical_digest({"value": value})
 
 
 def test_non_executable_decision_cannot_be_authority():
