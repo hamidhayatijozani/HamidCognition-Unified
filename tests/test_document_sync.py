@@ -43,7 +43,7 @@ class DocumentSyncTests(unittest.TestCase):
         template = (ROOT / "PRODUCT" / ".env.production.example").read_text(encoding="utf-8")
         quickstart = (ROOT / "PRODUCT" / "QUICKSTART.md").read_text(encoding="utf-8")
 
-        required = set(re.findall(r"\\$\\{([A-Z0-9_]+):\\?set\\s+[A-Z0-9_]+\\}", compose))
+        required = set(re.findall(r"\$\{([A-Z0-9_]+):\?set\s+[A-Z0-9_]+\}", compose))
         configured = set(re.findall(r"^([A-Z0-9_]+)=", template, re.MULTILINE))
 
         self.assertTrue(required, "production Compose required-variable contract was not detected")
