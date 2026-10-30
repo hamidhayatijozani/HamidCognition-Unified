@@ -14,7 +14,6 @@ Runtime decisions: `ALLOW`, `DENY`, `ASK`, `SANDBOX`. `DEFER` remains outside th
 
 ## Enforced controls
 
-- production authentication is fail-closed when configuration is missing
 - tenant-bound evidence access and cross-tenant denial
 - immutable policy snapshot plus policy hash inside each decision record
 - action hash bound to tenant, actor, action, target and parameters
@@ -26,12 +25,12 @@ Runtime decisions: `ALLOW`, `DENY`, `ASK`, `SANDBOX`. `DEFER` remains outside th
 - decision expiry and one-time execution nonce
 - approval bound to tenant, action hash and policy version
 - append-only audit events linked by a SHA-256 hash chain
-- durable PostgreSQL storage for production deployments, SQLite retained only for local development
+- durable PostgreSQL storage for deployments, SQLite retained for local development
 - HTTP enforcement adapter and MCP `tools/call` adapter
 - forged decision, altered action and replay attempts rejected
 - execution is reserved atomically before the HTTP/MCP tool side effect; final outcome, consumed state, record version, and audit event are committed atomically after the tool response
-- direct tool calls rejected unless a Gate-issued, tenant/action/expiry/nonce-bound execution authority is present
-- production Compose stack with PostgreSQL and Caddy TLS termination
+- direct tool calls require a Gate-issued, tenant/action/expiry/nonce-bound execution authority
+- Compose stack configuration with PostgreSQL and Caddy TLS termination
 
 ## API
 
@@ -49,7 +48,7 @@ An Evidence Record contains tenant, actor, request, normalized action, action ha
 
 ## Getting started in 60 seconds (local demo)
 
-This is a local development demo, not a production deployment or customer acceptance test. It requires Python 3.11+ and a terminal.
+This is a local development demo, not a deployment or customer acceptance test. It requires Python 3.11+ and a terminal.
 
 Terminal 1:
 
@@ -67,13 +66,13 @@ Terminal 2, from the same `action_gate` directory and virtual environment:
 python demo.py
 ```
 
-The demo calls the running local API. It exits with an error if the API is not reachable. The default local development database is SQLite; this does not validate PostgreSQL deployment, TLS, customer credentials, or production runtime health.
+The demo calls the running local API. It exits with an error if the API is not reachable. The default local development database is SQLite; this does not validate PostgreSQL configuration, TLS, customer credentials, or runtime health.
 
-## Production environment template
+## Environment template
 
-A template is provided at `.env.example` for `docker-compose.production.yml`. Copy it to `.env`, replace every `REPLACE_ME_...` value with a unique cryptographically random secret, set `DOMAIN` to a DNS name that points to the deployment host, and keep `.env` out of Git. Never use the example values as real credentials. The Compose stack requires Docker Compose and a reachable DNS/TLS setup.
+A template is provided at `.env.example` for `docker-compose.production.yml`. Copy it to `.env`, replace every `REPLACE_ME_...` value with a unique cryptographically random secret, set `DOMAIN` to a DNS name that points to the deployment host, and keep `.env` out of Git. Never use the example values as real credentials.
 
-Generate each secret independently, for example with `openssl rand -hex 32`. Do not reuse one secret across variables. After configuring the file, start the production stack using the documented Compose command below.
+Generate each secret independently, for example with `openssl rand -hex 32`. Do not reuse one secret across variables.
 
 ## Local development
 
@@ -86,7 +85,7 @@ python demo.py
 
 Local development defaults to SQLite when `ACTION_GATE_DATABASE_URL` is absent.
 
-## Production deployment
+## Deployment configuration
 
 Requirements: Docker Compose, a DNS record pointing `DOMAIN` to the deployment host, and generated secrets.
 
@@ -101,16 +100,16 @@ export ACTION_GATE_REQUIRE_SESSION_BINDING='1'
 docker compose -f docker-compose.production.yml up -d --build
 ```
 
-The production stack is:
+The configured stack is:
 
 ```text
 Internet -> Caddy TLS -> enforcement -> Action Gate -> PostgreSQL
                                       \-> tool
 ```
 
-Caddy terminates HTTPS and obtains certificates for the configured domain. PostgreSQL is not exposed to the host. The tool service is not exposed to the host. The enforcement service is also private to the Compose network and is reached through the TLS edge.
+Caddy terminates HTTPS and obtains certificates for the configured domain. PostgreSQL, the tool service and the enforcement service are intended to remain private to the Compose network.
 
-Do not commit production secrets. For rotation, configure `ACTION_GATE_SIGNING_KEYS` as a JSON object of key IDs to secrets and set `ACTION_GATE_KEY_ID` to the active key. Existing decisions remain verifiable while their key remains configured.
+Do not commit secrets. For rotation, configure `ACTION_GATE_SIGNING_KEYS` as a JSON object of key IDs to secrets and set `ACTION_GATE_KEY_ID` to the active key.
 
 ## Integration tests
 
@@ -120,11 +119,20 @@ python mcp_integration.py
 pytest -q
 ```
 
-The integration gates exercise real processes rather than mocks. They cover denied actions, allowed execution, exact action binding, forged decisions, one-time nonce replay and direct-tool bypass rejection. `test_production_storage.py` verifies the storage abstraction and production deployment configuration.
+The integration tests exercise real local processes. They cover denied actions, allowed execution, exact action binding, forged decisions, one-time nonce replay and direct-tool bypass rejection. `test_production_storage.py` verifies the storage abstraction and deployment configuration.
+
+## Reproduce
+
+Tests run against local fixtures — no production database or live tools required.
+
+## Coverage boundaries
+- In scope: tool-call binding, single-use authority, evidence persistence, tenant isolation
+- Out of scope: model alignment, prompt-injection defense, rate limiting, cost governance
+- Not production-hardened: no SLA, no load testing claims
 
 ## Current product boundary
 
-This release is the production Action Gate runtime boundary. It adds actor/session-bound execution, cryptographically bound production approvals, database-backed replay protection and rate limiting, configurable versioned policy snapshots; atomic execution finalization and production-default session binding, signing-key rotation with historical-key verification, and a dependency-free Python SDK. HSM/KMS custody, external identity federation, SIEM integration and HA orchestration remain deployment-specific controls and are not represented as implemented features.
+HSM/KMS custody, external identity federation, SIEM integration and HA orchestration remain deployment-specific controls and are not represented as implemented features.
 
 `SANDBOX` means **sandbox-required decision state**. It is not proof that a real isolation sandbox has been provisioned.
 
