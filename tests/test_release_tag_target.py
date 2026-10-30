@@ -61,6 +61,7 @@ def test_every_required_release_workflow_runs_on_main_push():
     for name, relative in REQUIRED_MAIN_WORKFLOWS.items():
         assert f'"{name}"' in readiness
         source = (root / relative).read_text(encoding="utf-8")
-        match = re.search(r"(?ms)^  push:\\s*\\n(?P<body>(?:^    .*\\n)+)", source)
+        match = re.search(r"(?m)^  push:\s*\n((?:^    .*\n)+)", source)
         assert match is not None, f"{name} has no push trigger"
-        assert re.search(r"branches:\\s*\\[\\s*['\\\"]?main['\\\"]?\\s*\\]", match.group("body")), f"{name} does not run on main"
+        branches = re.search(r"(?m)^    branches:\s*\[(.*?)\]", match.group(1))
+        assert branches is not None and "main" in branches.group(1).strip("'\" "), f"{name} does not run on main"
