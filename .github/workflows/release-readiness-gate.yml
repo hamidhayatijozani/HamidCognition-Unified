@@ -17,6 +17,12 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout exact Product Gates source SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+
       - name: Require all release validation workflows on the same SHA
         id: validate
         env:
@@ -83,8 +89,15 @@ jobs:
             tag_sha="$(jq -r '.object.sha' /tmp/annotated-tag.json)"
           done
 
-          if [ "$tag_type" != "commit" ] || [ "$tag_sha" != "$TARGET_SHA" ]; then
-            echo "Release tag $tag resolves to type=$tag_type sha=$tag_sha, expected commit $TARGET_SHA"
+          classification="$(python scripts/classify_release_tag_target.py "$TARGET_SHA" "$tag_type" "$tag_sha")"
+          if [ "$classification" = "MISMATCH" ]; then
+            echo "RELEASE_READINESS_SKIP_NON_RELEASE_SHA: $tag points to $tag_sha, not $TARGET_SHA"
+            echo "validated_sha=$TARGET_SHA"
+            echo "validated_release=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$classification" != "MATCH" ]; then
+            echo "Invalid release tag classification: $classification"
             exit 1
           fi
           echo "Exact release tag verified: $tag -> $TARGET_SHA"
