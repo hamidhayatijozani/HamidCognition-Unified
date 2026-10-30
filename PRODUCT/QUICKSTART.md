@@ -22,7 +22,7 @@ docker compose --env-file action_gate/.env.production -f action_gate/docker-comp
 docker compose --env-file action_gate/.env.production -f action_gate/docker-compose.production.yml logs --tail=200 postgres action-gate enforcement tool dashboard chatgpt-mcp
 ```
 
-The production Compose contract requires independent values for API authentication, decision signing, execution authority, state-oracle signing, approval signing, enforcement authentication, PostgreSQL, and MCP bearer authentication. Do not reuse one secret across roles.
+The production Compose contract requires independent values for API authentication, decision signing, execution authority, state-oracle signing, approval signing, PostgreSQL, and MCP bearer authentication. Do not reuse one secret across roles.
 
 The public edge is Caddy on ports 80/443. Action Gate, PostgreSQL, enforcement internals, and the protected tool remain on the private Compose network. Do not expose ports 5432, 8000, or 9000 directly to the Internet.
 
