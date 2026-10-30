@@ -12,7 +12,7 @@ This runbook is the operational handoff for a **restricted, non-production pilot
 
 ## 2. Required configuration
 
-Create `action_gate/.env.production` on the deployment host. Never commit it.
+Copy `PRODUCT/.env.production.example` to `action_gate/.env.production` on the deployment host, replace every placeholder, and run `chmod 600 action_gate/.env.production`. Never commit the resulting file.
 
 Required values from the production Compose contract:
 - `POSTGRES_PASSWORD`
@@ -21,6 +21,10 @@ Required values from the production Compose contract:
 - `ACTION_GATE_AUTHORITY_SECRET`
 - `ACTION_GATE_STATE_ORACLE_SECRET`
 - `ACTION_GATE_APPROVAL_SECRET`
+- `MCP_BEARER_TOKEN`
+- `DOMAIN`
+
+For the ChatGPT MCP surface, replace the template's `MCP_ISSUER_URL` and `MCP_RESOURCE_URL` example values with the customer's real issuer and externally reachable resource URL. `DOMAIN` must match the TLS edge hostname.
 
 Use unique, high-entropy values for every secret. Do not reuse one secret across roles. Restrict file permissions (`chmod 600 action_gate/.env.production`). Configure optional values only after reviewing the Compose file and the intended pilot policy. Do not paste secrets into CI logs, issues, chat, or screenshots.
 

@@ -38,6 +38,19 @@ class DocumentSyncTests(unittest.TestCase):
         self.assertEqual(observed.get("release_version"), release["version"])
         self.assertEqual(observed.get("release_tag"), release["release_tag"])
 
+    def test_production_compose_required_variables_exist_in_production_template(self):
+        compose = (ROOT / "action_gate" / "docker-compose.production.yml").read_text(encoding="utf-8")
+        template = (ROOT / "PRODUCT" / ".env.production.example").read_text(encoding="utf-8")
+        quickstart = (ROOT / "PRODUCT" / "QUICKSTART.md").read_text(encoding="utf-8")
+
+        required = set(re.findall(r"\$\{([A-Z0-9_]+):\?set\s+[A-Z0-9_]+\}", compose))
+        configured = set(re.findall(r"^([A-Z0-9_]+)=", template, re.MULTILINE))
+
+        self.assertTrue(required, "production Compose required-variable contract was not detected")
+        self.assertFalse(required - configured, f"production template misses: {sorted(required - configured)}")
+        self.assertIn("PRODUCT/.env.production.example", quickstart)
+        self.assertIn("action_gate/.env.production", quickstart)
+
     def test_structured_release_identity(self):
         release = json.loads((ROOT / "PRODUCT/COMMERCIAL_RELEASE.json").read_text())
         self.assertEqual(release["version"], "1" + ".1" + ".1")
