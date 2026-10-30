@@ -25,3 +25,13 @@ def test_non_commit_tag_target_fails_closed(tag_type):
 def test_malformed_sha_fails_closed(target_sha, tag_sha):
     with pytest.raises(ValueError, match="invalid_commit_sha"):
         classify_release_tag_target(target_sha, "commit", tag_sha)
+
+
+def test_readiness_workflow_uses_control_sha_for_classifier():
+    from pathlib import Path
+
+    workflow = Path(__file__).resolve().parents[1] / ".github" / "workflows" / "release-readiness-gate.yml"
+    source = workflow.read_text(encoding="utf-8")
+    assert "ref: ${{ github.sha }}" in source
+    assert 'TARGET_SHA="${{ github.event.workflow_run.head_sha }}"' in source
+    assert "python scripts/classify_release_tag_target.py" in source
