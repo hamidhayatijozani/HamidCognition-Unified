@@ -16,55 +16,90 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Load exact validated source SHA
+        id: validation
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p validation
+          if ! gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --name release-readiness-validated-sha --dir validation; then
+            echo "No validated source artifact; readiness was not a release pass."
+            echo "validated=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          test -f validation/validated-sha.txt
+          TARGET_SHA="$(tr -d '[:space:]' < validation/validated-sha.txt)"
+          if [[ ! "$TARGET_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Invalid validated SHA artifact"
+            exit 1
+          fi
+          echo "sha=$TARGET_SHA" >> "$GITHUB_OUTPUT"
+          echo "validated=true" >> "$GITHUB_OUTPUT"
+          echo "Building only validated source SHA: $TARGET_SHA"
+
       - name: Checkout validated revision
+        if: steps.validation.outputs.validated == 'true'
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ steps.validation.outputs.sha }}
 
       - name: Read canonical version
+        if: steps.validation.outputs.validated == 'true'
         id: version
         shell: bash
         run: |
+          set -euo pipefail
           VERSION="$(tr -d '[:space:]' < action_gate/VERSION)"
+          test -n "$VERSION"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Action Gate version: $VERSION"
 
       - name: Validate expected release baseline
+        if: steps.validation.outputs.validated == 'true'
         shell: bash
         run: |
           VERSION="$(tr -d '[:space:]' < action_gate/VERSION)"
           test -n "$VERSION"
 
       - name: Build production image
+        if: steps.validation.outputs.validated == 'true'
         run: docker build --pull -f action_gate/Dockerfile -t action-gate:${{ steps.version.outputs.version }} .
 
       - name: Export image archive
+        if: steps.validation.outputs.validated == 'true'
         run: docker save action-gate:${{ steps.version.outputs.version }} -o action-gate-${{ steps.version.outputs.version }}.tar
 
       - name: Generate SHA256
+        if: steps.validation.outputs.validated == 'true'
         shell: bash
         run: sha256sum action-gate-${{ steps.version.outputs.version }}.tar | tee action-gate-${{ steps.version.outputs.version }}.tar.sha256
 
       - name: Create release manifest
+        if: steps.validation.outputs.validated == 'true'
         shell: bash
         env:
-          VALIDATED_SHA: ${{ github.event.workflow_run.head_sha }}
+          VALIDATED_SHA: ${{ steps.validation.outputs.sha }}
           VALIDATED_RUN_ID: ${{ github.event.workflow_run.id }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
-          cat > action-gate-${{ steps.version.outputs.version }}.manifest.txt <<EOF
+          cat > "action-gate-$VERSION.manifest.txt" <<EOF
           product=HamidCognition Action Gate
-          version=${{ steps.version.outputs.version }}
+          version=$VERSION
           commit=$VALIDATED_SHA
           release_readiness_run_id=$VALIDATED_RUN_ID
-          image=action-gate:${{ steps.version.outputs.version }}
-          archive=action-gate-${{ steps.version.outputs.version }}.tar
+          image=action-gate:$VERSION
+          archive=action-gate-$VERSION.tar
           generated_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
           EOF
 
       - name: Upload release candidate evidence
+        if: steps.validation.outputs.validated == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: action-gate-release-candidate-${{ steps.version.outputs.version }}-${{ github.event.workflow_run.head_sha }}
+          name: action-gate-release-candidate-${{ steps.version.outputs.version }}-${{ steps.validation.outputs.sha }}
           path: |
             action-gate-${{ steps.version.outputs.version }}.tar
             action-gate-${{ steps.version.outputs.version }}.tar.sha256
