@@ -113,6 +113,16 @@ class HTTPHandler(BaseHTTPRequestHandler):
                 try:
                     reserved = reserve_execution(decision_id, tenant_id, actor_id, session_id, expected_hash, record["nonce"])
                     authority = reserved["execution_authority"]
+                except urllib.error.HTTPError as exc:
+                    # Preserve deterministic Gate conflicts (especially replayed
+                    # or concurrently reserved one-time authorities) at the
+                    # enforcement boundary instead of disguising them as 502.
+                    body = exc.read()
+                    self.send_response(exc.code)
+                    self.send_header("Content-Type", "application/json")
+                    self.end_headers()
+                    self.wfile.write(body or b'{"error":"action_gate_request_rejected"}')
+                    return
                 except Exception:
                     self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
                 try:
@@ -128,6 +138,16 @@ class HTTPHandler(BaseHTTPRequestHandler):
                     return
                 try:
                     record_execution(decision_id, tenant_id, actor_id, session_id, expected_hash, record["nonce"], {"http_status": status, "tool_response": out})
+                except urllib.error.HTTPError as exc:
+                    # Preserve deterministic Gate conflicts (especially replayed
+                    # or concurrently reserved one-time authorities) at the
+                    # enforcement boundary instead of disguising them as 502.
+                    body = exc.read()
+                    self.send_response(exc.code)
+                    self.send_header("Content-Type", "application/json")
+                    self.end_headers()
+                    self.wfile.write(body or b'{"error":"action_gate_request_rejected"}')
+                    return
                 except Exception:
                     self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
                 self.send_response(status); self.end_headers(); self.wfile.write(json.dumps(out).encode()); return
