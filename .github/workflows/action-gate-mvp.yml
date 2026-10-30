@@ -25,6 +25,13 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r requirements.txt
+      - name: Run focused authority adversarial tests
+        env:
+          ACTION_GATE_ENV: development
+          ACTION_GATE_AUTHORITY_SECRET: ci-authority-secret
+          ACTION_GATE_STATE_ORACLE_SECRET: ci-state-oracle-secret
+          ACTION_GATE_SIGNING_SECRET: ci-signing-secret
+        run: pytest -q test_security_authority_adversarial.py
       - run: pytest -q
       - run: nohup env ACTION_GATE_API_TOKEN=ci-test-token uvicorn app:app --host 127.0.0.1 --port 8000 >/tmp/action-gate.log 2>&1 &
       - run: sleep 2 && python demo.py
