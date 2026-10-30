@@ -1,3 +1,6 @@
+import re
+from pathlib import Path
+
 import pytest
 
 from scripts.classify_release_tag_target import classify_release_tag_target
@@ -35,3 +38,29 @@ def test_readiness_workflow_uses_control_sha_for_classifier():
     assert "ref: ${{ github.sha }}" in source
     assert 'TARGET_SHA="${{ github.event.workflow_run.head_sha }}"' in source
     assert "python scripts/classify_release_tag_target.py" in source
+
+
+REQUIRED_MAIN_WORKFLOWS = {
+    "Action Gate Product Gates": ".github/workflows/product-gates.yml",
+    "Action Gate Product Integrity": ".github/workflows/action-gate-product-integrity.yml",
+    "Action Gate Clean-Room Verification": ".github/workflows/action-gate-clean-room.yml",
+    "Action Gate Production E2E Smoke": ".github/workflows/production-e2e-smoke.yml",
+    "Action Gate Security Authority Gate": ".github/workflows/security-authority-gate.yml",
+    "Product Verification": ".github/workflows/product-verification.yml",
+    "Security History Secret Scan": ".github/workflows/security-history-secret-scan.yml",
+    "Action Gate MVP": ".github/workflows/action-gate-mvp.yml",
+    "Canonical Gates": ".github/workflows/gates-canonical.yml",
+    "Canonical gates-local proof": ".github/workflows/gates-local-proof.yml",
+    "Evidence Chain Integrity": ".github/workflows/evidence-chain-integrity.yml",
+}
+
+
+def test_every_required_release_workflow_runs_on_main_push():
+    root = Path(__file__).resolve().parents[1]
+    readiness = (root / ".github/workflows/release-readiness-gate.yml").read_text(encoding="utf-8")
+    for name, relative in REQUIRED_MAIN_WORKFLOWS.items():
+        assert f'"{name}"' in readiness
+        source = (root / relative).read_text(encoding="utf-8")
+        match = re.search(r"(?ms)^  push:\\s*\\n(?P<body>(?:^    .*\\n)+)", source)
+        assert match is not None, f"{name} has no push trigger"
+        assert re.search(r"branches:\\s*\\[\\s*['\\\"]?main['\\\"]?\\s*\\]", match.group("body")), f"{name} does not run on main"
