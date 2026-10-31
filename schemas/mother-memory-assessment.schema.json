@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/hamidhayatijozani/HamidCognition-Unified/schemas/mother-memory-assessment.schema.json",
+  "title": "BESAZ Mother Memory Model Assessment",
+  "type": "object",
+  "required": [
+    "model",
+    "scope",
+    "observations",
+    "interpretations",
+    "evidence_refs",
+    "uncertainty"
+  ],
+  "properties": {
+    "assessment_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "subject_key": {
+      "const": "creator"
+    },
+    "model": {
+      "type": "object",
+      "required": [
+        "provider",
+        "name",
+        "version"
+      ],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "text"
+        ],
+        "properties": {
+          "kind": {
+            "const": "OBSERVATION"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "interpretations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "text",
+          "confidence",
+          "basis"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "INFERENCE",
+              "INTERPRETATION"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "basis": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "strengths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "patterns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "changes_over_time": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "uncertainty": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "enum": [
+        "ACTIVE",
+        "DELETED"
+      ]
+    },
+    "review_status": {
+      "enum": [
+        "UNREVIEWED",
+        "ACCEPTED",
+        "DISPUTED",
+        "NEEDS_REVISION"
+      ]
+    },
+    "record_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "reviewed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reviewer_note": {
+      "type": "string"
+    }
+  },
+  "not": {
+    "anyOf": [
+      {
+        "required": [
+          "chain_of_thought"
+        ]
+      },
+      {
+        "required": [
+          "hidden_reasoning"
+        ]
+      },
+      {
+        "required": [
+          "private_reasoning"
+        ]
+      },
+      {
+        "required": [
+          "raw_transcript"
+        ]
+      }
+    ]
+  },
+  "additionalProperties": false
+}
