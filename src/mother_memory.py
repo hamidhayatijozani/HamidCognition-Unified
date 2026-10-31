@@ -37,7 +37,7 @@ DEFAULT_GOVERNANCE = {
     "public_repository_records_allowed": False,
     "human_review_required_for_profile_changes": True,
 }
-FORBIDDEN_KEYS = {"chain_of_thought", "hidden_reasoning", "private_reasoning", "raw_transcript"}
+FORBIDDEN_KEYS = {"chain_of_thought", "hidden_reasoning", "private_reasoning", "raw_transcript", "sensitive_traits"}
 
 
 class MemoryValidationError(ValueError):
@@ -169,8 +169,8 @@ class MotherMemory:
             raise MemoryValidationError("observations, interpretations and evidence_refs must be arrays")
         if not uncertainty or not isinstance(uncertainty, str):
             raise MemoryValidationError("uncertainty must explicitly describe what is unknown")
-        if not evidence:
-            raise MemoryValidationError("at least one evidence reference is required; do not store unsupported impressions")
+        if not evidence or any(not str(x).strip() for x in evidence):
+            raise MemoryValidationError("at least one non-empty evidence reference is required; do not store unsupported impressions")
         for item in observations:
             if not isinstance(item, dict) or not str(item.get("text", "")).strip():
                 raise MemoryValidationError("each observation needs non-empty text")
@@ -239,7 +239,19 @@ class MotherMemory:
         if len(state["assessments"]) == before:
             return False
         self._write("memory", state)
-        self._audit("ASSESSMENT_DELETED", assessment_id, {"content_removed": True})
+        emergence = self._read("emergence")
+        prior_candidates = len(emergence.get("items", []))
+        emergence["items"] = [
+            item for item in emergence.get("items", [])
+            if assessment_id not in item.get("assessment_ids", [])
+        ]
+        removed_candidates = prior_candidates - len(emergence["items"])
+        if removed_candidates:
+            self._write("emergence", emergence)
+        self._audit("ASSESSMENT_DELETED", assessment_id, {
+            "content_removed": True,
+            "derived_candidates_removed": removed_candidates,
+        })
         return True
 
     def add_session(self, *, model: dict[str, str], source_ref: str, scope: str) -> dict[str, Any]:
