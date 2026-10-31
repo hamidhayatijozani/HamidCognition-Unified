@@ -278,6 +278,50 @@ class MotherMemory:
             })
         return {"model_count": len(by_model), "assessment_count": len(active), "comparisons": comparisons}
 
+    def detect_emergence(self, *, min_providers: int = 2) -> list[dict[str, Any]]:
+        """Find exact recurring pattern labels across providers; never infer semantic similarity."""
+        if min_providers < 2:
+            raise MemoryValidationError("min_providers must be at least 2")
+        grouped: dict[tuple[str, str], dict[str, Any]] = {}
+        for item in self.list_assessments():
+            provider = item["model"]["provider"]
+            for raw_pattern in item.get("patterns", []):
+                pattern = " ".join(str(raw_pattern).casefold().split())
+                if not pattern:
+                    continue
+                key = (item["scope"], pattern)
+                entry = grouped.setdefault(key, {"scope": item["scope"], "pattern": pattern, "providers": set(), "assessment_ids": []})
+                entry["providers"].add(provider)
+                entry["assessment_ids"].append(item["assessment_id"])
+        candidates = []
+        state = self._read("emergence")
+        existing = {(x.get("scope"), x.get("pattern"), tuple(sorted(x.get("assessment_ids", [])))) for x in state.get("items", [])}
+        for entry in grouped.values():
+            if len(entry["providers"]) < min_providers:
+                continue
+            providers = sorted(entry["providers"])
+            assessment_ids = sorted(set(entry["assessment_ids"]))
+            identity = (entry["scope"], entry["pattern"], tuple(assessment_ids))
+            if identity in existing:
+                continue
+            candidate = {
+                "candidate_id": str(uuid.uuid4()),
+                "scope": entry["scope"],
+                "pattern": entry["pattern"],
+                "providers": providers,
+                "assessment_ids": assessment_ids,
+                "status": "REVIEW_REQUIRED",
+                "method": "EXACT_LABEL_RECURRENCE",
+                "interpretation": "Repeated exact labels only; this does not establish semantic agreement, model independence, or a stable personal trait.",
+                "created_at": _now(),
+            }
+            state["items"].append(candidate)
+            candidates.append(candidate)
+        if candidates:
+            self._write("emergence", state)
+            self._audit("EMERGENCE_CANDIDATES_CREATED", candidates[0]["candidate_id"], {"count": len(candidates)})
+        return candidates
+
     def verify_audit_chain(self) -> dict[str, Any]:
         path = self.root / "audit.jsonl"
         previous = ""
