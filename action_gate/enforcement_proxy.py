@@ -22,6 +22,15 @@ def auth_headers():
     return {"Authorization": f"Bearer {API_TOKEN}"} if API_TOKEN else {}
 
 
+def send_gate_http_error(handler, exc: urllib.error.HTTPError) -> None:
+    """Preserve deterministic Gate HTTP errors without masking transport failures."""
+    body = exc.read()
+    handler.send_response(exc.code)
+    handler.send_header("Content-Type", "application/json")
+    handler.end_headers()
+    handler.wfile.write(body or b'{"error":"action_gate_request_rejected"}')
+
+
 def post_json(url, payload, headers=None):
     safe_url = require_safe_url(url)
     req = urllib.request.Request(
@@ -114,14 +123,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
                     reserved = reserve_execution(decision_id, tenant_id, actor_id, session_id, expected_hash, record["nonce"])
                     authority = reserved["execution_authority"]
                 except urllib.error.HTTPError as exc:
-                    # Preserve deterministic Gate conflicts (especially replayed
-                    # or concurrently reserved one-time authorities) at the
-                    # enforcement boundary instead of disguising them as 502.
-                    body = exc.read()
-                    self.send_response(exc.code)
-                    self.send_header("Content-Type", "application/json")
-                    self.end_headers()
-                    self.wfile.write(body or b'{"error":"action_gate_request_rejected"}')
+                    send_gate_http_error(self, exc)
                     return
                 except Exception:
                     self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
@@ -139,14 +141,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
                 try:
                     record_execution(decision_id, tenant_id, actor_id, session_id, expected_hash, record["nonce"], {"http_status": status, "tool_response": out})
                 except urllib.error.HTTPError as exc:
-                    # Preserve deterministic Gate conflicts (especially replayed
-                    # or concurrently reserved one-time authorities) at the
-                    # enforcement boundary instead of disguising them as 502.
-                    body = exc.read()
-                    self.send_response(exc.code)
-                    self.send_header("Content-Type", "application/json")
-                    self.end_headers()
-                    self.wfile.write(body or b'{"error":"action_gate_request_rejected"}')
+                    send_gate_http_error(self, exc)
                     return
                 except Exception:
                     self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
@@ -174,6 +169,9 @@ class MCPHandler(BaseHTTPRequestHandler):
             try:
                 reserved = reserve_execution(result["decision_id"], tenant_id, actor_id, session_id, result["action_hash"], result["nonce"])
                 authority = reserved["execution_authority"]
+            except urllib.error.HTTPError as exc:
+                send_gate_http_error(self, exc)
+                return
             except Exception:
                 self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
             try:
@@ -189,6 +187,9 @@ class MCPHandler(BaseHTTPRequestHandler):
                 return
             try:
                 record_execution(result["decision_id"], tenant_id, actor_id, session_id, result["action_hash"], result["nonce"], {"http_status": status, "tool_response": out, "protocol": "MCP", "method": "tools/call", "tool": tool})
+            except urllib.error.HTTPError as exc:
+                send_gate_http_error(self, exc)
+                return
             except Exception:
                 self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
             self.send_response(status); self.end_headers(); self.wfile.write(json.dumps(out).encode())
