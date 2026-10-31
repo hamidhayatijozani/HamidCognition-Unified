@@ -1,4 +1,7 @@
 import json
+import os
+import hmac
+import hashlib
 import socket
 import time
 import urllib.request
@@ -100,6 +103,49 @@ finally:
         con.commit()
     finally:
         con.close()
+
+# Production approval must be verifiable by the Gate, not merely signed by
+# the dashboard. This catches a missing approval-secret injection in Compose.
+approval_request = {
+    "tenant_id": TENANT,
+    "agent_id": "compose-agent",
+    "actor_id": "compose-approver",
+    "session_id": "compose-approval-session",
+    "action": "send_email",
+    "target": "customer@example.invalid",
+    "parameters": {"subject": "CI approval boundary", "body": "non-delivery fixture"},
+}
+approval_decision = post(
+    BASE + "/v1/action/evaluate",
+    approval_request,
+    {"Content-Type": "application/json", **H},
+)
+assert approval_decision["decision"] == "ASK", approval_decision
+approval = {
+    "approver_id": "ci-approver",
+    "approved": True,
+    "reason": "production compose approval-signature smoke test",
+    "action_hash": approval_decision["action_hash"],
+    "tenant_id": TENANT,
+    "policy_version": approval_decision["policy_version"],
+    "ttl_seconds": 300,
+}
+approval_canonical = json.dumps(
+    approval, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+).encode("utf-8")
+approval["approval_signature"] = hmac.new(
+    os.environ["ACTION_GATE_APPROVAL_SECRET"].encode("utf-8"),
+    approval_canonical,
+    hashlib.sha256,
+).hexdigest()
+approved = post(
+    BASE + "/v1/action/" + approval_decision["decision_id"] + "/approve",
+    approval,
+    {"Content-Type": "application/json", **H},
+)
+assert approved["decision"] == "ALLOW", approved
+assert approved["approval"]["approved"] is True, approved
+print("PRODUCTION_APPROVAL_SIGNATURE_E2E_PASS", flush=True)
 
 payload = {"tenant_id": TENANT, "agent_id": "compose-agent", "actor_id": "compose-actor", "session_id": "compose-session", "action": "read_public_file", "target": "/public/info.txt", "parameters": {}}
 headers = {"Content-Type": "application/json", "X-Agent-ID": "compose-agent", "X-Actor-ID": "compose-actor", "X-Session-ID": "compose-session", "X-Tenant-ID": TENANT, "X-Action": "read_public_file", "X-Action-Target": "/public/info.txt"}
