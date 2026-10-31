@@ -69,7 +69,7 @@ At first initialization, the runtime creates:
 - `manifest.json`
 - `audit.jsonl`
 
-The initial release uses the memory and session stores. Concepts and emergence are reserved for later evidence-backed aggregation; no automated trait discovery is claimed yet.
+The initial release uses the memory and session stores. Concepts remain reserved. The emergence routine only detects exact repeated pattern labels across providers and marks them `REVIEW_REQUIRED`; it does not perform semantic matching or infer a stable trait.
 
 ## API
 
