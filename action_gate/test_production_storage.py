@@ -35,6 +35,10 @@ def test_production_compose_uses_postgres_and_tls():
     caddy = (runtime_dir / "Caddyfile").read_text(encoding="utf-8")
     assert "postgres:17-alpine" in compose
     assert "ACTION_GATE_DATABASE_URL: postgresql://" in compose
+    gate_service = compose.split("  action-gate:", 1)[1].split("\n  tool:", 1)[0]
+    approval_binding = "ACTION_GATE_APPROVAL_SECRET: ${ACTION_GATE_APPROVAL_SECRET:?set ACTION_GATE_APPROVAL_SECRET}"
+    assert approval_binding in gate_service
+    assert approval_binding in compose.split("  dashboard:", 1)[1].split("\n  action-gate:", 1)[0]
     assert '"443:443"' in compose
     assert "reverse_proxy enforcement:8080" in caddy
 
