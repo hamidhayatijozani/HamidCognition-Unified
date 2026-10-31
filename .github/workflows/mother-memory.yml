@@ -31,3 +31,5 @@ jobs:
         run: python -m pip install pytest
       - name: Run Mother Memory tests
         run: python -m pytest -q tests/test_mother_memory.py
+      - name: Validate local CLI entry point
+        run: python -m scripts.mother_memory_cli --help
