@@ -104,3 +104,13 @@ def test_emergence_requires_multiple_providers_and_never_promotes_trait(tmp_path
     assert candidates[0]["method"] == "EXACT_LABEL_RECURRENCE"
     assert "does not establish" in candidates[0]["interpretation"]
     assert store.detect_emergence() == []
+
+def test_deleting_source_assessment_removes_derived_candidates(tmp_path):
+    store = MotherMemory(tmp_path)
+    first = store.record_assessment(assessment("GPT-6"), consent=True)
+    other = assessment("Claude")
+    other["model"]["provider"] = "Anthropic"
+    store.record_assessment(other, consent=True)
+    assert len(store.detect_emergence()) == 1
+    assert store.delete_assessment(first["assessment_id"])
+    assert store._read("emergence")["items"] == []
