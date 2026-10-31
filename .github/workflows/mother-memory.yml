@@ -1,0 +1,32 @@
+name: Mother Memory Contract Tests
+
+on:
+  pull_request:
+    paths:
+      - "src/mother_memory.py"
+      - "tests/test_mother_memory.py"
+      - "schemas/mother-memory-assessment.schema.json"
+      - ".github/workflows/mother-memory.yml"
+  push:
+    branches: [main]
+    paths:
+      - "src/mother_memory.py"
+      - "tests/test_mother_memory.py"
+      - "schemas/mother-memory-assessment.schema.json"
+      - ".github/workflows/mother-memory.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  mother-memory-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test runner
+        run: python -m pip install pytest
+      - name: Run Mother Memory tests
+        run: python -m pytest -q tests/test_mother_memory.py
