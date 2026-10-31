@@ -24,7 +24,11 @@ def auth_headers():
 
 def send_gate_http_error(handler, exc: urllib.error.HTTPError) -> None:
     """Preserve deterministic Gate HTTP errors without masking transport failures."""
-    body = exc.read()
+    # post_json reads the body once for diagnostics; reuse that exact payload
+    # rather than emitting an empty fallback after the stream is consumed.
+    body = getattr(exc, "_action_gate_body", None)
+    if body is None:
+        body = exc.read()
     handler.send_response(exc.code)
     handler.send_header("Content-Type", "application/json")
     handler.end_headers()
@@ -42,7 +46,9 @@ def post_json(url, payload, headers=None):
         with urllib.request.urlopen(req) as r:
             return r.status, json.loads(r.read())
     except urllib.error.HTTPError as exc:
-        body = exc.read().decode("utf-8", errors="replace")
+        raw_body = exc.read()
+        exc._action_gate_body = raw_body
+        body = raw_body.decode("utf-8", errors="replace")
         print(
             f"UPSTREAM_HTTP_ERROR status={exc.code} url={safe_url} body={body[:1000]}",
             file=sys.stderr,
