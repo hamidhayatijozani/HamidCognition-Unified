@@ -75,7 +75,7 @@ try:
 
     # Replay reaches the Gate, which rejects the consumed nonce; the enforcement layer must fail closed.
     status, replayed = post("http://127.0.0.1:8080/execute", {"x": 1}, bound_headers)
-    assert status == 502 and replayed["error"] == "evidence_recording_failed_closed"
+    assert status == 409 and replayed["detail"] == "decision_nonce_already_consumed"
 
     altered_headers = {**allowed_headers, "X-HCJ-Decision-ID": decision_id, "X-Action-Target": "/other-target"}
     status, mismatch = post("http://127.0.0.1:8080/execute", {"x": 1}, altered_headers)
