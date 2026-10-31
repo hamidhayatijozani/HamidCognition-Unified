@@ -5,6 +5,7 @@ on:
     paths:
       - "src/mother_memory.py"
       - "tests/test_mother_memory.py"
+      - "scripts/mother_memory_cli.py"
       - "schemas/mother-memory-assessment.schema.json"
       - ".github/workflows/mother-memory.yml"
   push:
