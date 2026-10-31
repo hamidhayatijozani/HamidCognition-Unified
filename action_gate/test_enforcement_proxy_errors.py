@@ -52,3 +52,21 @@ def test_uses_safe_json_when_gate_error_body_is_empty():
 
     assert handler.status == 409
     assert handler.wfile.getvalue() == b'{"error":"action_gate_request_rejected"}'
+
+
+def test_preserves_body_already_consumed_for_upstream_diagnostics():
+    body = b'{"detail":"decision_nonce_already_consumed"}'
+    error = urllib.error.HTTPError(
+        "http://action-gate.local/reserve",
+        409,
+        "Conflict",
+        {},
+        io.BytesIO(b""),
+    )
+    error._action_gate_body = body
+    handler = FakeHandler()
+
+    send_gate_http_error(handler, error)
+
+    assert handler.status == 409
+    assert handler.wfile.getvalue() == body
