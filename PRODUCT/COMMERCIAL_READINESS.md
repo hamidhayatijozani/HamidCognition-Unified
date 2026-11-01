@@ -1,103 +1,77 @@
 # Action Gate Commercial Readiness
 
-## Canonical product
+Evidence snapshot: 2026-11-01 (UTC)
 
-**HamidCognition Action Gate v1.1.1** is the current customer-facing validated product boundary.
+## Last published immutable release
 
-A customer quote must identify the exact release tag, source commit, artifact and checksum being offered.
+The last published release artifact recorded by the repository is **HamidCognition Action Gate v1.1.1**:
 
-## Included
-
-- Action Gate runtime
-- HTTP enforcement integration
-- authenticated MCP enforcement integration
-- decision evidence and replay
-- tenant / actor / session binding
-- production authentication
-- fail-closed execution boundary
-- persistent PostgreSQL storage
-- persistent execution-authority nonce state
-- production Compose deployment
-- validation evidence
-- Clean-Room verification
-- versioned release artifact and checksum
-
-## Current published release
-
-- Product: HamidCognition Action Gate
-- Version: 1.1.1
 - Release tag: `action-gate-v1.1.1`
-- Source commit: `e9ea7565f4ddea91f5c45104237bd20564c80894`
+- Tagged source commit: `e9ea7565f4ddea91f5c45104237bd20564c80894`
 - Release-candidate workflow run: `36966012148`
 - Artifact: `action-gate-1.1.1.tar`
 - Artifact digest: `sha256:517064de0427286ff4f346d46996642aca3b9def891d1c08bfaebc25546fb791`
 
-## Customer delivery package
+The tag still resolves to the recorded source commit. Current `main` is `5acd7fa4a600f99281f9f5396eef5f7df5e14343`, 509 commits ahead of that tag. PR #243 and PR #244 were merged after the v1.1.1 source commit. Therefore, the v1.1.1 archive must not be represented as containing those later changes, and current `main` must not be represented as a newly published release.
 
-1. versioned runtime artifact or container image;
-2. deployment configuration template;
-3. policy configuration template;
-4. integration/API contract;
-5. security boundary;
-6. operations runbook;
-7. customer acceptance matrix and procedure;
-8. versioned release notes;
-9. provenance and license terms;
-10. delivery manifest.
+## Current source and validation evidence
 
-## Commercial modes
+Current `main`:
 
-**SELF_HOSTED** means the customer operates the runtime.
+- SHA: `5acd7fa4a600f99281f9f5396eef5f7df5e14343`
+- PR #243 merged as `81543c44dee6d5b72722649568986e49907caec1`: deterministic Gate conflict status/body preserved across HTTP and MCP enforcement.
+- PR #244 merged as `e44552f63f73c7fbf54e0a32bc0981220221b8f7`: production approval-signing secret injected into the Action Gate verifier.
 
-**MANAGED** means HamidCognition operates the service boundary.
+The latest complete Action Gate validation evidence located for these changes is on PR #244 head SHA `9120f63e3014d98876ab5075c2eb538ca0341abe`, not on current `main` and not on a customer host:
 
-**ENTERPRISE** means self-hosted or managed deployment plus negotiated integration, security review, support and SLA terms.
+- 20/20 GitHub check runs succeeded.
+- [Action Gate Product Gates run #41172304753](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41172304753) passed. Its steps include real HTTP enforcement, real MCP enforcement, production Compose, PostgreSQL checks, concurrent nonce contention, approval verification, 200-event replay, and replay after service restart.
+- [Production E2E Smoke run #41172304650](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41172304650) passed, including PostgreSQL evidence retrieval after an Action Gate restart.
+- [Clean-Room Verification run #41172304789](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41172304789) passed.
+- [Security Authority Gate run #41172305010](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41172305010) passed.
 
-The repository does not represent Managed or Enterprise operations as already delivered to a paying customer.
+On current `main`, [Evidence Chain Integrity run #41244586257](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41244586257) passed and created a Sigstore witness for that source SHA. This is evidence-chain verification, not a substitute for the full Action Gate Product Gates suite.
 
-## Pilot entry point
+The current-main release chain did not publish a new artifact. The readiness, candidate, and publisher jobs at runs #41204043688, #41204057084, and #41204067836 completed as successful no-ops: validated-SHA publication, candidate checkout/build, and release verification/publication were skipped. No new release is claimed.
 
-The proposed standard first-deal offer is **2,500 USDT fixed for 30 days**: one customer-selected HTTP/MCP tool, one controlled test environment, agreed acceptance cases, deployment assistance and a reproducible evidence package. This is a commercial hypothesis, not a market-validated price or evidence of an existing transaction.
+## Runtime and deployment boundary
 
-Acceptance is based on executable behavior:
+[Production Runtime Supervisor run #41267310701](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41267310701) checked current `main`, but its log states that `PRODUCTION_BASE_URL` is not configured and the runtime probe was skipped. The recorded production status is **UNKNOWN**, not healthy or deployed.
 
-- unauthorized direct downstream access is rejected;
-- authority is bound to intended tenant, actor, session, action and policy;
-- expired authority is rejected;
-- replay is rejected;
-- tampering is rejected;
-- persistence survives restart;
-- evidence can be reproduced from the customer's deployment.
+The repository's production Compose configuration uses a separate SQLite nonce registry for the protected tool, stored at `/data/tool_authority.db` on the persistent `tool_data` volume. For the current implementation:
 
-## Live-sale dependency
+- keep the protected tool at one instance for the limited pilot;
+- preserve and back up `tool_data` as well as PostgreSQL;
+- do not horizontally scale the tool or claim multi-replica nonce consistency;
+- if the nonce volume is lost or restored from a stale backup, keep execution disabled until outstanding authorities are invalidated and the nonce state is safely re-established.
 
-Technical release readiness is not revenue.
+A customer host, DNS/TLS endpoint, externally reachable deployment, and customer-host acceptance run have not been evidenced.
 
-A completed sale requires:
+## Security boundary
 
-1. named buyer and technical owner;
-2. written scope and acceptance criteria;
-3. price and license/usage terms;
-4. invoice or payment request;
-5. verified payment settlement;
-6. customer acceptance evidence;
-7. entitlement/delivery record.
+The tested product boundary covers the exact execution paths and cases represented by the cited CI runs. It does not establish universal AI safety, correctness of customer policies, downstream business correctness, regulatory certification, HSM/KMS custody, multi-replica nonce coordination, or replay of external world state and side effects.
 
-### Settlement handling
+## Commercial and legal boundary
 
-Commercial settlement is USDT-only. The actual provider, receiving address, network and verification policy must be supplied through an appropriate secure commercial channel, not stored in public source control. Manual/provider settlement must not be described as on-chain verification.
+The proposed first pilot remains **2,500 USDT fixed for 30 days**, limited to one customer-selected HTTP or MCP tool in one controlled test environment. This is a proposal, not a market-validated price or an existing transaction.
 
-## Commercial truth rule
+The repository's `LICENSE` states that the repository is proprietary and grants no commercial licence by public visibility alone. A separate written pilot licence/permission and agreed scope must be in place before customer delivery. The IP evidence register is explicitly a partial draft, not a legal opinion or proof of exclusive ownership.
 
-Do not call the product sold, customer validated, revenue-generating, production proven with customers, or compliant unless the corresponding external evidence exists.
+No customer acceptance, signed pilot contract, payment settlement, or revenue evidence is recorded here.
 
-## Launch assets
+## Go / No-Go
 
-- `SALES/ONE_PAGER.md`
-- `SALES/PILOT_OFFER.md`
-- `SALES/DEMO_SCRIPT.md`
-- `SALES/ICP_AND_POSITIONING.md`
-- `SALES/OUTBOUND_EMAILS.md`
-- `SALES/OBJECTIONS.md`
-- `SALES/PRICING_AND_SCOPE.md`
-- `SALES/COMMERCIAL_LAUNCH_PLAN.md`
+**NO-GO for production customer execution today.** The current-main product validation, release artifact, production endpoint, and customer acceptance are not all established on one immutable source/deployment identity.
+
+**Eligible next step:** a restricted technical evaluation using one tool, one tool instance, synthetic or reversible actions, a controlled customer environment, a written licence/scope, and the full acceptance matrix. Production actions remain disabled until the customer-host checks pass.
+
+## Required delivery package
+
+1. exact immutable release tag, source SHA, artifact and checksum;
+2. secret-free deployment and policy templates;
+3. integration/API contract;
+4. security boundary and known limitations;
+5. operations and rollback runbook, including the single-instance nonce-store constraint;
+6. customer acceptance matrix and raw evidence bundle;
+7. written licence and pilot agreement;
+8. delivery and entitlement record.
