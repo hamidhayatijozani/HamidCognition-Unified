@@ -468,8 +468,13 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
     decision_id = f"dec_{uuid.uuid4().hex}"
     trace_id = f"trace_{uuid.uuid4().hex}"
     nonce = uuid.uuid4().hex
-    risk, risk_reasons = evaluate_risk(req)
-    signal = compute_signal(req, risk)
+    try:
+        risk, risk_reasons = evaluate_risk(req)
+        signal = compute_signal(req, risk)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(503, "policy_evaluation_unavailable") from exc
     current_state = get_current_snapshot()
     if current_state is None:
         if ENVIRONMENT == "production":
@@ -495,7 +500,12 @@ def evaluate(req: ActionRequest, authorization: str | None = Header(default=None
             "reason": "unknown_or_stale_evidence_requires_recheck",
         }]
     else:
-        decision, policy_checks = decide(req, risk, signal)
+        try:
+            decision, policy_checks = decide(req, risk, signal)
+        except HTTPException:
+            raise
+        except Exception as exc:
+            raise HTTPException(503, "policy_evaluation_unavailable") from exc
     req.evidence = normalized_evidence
     normalized = normalized_action(req, signal)
     created = now()
