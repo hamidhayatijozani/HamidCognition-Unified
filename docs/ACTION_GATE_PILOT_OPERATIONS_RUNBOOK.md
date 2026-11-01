@@ -10,6 +10,20 @@ This runbook is the operational handoff for a **restricted, non-production pilot
 - Expose only a reviewed TLS reverse proxy or authenticated tunnel. The production Compose file does not by itself establish public TLS, DNS, or a deployed endpoint.
 - Keep a rollback path: stop the stack and revoke pilot credentials before deleting data or volumes.
 
+## 1.1 Protected-tool nonce-store topology
+
+The current production Compose configuration stores the protected tool's nonce registry in SQLite at `/data/tool_authority.db`, backed by the Docker volume `tool_data:/data`. This store is separate from Action Gate's PostgreSQL records and audit ledger.
+
+For the limited pilot:
+
+- run exactly one protected-tool instance;
+- retain the `tool_data` volume across container restarts and upgrades;
+- back up `tool_data` together with PostgreSQL, and test restoration before customer traffic;
+- do not horizontally scale the tool or claim multi-host/high-availability nonce consistency;
+- if the volume is lost or restored from a stale backup, disable protected execution, invalidate outstanding authorities (for example by rotating the dedicated authority secret), restore or recreate the nonce store under a controlled procedure, then rerun replay and acceptance tests before re-enabling execution.
+
+A shared transactional nonce backend and cross-replica concurrency tests are prerequisites for any multi-instance deployment.
+
 ## 2. Required configuration
 
 Copy `PRODUCT/.env.production.example` to `action_gate/.env.production` on the deployment host, replace every placeholder, and run `chmod 600 action_gate/.env.production`. Never commit the resulting file.
