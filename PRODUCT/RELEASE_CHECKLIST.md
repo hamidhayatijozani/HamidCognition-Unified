@@ -1,54 +1,68 @@
 # Action Gate Release Checklist
 
-## Engineering
+Evidence snapshot: 2026-11-01 (UTC)
 
-- [x] Canonical product release is 1.0.10.
-- [x] Versioned release artifact published.
-- [x] Release checksum asset published.
-- [x] Release manifest asset published.
-- [x] Publisher records verified source commit.
-- [x] Release-candidate workflow 36303350191 completed successfully for source commit 77d820e99dc78a6a9e3217d3c1c49d5cdf07813f.
-- [ ] Current-main CI status independently green at the latest main commit.
-- [ ] Signing material externally managed. This remains an operational deployment requirement.
+## Last published immutable release
 
-## Security
+- [x] Versioned release tag exists: `action-gate-v1.1.1`.
+- [x] Tag target: `e9ea7565f4ddea91f5c45104237bd20564c80894`.
+- [x] Release-candidate workflow: `36966012148`.
+- [x] Artifact: `action-gate-1.1.1.tar`.
+- [x] Artifact SHA-256: `517064de0427286ff4f346d46996642aca3b9def891d1c08bfaebc25546fb791`.
 
-- [x] No production secrets are committed in the product environment template.
-- [x] Actor/session/tenant binding is covered by the product validation boundary.
-- [x] Nonce single-use and persistence are covered by the product acceptance boundary.
-- [x] Evidence failure is fail-closed.
-- [x] SANDBOX cannot cross the production execution boundary.
-- [x] Direct downstream bypass is constrained by the enforcement contract.
-- [x] Release write privileges are isolated from build/evidence workflows.
+This is the last published artifact found. It is not the current `main` build.
 
-## Customer delivery
+## Current main
 
-- [x] Deployment contract delivered.
-- [x] Integration contract delivered.
-- [x] Environment template delivered.
-- [x] Operations runbook delivered.
-- [x] Customer acceptance procedure delivered.
-- [x] Delivery manifest delivered.
-- [x] Versioned product release published.
+- Current main SHA: `5acd7fa4a600f99281f9f5396eef5f7df5e14343`.
+- PR #243 is merged: `81543c44dee6d5b72722649568986e49907caec1`.
+- PR #244 is merged: `e44552f63f73c7fbf54e0a32bc0981220221b8f7`.
+- Current main is 509 commits ahead of the v1.1.1 tag.
+- No new immutable release artifact for current main is evidenced.
+- Main branch protection is disabled and no repository rulesets were returned by the GitHub API.
+- No complete same-SHA Action Gate Product Gates run was found for the current main SHA in this evidence snapshot.
 
-## Exact published release evidence
+## Latest full Action Gate candidate evidence
 
-- Product: HamidCognition Action Gate
-- Version: 1.0.10
-- Release tag: action-gate-v1.0.10
-- Source commit recorded by publisher: 77d820e99dc78a6a9e3217d3c1c49d5cdf07813f
-- Release-candidate workflow run: 36303350191
-- Release artifact: action-gate-1.0.10.tar
-- Release artifact digest: sha256:10bb53b69b56ff86146f5c71e3e5d7e34dacb4e12dba2adafc59f9d5276abd91
-- Release checksum asset: action-gate-1.0.10.tar.sha256
-- Release checksum digest: sha256:1f57c20d6d27608c817fd695f963b33b8bd5c69c3d37a9052a519f2d45fb4dfa
-- Manifest asset: action-gate-1.0.10.manifest.txt
-- Manifest digest: sha256:bcf4aceeee10e18bfbb358d95116d357e0f6fa9bb796527b2d2a930e8427f5e5
+The following results are tied to PR #244 head SHA `9120f63e3014d98876ab5075c2eb538ca0341abe`, not current main and not a customer deployment:
 
-## Known boundary
+- [x] 20/20 check runs succeeded.
+- [x] Product Gates: [run #41172304753](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41172304753).
+- [x] Production PostgreSQL E2E and restart persistence: [run #41172304650](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41172304650).
+- [x] Clean-Room Verification: [run #41172304789](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41172304789).
+- [x] Security Authority Gate: [run #41172305010](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41172305010).
+- [x] Canonical Gates: [run #41172304733](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41172304733).
 
-This evidence establishes the published release artifact and its recorded source provenance. It does not establish customer infrastructure readiness, external signing-key custody, regulatory certification, live financial-trading performance, or completion of a customer transaction.
+The Product Gates run includes HTTP/MCP integration, production Compose, PostgreSQL audit immutability and ordering checks, a 16-worker nonce race with one winner, approval-signature verification, 200-event replay, and replay after service restart.
 
-## Commercial close condition
+## Current-main evidence and release status
 
-A sale is complete only after a real payment provider has an active product/price and checkout/payment link, followed by an actual successful transaction. Repository documentation alone is not a sale.
+- [x] Evidence Chain Integrity on current main: [run #41244586257](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41244586257).
+- [ ] Full Action Gate Product Gates on the exact current main SHA: not evidenced in this snapshot.
+- [ ] New release-readiness proof for current main: not established.
+- [ ] Release candidate archive for current main: not produced.
+- [ ] New release publication for current main: not performed.
+- [ ] Production endpoint probe: UNKNOWN; `PRODUCTION_BASE_URL` is not configured, as recorded by [run #41267310701](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41267310701).
+- [ ] Customer-host acceptance: not evidenced.
+- [ ] Written pilot licence and customer agreement: not evidenced.
+- [ ] Customer acceptance, payment, and revenue: not evidenced.
+
+The current-main release workflow runs #41204043688, #41204057084, and #41204067836 ended with success conclusions but skipped validated-SHA publication, candidate build, and release publication. They are successful no-ops, not a new release.
+
+## Deployment constraints
+
+- [ ] Keep one protected-tool instance for the limited pilot. Its nonce registry is SQLite at `/data/tool_authority.db` on the persistent `tool_data` volume; multi-replica nonce coordination is not established.
+- [ ] Back up PostgreSQL and the separate `tool_data` volume.
+- [ ] Configure the actual customer host, DNS/TLS, and production endpoint before probing.
+- [ ] Run the full acceptance matrix against the exact deployed tag, source SHA, image digest, and policy fingerprint.
+
+## Legal and commercial
+
+- [ ] Obtain a written pilot licence/permission. The repository is proprietary; public visibility is not a commercial licence.
+- [ ] Agree one-tool scope, data handling, rollback, responsibilities, and acceptance criteria in writing.
+- [ ] Treat 2,500 USDT / 30 days as a proposed price only.
+- [ ] Record payment settlement and customer acceptance only when external evidence exists.
+
+## Release rule
+
+Do not mark current main as released, production deployed, customer accepted, or revenue-generating until the exact-source release chain, customer-host checks, written licence, acceptance evidence, and commercial records exist.
