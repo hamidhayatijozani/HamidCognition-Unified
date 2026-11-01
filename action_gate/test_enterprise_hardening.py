@@ -89,7 +89,7 @@ def test_policy_evaluation_failure_returns_unavailable_without_persisting(
     monkeypatch, failure_point
 ):
     from fastapi import HTTPException
-    import action_gate.app as gate_app
+    import app as gate_app
 
     monkeypatch.setattr(gate_app, "ENVIRONMENT", "development")
     monkeypatch.setattr(gate_app, "REQUIRE_SESSION_BINDING", False)
