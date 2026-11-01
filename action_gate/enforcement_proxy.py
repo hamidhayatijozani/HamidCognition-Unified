@@ -22,6 +22,26 @@ def auth_headers():
     return {"Authorization": f"Bearer {API_TOKEN}"} if API_TOKEN else {}
 
 
+_ALLOW_FIELDS = ("decision_id", "action_hash", "policy_hash", "nonce")
+_DECISIONS = {"ALLOW", "DENY", "ASK", "SANDBOX"}
+
+
+def trustworthy_decision(result) -> bool:
+    """A Gate decision may authorize a tool only when its execution binding is complete."""
+    if not isinstance(result, dict) or result.get("decision") not in _DECISIONS:
+        return False
+    if result["decision"] != "ALLOW":
+        return True
+    return all(isinstance(result.get(key), str) and result.get(key) for key in _ALLOW_FIELDS)
+
+
+def reject_untrusted(handler) -> None:
+    handler.send_response(502)
+    handler.send_header("Content-Type", "application/json")
+    handler.end_headers()
+    handler.wfile.write(b'{"error":"action_gate_response_untrusted"}')
+
+
 def send_gate_http_error(handler, exc: urllib.error.HTTPError) -> None:
     """Preserve deterministic Gate HTTP errors without masking transport failures."""
     # post_json reads the body once for diagnostics; reuse that exact payload
@@ -153,10 +173,18 @@ class HTTPHandler(BaseHTTPRequestHandler):
                     self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
                 self.send_response(status); self.end_headers(); self.wfile.write(json.dumps(out).encode()); return
             result = post_json(GATE_URL + "/v1/action/evaluate", {"agent_id": agent_id, "actor_id": actor_id, "session_id": session_id, "tenant_id": tenant_id, "action": action, "target": target, "parameters": payload})[1]
+            if not trustworthy_decision(result):
+                reject_untrusted(self)
+                return
             # Preserve the Gate-issued digest; the proxy must not independently
             # recompute an authorization binding after the decision is issued.
             result["enforcement_action_hash"] = result["action_hash"]
             self.send_response(200); self.end_headers(); self.wfile.write(json.dumps({"enforced": result["decision"] == "ALLOW", "decision": result}).encode())
+        except urllib.error.HTTPError as exc:
+            # A deterministic Gate status, including policy-evaluation 503,
+            # must survive this boundary. Transport failures are not HTTPError
+            # after post_json distinguishes them, and stay fail-closed below.
+            send_gate_http_error(self, exc)
         except Exception:
             self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"action_gate_or_tool_unreachable"}')
 
@@ -170,6 +198,9 @@ class MCPHandler(BaseHTTPRequestHandler):
             params = message.get("params", {}); tool = params.get("name", "unknown"); args = params.get("arguments", {})
             tenant_id = self.headers.get("X-Tenant-ID", "default"); actor_id = self.headers.get("X-Actor-ID"); session_id = self.headers.get("X-Session-ID"); agent_id = self.headers.get("X-Agent-ID", "unknown"); target = args.get("target")
             result = post_json(GATE_URL + "/v1/action/evaluate", {"agent_id": agent_id, "actor_id": actor_id, "session_id": session_id, "tenant_id": tenant_id, "action": tool, "target": target, "parameters": args})[1]
+            if not trustworthy_decision(result):
+                reject_untrusted(self)
+                return
             if result["decision"] != "ALLOW":
                 self.send_response(200); self.end_headers(); self.wfile.write(json.dumps({"jsonrpc": "2.0", "id": message.get("id"), "result": {"blocked_by_action_gate": True, "decision": result}}).encode()); return
             try:
@@ -199,6 +230,8 @@ class MCPHandler(BaseHTTPRequestHandler):
             except Exception:
                 self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"evidence_recording_failed_closed"}'); return
             self.send_response(status); self.end_headers(); self.wfile.write(json.dumps(out).encode())
+        except urllib.error.HTTPError as exc:
+            send_gate_http_error(self, exc)
         except Exception:
             self.send_response(502); self.end_headers(); self.wfile.write(b'{"error":"action_gate_or_tool_unreachable"}')
 
