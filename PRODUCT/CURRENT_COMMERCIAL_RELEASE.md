@@ -7,7 +7,7 @@ Evidence snapshot: 2026-11-01 (UTC)
 The latest independently validated and published Action Gate release is **v1.1.1**:
 
 - release tag: `action-gate-v1.1.1`
-- tagged source commit: `e9ea7565f4ddea91f5c45104237bd20564c80894`
+- source identity: recorded in the immutable release manifest and the internal `action_gate/RELEASE_CLOSURE.md`
 - artifact: `action-gate-1.1.1.tar`
 - artifact SHA-256: `517064de0427286ff4f346d46996642aca3b9def891d1c08bfaebc25546fb791`
 
