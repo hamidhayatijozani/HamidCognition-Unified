@@ -11,7 +11,9 @@ permissions:
 
 jobs:
   publish:
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    # A successful readiness run may originate from main Product Gates or
+    # from an exact release-tag push. Publication still requires its artifact.
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Select exactly one release candidate artifact
@@ -75,8 +77,24 @@ jobs:
 
           readiness_json="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$readiness_run_id")"
           test "$(jq -r '.name' <<< "$readiness_json")" = "Action Gate Release Readiness Gate"
-          test "$(jq -r '.head_branch' <<< "$readiness_json")" = "main"
           test "$(jq -r '.conclusion' <<< "$readiness_json")" = "success"
+          readiness_event="$(jq -r '.event' <<< "$readiness_json")"
+          readiness_branch="$(jq -r '.head_branch' <<< "$readiness_json")"
+          readiness_head_sha="$(jq -r '.head_sha' <<< "$readiness_json")"
+          test "$readiness_head_sha" = "$source_sha"
+          case "$readiness_event" in
+            workflow_run)
+              test "$readiness_branch" = "main"
+              ;;
+            push)
+              # The readiness workflow already verified the exact tag name,
+              # tag target, and ancestry from main before uploading its SHA.
+              ;;
+            *)
+              echo "Unsupported readiness event: $readiness_event"
+              exit 1
+              ;;
+          esac
 
           mkdir -p validation
           gh run download "$readiness_run_id" --repo "$GITHUB_REPOSITORY" --name release-readiness-validated-sha --dir validation
