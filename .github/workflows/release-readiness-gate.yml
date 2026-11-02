@@ -6,6 +6,9 @@ on:
       - "Action Gate Product Gates"
     types:
       - completed
+  push:
+    tags:
+      - "action-gate-v*"
 
 permissions:
   contents: read
@@ -14,7 +17,7 @@ permissions:
 
 jobs:
   release-readiness:
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    if: ${{ github.event_name == 'push' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout workflow-control commit for the tag classifier
@@ -23,6 +26,7 @@ jobs:
           # The classifier belongs to the workflow-control revision. The
           # Product Gates source SHA is still read separately from the event.
           ref: ${{ github.sha }}
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Require all release validation workflows on the same SHA
@@ -33,11 +37,17 @@ jobs:
         run: |
           set -euo pipefail
 
-          # The workflow_run event is the authoritative identity of the
-          # Product Gates run that triggered this gate. Do not resolve a
-          # second run through a mutable API lookup: that can select an
-          # unrelated older run and break the source-SHA evidence chain.
-          TARGET_SHA="${{ github.event.workflow_run.head_sha }}"
+          # Use the exact Product Gates source SHA for workflow_run events.
+          # A tag-push event closes the other half of the release sequence:
+          # it lets a tag created after CI has completed start this same gate.
+          if [ "$GITHUB_EVENT_NAME" = "workflow_run" ]; then
+            TARGET_SHA="${{ github.event.workflow_run.head_sha }}"
+          elif [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            TARGET_SHA="$GITHUB_SHA"
+          else
+            echo "Unsupported release-readiness event: $GITHUB_EVENT_NAME"
+            exit 1
+          fi
 
           if [ -z "$TARGET_SHA" ] || [ "$TARGET_SHA" = "null" ]; then
             echo "Unable to resolve triggering workflow run SHA"
@@ -60,11 +70,27 @@ jobs:
           fi
 
           tag="action-gate-v$VERSION"
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            if [ "$GITHUB_REF" != "refs/tags/$tag" ]; then
+              echo "Pushed tag $GITHUB_REF does not match canonical source version $tag"
+              exit 1
+            fi
+            git fetch --no-tags origin main
+            if ! git merge-base --is-ancestor "$TARGET_SHA" FETCH_HEAD; then
+              echo "Tagged source $TARGET_SHA is not reachable from main"
+              exit 1
+            fi
+          fi
+
           tag_http="$(curl -sS -o /tmp/release-tag.json -w '%{http_code}' \
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/git/ref/tags/$tag")"
           if [ "$tag_http" = "404" ]; then
+            if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+              echo "Pushed release tag $tag is not resolvable"
+              exit 1
+            fi
             echo "RELEASE_READINESS_SKIP_NON_RELEASE_SHA"
             echo "validated_sha=$TARGET_SHA"
             echo "validated_release=false" >> "$GITHUB_OUTPUT"
@@ -94,6 +120,10 @@ jobs:
 
           classification="$(python scripts/classify_release_tag_target.py "$TARGET_SHA" "$tag_type" "$tag_sha")"
           if [ "$classification" = "MISMATCH" ]; then
+            if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+              echo "Release tag $tag points to $tag_sha, not pushed source $TARGET_SHA"
+              exit 1
+            fi
             echo "RELEASE_READINESS_SKIP_NON_RELEASE_SHA: $tag points to $tag_sha, not $TARGET_SHA"
             echo "validated_sha=$TARGET_SHA"
             echo "validated_release=false" >> "$GITHUB_OUTPUT"
