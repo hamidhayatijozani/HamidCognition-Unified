@@ -11,9 +11,9 @@ permissions:
 
 jobs:
   publish:
-    # A successful readiness run may originate from main Product Gates or
-    # from an exact release-tag push. Publication still requires its artifact.
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # Candidate runs are emitted only for exact action-gate-v* tag readiness.
+    # Keep ordinary main readiness no-ops out of the publication path.
+    if: ${{ github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_branch, 'action-gate-v') }}
     runs-on: ubuntu-latest
     steps:
       - name: Select exactly one release candidate artifact
