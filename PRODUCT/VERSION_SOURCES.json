@@ -7,9 +7,10 @@
     "render.yaml"
   ],
   "derived": [
-    "README.md",
     "PRODUCT/CURRENT_COMMERCIAL_RELEASE.md",
-    "PRODUCT/RELEASE_NOTES_1.1.1.md"
+    "PRODUCT/RELEASE_NOTES_1.1.1.md",
+    "PRODUCT/RELEASE_NOTES_1.1.2.md",
+    "README.md"
   ],
   "ignored": [
     "CHANGELOG.md",
