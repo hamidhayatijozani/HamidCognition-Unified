@@ -46,6 +46,7 @@ def product_version() -> str:
     return version
 
 def canonical_identity() -> dict[str, str]:
+    """Load the last published release identity, independent of the next build version."""
     identity = json.loads(CANONICAL_RELEASE.read_text(encoding="utf-8"))
     required = ("version", "release_tag", "source_commit")
     if any(not identity.get(key) for key in required):
@@ -54,8 +55,6 @@ def canonical_identity() -> dict[str, str]:
         raise ValueError("Commercial release version is invalid")
     if not re.fullmatch(r"[0-9a-f]{40}", identity["source_commit"], re.I):
         raise ValueError("Commercial release source_commit is invalid")
-    if identity["version"] != product_version():
-        raise ValueError("Commercial release version does not match action_gate/VERSION")
     return {
         "release_version": identity["version"],
         "release_tag": identity["release_tag"],
@@ -134,6 +133,7 @@ def build_state() -> dict[str, Any]:
     return {"schema": "hamidcognition.document-sync.v1",
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "repository_commit": git_value(["rev-parse", "HEAD"]),
+            "development_version": product_version(),
             "canonical_release": identity,
             "declared_source_fingerprints": fingerprints,
             "missing_sources": missing,
