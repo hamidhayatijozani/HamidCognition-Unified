@@ -87,14 +87,46 @@ class DocumentSyncTests(unittest.TestCase):
         self.assertIn("canonical_release", state)
         self.assertIn("declared_source_fingerprints", state)
 
-    def test_release_identity_is_bound_to_canonical_record(self):
+    def test_release_identity_is_bound_to_published_record(self):
         result = self.run_sync("--check")
         state = json.loads(result.stdout)
         identity = state["canonical_release"]
+        release = json.loads((ROOT / "PRODUCT/COMMERCIAL_RELEASE.json").read_text(encoding="utf-8"))
         version_file = (ROOT / "action_gate" / "VERSION").read_text(encoding="utf-8").strip()
-        self.assertEqual(identity["release_version"], version_file)
-        self.assertEqual(identity["release_version"], "1" + ".1" + ".1")
-        self.assertEqual(identity["release_tag"], "action-gate-v1." + "1.1")
+        self.assertEqual(identity["release_version"], release["version"])
+        self.assertEqual(identity["release_tag"], release["release_tag"])
+        self.assertEqual(state["development_version"], version_file)
+        self.assertEqual(state["development_version"], "1" + ".1" + ".1")
+
+    def test_development_version_can_advance_without_rewriting_published_release(self):
+        spec = importlib.util.spec_from_file_location("document_sync_under_test", SCRIPT)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        original_version_path = module.VERSION_PATH
+        original_release_path = module.CANONICAL_RELEASE
+        try:
+            with tempfile.TemporaryDirectory() as directory:
+                version_path = Path(directory) / "VERSION"
+                release_path = Path(directory) / "COMMERCIAL_RELEASE.json"
+                version_path.write_text("1.1.2\n", encoding="utf-8")
+                release_path.write_text(json.dumps({
+                    "schema": "hamidcognition.commercial-release.v1",
+                    "product": "HamidCognition Action Gate",
+                    "version": "1.1.1",
+                    "release_tag": "action-gate-v1.1.1",
+                    "source_commit": "a" * 40,
+                    "release_candidate_workflow_run": "36966012148",
+                    "artifact_sha256": "b" * 64,
+                }), encoding="utf-8")
+                module.VERSION_PATH = version_path
+                module.CANONICAL_RELEASE = release_path
+                identity = module.canonical_identity()
+                self.assertEqual(module.product_version(), "1.1.2")
+                self.assertEqual(identity["release_version"], "1.1.1")
+                self.assertEqual(identity["release_tag"], "action-gate-v1.1.1")
+        finally:
+            module.VERSION_PATH = original_version_path
+            module.CANONICAL_RELEASE = original_release_path
         self.assertEqual(len(identity["source_commit"]), 40)
 
 
