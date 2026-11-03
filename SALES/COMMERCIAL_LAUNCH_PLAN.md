@@ -12,8 +12,9 @@ The target is not "more GitHub". The target is one buyer, one protected tool, on
 - Published release: v1.1.1
 - Release tag: `action-gate-v1.1.1`
 - Published source: `e9ea7565f4ddea91f5c45104237bd20564c80894`
-- Pilot: 30 days, one protected HTTP or MCP tool
-- Proposed pilot fee: USD 7,500–10,000
+- Development candidate: v1.1.2, not yet tagged or published
+- Pilot: 30 days, one protected HTTP or MCP tool in one controlled test environment
+- Proposed pilot fee: 2,500 USDT fixed for 30 days (commercial hypothesis; not market-validated, contracted, or paid)
 - Delivery models: SELF_HOSTED / MANAGED / ENTERPRISE
 
 The current mutable `main` branch is development state and must not be quoted as the customer artifact until a new release is deliberately cut and its evidence is complete.
@@ -70,6 +71,8 @@ A prospect is qualified only when all are known:
 If these are unknown, do not start custom engineering.
 
 ### 5. Close the pilot
+
+Before delivery, obtain a written license/permission covering the exact pilot scope. The repository is public but proprietary; public visibility is not a customer-use license.
 
 The pilot agreement must contain:
 
