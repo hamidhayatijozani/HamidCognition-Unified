@@ -7,7 +7,7 @@ Evidence snapshot: 2026-11-03 (UTC)
 The latest published Action Gate release remains **v1.1.1**.
 
 - Release tag: `action-gate-v1.1.1`
-- Source commit: `e9ea7565f4ddea91f5c45104237bd20564c80894`
+- Source identity: recorded in the immutable release manifest and the release tag metadata.
 - GitHub Release: https://github.com/hamidhayatijozani/HamidCognition-Unified/releases/tag/action-gate-v1.1.1
 - Artifact: `action-gate-1.1.1.tar`
 - Artifact SHA-256: `517064de0427286ff4f346d46996642aca3b9def891d1c08bfaebc25546fb791`
