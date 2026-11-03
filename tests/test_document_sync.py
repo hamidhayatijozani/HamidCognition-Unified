@@ -108,7 +108,7 @@ class DocumentSyncTests(unittest.TestCase):
             with tempfile.TemporaryDirectory() as directory:
                 version_path = Path(directory) / "VERSION"
                 release_path = Path(directory) / "COMMERCIAL_RELEASE.json"
-                version_path.write_text("1.1.2\\n", encoding="utf-8")
+                version_path.write_text("1.1.2\n", encoding="utf-8")
                 release_path.write_text(json.dumps({
                     "schema": "hamidcognition.commercial-release.v1",
                     "product": "HamidCognition Action Gate",
