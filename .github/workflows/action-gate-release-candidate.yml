@@ -13,8 +13,8 @@ permissions:
 
 jobs:
   release-candidate:
-    # Readiness runs are created either by main's Product Gates workflow_run
-    # or by an exact action-gate-v* tag push after those gates have passed.
+    # Candidate artifacts are built only after an exact action-gate-v* tag push
+    # has passed the same-SHA Release Readiness Gate.
     # The validated-SHA artifact remains mandatory in both paths.
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' }}
     runs-on: ubuntu-latest
