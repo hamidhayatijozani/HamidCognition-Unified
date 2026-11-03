@@ -96,7 +96,6 @@ class DocumentSyncTests(unittest.TestCase):
         self.assertEqual(identity["release_version"], release["version"])
         self.assertEqual(identity["release_tag"], release["release_tag"])
         self.assertEqual(state["development_version"], version_file)
-        self.assertEqual(state["development_version"], "1" + ".1" + ".1")
 
     def test_development_version_can_advance_without_rewriting_published_release(self):
         spec = importlib.util.spec_from_file_location("document_sync_under_test", SCRIPT)
