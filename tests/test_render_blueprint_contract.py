@@ -44,8 +44,8 @@ def section_after(source: str, marker: str, stop: str) -> str:
     start = source.index(marker) + len(marker)
     ends = [
         position
-        for marker in (stop, "\\nservices:")
-        if (position := source.find(marker, start)) >= 0
+        for boundary in (stop, "\nservices:")
+        if (position := source.find(boundary, start)) >= 0
     ]
     if not ends:
         raise AssertionError(f"Section terminator not found after {marker!r}")
