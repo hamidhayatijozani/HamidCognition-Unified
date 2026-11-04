@@ -42,8 +42,14 @@ EXPECTED_SERVICE_GROUPS = {
 
 def section_after(source: str, marker: str, stop: str) -> str:
     start = source.index(marker) + len(marker)
-    end = source.index(stop, start)
-    return source[start:end]
+    ends = [
+        position
+        for marker in (stop, "\\nservices:")
+        if (position := source.find(marker, start)) >= 0
+    ]
+    if not ends:
+        raise AssertionError(f"Section terminator not found after {marker!r}")
+    return source[start:min(ends)]
 
 
 def generated_keys_for_group(source: str, group_name: str) -> set[str]:
