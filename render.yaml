@@ -9,6 +9,8 @@ envVarGroups:
         generateValue: true
       - key: ACTION_GATE_AUTHORITY_SECRET
         generateValue: true
+      - key: ACTION_GATE_STATE_ORACLE_SECRET
+        generateValue: true
       - key: MCP_BEARER_TOKEN
         generateValue: true
 
