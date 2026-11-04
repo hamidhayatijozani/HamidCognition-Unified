@@ -66,7 +66,7 @@ def generated_keys_for_group(source: str, group_name: str) -> set[str]:
     )
 
 
-def groups_for_service(source: str, service_name: str) -> set[str]:
+def service_block(source: str, service_name: str) -> str:
     match = re.search(
         rf"(?ms)^  - type: [^\n]+\n    name: {re.escape(service_name)}\n"
         rf"(?P<body>.*?)(?=^  - type: |^databases:|\Z)",
@@ -74,8 +74,15 @@ def groups_for_service(source: str, service_name: str) -> set[str]:
     )
     if match is None:
         raise AssertionError(f"Render service is missing: {service_name}")
+    return match.group("body")
+
+
+def groups_for_service(source: str, service_name: str) -> set[str]:
     return set(
-        re.findall(r"(?m)^      - fromGroup: ([a-z0-9-]+)$", match.group("body"))
+        re.findall(
+            r"(?m)^      - fromGroup: ([a-z0-9-]+)$",
+            service_block(source, service_name),
+        )
     )
 
 
@@ -99,6 +106,28 @@ class RenderBlueprintContractTests(unittest.TestCase):
                     expected_groups,
                     f"Unexpected secret-group assignment for {service_name}",
                 )
+
+    def test_action_gate_pilot_services_use_paid_compute(self):
+        source = RENDER_BLUEPRINT.read_text(encoding="utf-8")
+        for service_name in EXPECTED_SERVICE_GROUPS:
+            with self.subTest(service=service_name):
+                block = service_block(source, service_name)
+                plan = re.search(r"(?m)^    plan: ([a-z0-9_]+)$", block)
+                self.assertIsNotNone(plan, f"Plan missing for {service_name}")
+                self.assertEqual(plan.group(1), "starter")
+
+    def test_action_gate_postgres_uses_a_non_expiring_paid_plan(self):
+        source = RENDER_BLUEPRINT.read_text(encoding="utf-8")
+        database_section = source.split("databases:", 1)[1]
+        match = re.search(
+            r"(?ms)^  - name: hamidcognition-action-gate-db\\n"
+            r"(?P<body>.*?)(?=^  - name: |\\Z)",
+            database_section,
+        )
+        self.assertIsNotNone(match, "Action Gate Postgres database is missing")
+        plan = re.search(r"(?m)^    plan: ([a-z0-9_]+)$", match.group("body"))
+        self.assertIsNotNone(plan, "Action Gate Postgres plan is missing")
+        self.assertEqual(plan.group(1), "basic_256mb")
 
 
 if __name__ == "__main__":
