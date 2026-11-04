@@ -119,13 +119,10 @@ class RenderBlueprintContractTests(unittest.TestCase):
     def test_action_gate_postgres_uses_a_non_expiring_paid_plan(self):
         source = RENDER_BLUEPRINT.read_text(encoding="utf-8")
         database_section = source.split("databases:", 1)[1]
-        match = re.search(
-            r"(?ms)^  - name: hamidcognition-action-gate-db\\n"
-            r"(?P<body>.*?)(?=^  - name: |\\Z)",
-            database_section,
-        )
-        self.assertIsNotNone(match, "Action Gate Postgres database is missing")
-        plan = re.search(r"(?m)^    plan: ([a-z0-9_]+)$", match.group("body"))
+        db_block = database_section.split(
+            "  - name: hamidcognition-action-gate-db", 1
+        )[1].split("\\n  - name:", 1)[0]
+        plan = re.search(r"(?m)^    plan: ([a-z0-9_]+)$", db_block)
         self.assertIsNotNone(plan, "Action Gate Postgres plan is missing")
         self.assertEqual(plan.group(1), "basic_256mb")
 
