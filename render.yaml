@@ -43,7 +43,7 @@ services:
   - type: pserv
     name: hamidcognition-action-gate
     runtime: docker
-    plan: free
+    plan: starter
     region: frankfurt
     dockerfilePath: ./action_gate/Dockerfile
     dockerContext: .
@@ -72,7 +72,7 @@ services:
   - type: pserv
     name: hamidcognition-protected-tool
     runtime: docker
-    plan: free
+    plan: starter
     region: frankfurt
     dockerfilePath: ./action_gate/Dockerfile.tool
     dockerContext: ./action_gate
@@ -89,7 +89,7 @@ services:
   - type: pserv
     name: hamidcognition-enforcement
     runtime: docker
-    plan: free
+    plan: starter
     region: frankfurt
     dockerfilePath: ./action_gate/Dockerfile.enforcement
     dockerContext: ./action_gate
@@ -113,7 +113,7 @@ services:
   - type: web
     name: hamidcognition-action-gate-console
     runtime: docker
-    plan: free
+    plan: starter
     region: frankfurt
     dockerfilePath: ./dashboard/Dockerfile
     dockerContext: .
@@ -139,7 +139,7 @@ services:
   - type: web
     name: hamidcognition-action-gate-mcp
     runtime: docker
-    plan: free
+    plan: starter
     region: frankfurt
     dockerfilePath: ./action_gate/Dockerfile.mcp
     dockerContext: .
@@ -179,7 +179,7 @@ databases:
     databaseName: claimlab
     user: claimlab
   - name: hamidcognition-action-gate-db
-    plan: free
+    plan: basic_256mb
     region: frankfurt
     postgresMajorVersion: "17"
     databaseName: action_gate
