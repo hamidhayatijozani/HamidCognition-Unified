@@ -24,6 +24,16 @@ The customer must receive a separate written license or other legally valid auth
 - termination and post-termination handling;
 - applicable law and dispute terms.
 
+## Restricted-use requirement for commercial licenses
+
+Unless the rights holder adopts a different policy in a later signed written instrument, every commercial license or evaluation authorization must expressly prohibit:
+
+- use by government, military, intelligence, law-enforcement, or regulatory-enforcement bodies;
+- use for surveillance, tracking, profiling, or targeting of people;
+- use to facilitate repression, unlawful discrimination, or coercive enforcement against individuals or groups.
+
+The restriction must be written into the signed agreement, not assumed from this checklist. This is a proposed proprietary licensing condition and requires qualified legal review for the governing jurisdiction, definitions, exceptions required by law, and enforceability. It does not override third-party licenses or mandatory law.
+
 ## Technical attachment
 The commercial agreement should reference the exact product delivery manifest, release tag, commit, artifact checksum, acceptance result, and any customer-specific integration scope.
 
