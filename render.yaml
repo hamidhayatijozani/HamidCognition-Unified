@@ -1,14 +1,24 @@
 envVarGroups:
-  - name: hamidcognition-action-gate-secrets
+  - name: action-gate-api-auth
     envVars:
       - key: ACTION_GATE_API_TOKEN
         generateValue: true
-      - key: ACTION_GATE_SIGNING_SECRET
-        generateValue: true
-      - key: ACTION_GATE_APPROVAL_SECRET
-        generateValue: true
+  - name: action-gate-authority
+    envVars:
       - key: ACTION_GATE_AUTHORITY_SECRET
         generateValue: true
+  - name: action-gate-runtime-signing
+    envVars:
+      - key: ACTION_GATE_SIGNING_SECRET
+        generateValue: true
+      - key: ACTION_GATE_STATE_ORACLE_SECRET
+        generateValue: true
+  - name: action-gate-approval
+    envVars:
+      - key: ACTION_GATE_APPROVAL_SECRET
+        generateValue: true
+  - name: action-gate-mcp-auth
+    envVars:
       - key: MCP_BEARER_TOKEN
         generateValue: true
 
@@ -33,12 +43,15 @@ services:
   - type: pserv
     name: hamidcognition-action-gate
     runtime: docker
-    plan: free
+    plan: starter
     region: frankfurt
     dockerfilePath: ./action_gate/Dockerfile
     dockerContext: .
     envVars:
-      - fromGroup: hamidcognition-action-gate-secrets
+      - fromGroup: action-gate-api-auth
+      - fromGroup: action-gate-authority
+      - fromGroup: action-gate-runtime-signing
+      - fromGroup: action-gate-approval
       - key: ACTION_GATE_ENV
         value: production
       - key: ACTION_GATE_DATABASE_URL
@@ -59,12 +72,13 @@ services:
   - type: pserv
     name: hamidcognition-protected-tool
     runtime: docker
-    plan: free
+    plan: starter
     region: frankfurt
     dockerfilePath: ./action_gate/Dockerfile.tool
     dockerContext: ./action_gate
     envVars:
-      - fromGroup: hamidcognition-action-gate-secrets
+      - fromGroup: action-gate-api-auth
+      - fromGroup: action-gate-authority
       - key: TOOL_NONCE_DB
         value: /data/tool_authority.db
     disk:
@@ -75,12 +89,12 @@ services:
   - type: pserv
     name: hamidcognition-enforcement
     runtime: docker
-    plan: free
+    plan: starter
     region: frankfurt
     dockerfilePath: ./action_gate/Dockerfile.enforcement
     dockerContext: ./action_gate
     envVars:
-      - fromGroup: hamidcognition-action-gate-secrets
+      - fromGroup: action-gate-api-auth
       - key: GATE_URL
         fromService:
           name: hamidcognition-action-gate
@@ -99,13 +113,14 @@ services:
   - type: web
     name: hamidcognition-action-gate-console
     runtime: docker
-    plan: free
+    plan: starter
     region: frankfurt
     dockerfilePath: ./dashboard/Dockerfile
     dockerContext: .
     healthCheckPath: /health
     envVars:
-      - fromGroup: hamidcognition-action-gate-secrets
+      - fromGroup: action-gate-api-auth
+      - fromGroup: action-gate-approval
       - key: ACTION_GATE_URL
         fromService:
           name: hamidcognition-action-gate
@@ -124,12 +139,13 @@ services:
   - type: web
     name: hamidcognition-action-gate-mcp
     runtime: docker
-    plan: free
+    plan: starter
     region: frankfurt
     dockerfilePath: ./action_gate/Dockerfile.mcp
     dockerContext: .
     envVars:
-      - fromGroup: hamidcognition-action-gate-secrets
+      - fromGroup: action-gate-api-auth
+      - fromGroup: action-gate-mcp-auth
       - key: ACTION_GATE_URL
         fromService:
           name: hamidcognition-action-gate
@@ -163,7 +179,7 @@ databases:
     databaseName: claimlab
     user: claimlab
   - name: hamidcognition-action-gate-db
-    plan: free
+    plan: basic_256mb
     region: frankfurt
     postgresMajorVersion: "17"
     databaseName: action_gate
