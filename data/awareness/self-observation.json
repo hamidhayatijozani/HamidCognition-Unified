@@ -393,7 +393,7 @@
   ],
   "hard_boundary": "self-observation cannot execute, self-upgrade, self-grant authority, or rewrite contracts",
   "mode": "SELF_OBSERVE_ONLY",
-  "observation_time": "2026-11-08T20:56:59.649102+00:00",
+  "observation_time": "2026-11-09T05:15:38.612295+00:00",
   "project": "BESAZ",
   "proposals": [
     {
