@@ -3,6 +3,7 @@ name: Research P/S/T Shock Recovery
 on:
   push:
     branches:
+      - research/shock-recovery-proof-v2
       - research/shock-recovery-v1.1
   workflow_dispatch:
 
@@ -12,19 +13,18 @@ permissions:
 jobs:
   falsification:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: integrated/research
+    env:
+      PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
       - name: Install test runner
         run: python -m pip install "pytest>=8,<9"
       - name: Falsification suite
-        run: python -m pytest -q test_shock_recovery.py
+        run: python -m pytest -q integrated/research/test_integrated_shock_recovery.py
       - name: Generate evidence pack
-        run: python run_shock_suite.py
+        run: python integrated/research/run_shock_suite.py
       - name: Verify evidence pack exists
-        run: test -s EVIDENCE_PACK.json
+        run: test -s integrated/research/EVIDENCE_PACK.json
       - name: Upload evidence pack
         uses: actions/upload-artifact@v4
         with:
