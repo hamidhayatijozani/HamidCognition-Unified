@@ -1,77 +1,86 @@
 # Action Gate Commercial Readiness
 
-Evidence snapshot: 2026-11-01 (UTC)
+Evidence snapshot: 2026-11-07 (UTC)
 
-## Last published immutable release
+## Current source identity
 
-The last published release artifact recorded by the repository is **HamidCognition Action Gate v1.1.1**:
+Current `main` head observed from GitHub:
+- SHA: `deafc1d233cb955768e01d85af5ce3398484c235`
+- Latest observed commit: `BESAZ: record innovation sandbox report`
 
-- Release tag: `action-gate-v1.1.1`
-- Tagged source commit: `e9ea7565f4ddea91f5c45104237bd20564c80894`
-- Release-candidate workflow run: `36966012148`
-- Artifact: `action-gate-1.1.1.tar`
-- Artifact digest: `sha256:517064de0427286ff4f346d46996642aca3b9def891d1c08bfaebc25546fb791`
+The published Action Gate v1.1.1 artifact remains a historical release and is not asserted to contain current-main changes.
 
-The tag still resolves to the recorded source commit. Current `main` is `5acd7fa4a600f99281f9f5396eef5f7df5e14343`, 509 commits ahead of that tag. PR #243 and PR #244 were merged after the v1.1.1 source commit. Therefore, the v1.1.1 archive must not be represented as containing those later changes, and current `main` must not be represented as a newly published release.
+## Current pilot-hardening work
 
-## Current source and validation evidence
+### PR #258 — open
+`fix(pilot): isolate Render secrets and durable Action Gate plans`
 
-Current `main`:
+- Base: `main` at `e9f95774759e338a1f6de6acfc0c1658b7080374`
+- Head: `b3d70799efe264acc62725960a92b3c94f85d73d`
+- Status: OPEN, MERGEABLE, NOT MERGED
+- Scope: isolate Render secret groups, use paid starter compute for the five Action Gate services, use paid basic_256mb Action Gate PostgreSQL, and add regression tests.
+- GitHub Actions observed on the exact PR head: 16 completed workflow runs, all with conclusion `success`.
+- The observed Product Gates run includes real HTTP enforcement, real MCP enforcement, PostgreSQL audit checks, 200-event replay, restart-and-replay, customer console E2E, and production-stack checks.
+- No Render service, database, public endpoint, customer environment, customer acceptance, payment, or revenue is established by this PR.
 
-- SHA: `5acd7fa4a600f99281f9f5396eef5f7df5e14343`
-- PR #243 merged as `81543c44dee6d5b72722649568986e49907caec1`: deterministic Gate conflict status/body preserved across HTTP and MCP enforcement.
-- PR #244 merged as `e44552f63f73c7fbf54e0a32bc0981220221b8f7`: production approval-signing secret injected into the Action Gate verifier.
+### PR #257 — open
+`security: make autonomous repair contents read-only`
 
-The latest complete Action Gate validation evidence located for these changes is on PR #244 head SHA `9120f63e3014d98876ab5075c2eb538ca0341abe`, not on current `main` and not on a customer host:
+- Status: OPEN but currently `mergeable=false`.
+- Change: reduce GitHub Actions repository contents permission from write to read for the autonomous repair workflow.
+- This remains an independent security hardening change and has not been merged.
 
-- 20/20 GitHub check runs succeeded.
-- [Action Gate Product Gates run #41172304753](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41172304753) passed. Its steps include real HTTP enforcement, real MCP enforcement, production Compose, PostgreSQL checks, concurrent nonce contention, approval verification, 200-event replay, and replay after service restart.
-- [Production E2E Smoke run #41172304650](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41172304650) passed, including PostgreSQL evidence retrieval after an Action Gate restart.
-- [Clean-Room Verification run #41172304789](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41172304789) passed.
-- [Security Authority Gate run #41172305010](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41172305010) passed.
+### PR #256 — open
+Superseded in practical scope by the current-main-based PR #258. Its historical CI evidence is not transferred to the newer head.
 
-On current `main`, [Evidence Chain Integrity run #41244586257](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41244586257) passed and created a Sigstore witness for that source SHA. This is evidence-chain verification, not a substitute for the full Action Gate Product Gates suite.
+## Acceptance evidence
 
-The current-main release chain did not publish a new artifact. The readiness, candidate, and publisher jobs at runs #41204043688, #41204057084, and #41204067836 completed as successful no-ops: validated-SHA publication, candidate checkout/build, and release verification/publication were skipped. No new release is claimed.
+The current repository contains a limited-pilot runbook at
+`docs/ACTION_GATE_PILOT_OPERATIONS_RUNBOOK.md`.
 
-## Runtime and deployment boundary
+The runbook requires, on the actual pilot host:
 
-[Production Runtime Supervisor run #41267310701](https://github.com/hamidhayatijozani/HamidCognition-Unified/actions/runs/41267310701) checked current `main`, but its log states that `PRODUCTION_BASE_URL` is not configured and the runtime probe was skipped. The recorded production status is **UNKNOWN**, not healthy or deployed.
+1. PostgreSQL health and Action Gate health;
+2. ALLOW and DENY enforcement;
+3. missing/expired/wrong-tenant/wrong-action/stale-world/reused-nonce rejection;
+4. HTTP/MCP parity;
+5. PostgreSQL persistence after restart and audit UPDATE/DELETE rejection;
+6. fail-closed access control;
+7. rollback and credential revocation;
+8. a retained redacted evidence bundle.
 
-The repository's production Compose configuration uses a separate SQLite nonce registry for the protected tool, stored at `/data/tool_authority.db` on the persistent `tool_data` volume. For the current implementation:
+The runbook explicitly states that green CI is not a substitute for target-host evidence.
 
-- keep the protected tool at one instance for the limited pilot;
-- preserve and back up `tool_data` as well as PostgreSQL;
-- do not horizontally scale the tool or claim multi-replica nonce consistency;
-- if the nonce volume is lost or restored from a stale backup, keep execution disabled until outstanding authorities are invalidated and the nonce state is safely re-established.
+## Known deployment boundary
 
-A customer host, DNS/TLS endpoint, externally reachable deployment, and customer-host acceptance run have not been evidenced.
+The repository's production Compose path has automated CI evidence for the controlled container stack, including PostgreSQL persistence/replay and enforcement checks. A real externally reachable deployment, TLS/DNS endpoint, and customer-host acceptance run remain unverified.
 
-## Security boundary
+The protected tool currently uses a separate SQLite nonce registry on persistent `tool_data`. The runbook therefore limits the pilot to one protected-tool instance and prohibits claims of multi-replica nonce consistency.
 
-The tested product boundary covers the exact execution paths and cases represented by the cited CI runs. It does not establish universal AI safety, correctness of customer policies, downstream business correctness, regulatory certification, HSM/KMS custody, multi-replica nonce coordination, or replay of external world state and side effects.
+## Commercial boundary
 
-## Commercial and legal boundary
+Proposed limited pilot:
+- price: 2,500 USDT fixed for 30 days;
+- scope: one customer-selected HTTP or MCP tool;
+- environment: controlled, isolated, reversible test actions.
 
-The proposed first pilot remains **2,500 USDT fixed for 30 days**, limited to one customer-selected HTTP or MCP tool in one controlled test environment. This is a proposal, not a market-validated price or an existing transaction.
+This is a proposed offer, not evidence of a customer, contract, payment, or revenue.
 
-The repository's `LICENSE` states that the repository is proprietary and grants no commercial licence by public visibility alone. A separate written pilot licence/permission and agreed scope must be in place before customer delivery. The IP evidence register is explicitly a partial draft, not a legal opinion or proof of exclusive ownership.
+## Current Go / No-Go
 
-No customer acceptance, signed pilot contract, payment settlement, or revenue evidence is recorded here.
+**NO-GO for production customer execution.**
 
-## Go / No-Go
+**Eligible:** restricted technical evaluation after the deployment contract is reviewed, the paid Render resources are explicitly approved, an immutable release artifact is produced from the accepted source SHA, and the full acceptance matrix is executed on the actual pilot host.
 
-**NO-GO for production customer execution today.** The current-main product validation, release artifact, production endpoint, and customer acceptance are not all established on one immutable source/deployment identity.
+**Not claimed:** public production deployment, customer acceptance, revenue, certification, universal AI safety, multi-replica nonce coordination, or external-world replay.
 
-**Eligible next step:** a restricted technical evaluation using one tool, one tool instance, synthetic or reversible actions, a controlled customer environment, a written licence/scope, and the full acceptance matrix. Production actions remain disabled until the customer-host checks pass.
+## Delivery package still required
 
-## Required delivery package
-
-1. exact immutable release tag, source SHA, artifact and checksum;
-2. secret-free deployment and policy templates;
+1. immutable release tag + artifact + checksum;
+2. secret-free deployment/policy templates;
 3. integration/API contract;
-4. security boundary and known limitations;
-5. operations and rollback runbook, including the single-instance nonce-store constraint;
-6. customer acceptance matrix and raw evidence bundle;
-7. written licence and pilot agreement;
-8. delivery and entitlement record.
+4. security boundary + limitations;
+5. pilot operations/rollback runbook;
+6. customer acceptance matrix + raw evidence;
+7. written pilot licence/scope;
+8. delivery/entitlement record.
