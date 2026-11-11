@@ -1,0 +1,45 @@
+name: EXP-006 Novel Market Discovery
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "RESEARCH/EXP006_DISCOVERY.py"
+      - ".github/workflows/exp006-discovery.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  discovery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Execute novel real-market discovery
+        run: python RESEARCH/EXP006_DISCOVERY.py
+      - name: Validate result shape and integrity
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open("RESEARCH/EXP006_RESULT.json", encoding="utf-8"))
+          assert p["experiment"] == "EXP-006"
+          assert p["status"] == "EXECUTED_REAL_EXTERNAL_DISCOVERY"
+          assert p["data_integrity"]["future_features_used"] is False
+          assert p["data_integrity"]["parameter_tuning_on_evaluation"] is False
+          assert p["data_integrity"]["windows_disjoint"] is True
+          assert len(p["windows"]) == 2
+          assert len(p["strategies"]) == 5
+          for w in p["windows"].values():
+              assert w["observations"] >= 1200
+              assert w["raw_sha256"]
+          PY
+      - name: Upload discovery evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp006-novel-market-discovery
+          path: RESEARCH/EXP006_RESULT.json
+          if-no-files-found: error
