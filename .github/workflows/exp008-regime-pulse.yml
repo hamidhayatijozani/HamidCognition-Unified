@@ -1,0 +1,32 @@
+name: EXP-008 Regime Conditioned Pulse
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "RESEARCH/EXP008_REGIME_CONDITIONED_PULSE.py"
+      - ".github/workflows/exp008-regime-pulse.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  discovery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: python RESEARCH/EXP008_REGIME_CONDITIONED_PULSE.py
+      - run: |
+          python - <<'PY'
+          import json
+          p=json.load(open("RESEARCH/EXP008_RESULT.json"))
+          assert p["experiment"]=="EXP-008"
+          assert p["status"]=="EXECUTED_REAL_EXTERNAL_DISCOVERY"
+          assert p["integrity"]["future_features_used"] is False
+          assert p["integrity"]["regime_rule_fixed"] is True
+          assert len(p["comparison"])==2
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exp008-regime-conditioned-pulse
+          path: RESEARCH/EXP008_RESULT.json
